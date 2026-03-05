@@ -124,7 +124,7 @@ export default function EidiyaLuckPage() {
 
   return (
     <div className="min-h-screen w-full bg-[#060709] overflow-x-hidden">
-      <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 w-full overflow-hidden py-28">
+      <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 w-full overflow-hidden py-32">
         {/* Background glow */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-[35%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(500px,90vw)] h-[300px] bg-[#C9A84C]/[0.04] rounded-full blur-[150px]" />
@@ -132,17 +132,17 @@ export default function EidiyaLuckPage() {
 
         <div className="relative z-10 text-center max-w-md mx-auto w-full">
           {/* Header */}
-          <div className="mb-3">
+          <div className="mb-5">
             <span className="inline-flex items-center gap-2 bg-[#C9A84C]/[0.08] border border-[#C9A84C]/15 rounded-full px-5 py-2 text-[#C9A84C] text-sm font-medium">
               <Gift className="w-4 h-4" />
               عيديتك بحظّك!
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-black text-white/90 mb-3 leading-[1.4]">
+          <h1 className="text-3xl sm:text-4xl font-black text-white/90 mb-4 leading-[1.5]">
             <span className="text-[#C9A84C]">{senderName}</span> يعيّدك
           </h1>
-          <p className="text-white/35 text-sm mb-10 leading-[1.8]">
+          <p className="text-white/35 text-sm mb-12 leading-[1.9]">
             لفّ العداد وشوف كم عيديتك! 🎰
           </p>
 
@@ -164,21 +164,21 @@ export default function EidiyaLuckPage() {
 
             <div className="relative z-10 p-8 sm:p-10">
               {/* Number display */}
-              <div className="mb-8">
-                <div className={`relative inline-block rounded-2xl px-10 py-6 transition-all duration-500 ${
+              <div className="mb-10">
+                <div className={`relative inline-block rounded-2xl px-8 sm:px-10 py-6 transition-all duration-500 max-w-full ${
                   phase === 'spinning' ? 'bg-[#C9A84C]/[0.08] animate-pulse' : phase === 'done' ? 'bg-[#C9A84C]/[0.10]' : 'bg-white/[0.03]'
                 }`}
                   style={{
                     border: phase === 'done' ? '1px solid rgba(201,168,76,0.25)' : '1px solid rgba(255,255,255,0.05)',
                   }}
                 >
-                  <div className={`text-7xl sm:text-8xl font-black tabular-nums leading-none transition-all duration-150 ${
+                  <div className={`text-6xl sm:text-7xl md:text-8xl font-black tabular-nums leading-none transition-all duration-150 break-words ${
                     phase === 'spinning' ? 'text-[#C9A84C] luck-spin-blur' : phase === 'done' ? 'text-[#C9A84C]' : 'text-white/15'
                   }`}>
                     {phase === 'ready' ? '؟؟؟' : toAr(displayNum)}
                   </div>
                   {phase !== 'ready' && (
-                    <span className={`block mt-2 font-bold text-lg transition-colors ${phase === 'done' ? 'text-[#C9A84C]/80' : 'text-[#C9A84C]/40'}`}>
+                    <span className={`block mt-3 font-bold text-lg transition-colors ${phase === 'done' ? 'text-[#C9A84C]/80' : 'text-[#C9A84C]/40'}`}>
                       ريال
                     </span>
                   )}
@@ -187,12 +187,12 @@ export default function EidiyaLuckPage() {
 
               {/* Reaction (after spin) */}
               {phase === 'done' && reaction && (
-                <div className="animate-fade-up mb-8">
-                  <div key={emojiKey} className="text-6xl mb-3 animate-emoji-pop">
+                <div className="animate-fade-up mb-10">
+                  <div key={emojiKey} className="text-6xl mb-4 animate-emoji-pop">
                     {reaction.emoji}
                   </div>
-                  <h3 className="text-white font-bold text-xl mb-2">{reaction.title}</h3>
-                  <p className="text-white/40 text-sm leading-[1.8]">{reaction.desc}</p>
+                  <h3 className="text-white font-bold text-xl mb-3">{reaction.title}</h3>
+                  <p className="text-white/40 text-sm leading-[1.9]">{reaction.desc}</p>
                 </div>
               )}
 
@@ -212,7 +212,7 @@ export default function EidiyaLuckPage() {
               )}
 
               {phase === 'done' && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <button onClick={shareWa} className="btn-gold w-full justify-center group">
                     <Share2 className="w-4 h-4" />
                     شارك حظك عبر واتساب
@@ -227,7 +227,7 @@ export default function EidiyaLuckPage() {
           </div>
 
           {/* Back to home */}
-          <Link to="/" className="group btn-ghost-gold mt-8 justify-center mx-auto">
+          <Link to="/" className="group btn-ghost-gold mt-12 justify-center mx-auto">
             العودة للرئيسية
             <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
           </Link>

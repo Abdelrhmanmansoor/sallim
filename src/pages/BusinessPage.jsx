@@ -8,10 +8,10 @@ import {
 /* ═══ Section Heading ═══ */
 function SectionHead({ tag, title, sub }) {
   return (
-    <div className="text-center mb-16">
-      <span className="inline-block text-[#d4b96b]/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-3">{tag}</span>
-      <h2 className="text-3xl sm:text-4xl font-bold text-white/90 mb-3">{title}</h2>
-      {sub && <p className="text-white/35 text-[15px] max-w-xl mx-auto leading-[1.8]">{sub}</p>}
+    <div className="text-center mb-20">
+      <span className="inline-block text-[#d4b96b]/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-4">{tag}</span>
+      <h2 className="text-3xl sm:text-4xl font-bold text-white/90 mb-4">{title}</h2>
+      {sub && <p className="text-white/35 text-[15px] max-w-xl mx-auto leading-[1.9]">{sub}</p>}
     </div>
   )
 }
@@ -23,8 +23,8 @@ function Advantage({ icon: Icon, title, desc }) {
       <div className="w-12 h-12 rounded-2xl bg-[#d4b96b]/[0.07] flex items-center justify-center mb-5 group-hover:bg-[#d4b96b]/[0.12] transition-colors">
         <Icon className="w-5 h-5 text-[#d4b96b]" strokeWidth={1.5} />
       </div>
-      <h3 className="text-white/90 font-bold text-lg mb-2">{title}</h3>
-      <p className="text-white/35 text-[14px] leading-[1.8]">{desc}</p>
+      <h3 className="text-white/90 font-bold text-lg mb-3">{title}</h3>
+      <p className="text-white/35 text-[14px] leading-[1.9]">{desc}</p>
     </div>
   )
 }
@@ -39,14 +39,14 @@ function PricingCard({ title, subtitle, price, period, features, cta, ctaLink, h
           <span className="bg-[#d4b96b] text-[#060709] text-[11px] font-bold px-4 py-1.5 rounded-full whitespace-nowrap">الأنسب للشركات</span>
         </div>
       )}
-      <div className="text-center mb-8">
-        <div className={`w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center ${highlight ? 'bg-[#d4b96b]/15' : 'bg-white/[0.04]'}`}>
+      <div className="text-center mb-10">
+        <div className={`w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center ${highlight ? 'bg-[#d4b96b]/15' : 'bg-white/[0.04]'}`}>
           <Icon className={`w-6 h-6 ${highlight ? 'text-[#d4b96b]' : 'text-white/40'}`} strokeWidth={1.5} />
         </div>
-        <h3 className="text-white font-bold text-xl mb-1">{title}</h3>
-        <p className="text-white/30 text-sm">{subtitle}</p>
+        <h3 className="text-white font-bold text-xl mb-2">{title}</h3>
+        <p className="text-white/30 text-sm leading-[1.7]">{subtitle}</p>
       </div>
-      <div className="text-center mb-8">
+      <div className="text-center mb-10">
         {price === 'مجاني' ? (
           <span className="text-3xl font-black text-[#d4b96b]">مجاني</span>
         ) : (
@@ -56,10 +56,10 @@ function PricingCard({ title, subtitle, price, period, features, cta, ctaLink, h
           </div>
         )}
       </div>
-      <div className="space-y-3 mb-10 flex-1">
+      <div className="space-y-4 mb-10 flex-1">
         {features.map((f, i) => (
           <div key={i} className="flex items-start gap-3">
-            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${highlight ? 'bg-[#d4b96b]/15' : 'bg-white/[0.04]'}`}>
+            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-1 ${highlight ? 'bg-[#d4b96b]/15' : 'bg-white/[0.04]'}`}>
               <Check className={`w-3 h-3 ${highlight ? 'text-[#d4b96b]' : 'text-white/40'}`} strokeWidth={2.5} />
             </div>
             <span className="text-white/60 text-sm leading-[1.7]">{f}</span>
@@ -99,7 +99,7 @@ export default function BusinessPage() {
     <div className="min-h-screen w-full bg-[#060709] overflow-x-hidden">
 
       {/* ─── HERO ─── */}
-      <section className="relative pt-36 pb-28 px-4 w-full overflow-hidden">
+      <section className="relative pt-36 pb-32 px-4 w-full overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-[25%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(600px,100vw)] h-[300px] bg-[#d4b96b]/[0.04] rounded-full blur-[150px]" />
         </div>
@@ -108,12 +108,12 @@ export default function BusinessPage() {
             <Building2 className="w-4 h-4 text-[#d4b96b]" />
             <span className="text-[#d4b96b] text-sm font-medium">حلول الشركات والمؤسسات</span>
           </div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white/90 mb-6 leading-[1.3]">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white/90 mb-8 leading-[1.4]">
             هنّئ عملاءك
             <br />
             <span className="text-[#d4b96b]">بهوية مؤسستك</span>
           </h1>
-          <p className="text-lg sm:text-xl text-white/40 leading-[1.9] mb-12 max-w-xl mx-auto">
+          <p className="text-lg sm:text-xl text-white/40 leading-[2] mb-14 max-w-xl mx-auto">
             منصة سَلِّم تمكّنك من تصميم وإرسال بطاقات تهنئة احترافية
             <br />
             بشعار شركتك وألوانها — بسهولة وسرعة
@@ -141,23 +141,23 @@ export default function BusinessPage() {
       </section>
 
       {/* ─── WHAT IS SALLIM ─── */}
-      <section className="py-28 px-4 relative w-full">
+      <section className="py-32 px-4 relative w-full">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
         <div className="max-w-4xl mx-auto relative z-10">
           <SectionHead tag="عن المنصة" title="ما هي سَلِّم؟" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-white/[0.02] border border-white/[0.05] rounded-3xl p-8">
-              <Star className="w-8 h-8 text-[#d4b96b] mb-4" strokeWidth={1.5} />
-              <h3 className="text-white/90 font-bold text-lg mb-3">منصة بطاقات تهنئة عربية</h3>
-              <p className="text-white/35 text-[14px] leading-[1.9]">
+              <Star className="w-8 h-8 text-[#d4b96b] mb-5" strokeWidth={1.5} />
+              <h3 className="text-white/90 font-bold text-lg mb-4">منصة بطاقات تهنئة عربية</h3>
+              <p className="text-white/35 text-[14px] leading-[2]">
                 سَلِّم هي منصة عربية متكاملة لتصميم بطاقات تهنئة العيد بخطوط عربية أصيلة وعبارات مختارة بعناية.
                 تتيح لك المنصة تصميم بطاقة احترافية في ثوانٍ — بدون خبرة تصميم أو برامج معقدة.
               </p>
             </div>
             <div className="bg-white/[0.02] border border-white/[0.05] rounded-3xl p-8">
-              <Zap className="w-8 h-8 text-[#d4b96b] mb-4" strokeWidth={1.5} />
-              <h3 className="text-white/90 font-bold text-lg mb-3">سهلة وسريعة</h3>
-              <p className="text-white/35 text-[14px] leading-[1.9]">
+              <Zap className="w-8 h-8 text-[#d4b96b] mb-5" strokeWidth={1.5} />
+              <h3 className="text-white/90 font-bold text-lg mb-4">سهلة وسريعة</h3>
+              <p className="text-white/35 text-[14px] leading-[2]">
                 اختر قالباً جاهزاً → خصّص النص والألوان → حمّل أو أرسل عبر واتساب.
                 كل ذلك في أقل من دقيقة واحدة — مجاناً بالكامل للأفراد بدون تسجيل حساب.
               </p>
@@ -167,7 +167,7 @@ export default function BusinessPage() {
       </section>
 
       {/* ─── FREE FEATURES ─── */}
-      <section className="py-28 px-4 relative w-full">
+      <section className="py-32 px-4 relative w-full">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
         <div className="max-w-5xl mx-auto relative z-10">
           <SectionHead
@@ -187,7 +187,7 @@ export default function BusinessPage() {
       </section>
 
       {/* ─── BULK ADVANTAGES ─── */}
-      <section className="py-28 px-4 relative w-full">
+      <section className="py-32 px-4 relative w-full">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
         <div className="max-w-5xl mx-auto relative z-10">
           <SectionHead
@@ -221,7 +221,7 @@ export default function BusinessPage() {
       </section>
 
       {/* ─── PRICING ─── */}
-      <section className="py-28 px-4 relative w-full">
+      <section className="py-32 px-4 relative w-full">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
         <div className="max-w-4xl mx-auto relative z-10">
           <SectionHead
@@ -273,12 +273,12 @@ export default function BusinessPage() {
       </section>
 
       {/* ─── CTA ─── */}
-      <section className="py-28 px-4 relative w-full">
+      <section className="py-32 px-4 relative w-full">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
         <div className="max-w-xl mx-auto text-center relative z-10">
-          <img src="/images/logo.png" alt="سَلِّم" className="h-20 w-auto mx-auto opacity-80 mb-8" />
-          <h2 className="text-2xl sm:text-3xl font-bold text-white/90 mb-4">جاهز تبدأ؟</h2>
-          <p className="text-white/30 text-sm mb-10 leading-[1.8]">
+          <img src="/images/logo.png" alt="سَلِّم" className="h-20 w-auto mx-auto opacity-80 mb-10" />
+          <h2 className="text-2xl sm:text-3xl font-bold text-white/90 mb-5">جاهز تبدأ؟</h2>
+          <p className="text-white/30 text-sm mb-12 leading-[1.9]">
             تواصل معنا الآن وسنساعدك في إعداد حساب مؤسستك
             <br />
             خلال ساعات — الخدمة متاحة طوال أيام العيد
