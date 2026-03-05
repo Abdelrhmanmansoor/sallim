@@ -19,40 +19,16 @@ const Auth = (function() {
     'use strict';
 
     // ═══════════════════════════════════════════════════════════════════════════
-    // ACTIVATION CODES DATABASE (SHA-256 HASHED)
-    // 
-    // These are pre-hashed codes. To add new codes:
-    // 1. Hash the code: await Security.hashActivationCode('YOUR-CODE-HERE')
-    // 2. Add the hash to this array
-    // 
-    // Original codes are NEVER stored in the code.
-    // Format: { hash: 'sha256_hash', tier: 'basic|pro|enterprise', maxUsers: number }
+    // GET VALID CODES FROM ACTIVATION_CODES MODULE
     // ═══════════════════════════════════════════════════════════════════════════
-
-    const VALID_CODES = [
-        // Example hashed codes (you would generate these for real codes)
-        // Code: STARTUP-2024-BASIC → Hash below
-        { 
-            hash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 
-            tier: 'basic', 
-            maxUsers: 5,
-            features: ['dashboard', 'reports']
-        },
-        // Code: BUSINESS-PRO-2024 → Hash below
-        { 
-            hash: '5e884898da28047d3598653bee65b1c917f30b8c8f9e71efeabe2a9c88d4b6b9',
-            tier: 'pro',
-            maxUsers: 25,
-            features: ['dashboard', 'reports', 'api', 'customization']
-        },
-        // Code: ENTERPRISE-MAX-2024 → Hash below  
-        {
-            hash: '6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090',
-            tier: 'enterprise',
-            maxUsers: -1, // unlimited
-            features: ['dashboard', 'reports', 'api', 'customization', 'white-label', 'support']
+    
+    function getValidCodes() {
+        // Use ACTIVATION_CODES if available, otherwise fallback to empty array
+        if (typeof ACTIVATION_CODES !== 'undefined' && ACTIVATION_CODES.codes) {
+            return ACTIVATION_CODES.codes;
         }
-    ];
+        return [];
+    }
 
     /**
      * Initialize valid codes - call this to generate hashes for new codes
@@ -84,6 +60,7 @@ const Auth = (function() {
         const inputHash = await Security.hashActivationCode(code);
 
         // Find matching code
+        const VALID_CODES = getValidCodes();
         const codeInfo = VALID_CODES.find(c => c.hash === inputHash);
         
         if (!codeInfo) {

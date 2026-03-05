@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         SECURITY HEADERS
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    
+    <title>لوحة التحكم | Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         LOADING OVERLAY
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <div id="loadingOverlay" class="loading-overlay show">
+        <div class="spinner" style="width: 40px; height: 40px; border-width: 3px;"></div>
+    </div>
+
+    <div id="dashboardContent" class="container dashboard-container" style="display: none;">
+        <!-- ═══════════════════════════════════════════════════════════════════
+             HEADER
+             ═══════════════════════════════════════════════════════════════════ -->
+        <header class="dashboard-header">
+            <div class="company-info">
+                <img id="companyLogo" class="company-logo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' fill='%23666'%3E%3Crect width='48' height='48' rx='8'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='20'%3E🏢%3C/text%3E%3C/svg%3E" alt="Logo">
+                <div>
+                    <h1 id="companyNameDisplay" class="company-name">شركتك</h1>
+                    <span id="tierBadge" class="company-tier">Basic</span>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div id="sessionTimer" class="session-timer">
+                    ⏱️ الجلسة: <span id="remainingTime">--:--</span>
+                </div>
+                <button id="logoutBtn" class="btn btn-outline">
+                    تسجيل خروج
+                </button>
+            </div>
+        </header>
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             ALERTS
+             ═══════════════════════════════════════════════════════════════════ -->
+        <div id="alertError" class="alert alert-error"></div>
+        <div id="alertSuccess" class="alert alert-success"></div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             STATS GRID
+             ═══════════════════════════════════════════════════════════════════ -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="tierDisplay">Basic</div>
+                <div class="stat-label">الباقة الحالية</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="maxUsersDisplay">5</div>
+                <div class="stat-label">المستخدمين المسموح بهم</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="activationDate">--</div>
+                <div class="stat-label">تاريخ التفعيل</div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             MAIN CONTENT AREA
+             ═══════════════════════════════════════════════════════════════════ -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+            
+            <!-- ═══════════════════════════════════════════════════════════════
+                 LOGO UPLOAD SECTION
+                 ═══════════════════════════════════════════════════════════════ -->
+            <div class="card">
+                <h3 class="mb-2" style="font-size: 1rem; font-weight: 600;">🖼️ شعار الشركة</h3>
+                <p class="text-muted text-sm mb-2">ارفع شعار شركتك (PNG, JPG, WebP - أقصى حجم 2MB)</p>
+                
+                <div id="logoUploadArea" class="logo-upload">
+                    <img id="logoPreview" class="logo-preview" style="display: none;">
+                    <div id="logoPlaceholder">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📤</div>
+                        <p class="logo-upload-text">اضغط أو اسحب الملف هنا</p>
+                        <p class="logo-upload-hint">PNG, JPG, WebP (أقصى 2MB)</p>
+                    </div>
+                    <input type="file" id="logoInput" accept=".png,.jpg,.jpeg,.webp" style="display: none;">
+                </div>
+                
+                <button id="removeLogo" class="btn btn-danger btn-block mt-2" style="display: none;">
+                    إزالة الشعار
+                </button>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════════════
+                 FEATURES LIST
+                 ═══════════════════════════════════════════════════════════════ -->
+            <div class="card">
+                <h3 class="mb-2" style="font-size: 1rem; font-weight: 600;">✨ المميزات المتاحة</h3>
+                <ul id="featuresList" style="list-style: none; padding: 0;">
+                    <!-- Features will be populated dynamically -->
+                </ul>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════════════
+                 ACCOUNT INFO
+                 ═══════════════════════════════════════════════════════════════ -->
+            <div class="card">
+                <h3 class="mb-2" style="font-size: 1rem; font-weight: 600;">👤 معلومات الحساب</h3>
+                <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                    <p class="mb-1"><strong>البريد:</strong> <span id="emailDisplay">--</span></p>
+                    <p class="mb-1"><strong>حالة الحساب:</strong> <span class="text-success">مفعّل ✓</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             SECURITY INFO CARD
+             ═══════════════════════════════════════════════════════════════════ -->
+        <div class="card card-gold mt-2">
+            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem;">🔒 معلومات الأمان</h3>
+            <ul style="font-size: 0.8125rem; color: var(--text-secondary); list-style: disc; padding-right: 1.25rem;">
+                <li class="mb-1">الجلسة تنتهي تلقائياً بعد 8 ساعات</li>
+                <li class="mb-1">جميع البيانات مشفرة ومحمية بتوقيع HMAC</li>
+                <li class="mb-1">يتم حفظ الشعار محلياً كـ Base64 (لا روابط خارجية)</li>
+                <li>محاولات الدخول الفاشلة تؤدي لحظر مؤقت</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         SCRIPTS
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <script src="js/security.js"></script>
+    <script src="js/codes.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        /**
+         * ═══════════════════════════════════════════════════════════════════════
+         * DASHBOARD PAGE CONTROLLER
+         * ═══════════════════════════════════════════════════════════════════════
+         */
+        (async function() {
+            'use strict';
+
+            // ═══════════════════════════════════════════════════════════════════
+            // DOM ELEMENTS
+            // ═══════════════════════════════════════════════════════════════════
+            const $ = (sel) => document.querySelector(sel);
+            const loadingOverlay = $('#loadingOverlay');
+            const dashboardContent = $('#dashboardContent');
+            const alertError = $('#alertError');
+            const alertSuccess = $('#alertSuccess');
+
+            // Company info elements
+            const companyLogo = $('#companyLogo');
+            const companyNameDisplay = $('#companyNameDisplay');
+            const tierBadge = $('#tierBadge');
+            const tierDisplay = $('#tierDisplay');
+            const maxUsersDisplay = $('#maxUsersDisplay');
+            const activationDate = $('#activationDate');
+            const emailDisplay = $('#emailDisplay');
+            const featuresList = $('#featuresList');
+            const remainingTimeEl = $('#remainingTime');
+
+            // Logo upload elements
+            const logoUploadArea = $('#logoUploadArea');
+            const logoInput = $('#logoInput');
+            const logoPreview = $('#logoPreview');
+            const logoPlaceholder = $('#logoPlaceholder');
+            const removeLogo = $('#removeLogo');
+
+            // Buttons
+            const logoutBtn = $('#logoutBtn');
+
+            // ═══════════════════════════════════════════════════════════════════
+            // LOGO UPLOAD CONFIGURATION
+            // ═══════════════════════════════════════════════════════════════════
+            const LOGO_CONFIG = {
+                maxSize: 2 * 1024 * 1024, // 2MB
+                allowedTypes: ['image/png', 'image/jpeg', 'image/webp'],
+                allowedExtensions: ['.png', '.jpg', '.jpeg', '.webp']
+            };
+
+            // ═══════════════════════════════════════════════════════════════════
+            // UTILITY FUNCTIONS
+            // ═══════════════════════════════════════════════════════════════════
+
+            function showAlert(type, message) {
+                alertError.classList.remove('show');
+                alertSuccess.classList.remove('show');
+                
+                const alert = type === 'error' ? alertError : alertSuccess;
+                // ⚠️ SECURITY: Use textContent to prevent XSS
+                alert.textContent = message;
+                alert.classList.add('show');
+                
+                setTimeout(() => alert.classList.remove('show'), 5000);
+            }
+
+            function formatDate(timestamp) {
+                return new Date(timestamp).toLocaleDateString('ar-SA', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+
+            function formatTime(ms) {
+                const hours = Math.floor(ms / 3600000);
+                const minutes = Math.floor((ms % 3600000) / 60000);
+                return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            }
+
+            // ═══════════════════════════════════════════════════════════════════
+            // AUTHENTICATION CHECK
+            // Called immediately when page loads
+            // ═══════════════════════════════════════════════════════════════════
+            async function checkAuth() {
+                const user = await Auth.requireAuth('index.html');
+                if (!user) return null;
+                return user;
+            }
+
+            // ═══════════════════════════════════════════════════════════════════
+            // POPULATE DASHBOARD DATA
+            // ═══════════════════════════════════════════════════════════════════
+            function populateDashboard(user) {
+                // ⚠️ SECURITY: All user data is sanitized before display
+                companyNameDisplay.textContent = Security.sanitize(user.companyName);
+                tierBadge.textContent = user.tier.charAt(0).toUpperCase() + user.tier.slice(1);
+                tierDisplay.textContent = user.tier.charAt(0).toUpperCase() + user.tier.slice(1);
+                maxUsersDisplay.textContent = user.maxUsers === -1 ? 'غير محدود' : user.maxUsers;
+                activationDate.textContent = formatDate(user.activatedAt);
+                emailDisplay.textContent = Security.sanitize(user.email);
+
+                // Populate features list
+                featuresList.innerHTML = '';
+                const featureNames = {
+                    'dashboard': '📊 لوحة التحكم',
+                    'reports': '📈 التقارير',
+                    'api': '🔌 الوصول للـ API',
+                    'customization': '🎨 التخصيص',
+                    'white-label': '🏷️ العلامة البيضاء',
+                    'support': '🛟 الدعم الفني'
+                };
+
+                user.features.forEach(feature => {
+                    const li = document.createElement('li');
+                    li.style.cssText = 'padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary); font-size: 0.875rem;';
+                    // ⚠️ SECURITY: Use textContent
+                    li.textContent = featureNames[feature] || feature;
+                    featuresList.appendChild(li);
+                });
+
+                // Load saved logo if exists
+                if (user.logo) {
+                    displayLogo(user.logo);
+                }
+            }
+
+            // ═══════════════════════════════════════════════════════════════════
+            // SESSION TIMER
+            // ═══════════════════════════════════════════════════════════════════
+            async function updateSessionTimer() {
+                const remaining = await SecureStorage.Session.getRemainingTime();
+                
+                if (remaining <= 0) {
+                    // Session expired
+                    await Auth.logout();
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                remainingTimeEl.textContent = formatTime(remaining);
+
+                // Warn if less than 30 minutes remaining
+                if (remaining < 1800000) {
+                    remainingTimeEl.style.color = 'var(--danger)';
+                }
+            }
+
+            // Update timer every minute
+            setInterval(updateSessionTimer, 60000);
+
+            // ═══════════════════════════════════════════════════════════════════
+            // LOGO UPLOAD HANDLERS
+            // ═══════════════════════════════════════════════════════════════════
+
+            /**
+             * Validate uploaded file
+             * @param {File} file - File to validate
+             * @returns {Object} - { valid: boolean, error?: string }
+             */
+            function validateLogoFile(file) {
+                // ═══════════════════════════════════════════════════════════════
+                // CHECK FILE TYPE
+                // ═══════════════════════════════════════════════════════════════
+                if (!LOGO_CONFIG.allowedTypes.includes(file.type)) {
+                    return { 
+                        valid: false, 
+                        error: 'نوع الملف غير مدعوم. استخدم PNG, JPG, أو WebP' 
+                    };
+                }
+
+                // ═══════════════════════════════════════════════════════════════
+                // CHECK FILE EXTENSION (double-check for spoofed MIME types)
+                // ═══════════════════════════════════════════════════════════════
+                const fileName = file.name.toLowerCase();
+                const hasValidExtension = LOGO_CONFIG.allowedExtensions.some(ext => 
+                    fileName.endsWith(ext)
+                );
+                
+                if (!hasValidExtension) {
+                    return { 
+                        valid: false, 
+                        error: 'امتداد الملف غير مدعوم' 
+                    };
+                }
+
+                // ═══════════════════════════════════════════════════════════════
+                // CHECK FILE SIZE
+                // ═══════════════════════════════════════════════════════════════
+                if (file.size > LOGO_CONFIG.maxSize) {
+                    return { 
+                        valid: false, 
+                        error: 'حجم الملف أكبر من 2MB' 
+                    };
+                }
+
+                return { valid: true };
+            }
+
+            /**
+             * Convert file to base64 and validate it's actually an image
+             * @param {File} file - Image file
+             * @returns {Promise<string>} - Base64 data URL
+             */
+            function fileToBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    
+                    reader.onload = () => {
+                        // ═══════════════════════════════════════════════════════
+                        // VALIDATE IT'S ACTUALLY AN IMAGE
+                        // Create an image element to verify the file content
+                        // ═══════════════════════════════════════════════════════
+                        const img = new Image();
+                        
+                        img.onload = () => {
+                            // Valid image
+                            resolve(reader.result);
+                        };
+                        
+                        img.onerror = () => {
+                            reject(new Error('الملف ليس صورة صالحة'));
+                        };
+                        
+                        img.src = reader.result;
+                    };
+                    
+                    reader.onerror = () => reject(new Error('فشل قراءة الملف'));
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            /**
+             * Display logo in UI
+             * @param {string} base64Data - Base64 image data
+             */
+            function displayLogo(base64Data) {
+                logoPreview.src = base64Data;
+                logoPreview.style.display = 'block';
+                logoPlaceholder.style.display = 'none';
+                logoUploadArea.classList.add('has-logo');
+                removeLogo.style.display = 'block';
+                companyLogo.src = base64Data;
+            }
+
+            /**
+             * Handle logo file selection
+             * @param {File} file - Selected file
+             */
+            async function handleLogoUpload(file) {
+                // Validate file
+                const validation = validateLogoFile(file);
+                if (!validation.valid) {
+                    showAlert('error', validation.error);
+                    return;
+                }
+
+                try {
+                    // Convert to base64
+                    const base64Data = await fileToBase64(file);
+                    
+                    // Display in UI
+                    displayLogo(base64Data);
+                    
+                    // Save to user data
+                    const userData = await SecureStorage.getSecure('user_data');
+                    if (userData) {
+                        userData.logo = base64Data;
+                        await SecureStorage.setSecure('user_data', userData);
+                        
+                        // Update session user data
+                        const session = await SecureStorage.Session.validate();
+                        if (session) {
+                            session.user.logo = base64Data;
+                            await SecureStorage.setSecure('session', session);
+                        }
+                    }
+                    
+                    showAlert('success', 'تم حفظ الشعار بنجاح');
+                } catch (err) {
+                    showAlert('error', err.message || 'فشل رفع الشعار');
+                }
+            }
+
+            // Logo upload click handler
+            logoUploadArea.addEventListener('click', () => {
+                logoInput.click();
+            });
+
+            // File input change handler
+            logoInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    handleLogoUpload(file);
+                }
+                // Reset input so same file can be selected again
+                logoInput.value = '';
+            });
+
+            // Drag and drop handlers
+            logoUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                logoUploadArea.style.borderColor = 'var(--gold)';
+                logoUploadArea.style.background = 'rgba(201, 168, 76, 0.05)';
+            });
+
+            logoUploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                logoUploadArea.style.borderColor = '';
+                logoUploadArea.style.background = '';
+            });
+
+            logoUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                logoUploadArea.style.borderColor = '';
+                logoUploadArea.style.background = '';
+                
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    handleLogoUpload(file);
+                }
+            });
+
+            // Remove logo handler
+            removeLogo.addEventListener('click', async () => {
+                logoPreview.style.display = 'none';
+                logoPlaceholder.style.display = 'block';
+                logoUploadArea.classList.remove('has-logo');
+                removeLogo.style.display = 'none';
+                companyLogo.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' fill='%23666'%3E%3Crect width='48' height='48' rx='8'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='20'%3E🏢%3C/text%3E%3C/svg%3E";
+
+                // Remove from storage
+                const userData = await SecureStorage.getSecure('user_data');
+                if (userData) {
+                    userData.logo = null;
+                    await SecureStorage.setSecure('user_data', userData);
+                }
+
+                showAlert('success', 'تم إزالة الشعار');
+            });
+
+            // ═══════════════════════════════════════════════════════════════════
+            // LOGOUT HANDLER
+            // ═══════════════════════════════════════════════════════════════════
+            logoutBtn.addEventListener('click', async () => {
+                await Auth.logout();
+                window.location.href = 'index.html';
+            });
+
+            // ═══════════════════════════════════════════════════════════════════
+            // INITIALIZE DASHBOARD
+            // ═══════════════════════════════════════════════════════════════════
+            const user = await checkAuth();
+            if (user) {
+                populateDashboard(user);
+                await updateSessionTimer();
+                dashboardContent.style.display = 'block';
+            }
+            loadingOverlay.classList.remove('show');
+
+        })();
+    </script>
+</body>
+</html>

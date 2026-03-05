@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         SECURITY HEADERS (would normally be set by server)
+         These meta tags provide minimal client-side protection
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    
+    <title>تفعيل النظام | Company Activation</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         LOADING OVERLAY
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner" style="width: 40px; height: 40px; border-width: 3px;"></div>
+    </div>
+
+    <div class="container">
+        <div class="card card-gold">
+            <!-- ═══════════════════════════════════════════════════════════════
+                 HEADER
+                 ═══════════════════════════════════════════════════════════════ -->
+            <div class="card-header">
+                <h1 class="card-title">🔐 تفعيل النظام</h1>
+                <p class="card-subtitle">أدخل بيانات التفعيل للوصول للوحة التحكم</p>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════════════
+                 ALERT MESSAGES
+                 ═══════════════════════════════════════════════════════════════ -->
+            <div id="alertError" class="alert alert-error"></div>
+            <div id="alertSuccess" class="alert alert-success"></div>
+            <div id="alertWarning" class="alert alert-warning"></div>
+
+            <!-- ═══════════════════════════════════════════════════════════════
+                 TABS
+                 ═══════════════════════════════════════════════════════════════ -->
+            <div class="tabs">
+                <button class="tab active" data-tab="activate">تفعيل جديد</button>
+                <button class="tab" data-tab="login">تسجيل دخول</button>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════════════
+                 ACTIVATION FORM
+                 ═══════════════════════════════════════════════════════════════ -->
+            <div id="activateTab" class="tab-content active">
+                <form id="activateForm" novalidate>
+                    <div class="form-group">
+                        <label class="form-label">كود التفعيل *</label>
+                        <input 
+                            type="text" 
+                            id="activationCode"
+                            class="form-input" 
+                            placeholder="XXXX-XXXX-XXXX"
+                            autocomplete="off"
+                            maxlength="32"
+                            required
+                        >
+                        <div class="form-error" id="codeError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">اسم الشركة *</label>
+                        <input 
+                            type="text" 
+                            id="companyName"
+                            class="form-input" 
+                            placeholder="اسم شركتك"
+                            maxlength="100"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">البريد الإلكتروني *</label>
+                        <input 
+                            type="email" 
+                            id="activateEmail"
+                            class="form-input" 
+                            placeholder="email@company.com"
+                            autocomplete="email"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">كلمة المرور *</label>
+                        <input 
+                            type="password" 
+                            id="activatePassword"
+                            class="form-input" 
+                            placeholder="8 أحرف على الأقل"
+                            minlength="8"
+                            autocomplete="new-password"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">تأكيد كلمة المرور *</label>
+                        <input 
+                            type="password" 
+                            id="confirmPassword"
+                            class="form-input" 
+                            placeholder="أعد كتابة كلمة المرور"
+                            minlength="8"
+                            autocomplete="new-password"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" id="activateBtn" class="btn btn-gold btn-block">
+                        <span>تفعيل الحساب</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════════════
+                 LOGIN FORM
+                 ═══════════════════════════════════════════════════════════════ -->
+            <div id="loginTab" class="tab-content">
+                <form id="loginForm" novalidate>
+                    <div class="form-group">
+                        <label class="form-label">البريد الإلكتروني</label>
+                        <input 
+                            type="email" 
+                            id="loginEmail"
+                            class="form-input" 
+                            placeholder="email@company.com"
+                            autocomplete="email"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">كلمة المرور</label>
+                        <input 
+                            type="password" 
+                            id="loginPassword"
+                            class="form-input" 
+                            placeholder="كلمة المرور"
+                            autocomplete="current-password"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" id="loginBtn" class="btn btn-gold btn-block">
+                        <span>تسجيل الدخول</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════════════
+                 BRUTE FORCE WARNING
+                 ═══════════════════════════════════════════════════════════════ -->
+            <div id="bruteForceWarning" class="alert alert-warning mt-2" style="display: none;">
+                <span id="bfMessage"></span>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════════════
+                 FOOTER INFO
+                 ═══════════════════════════════════════════════════════════════ -->
+            <div class="text-center mt-2 text-xs text-muted">
+                <p>جميع البيانات مشفرة ومحمية محلياً</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         SCRIPTS
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <script src="js/security.js"></script>
+    <script src="js/codes.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        /**
+         * ═══════════════════════════════════════════════════════════════════════
+         * ACTIVATION PAGE CONTROLLER
+         * ═══════════════════════════════════════════════════════════════════════
+         */
+        (async function() {
+            'use strict';
+
+            // ═══════════════════════════════════════════════════════════════════
+            // DOM ELEMENTS
+            // ═══════════════════════════════════════════════════════════════════
+            const $ = (sel) => document.querySelector(sel);
+            const loadingOverlay = $('#loadingOverlay');
+            const alertError = $('#alertError');
+            const alertSuccess = $('#alertSuccess');
+            const alertWarning = $('#alertWarning');
+            const bruteForceWarning = $('#bruteForceWarning');
+            const bfMessage = $('#bfMessage');
+
+            // Forms
+            const activateForm = $('#activateForm');
+            const loginForm = $('#loginForm');
+            const activateBtn = $('#activateBtn');
+            const loginBtn = $('#loginBtn');
+
+            // Tabs
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            // ═══════════════════════════════════════════════════════════════════
+            // UTILITY FUNCTIONS
+            // ═══════════════════════════════════════════════════════════════════
+
+            function showLoading() {
+                loadingOverlay.classList.add('show');
+            }
+
+            function hideLoading() {
+                loadingOverlay.classList.remove('show');
+            }
+
+            function showAlert(type, message) {
+                // Hide all alerts first
+                alertError.classList.remove('show');
+                alertSuccess.classList.remove('show');
+                alertWarning.classList.remove('show');
+
+                const alert = type === 'error' ? alertError : 
+                             type === 'success' ? alertSuccess : alertWarning;
+                
+                // ⚠️ SECURITY: Use textContent, not innerHTML
+                alert.textContent = message;
+                alert.classList.add('show');
+
+                // Auto-hide success messages
+                if (type === 'success') {
+                    setTimeout(() => alert.classList.remove('show'), 5000);
+                }
+            }
+
+            function hideAlerts() {
+                alertError.classList.remove('show');
+                alertSuccess.classList.remove('show');
+                alertWarning.classList.remove('show');
+            }
+
+            function setButtonLoading(btn, loading) {
+                if (loading) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<div class="spinner"></div><span>جاري المعالجة...</span>';
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = btn.dataset.originalText || '<span>إرسال</span>';
+                }
+            }
+
+            // ═══════════════════════════════════════════════════════════════════
+            // CHECK IF ALREADY LOGGED IN
+            // ═══════════════════════════════════════════════════════════════════
+            async function checkExistingSession() {
+                const isAuth = await Auth.isAuthenticated();
+                if (isAuth) {
+                    window.location.href = 'dashboard.html';
+                }
+            }
+
+            // ═══════════════════════════════════════════════════════════════════
+            // CHECK BRUTE FORCE STATUS
+            // ═══════════════════════════════════════════════════════════════════
+            function updateBruteForceStatus() {
+                const status = Security.BruteForce.checkCanAttempt();
+                
+                if (!status.canAttempt) {
+                    bruteForceWarning.style.display = 'block';
+                    bfMessage.textContent = status.message;
+                    activateBtn.disabled = true;
+                    loginBtn.disabled = true;
+
+                    // Check again after wait time
+                    setTimeout(updateBruteForceStatus, Math.min(status.waitTime, 1000));
+                } else {
+                    bruteForceWarning.style.display = 'none';
+                    activateBtn.disabled = false;
+                    loginBtn.disabled = false;
+
+                    if (status.remainingAttempts !== undefined && status.remainingAttempts < 5) {
+                        bruteForceWarning.style.display = 'block';
+                        bfMessage.textContent = `تبقى ${status.remainingAttempts} محاولات`;
+                    }
+                }
+            }
+
+            // ═══════════════════════════════════════════════════════════════════
+            // TAB SWITCHING
+            // ═══════════════════════════════════════════════════════════════════
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const targetTab = tab.dataset.tab;
+                    
+                    // Update tab buttons
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    // Update tab content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === targetTab + 'Tab') {
+                            content.classList.add('active');
+                        }
+                    });
+
+                    hideAlerts();
+                });
+            });
+
+            // ═══════════════════════════════════════════════════════════════════
+            // ACTIVATION FORM HANDLER
+            // ═══════════════════════════════════════════════════════════════════
+            activateForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                hideAlerts();
+
+                // Get form values
+                const code = $('#activationCode').value.trim().toUpperCase();
+                const companyName = $('#companyName').value.trim();
+                const email = $('#activateEmail').value.trim();
+                const password = $('#activatePassword').value;
+                const confirmPass = $('#confirmPassword').value;
+
+                // ═══════════════════════════════════════════════════════════════
+                // CLIENT-SIDE VALIDATION
+                // ═══════════════════════════════════════════════════════════════
+
+                if (!code || !Security.isValidCode(code)) {
+                    showAlert('error', 'كود التفعيل غير صحيح (8-32 حرف/رقم)');
+                    return;
+                }
+
+                if (!companyName || companyName.length < 2) {
+                    showAlert('error', 'اسم الشركة مطلوب');
+                    return;
+                }
+
+                if (!Security.isValidEmail(email)) {
+                    showAlert('error', 'البريد الإلكتروني غير صحيح');
+                    return;
+                }
+
+                if (password.length < 8) {
+                    showAlert('error', 'كلمة المرور يجب أن تكون 8 أحرف على الأقل');
+                    return;
+                }
+
+                if (password !== confirmPass) {
+                    showAlert('error', 'كلمتا المرور غير متطابقتين');
+                    return;
+                }
+
+                // ═══════════════════════════════════════════════════════════════
+                // PROCESS ACTIVATION
+                // ═══════════════════════════════════════════════════════════════
+                activateBtn.dataset.originalText = activateBtn.innerHTML;
+                setButtonLoading(activateBtn, true);
+
+                try {
+                    const result = await Auth.activate({
+                        code,
+                        companyName,
+                        email,
+                        password
+                    });
+
+                    if (result.error) {
+                        showAlert('error', result.error);
+                        updateBruteForceStatus();
+                    } else {
+                        showAlert('success', result.message);
+                        // Redirect to dashboard after short delay
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, 1500);
+                    }
+                } catch (err) {
+                    showAlert('error', 'حدث خطأ غير متوقع');
+                    console.error(err);
+                } finally {
+                    setButtonLoading(activateBtn, false);
+                }
+            });
+
+            // ═══════════════════════════════════════════════════════════════════
+            // LOGIN FORM HANDLER
+            // ═══════════════════════════════════════════════════════════════════
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                hideAlerts();
+
+                const email = $('#loginEmail').value.trim();
+                const password = $('#loginPassword').value;
+
+                if (!Security.isValidEmail(email)) {
+                    showAlert('error', 'البريد الإلكتروني غير صحيح');
+                    return;
+                }
+
+                if (!password) {
+                    showAlert('error', 'كلمة المرور مطلوبة');
+                    return;
+                }
+
+                loginBtn.dataset.originalText = loginBtn.innerHTML;
+                setButtonLoading(loginBtn, true);
+
+                try {
+                    const result = await Auth.login(email, password);
+
+                    if (result.error) {
+                        showAlert('error', result.error);
+                        updateBruteForceStatus();
+                    } else {
+                        showAlert('success', result.message);
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, 1000);
+                    }
+                } catch (err) {
+                    showAlert('error', 'حدث خطأ غير متوقع');
+                    console.error(err);
+                } finally {
+                    setButtonLoading(loginBtn, false);
+                }
+            });
+
+            // ═══════════════════════════════════════════════════════════════════
+            // INITIALIZE
+            // ═══════════════════════════════════════════════════════════════════
+            await checkExistingSession();
+            updateBruteForceStatus();
+            hideLoading();
+
+        })();
+    </script>
+</body>
+</html>

@@ -344,7 +344,7 @@ function EidiyaCalculator() {
     : { background: 'rgba(201,168,76,0.04)', border: '1.5px solid rgba(201,168,76,0.12)', boxShadow: '0 0 60px rgba(201,168,76,0.04)' }
 
   return (
-    <section className="section-container bg-[#0A0A0A] py-20 sm:py-28">
+    <section className="section-container bg-[#0A0A0A] py-24 sm:py-36">
       <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C]/10 to-transparent" />
 
       <div className="section-inner max-w-xl">
@@ -414,7 +414,7 @@ function EidiyaCalculator() {
                     <p className="text-white/20 text-xs leading-relaxed max-w-xs mx-auto">{quizQuestions[step - 1].hint}</p>
                   )}
                 </div>
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   {quizQuestions[step - 1].options.map((opt, i) => (
                     <button
                       key={i}
@@ -422,10 +422,10 @@ function EidiyaCalculator() {
                       disabled={selected !== null}
                       className={`w-full text-right px-5 py-4 rounded-2xl text-sm font-medium transition-all duration-300 ${
                         selected === i
-                          ? 'bg-gradient-to-br from-[#c4a44e] to-[#d4b96b] text-[#0A0A0A] scale-[1.02]'
+                          ? 'bg-gradient-to-br from-[#c4a44e] to-[#d4b96b] text-[#0A0A0A] scale-[1.02] shadow-lg shadow-[#C9A84C]/10'
                           : selected !== null
-                            ? 'bg-white/[0.015] text-white/20 border border-white/[0.04] cursor-not-allowed'
-                            : 'bg-white/[0.02] text-white/55 border border-white/[0.06] hover:bg-white/[0.04] hover:text-white/80 hover:border-[#C9A84C]/20'
+                            ? 'bg-white/[0.02] text-white/15 cursor-not-allowed'
+                            : 'bg-white/[0.03] text-white/55 hover:bg-white/[0.06] hover:text-white/80'
                       }`}
                     >
                       {opt.label}
@@ -567,10 +567,10 @@ function EidiyaLuckGenerator() {
   }
 
   const luckFeatures = [
-    { emoji: '🎲', title: 'عشوائي بالكامل', desc: 'العداد يختار مبلغ عشوائي من ٥ إلى ٢٬٠٠٠ ريال — مافي أحد يعرف النتيجة!' },
-    { emoji: '😂', title: 'ردود فعل مضحكة', desc: '٧ ردود فعل بالسعودية — من "يعني... مشكور" إلى "هذا مو عيدية... هذا راتب!!"' },
-    { emoji: '📱', title: 'يعمل على كل جهاز', desc: 'الرابط يفتح مباشرة على أي جوال أو كمبيوتر — بدون تحميل أي شي' },
-    { emoji: '🔗', title: 'شارك بسهولة', desc: 'انسخ الرابط أو أرسله واتساب — المستلم يضغط ويلفّ فوراً' },
+    { title: 'عشوائي بالكامل', desc: 'العداد يختار مبلغ عشوائي من ٥ إلى ٢٬٠٠٠ ريال — مافي أحد يعرف النتيجة' },
+    { title: 'ردود فعل مضحكة', desc: '٧ ردود فعل بالسعودية — من "يعني... مشكور" إلى "هذا مو عيدية... هذا راتب"' },
+    { title: 'يعمل على كل جهاز', desc: 'الرابط يفتح مباشرة على أي جوال أو كمبيوتر — بدون تحميل أي شي' },
+    { title: 'شارك بسهولة', desc: 'انسخ الرابط أو أرسله واتساب — المستلم يضغط ويلفّ فوراً' },
   ]
 
   const steps = [
@@ -580,19 +580,18 @@ function EidiyaLuckGenerator() {
   ]
 
   return (
-    <section className="section-container bg-[#070810] py-20 sm:py-32">
+    <section className="section-container bg-[#070810] py-24 sm:py-36">
       <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C]/10 to-transparent" />
-      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[min(500px,90vw)] h-[250px] bg-[#C9A84C]/[0.03] rounded-full blur-[120px] pointer-events-none" />
 
       <div className="section-inner max-w-4xl">
         {/* Section Heading */}
-        <div className="text-center mb-12 sm:mb-16">
+        <div className="text-center mb-14 sm:mb-20">
           <div className="inline-flex items-center gap-2 bg-[#C9A84C]/06 border border-[#C9A84C]/10 rounded-full px-4 py-2 mb-6">
             <Gift className="w-4 h-4 text-[#C9A84C]" />
             <span className="text-[#C9A84C] text-sm font-medium">ميزة جديدة — تسلية العيد</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-black text-white/90 mb-5 leading-tight">
-            🎰 عيديتك بحظك!
+            عيديتك بحظك!
           </h2>
           <p className="text-white/40 text-base sm:text-lg leading-relaxed max-w-xl mx-auto">
             أنشئ رابط عيدية عشوائي وأرسله لأصدقائك وعائلتك —
@@ -601,34 +600,27 @@ function EidiyaLuckGenerator() {
           </p>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12 sm:mb-16">
+        {/* Features - minimal, no cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-14 sm:mb-20">
           {luckFeatures.map((f, i) => (
-            <div key={i} className="unified-card p-5">
-              <div className="flex items-start gap-4">
-                <span className="text-2xl shrink-0">{f.emoji}</span>
-                <div className="min-w-0">
-                  <h4 className="text-white/90 font-semibold text-sm mb-1.5">{f.title}</h4>
-                  <p className="text-white/40 text-xs leading-relaxed">{f.desc}</p>
-                </div>
-              </div>
+            <div key={i} className="text-center">
+              <h4 className="text-white/70 font-semibold text-sm mb-2">{f.title}</h4>
+              <p className="text-white/30 text-xs leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>
 
-        {/* Steps */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 mb-12 sm:mb-16">
+        {/* Steps - inline, no card borders */}
+        <div className="flex items-center justify-center gap-4 sm:gap-10 mb-14 sm:mb-20">
           {steps.map((s, i) => (
-            <div key={i} className="flex items-center gap-4">
+            <div key={i} className="flex items-center gap-4 sm:gap-10">
               <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-xl bg-[#C9A84C]/[0.08] border border-[#C9A84C]/12 flex items-center justify-center mb-3">
-                  <span className="text-[#C9A84C] text-lg font-bold">{s.num}</span>
-                </div>
-                <h4 className="text-white/85 font-semibold text-sm mb-1">{s.title}</h4>
-                <p className="text-white/35 text-xs leading-relaxed">{s.desc}</p>
+                <span className="text-[#C9A84C]/60 text-2xl font-black mb-2">{s.num}</span>
+                <h4 className="text-white/70 font-semibold text-xs sm:text-sm mb-0.5">{s.title}</h4>
+                <p className="text-white/30 text-[10px] sm:text-xs">{s.desc}</p>
               </div>
               {i < steps.length - 1 && (
-                <span className="hidden sm:block text-[#C9A84C]/25 text-xl">←</span>
+                <span className="text-white/10 text-lg">←</span>
               )}
             </div>
           ))}
@@ -695,12 +687,11 @@ function EidiyaLuckGenerator() {
           </div>
 
           {/* How it works hint */}
-          <div className="w-full max-w-lg mt-6 hint-card text-center">
-            <p className="text-[#C9A84C] font-semibold text-sm mb-2">💡 وش يشوف المستلم؟</p>
-            <p className="text-white/35 text-xs leading-loose">
-              يفتح الرابط ← يشوف اسمك ← يضغط "لفّ العداد" ← العداد يدور ٣ ثواني
+          <div className="w-full max-w-lg mt-8">
+            <p className="text-white/25 text-xs text-center leading-loose">
+              <span className="text-[#C9A84C]/60 font-semibold">وش يشوف المستلم؟</span>
               <br />
-              ← يطلع المبلغ العشوائي مع ردة فعل ساحرة وكونفيتي 🎊
+              يفتح الرابط ← يشوف اسمك ← يضغط "لفّ العداد" ← العداد يدور ٣ ثواني ← يطلع المبلغ العشوائي مع ردة فعل ساحرة
             </p>
           </div>
         </div>
