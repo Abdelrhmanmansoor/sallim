@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  ArrowLeft, Sparkles, Palette, Type, Send, Download,
+  ArrowLeft, Palette, Type, Send, Download,
   Smartphone, Building2, ChevronDown, ChevronUp,
   Clock, Layers, FileText, Zap, Globe, Shield,
 } from 'lucide-react'
@@ -29,8 +29,7 @@ function EidCountdown() {
 
   if (t.passed) return (
     <div className="inline-flex items-center gap-2 bg-gold-500/8 border border-gold-500/15 rounded-full px-5 py-2">
-      <Sparkles className="w-3.5 h-3.5 text-gold-400" />
-      <span className="text-gold-300 text-sm font-medium">عيد مبارك</span>
+      <span className="text-gold-300 text-sm font-medium">عيد مبارك 🌙</span>
     </div>
   )
 
@@ -128,14 +127,14 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState(null)
 
   return (
-    <div className="min-h-screen w-full bg-[#060709]">
+    <div className="min-h-screen w-full bg-[#060709] overflow-x-hidden">
 
       {/* ─── HERO ─── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 w-full">
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 w-full overflow-hidden">
         {/* Background elements */}
         <div className="absolute inset-0 pointer-events-none">
           {/* Central glow */}
-          <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-gold-500/[0.03] rounded-full blur-[150px]" />
+          <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(600px,100vw)] h-[300px] bg-gold-500/[0.03] rounded-full blur-[150px]" />
           {/* Grid pattern */}
           <div className="absolute inset-0 opacity-[0.015]" style={{
             backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
@@ -149,10 +148,10 @@ export default function LandingPage() {
             <EidCountdown />
           </div>
 
-          {/* Title */}
-          <h1 className="animate-fade-up delay-1 text-6xl sm:text-8xl md:text-9xl font-extrabold leading-[0.85] mb-6 tracking-tight">
-            <span className="gradient-gold-text text-shadow-gold">سَلِّم</span>
-          </h1>
+          {/* Logo */}
+          <div className="animate-fade-up delay-1 mb-6">
+            <img src="/images/logo.png" alt="سَلِّم" className="h-32 sm:h-44 md:h-56 w-auto mx-auto drop-shadow-[0_0_40px_rgba(184,150,58,0.15)]" />
+          </div>
 
           <p className="animate-fade-up delay-2 text-base sm:text-lg text-white/35 leading-[1.9] mb-10 max-w-lg mx-auto">
             منصة احترافية لتصميم بطاقات تهنئة العيد
@@ -198,7 +197,7 @@ export default function LandingPage() {
       <section className="py-20 px-4 relative bg-[#060709] w-full">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
 
-        <div className="max-w-5xl mx-auto relative z-10 w-full">
+        <div className="max-w-5xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <span className="inline-block text-gold-500/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-3">الخطوات</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-white/90">
@@ -218,7 +217,7 @@ export default function LandingPage() {
       <section className="py-20 px-4 relative bg-[#060709] w-full">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
 
-        <div className="max-w-5xl mx-auto relative z-10 w-full">
+        <div className="max-w-5xl mx-auto relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             {/* Left: text */}
             <div>
@@ -258,7 +257,7 @@ export default function LandingPage() {
       <section className="py-20 px-4 relative bg-[#060709] w-full">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
 
-        <div className="max-w-2xl mx-auto relative z-10 w-full">
+        <div className="max-w-2xl mx-auto relative z-10">
           <div className="text-center mb-14">
             <span className="inline-block text-gold-500/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-3">الأسئلة</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-white/90">أسئلة شائعة</h2>
@@ -276,9 +275,9 @@ export default function LandingPage() {
       <section className="py-20 px-4 relative bg-[#060709] w-full">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
 
-        <div className="max-w-xl mx-auto text-center relative z-10 w-full">
-          <div className="w-14 h-14 rounded-2xl bg-gold-500/[0.07] flex items-center justify-center mb-8 mx-auto">
-            <Sparkles className="w-6 h-6 text-gold-400" strokeWidth={1.5} />
+        <div className="max-w-xl mx-auto text-center relative z-10">
+          <div className="mb-8 mx-auto">
+            <img src="/images/logo.png" alt="سَلِّم" className="h-16 w-auto mx-auto opacity-80" />
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-white/90 mb-4">جاهز تصمّم بطاقتك؟</h2>
           <p className="text-white/30 text-sm mb-10">

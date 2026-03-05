@@ -7,29 +7,30 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   min-height: 100vh;
   background-color: #060709;
   color: #ffffff;
-  font-family: 'Zain', system-ui, sans-serif;
+  font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
   direction: rtl;
   text-align: right;
   overflow-x: hidden;
+  max-width: 100vw;
 }
 
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  width: 100%;
+  overflow-x: hidden;
 }
 
-/* ═══ Zain Font ═══ */
-@font-face { font-family: 'Zain'; src: url('/fonts/zain-200.ttf') format('truetype'); font-weight: 200; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Zain'; src: url('/fonts/zain-400.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Zain'; src: url('/fonts/zain-600.ttf') format('truetype'); font-weight: 600; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Zain'; src: url('/fonts/zain-800.ttf') format('truetype'); font-weight: 800; font-style: normal; font-display: swap; }
+/* ═══ Font loaded from Google Fonts CDN (IBM Plex Sans Arabic) ═══ */
 
 @theme {
   --font-zain: 'Zain', system-ui, sans-serif;
@@ -87,7 +88,7 @@ body {
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Zain', system-ui, sans-serif;
+  font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
   direction: rtl;
   text-align: right;
   background: #060709;

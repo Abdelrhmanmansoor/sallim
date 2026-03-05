@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Sparkles } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 
 const links = [
   { path: '/',        label: 'الرئيسية' },
@@ -29,11 +29,8 @@ export default function Navbar() {
     }`}>
       <div className="max-w-6xl mx-auto px-5 h-[68px] flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gold-500/10 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-gold-400" strokeWidth={1.5} />
-          </div>
-          <span className="text-[17px] font-bold gradient-gold-text">سَلِّم</span>
+        <Link to="/" className="flex items-center gap-2.5">
+          <img src="/images/logo.png" alt="سَلِّم" className="h-9 w-auto" />
         </Link>
 
         {/* Desktop nav */}

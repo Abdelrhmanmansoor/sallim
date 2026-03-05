@@ -148,7 +148,7 @@ export default function SendPage() {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-10 px-4">
+    <div className="min-h-screen pt-20 pb-10 px-4 w-full">
       <Toaster position="top-center" toastOptions={{ style: { background: '#0c0d12', color: '#f0f0f0', border: '1px solid rgba(184,150,58,0.2)' } }} />
 
       <div className="max-w-4xl mx-auto">

@@ -17,10 +17,10 @@ export default function App() {
   const showParticles = location.pathname === '/' || location.pathname === '/dashboard'
   
   return (
-    <div className="min-h-screen bg-[#060709] text-white font-zain relative" dir="rtl">
+    <div className="min-h-screen w-full bg-[#060709] text-white font-ibm relative overflow-x-hidden" dir="rtl">
       {showParticles && <EidParticles />}
       <Navbar />
-      <main className="relative z-10">
+      <main className="relative z-10 w-full">
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/editor" element={<EditorPage />} />

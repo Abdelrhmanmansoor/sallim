@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { Sparkles } from 'lucide-react'
 
 const platformLinks = [
   { to: '/editor',  label: 'المحرر' },
@@ -21,10 +20,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-gold-500/10 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-gold-400" strokeWidth={1.5} />
-              </div>
-              <span className="text-[17px] font-bold gradient-gold-text">سَلِّم</span>
+              <img src="/images/logo.png" alt="سَلِّم" className="h-10 w-auto" />
             </div>
             <p className="text-white/25 text-sm leading-[1.8] max-w-xs">
               منصة احترافية لتصميم وإرسال بطاقات تهنئة العيد.
