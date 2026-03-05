@@ -1,0 +1,12 @@
+{
+  "SALLAM-1234-ABCD": {
+    "used": false,
+    "usedBy": null,
+    "plan": "pro"
+  },
+  "SALLAM-5678-EFGH": {
+    "used": false,
+    "usedBy": null,
+    "plan": "basic"
+  }
+}

@@ -1,15 +1,16 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState, useCallback, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import {
   ArrowLeft, Palette, Type, Send, Download,
-  Building2, ChevronDown,
-  Layers, FileText, Shield, Users, Share2, Gift,
+  ChevronDown, Layers, FileText, Shield, Share2, Gift,
 } from 'lucide-react'
 
 /* ═══ Helpers ═══ */
 const toAr = (n) => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d])
 
-/* ═══ Marquee Ticker ═══ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   MARQUEE TICKER
+   ═══════════════════════════════════════════════════════════════════════════ */
 function MarqueeTicker() {
   const items = [
     '✦ أكثر من ٥٠،٠٠٠ بطاقة صُمِّمت هذا العيد',
@@ -20,10 +21,10 @@ function MarqueeTicker() {
   const repeated = [...items, ...items, ...items]
 
   return (
-    <div className="w-full overflow-hidden bg-[#d4b96b] py-3">
-      <div className="flex animate-marquee whitespace-nowrap">
+    <div className="w-full overflow-hidden bg-[#d4b96b]">
+      <div className="flex animate-marquee whitespace-nowrap py-3">
         {repeated.map((item, i) => (
-          <span key={i} className="mx-8 text-[#060709] text-sm font-bold inline-block">
+          <span key={i} className="mx-8 text-[#060709] text-sm font-bold">
             {item}
           </span>
         ))}
@@ -32,7 +33,9 @@ function MarqueeTicker() {
   )
 }
 
-/* ═══ Eidiya Calculator ═══ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   EIDIYA CALCULATOR
+   ═══════════════════════════════════════════════════════════════════════════ */
 const reactions = [
   { min: 5,    max: 15,   emoji: '😑', title: 'يعني... مشكور',                desc: 'الله يجزاك خير، بس كان في أمل 🙂',                              glow: 'rgba(120,120,130,0.10)', border: 'rgba(120,120,130,0.15)', bg: 'rgba(120,120,130,0.04)' },
   { min: 16,   max: 30,   emoji: '🙂', title: 'ماشي، لا بأس',                  desc: 'يكفي على اللي ما يكفي',                                            glow: 'rgba(160,160,170,0.12)', border: 'rgba(160,160,170,0.18)', bg: 'rgba(160,160,170,0.05)' },
@@ -49,10 +52,10 @@ function getReaction(val) {
   return reactions[0]
 }
 
-/* Confetti particle */
 function Confetti({ active }) {
   const [particles, setParticles] = useState([])
-  useEffect(() => {
+  
+  useState(() => {
     if (!active) { setParticles([]); return }
     const ps = Array.from({ length: 30 }, (_, i) => ({
       id: i,
@@ -64,7 +67,9 @@ function Confetti({ active }) {
     }))
     setParticles(ps)
   }, [active])
+
   if (!active) return null
+  
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
       {particles.map(p => (
@@ -108,20 +113,20 @@ function EidiyaCalculator() {
   }
 
   return (
-    <section className="py-28 px-4 relative w-full" style={{ backgroundColor: '#0A0A0A' }}>
+    <section className="section-container bg-[#0A0A0A] py-20 sm:py-28">
       <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C]/10 to-transparent" />
-
-      <div className="max-w-xl mx-auto relative z-10">
+      
+      <div className="section-inner max-w-xl">
         {/* Section heading */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12 sm:mb-16">
           <span className="inline-block text-[#C9A84C]/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-4">تسلية</span>
           <h2 className="text-3xl sm:text-4xl font-bold text-white/90 mb-4">حاسبة العيدية</h2>
-          <p className="text-white/30 text-sm mt-4 leading-[1.8]">حرّك السلايدر وشوف ردة الفعل 😄</p>
+          <p className="text-white/30 text-sm mt-4 leading-relaxed">حرّك السلايدر وشوف ردة الفعل 😄</p>
         </div>
 
         {/* Card */}
         <div
-          className="relative rounded-3xl p-8 sm:p-10 transition-all duration-500 overflow-hidden"
+          className="relative rounded-3xl p-6 sm:p-10 transition-all duration-500 overflow-hidden"
           style={{
             background: reaction.bg,
             border: `1.5px solid ${reaction.border}`,
@@ -132,7 +137,7 @@ function EidiyaCalculator() {
 
           {/* Amount display */}
           <div className="text-center mb-8 relative z-10">
-            <div className="text-6xl sm:text-7xl font-black text-white tabular-nums leading-none mb-2 eidiya-num-transition">
+            <div className="text-5xl sm:text-7xl font-black text-white tabular-nums leading-none mb-2 eidiya-num-transition">
               {toAr(value)}
             </div>
             <span className="text-[#C9A84C] text-lg font-bold">ريال</span>
@@ -162,7 +167,7 @@ function EidiyaCalculator() {
               <button
                 key={q}
                 onClick={() => { setValue(q); const r = getReaction(q); if (!prevReactionRef.current || prevReactionRef.current.title !== r.title) { setEmojiKey(k => k + 1); prevReactionRef.current = r } }}
-                className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+                className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
                   value === q
                     ? 'bg-gradient-to-br from-[#c4a44e] to-[#d4b96b] text-[#0A0A0A] shadow-lg shadow-[#C9A84C]/20 scale-105'
                     : 'bg-white/[0.03] text-white/40 border border-white/[0.06] hover:bg-white/[0.07] hover:text-white/70 hover:border-white/[0.10]'
@@ -193,40 +198,34 @@ function EidiyaCalculator() {
 
           {/* Reaction Card */}
           <div
-            className="relative z-10 rounded-2xl p-6 text-center transition-all duration-500"
+            className="relative z-10 rounded-2xl p-5 sm:p-6 text-center transition-all duration-500"
             style={{
               background: 'rgba(255,255,255,0.02)',
               border: `1px solid ${reaction.border}`,
             }}
           >
-            <div key={emojiKey} className="text-6xl mb-4 animate-emoji-pop">
+            <div key={emojiKey} className="text-5xl sm:text-6xl mb-4 animate-emoji-pop">
               {reaction.emoji}
             </div>
-            <h3 className="text-white font-bold text-xl mb-2">{reaction.title}</h3>
-            <p className="text-white/40 text-sm leading-[1.8]">{reaction.desc}</p>
+            <h3 className="text-white font-bold text-lg sm:text-xl mb-2">{reaction.title}</h3>
+            <p className="text-white/40 text-sm leading-relaxed">{reaction.desc}</p>
           </div>
 
           {/* Action Buttons */}
           <div className="relative z-10 mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Link
-              to="/editor"
-              className="btn-gold w-full justify-center"
-            >
+            <Link to="/editor" className="btn-gold w-full justify-center">
               <Send className="w-4 h-4" />
-              أرسل عيدية — صمّم بطاقتك
+              <span>أرسل عيدية — صمّم بطاقتك</span>
             </Link>
-            <button
-              onClick={shareWa}
-              className="btn-outline-gold w-full justify-center"
-            >
+            <button onClick={shareWa} className="btn-outline-gold w-full justify-center">
               <Share2 className="w-4 h-4" />
-              شارك عبر واتساب
+              <span>شارك عبر واتساب</span>
             </button>
           </div>
 
-          {/* Send Eidiya hint */}
-          <div className="relative z-10 mt-6 rounded-2xl p-5 text-center" style={{ background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.10)' }}>
-            <p className="text-white/50 text-sm leading-[1.8]">
+          {/* Hint */}
+          <div className="relative z-10 mt-6 rounded-2xl p-4 sm:p-5 text-center bg-[#C9A84C]/[0.04] border border-[#C9A84C]/10">
+            <p className="text-white/50 text-sm leading-relaxed">
               💡 <span className="text-[#C9A84C] font-bold">أرسل عيدية حقيقية!</span> صمّم بطاقة تهنئة مع المبلغ واسمك واسم المستلم — وشاركها مباشرة عبر واتساب
             </p>
           </div>
@@ -236,7 +235,9 @@ function EidiyaCalculator() {
   )
 }
 
-/* ═══ Eidiya Luck Generator ═══ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   EIDIYA LUCK GENERATOR
+   ═══════════════════════════════════════════════════════════════════════════ */
 function EidiyaLuckGenerator() {
   const [name, setName] = useState('')
   const [copied, setCopied] = useState(false)
@@ -271,56 +272,55 @@ function EidiyaLuckGenerator() {
   ]
 
   return (
-    <section className="py-32 px-4 relative w-full" style={{ backgroundColor: '#070810' }}>
+    <section className="section-container bg-[#070810] py-20 sm:py-32">
       <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C]/10 to-transparent" />
-      {/* Decorative glow */}
       <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[min(500px,90vw)] h-[250px] bg-[#C9A84C]/[0.03] rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="max-w-4xl mx-auto relative z-10">
-        {/* ── Section Heading ── */}
-        <div className="text-center mb-16">
+      <div className="section-inner max-w-4xl">
+        {/* Section Heading */}
+        <div className="text-center mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 bg-[#C9A84C]/[0.08] border border-[#C9A84C]/15 rounded-full px-5 py-2 mb-6">
             <Gift className="w-4 h-4 text-[#C9A84C]" />
             <span className="text-[#C9A84C] text-sm font-medium">ميزة جديدة — تسلية العيد</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl font-black text-white/90 mb-5 leading-[1.4]">
+          <h2 className="text-3xl sm:text-5xl font-black text-white/90 mb-5 leading-tight">
             🎰 عيديتك بحظك!
           </h2>
-          <p className="text-white/40 text-base sm:text-lg leading-[1.9] max-w-xl mx-auto">
+          <p className="text-white/40 text-base sm:text-lg leading-relaxed max-w-xl mx-auto">
             أنشئ رابط عيدية عشوائي وأرسله لأصدقائك وعائلتك —
             <br className="hidden sm:block" />
             المستلم يلفّ العداد ويطلع له مبلغ عشوائي مع ردة فعل مضحكة!
           </p>
         </div>
 
-        {/* ── Features Grid ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-16">
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-12 sm:mb-16">
           {luckFeatures.map((f, i) => (
             <div
               key={i}
-              className="group relative bg-white/[0.02] border border-white/[0.05] rounded-2xl p-6 hover:border-[#C9A84C]/15 transition-all duration-500"
+              className="group relative bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 sm:p-6 hover:border-[#C9A84C]/15 transition-all duration-500"
             >
               <div className="flex items-start gap-4">
-                <span className="text-3xl shrink-0 mt-1">{f.emoji}</span>
+                <span className="text-2xl sm:text-3xl shrink-0 mt-1">{f.emoji}</span>
                 <div className="min-w-0">
-                  <h4 className="text-white/90 font-bold text-base mb-2">{f.title}</h4>
-                  <p className="text-white/35 text-sm leading-[1.8]">{f.desc}</p>
+                  <h4 className="text-white/90 font-bold text-sm sm:text-base mb-2">{f.title}</h4>
+                  <p className="text-white/35 text-xs sm:text-sm leading-relaxed">{f.desc}</p>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* ── How It Works Steps ── */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12 mb-16">
+        {/* Steps */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 mb-12 sm:mb-16">
           {steps.map((s, i) => (
-            <div key={i} className="flex items-center gap-4 sm:gap-3">
+            <div key={i} className="flex items-center gap-4">
               <div className="flex flex-col items-center text-center">
-                <div className="w-14 h-14 rounded-2xl bg-[#C9A84C]/[0.08] border border-[#C9A84C]/15 flex items-center justify-center mb-3">
-                  <span className="text-[#C9A84C] text-xl font-black">{s.num}</span>
+                <div className="w-12 sm:w-14 h-12 sm:h-14 rounded-2xl bg-[#C9A84C]/[0.08] border border-[#C9A84C]/15 flex items-center justify-center mb-3">
+                  <span className="text-[#C9A84C] text-lg sm:text-xl font-black">{s.num}</span>
                 </div>
-                <h4 className="text-white/85 font-bold text-sm mb-1.5">{s.title}</h4>
-                <p className="text-white/30 text-xs leading-[1.7]">{s.desc}</p>
+                <h4 className="text-white/85 font-bold text-sm mb-1">{s.title}</h4>
+                <p className="text-white/30 text-xs leading-relaxed">{s.desc}</p>
               </div>
               {i < steps.length - 1 && (
                 <span className="hidden sm:block text-[#C9A84C]/30 text-2xl mx-2">←</span>
@@ -329,88 +329,76 @@ function EidiyaLuckGenerator() {
           ))}
         </div>
 
-        {/* ── Generator Card ── */}
+        {/* Generator Card */}
         <div className="max-w-lg mx-auto">
-          <div className="rounded-3xl p-8 sm:p-10 transition-all duration-500"
-            style={{
-              background: 'rgba(201,168,76,0.03)',
-              border: '1.5px solid rgba(201,168,76,0.12)',
-              boxShadow: '0 0 60px rgba(201,168,76,0.04)',
-            }}
+          <div 
+            className="rounded-3xl p-6 sm:p-10 transition-all duration-500 bg-[#C9A84C]/[0.03] border-[1.5px] border-[#C9A84C]/12"
+            style={{ boxShadow: '0 0 60px rgba(201,168,76,0.04)' }}
           >
-            {/* Card title */}
-            <div className="text-center mb-8">
-              <h3 className="text-white/90 font-bold text-xl mb-2">أنشئ رابط العيدية</h3>
-              <p className="text-white/30 text-sm leading-[1.8]">اكتب اسمك وشارك الرابط مع أي شخص تبي تعيّده</p>
+            <div className="text-center mb-6 sm:mb-8">
+              <h3 className="text-white/90 font-bold text-lg sm:text-xl mb-2">أنشئ رابط العيدية</h3>
+              <p className="text-white/30 text-sm leading-relaxed">اكتب اسمك وشارك الرابط مع أي شخص تبي تعيّده</p>
             </div>
-          {/* Name input */}
-          <div className="mb-6">
-            <label className="block text-white/40 text-sm font-bold mb-3">اسمك (المُعَيِّد)</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => { setName(e.target.value); setCopied(false) }}
-              placeholder="مثال: أبو فهد"
-              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white text-[15px] placeholder:text-white/15 outline-none transition-all duration-300 focus:border-[#C9A84C]/30 focus:bg-[#C9A84C]/[0.03] focus:shadow-[0_0_20px_rgba(201,168,76,0.06)]"
-            />
-          </div>
 
-          {/* Generated link preview */}
-          {name.trim() && (
-            <div className="mb-6 animate-fade-up">
-              <label className="block text-white/25 text-[11px] font-bold mb-2 uppercase tracking-wider">الرابط</label>
-              <div className="flex items-center gap-2 bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-3">
-                <span className="text-white/30 text-xs truncate flex-1 direction-ltr" dir="ltr">{link}</span>
-                <button
-                  onClick={copyLink}
-                  className={`shrink-0 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300 ${
-                    copied
-                      ? 'bg-green-500/15 text-green-400 border border-green-500/20'
-                      : 'bg-[#C9A84C]/10 text-[#C9A84C] border border-[#C9A84C]/15 hover:bg-[#C9A84C]/20'
-                  }`}
-                >
-                  {copied ? '✔ تم النسخ' : 'انسخ'}
-                </button>
+            {/* Name input */}
+            <div className="mb-6">
+              <label className="block text-white/40 text-sm font-bold mb-3">اسمك (المُعَيِّد)</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => { setName(e.target.value); setCopied(false) }}
+                placeholder="مثال: أبو فهد"
+                className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 sm:px-5 py-3 sm:py-4 text-white text-[15px] placeholder:text-white/15 outline-none transition-all duration-300 focus:border-[#C9A84C]/30 focus:bg-[#C9A84C]/[0.03] focus:shadow-[0_0_20px_rgba(201,168,76,0.06)]"
+              />
+            </div>
+
+            {/* Generated link */}
+            {name.trim() && (
+              <div className="mb-6 animate-fade-up">
+                <label className="block text-white/25 text-[11px] font-bold mb-2 uppercase tracking-wider">الرابط</label>
+                <div className="flex items-center gap-2 bg-white/[0.02] border border-white/[0.06] rounded-xl px-3 sm:px-4 py-3">
+                  <span className="text-white/30 text-xs truncate flex-1" dir="ltr">{link}</span>
+                  <button
+                    onClick={copyLink}
+                    className={`shrink-0 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300 ${
+                      copied
+                        ? 'bg-green-500/15 text-green-400 border border-green-500/20'
+                        : 'bg-[#C9A84C]/10 text-[#C9A84C] border border-[#C9A84C]/15 hover:bg-[#C9A84C]/20'
+                    }`}
+                  >
+                    {copied ? '✔ تم النسخ' : 'انسخ'}
+                  </button>
+                </div>
               </div>
+            )}
+
+            {/* Buttons */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                onClick={shareWa}
+                disabled={!name.trim()}
+                className={`btn-gold w-full justify-center ${!name.trim() ? 'opacity-30 cursor-not-allowed' : ''}`}
+              >
+                <Share2 className="w-4 h-4" />
+                <span>أرسل عبر واتساب</span>
+              </button>
+              <button
+                onClick={copyLink}
+                disabled={!name.trim()}
+                className={`btn-outline-gold w-full justify-center ${!name.trim() ? 'opacity-30 cursor-not-allowed' : ''}`}
+              >
+                {copied ? '✔ تم النسخ!' : 'انسخ الرابط'}
+              </button>
             </div>
-          )}
-
-          {/* Action buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <button
-              onClick={shareWa}
-              disabled={!name.trim()}
-              className={`btn-gold w-full justify-center ${
-                !name.trim() ? '!opacity-30 !cursor-not-allowed !transform-none !shadow-none' : ''
-              }`}
-            >
-              <Share2 className="w-4 h-4" />
-              أرسل عبر واتساب
-            </button>
-            <button
-              onClick={copyLink}
-              disabled={!name.trim()}
-              className={`btn-outline-gold w-full justify-center ${
-                !name.trim() ? '!opacity-30 !cursor-not-allowed !transform-none' : ''
-              }`}
-            >
-              {copied ? '✔ تم النسخ!' : 'انسخ الرابط'}
-            </button>
-          </div>
-
           </div>
 
           {/* How it works hint */}
-          <div className="mt-8 rounded-2xl p-6 text-center" style={{ background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.10)' }}>
-            <p className="text-white/40 text-sm leading-[1.9] mb-3">
-              <span className="text-[#C9A84C] font-bold text-base">💡 وش يشوف المستلم؟</span>
-            </p>
-            <p className="text-white/30 text-sm leading-[2]">
+          <div className="mt-6 sm:mt-8 rounded-2xl p-5 sm:p-6 text-center bg-[#C9A84C]/[0.04] border border-[#C9A84C]/10">
+            <p className="text-[#C9A84C] font-bold text-sm sm:text-base mb-3">💡 وش يشوف المستلم؟</p>
+            <p className="text-white/30 text-xs sm:text-sm leading-loose">
               يفتح الرابط ← يشوف اسمك ← يضغط "لفّ العداد" ← العداد يدور ٣ ثواني
               <br />
               ← يطلع المبلغ العشوائي مع ردة فعل ساحرة وكونفيتي 🎊
-              <br />
-              ← يقدر يشارك النتيجة أو يلفّ مرة ثانية!
             </p>
           </div>
         </div>
@@ -419,19 +407,21 @@ function EidiyaLuckGenerator() {
   )
 }
 
-/* ═══ FAQ ═══ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   FAQ
+   ═══════════════════════════════════════════════════════════════════════════ */
 function FAQ({ q, a, isOpen, toggle }) {
   return (
     <div className="border border-white/[0.06] rounded-2xl overflow-hidden transition-colors hover:border-[#d4b96b]/20">
-      <button onClick={toggle} className="w-full flex items-center justify-between p-5 text-right group">
-        <span className="text-white/85 text-[15px] font-medium group-hover:text-white transition-colors">{q}</span>
+      <button onClick={toggle} className="w-full flex items-center justify-between p-4 sm:p-5 text-right group">
+        <span className="text-white/85 text-sm sm:text-[15px] font-medium group-hover:text-white transition-colors">{q}</span>
         <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mr-4 transition-all ${isOpen ? 'bg-[#d4b96b]/15 rotate-180' : 'bg-white/[0.03]'}`}>
           <ChevronDown className={`w-3.5 h-3.5 transition-colors ${isOpen ? 'text-[#d4b96b]' : 'text-white/30'}`} />
         </div>
       </button>
       <div className={`grid transition-all duration-300 ease-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="overflow-hidden">
-          <p className="px-5 pb-5 text-white/40 text-sm leading-[1.9]">{a}</p>
+          <p className="px-4 sm:px-5 pb-4 sm:pb-5 text-white/40 text-sm leading-relaxed">{a}</p>
         </div>
       </div>
     </div>
@@ -439,124 +429,136 @@ function FAQ({ q, a, isOpen, toggle }) {
 }
 
 const faqs = [
-  { q: 'هل المنصة مجانية؟', a: 'نعم، يمكنك تصميم وتحميل البطاقات مجاناً بدون تسجيل. الباقات المدفوعة تضيف ميزات متقدمة مثل الإرسال الجماعي وإزالة العلامة المائية.' },
+  { q: 'هل المنصة مجانية؟', a: 'نعم، يمكنك تصميم وتحميل البطاقات مجاناً بالكامل بدون تسجيل أو بيانات شخصية.' },
   { q: 'كيف أرفع تصاميمي الخاصة؟', a: 'من لوحة التحكم اختر تبويب "القوالب" ثم ارفع صور PNG أو JPG. القوالب تُحفظ وتظهر مباشرة في المحرر.' },
-  { q: 'هل أقدر أرسل لأكثر من شخص؟', a: 'نعم، من صفحة الإرسال ارفع ملف CSV بأسماء وأرقام المستلمين وأرسل لهم تلقائياً عبر واتساب.' },
+  { q: 'كيف أرسل البطاقة؟', a: 'بعد تصميم البطاقة، اضغط "إرسال عبر واتساب" وسيتم مشاركتها مباشرة مع من تختار.' },
   { q: 'ما جودة البطاقات؟', a: 'البطاقات تُصدَّر بدقة 1080×1080 بكسل بصيغة PNG أو PDF جاهز للطباعة.' },
   { q: 'هل يدعم الموقع الجوال؟', a: 'نعم، الموقع متجاوب بالكامل ومُحسّن لجميع الأجهزة والشاشات.' },
 ]
 
-/* ═══ Step Card ═══ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   STEP CARD
+   ═══════════════════════════════════════════════════════════════════════════ */
 function StepCard({ num, icon: Icon, title, desc }) {
   return (
-    <div className="group">
-      <div className="relative bg-white/[0.02] border border-white/[0.05] rounded-3xl p-8 hover:border-[#d4b96b]/15 transition-all duration-500 h-full">
+    <div className="group h-full">
+      <div className="relative bg-white/[0.02] border border-white/[0.05] rounded-3xl p-6 sm:p-8 hover:border-[#d4b96b]/15 transition-all duration-500 h-full">
         <div className="absolute -top-3 right-6 bg-[#060709] px-3">
           <span className="text-[#d4b96b]/40 text-[11px] font-bold tracking-wider">0{num}</span>
         </div>
-        <div className="w-12 h-12 rounded-2xl bg-[#d4b96b]/[0.07] flex items-center justify-center mb-6 group-hover:bg-[#d4b96b]/[0.12] transition-colors">
-          <Icon className="w-5 h-5 text-[#d4b96b]" strokeWidth={1.5} />
+        <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-2xl bg-[#d4b96b]/[0.07] flex items-center justify-center mb-5 sm:mb-6 group-hover:bg-[#d4b96b]/[0.12] transition-colors">
+          <Icon className="w-4 sm:w-5 h-4 sm:h-5 text-[#d4b96b]" strokeWidth={1.5} />
         </div>
-        <h3 className="text-white/90 font-bold text-lg mb-2">{title}</h3>
-        <p className="text-white/35 text-[14px] leading-[1.8]">{desc}</p>
+        <h3 className="text-white/90 font-bold text-base sm:text-lg mb-2">{title}</h3>
+        <p className="text-white/35 text-xs sm:text-[14px] leading-relaxed">{desc}</p>
       </div>
     </div>
   )
 }
 
-/* ═══ Feature Row ═══ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   FEATURE ROW
+   ═══════════════════════════════════════════════════════════════════════════ */
 function Feature({ icon: Icon, title, desc }) {
   return (
-    <div className="flex gap-5 group">
-      <div className="w-10 h-10 rounded-xl bg-white/[0.025] border border-white/[0.04] flex items-center justify-center shrink-0 group-hover:border-[#d4b96b]/15 group-hover:bg-[#d4b96b]/[0.05] transition-all duration-300">
+    <div className="flex gap-4 sm:gap-5 group">
+      <div className="w-9 sm:w-10 h-9 sm:h-10 rounded-xl bg-white/[0.025] border border-white/[0.04] flex items-center justify-center shrink-0 group-hover:border-[#d4b96b]/15 group-hover:bg-[#d4b96b]/[0.05] transition-all duration-300">
         <Icon className="w-4 h-4 text-[#d4b96b]/60 group-hover:text-[#d4b96b] transition-colors" strokeWidth={1.5} />
       </div>
-      <div>
-        <h3 className="text-white/85 font-semibold text-[15px] mb-1 group-hover:text-white transition-colors">{title}</h3>
-        <p className="text-white/30 text-sm leading-[1.7]">{desc}</p>
+      <div className="min-w-0">
+        <h3 className="text-white/85 font-semibold text-sm sm:text-[15px] mb-1 group-hover:text-white transition-colors">{title}</h3>
+        <p className="text-white/30 text-xs sm:text-sm leading-relaxed">{desc}</p>
       </div>
     </div>
   )
 }
 
-/* ═══════════════════════════════ */
-/* LANDING PAGE                   */
-/* ═══════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LANDING PAGE MAIN COMPONENT
+   ═══════════════════════════════════════════════════════════════════════════ */
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState(null)
 
   return (
-    <div className="min-h-screen w-full bg-[#060709] overflow-x-hidden">
+    <div className="w-full overflow-x-hidden">
 
-      {/* ─── HERO ─── */}
-      <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 w-full overflow-hidden">
-        {/* Background elements */}
-        <div className="absolute inset-0 pointer-events-none">
+      {/* ─────────────────────────────────────────────────────────────────────
+          HERO SECTION
+          ───────────────────────────────────────────────────────────────────── */}
+      <section className="section-container min-h-[100vh] flex flex-col items-center justify-center pt-20 pb-10 px-5">
+        {/* Background glow */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(600px,100vw)] h-[300px] bg-[#d4b96b]/[0.04] rounded-full blur-[150px]" />
         </div>
 
-        <div className="relative z-10 text-center max-w-3xl mx-auto">
-          {/* Logo — bigger & centered */}
-          <div className="animate-fade-up mb-8">
-            <img src="/images/logo.png" alt="سَلِّم" className="h-44 sm:h-56 md:h-72 w-auto mx-auto drop-shadow-[0_0_60px_rgba(212,185,107,0.2)]" />
+        <div className="relative z-10 text-center max-w-3xl mx-auto w-full">
+          {/* Logo */}
+          <div className="animate-fade-up mb-6 sm:mb-8">
+            <img 
+              src="/images/logo.png" 
+              alt="سَلِّم" 
+              className="h-36 sm:h-44 md:h-56 lg:h-72 w-auto mx-auto drop-shadow-[0_0_60px_rgba(212,185,107,0.2)]" 
+            />
           </div>
 
-          <p className="animate-fade-up delay-1 text-lg sm:text-xl text-white/40 leading-[1.9] mb-12 max-w-lg mx-auto">
+          <p className="animate-fade-up delay-1 text-base sm:text-lg md:text-xl text-white/40 leading-relaxed mb-8 sm:mb-12 max-w-lg mx-auto px-4">
             منصة احترافية لتصميم بطاقات تهنئة العيد
             <br />
             <span className="text-white/55">في ثوانٍ — مجاناً بدون تسجيل</span>
           </p>
 
-          {/* CTA Group — Companies + Individuals */}
-          <div className="animate-fade-up delay-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+          {/* CTA */}
+          <div className="animate-fade-up delay-2 flex flex-col sm:flex-row items-center justify-center gap-4 px-4">
             <Link to="/editor" className="group btn-gold">
-              <Users className="w-5 h-5" />
-              ابدأ مجاناً — للأفراد
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            </Link>
-            <Link to="/business" className="group btn-outline-gold">
-              <Building2 className="w-5 h-5" />
-              للشركات والمؤسسات
+              <span>ابدأ التصميم مجاناً</span>
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             </Link>
           </div>
 
           {/* Quick stats */}
-          <div className="animate-fade-up delay-3 mt-16 flex items-center justify-center gap-10 text-center">
+          <div className="animate-fade-up delay-3 mt-12 sm:mt-16 flex items-center justify-center gap-6 sm:gap-10 text-center">
             {[
               { n: '+100', l: 'عبارة تهنئة' },
               { n: '20', l: 'قالب جاهز' },
               { n: '8', l: 'خطوط عربية' },
             ].map((s, i) => (
               <div key={i} className="flex flex-col">
-                <span className="text-[#d4b96b] text-xl font-bold">{s.n}</span>
-                <span className="text-white/20 text-[11px] mt-0.5">{s.l}</span>
+                <span className="text-[#d4b96b] text-lg sm:text-xl font-bold">{s.n}</span>
+                <span className="text-white/20 text-[10px] sm:text-[11px] mt-0.5">{s.l}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── MARQUEE TICKER ─── */}
+      {/* ─────────────────────────────────────────────────────────────────────
+          MARQUEE TICKER
+          ───────────────────────────────────────────────────────────────────── */}
       <MarqueeTicker />
 
-      {/* ─── EIDIYA CALCULATOR ─── */}
+      {/* ─────────────────────────────────────────────────────────────────────
+          EIDIYA CALCULATOR
+          ───────────────────────────────────────────────────────────────────── */}
       <EidiyaCalculator />
 
-      {/* ─── EIDIYA LUCK GENERATOR ─── */}
+      {/* ─────────────────────────────────────────────────────────────────────
+          EIDIYA LUCK GENERATOR
+          ───────────────────────────────────────────────────────────────────── */}
       <EidiyaLuckGenerator />
 
-      {/* ─── HOW IT WORKS ─── */}
-      <section className="py-32 px-4 relative bg-[#060709] w-full">
-        <div className="max-w-5xl mx-auto relative z-10">
-          <div className="text-center mb-20">
+      {/* ─────────────────────────────────────────────────────────────────────
+          HOW IT WORKS
+          ───────────────────────────────────────────────────────────────────── */}
+      <section className="section-container bg-[#060709] py-20 sm:py-32">
+        <div className="section-inner max-w-5xl">
+          <div className="text-center mb-12 sm:mb-20">
             <span className="inline-block text-[#d4b96b]/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-4">الخطوات</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white/90">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white/90">
               كيف تصمّم بطاقتك
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
             <StepCard num={1} icon={Layers}  title="اختر القالب"  desc="تصفّح القوالب الجاهزة أو ارفع تصميمك الخاص من لوحة التحكم" />
             <StepCard num={2} icon={Palette}  title="خصّص البطاقة" desc="اختر الخط والعبارة والألوان واكتب اسم المُرسل والمُستلم" />
             <StepCard num={3} icon={Send}     title="أرسل أو حمّل" desc="صدّر بصيغة PNG أو PDF أو أرسل مباشرة عبر واتساب" />
@@ -564,48 +566,51 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── FEATURES ─── */}
-      <section className="py-32 px-4 relative bg-[#060709] w-full">
+      {/* ─────────────────────────────────────────────────────────────────────
+          FEATURES
+          ───────────────────────────────────────────────────────────────────── */}
+      <section className="section-container bg-[#060709] py-20 sm:py-32">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
 
-        <div className="max-w-5xl mx-auto relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
+        <div className="section-inner max-w-5xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
             <div>
               <span className="inline-block text-[#d4b96b]/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-4">المميزات</span>
-              <h2 className="text-3xl sm:text-4xl font-bold text-white/90 mb-5">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white/90 mb-4 sm:mb-5">
                 كل ما تحتاجه
                 <br />
                 <span className="text-white/40">في منصة واحدة</span>
               </h2>
-              <p className="text-white/30 text-[15px] leading-[1.8] mb-10">
+              <p className="text-white/30 text-sm sm:text-[15px] leading-relaxed mb-8 sm:mb-10">
                 صمّم بطاقات احترافية بخطوط عربية أصيلة وعبارات مختارة بعناية — ثم أرسلها لمن تحب مباشرة.
               </p>
               <Link to="/editor" className="group btn-ghost-gold">
-                جرّب المحرر الآن
+                <span>جرّب المحرر الآن</span>
                 <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
               </Link>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
               <Feature icon={Type}       title="خطوط عربية أصيلة"   desc="8 مخطوطات تشمل أميري وشهرزاد والقاهرة ولطيف وغيرها" />
               <Feature icon={FileText}   title="أكثر من 100 عبارة"  desc="عبارات رسمية وعائلية وتجارية وشعرية لكل مناسبة" />
-              <Feature icon={Send}       title="إرسال عبر واتساب"   desc="أرسل فردياً أو جماعياً مباشرة من المنصة" />
+              <Feature icon={Send}       title="إرسال عبر واتساب"   desc="أرسل البطاقة مباشرة لأحبابك عبر واتساب" />
               <Feature icon={Download}   title="تصدير بأعلى جودة"   desc="PNG بدقة 1080px أو PDF جاهز للطباعة" />
-              <Feature icon={Building2}  title="تخصيص كامل للشركات" desc="وايت لابل — شعار وألوان ونطاق مخصص بهوية شركتك" />
               <Feature icon={Shield}     title="مجاني وآمن"         desc="ابدأ فوراً بدون حساب أو بيانات شخصية" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* ─── FAQ ─── */}
-      <section className="py-32 px-4 relative bg-[#060709] w-full">
+      {/* ─────────────────────────────────────────────────────────────────────
+          FAQ
+          ───────────────────────────────────────────────────────────────────── */}
+      <section className="section-container bg-[#060709] py-20 sm:py-32">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
 
-        <div className="max-w-2xl mx-auto relative z-10">
-          <div className="text-center mb-16">
+        <div className="section-inner max-w-2xl">
+          <div className="text-center mb-12 sm:mb-16">
             <span className="inline-block text-[#d4b96b]/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-4">الأسئلة</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white/90">أسئلة شائعة</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white/90">أسئلة شائعة</h2>
           </div>
 
           <div className="space-y-3">
@@ -616,26 +621,24 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── CTA ─── */}
-      <section className="py-32 px-4 relative bg-[#060709] w-full">
+      {/* ─────────────────────────────────────────────────────────────────────
+          CTA
+          ───────────────────────────────────────────────────────────────────── */}
+      <section className="section-container bg-[#060709] py-20 sm:py-32">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
 
-        <div className="max-w-xl mx-auto text-center relative z-10">
-          <div className="mb-10 mx-auto">
-            <img src="/images/logo.png" alt="سَلِّم" className="h-20 w-auto mx-auto opacity-80" />
+        <div className="section-inner max-w-xl text-center">
+          <div className="mb-8 sm:mb-10 mx-auto">
+            <img src="/images/logo.png" alt="سَلِّم" className="h-16 sm:h-20 w-auto mx-auto opacity-80" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white/90 mb-5">جاهز تصمّم بطاقتك؟</h2>
-          <p className="text-white/30 text-sm mb-12 leading-[1.8]">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white/90 mb-4 sm:mb-5">جاهز تصمّم بطاقتك؟</h2>
+          <p className="text-white/30 text-sm leading-relaxed mb-10 sm:mb-12 px-4">
             صمّم بطاقة فريدة وأرسلها لمن تحب في أقل من دقيقة
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/editor" className="group btn-gold">
-              ابدأ الآن مجاناً
+              <span>ابدأ الآن مجاناً</span>
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            </Link>
-            <Link to="/business" className="group btn-outline-gold">
-              <Building2 className="w-5 h-5" />
-              حلول الشركات
             </Link>
           </div>
         </div>

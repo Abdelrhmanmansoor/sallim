@@ -17,12 +17,18 @@ import EidParticles from './components/effects/EidParticles'
 export default function App() {
   const location = useLocation()
   const showParticles = location.pathname === '/' || location.pathname === '/dashboard'
+  const isBusiness = location.pathname === '/business'
   
   return (
-    <div className="min-h-screen w-full bg-[#060709] text-white font-ibm relative overflow-x-hidden" dir="rtl">
+    <div className="flex flex-col min-h-screen w-full max-w-full bg-[#060709] text-white font-ibm overflow-x-hidden" dir="rtl">
+      {/* Golden particles background */}
       {showParticles && <EidParticles />}
-      <Navbar />
-      <main className="relative z-10 w-full">
+      
+      {/* Fixed navbar */}
+      {!isBusiness && <Navbar />}
+      
+      {/* Main content - grows to fill space */}
+      <main className="flex-1 w-full relative z-10">
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/editor" element={<EditorPage />} />
@@ -37,7 +43,9 @@ export default function App() {
           <Route path="/eidiya-luck" element={<EidiyaLuckPage />} />
         </Routes>
       </main>
-      <Footer />
+      
+      {/* Footer */}
+      {!isBusiness && <Footer />}
     </div>
   )
 }

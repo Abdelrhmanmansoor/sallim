@@ -9,7 +9,7 @@ const platformLinks = [
 
 const adminLinks = [
   { to: '/admin',     label: 'لوحة التحكم' },
-  { to: '/dashboard', label: 'الشركات' },
+  { to: '/business',  label: 'بوابة الشركات' },
 ]
 
 export default function Footer() {
