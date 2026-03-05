@@ -585,21 +585,20 @@ function EidiyaLuckGenerator() {
     <section className="relative bg-[#070810] py-28 sm:py-40 overflow-hidden">
       {/* ── Ambient Decorations ── */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Top gold glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-[#C9A84C]/[0.03] rounded-full blur-[120px]" />
-        {/* Bottom side glows */}
         <div className="absolute bottom-20 right-0 w-[400px] h-[400px] bg-[#C9A84C]/[0.02] rounded-full blur-[100px]" />
         <div className="absolute bottom-40 left-0 w-[300px] h-[300px] bg-[#C9A84C]/[0.015] rounded-full blur-[80px]" />
-        {/* Subtle grid pattern overlay */}
-        <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: 'radial-gradient(circle, #C9A84C 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        <div className="absolute inset-0 opacity-[0.012]" style={{ backgroundImage: 'radial-gradient(circle, #C9A84C 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
       </div>
 
-      {/* Top separator line */}
+      {/* Top / Bottom separator */}
       <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C]/15 to-transparent" />
+      <div className="absolute left-0 bottom-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C]/10 to-transparent" />
 
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6">
-        {/* ── Section Heading ── */}
-        <div className="text-center mb-16 sm:mb-24">
+      <div className="relative w-full max-w-3xl mx-auto px-5 sm:px-8 flex flex-col items-center">
+
+        {/* ═══ Section Heading ═══ */}
+        <div className="text-center mb-14 sm:mb-20 w-full">
           <div className="inline-flex items-center gap-2.5 bg-gradient-to-r from-[#C9A84C]/[0.08] to-[#C9A84C]/[0.04] border border-[#C9A84C]/15 rounded-full px-5 py-2.5 mb-7 backdrop-blur-sm">
             <Sparkles className="w-4 h-4 text-[#C9A84C]" />
             <span className="text-[#C9A84C] text-sm font-semibold tracking-wide">ميزة جديدة — تسلية العيد</span>
@@ -607,15 +606,15 @@ function EidiyaLuckGenerator() {
           <h2 className="text-4xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white/90 to-white/60 mb-6 leading-tight">
             عيديتك بحظك!
           </h2>
-          <p className="text-white/40 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
+          <p className="text-white/40 text-base sm:text-lg leading-relaxed max-w-xl mx-auto">
             أنشئ رابط عيدية عشوائي وأرسله لأصدقائك وعائلتك —
             <br className="hidden sm:block" />
             المستلم يلفّ العداد ويطلع له مبلغ عشوائي مع ردة فعل مضحكة!
           </p>
         </div>
 
-        {/* ── Features Grid — Glass Cards ── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-16 sm:mb-24">
+        {/* ═══ Features Grid ═══ */}
+        <div className="w-full grid grid-cols-2 gap-4 sm:gap-5 mb-14 sm:mb-20">
           {luckFeatures.map((f, i) => (
             <div
               key={i}
@@ -626,10 +625,9 @@ function EidiyaLuckGenerator() {
                 backdropFilter: 'blur(12px)',
               }}
             >
-              {/* Hover glow */}
               <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'radial-gradient(circle at center, rgba(201,168,76,0.06) 0%, transparent 70%)' }} />
-              <div className="relative">
-                <div className="w-11 h-11 mx-auto mb-4 rounded-xl bg-gradient-to-br from-[#C9A84C]/15 to-[#C9A84C]/05 border border-[#C9A84C]/10 flex items-center justify-center group-hover:scale-110 group-hover:border-[#C9A84C]/20 transition-all duration-500">
+              <div className="relative flex flex-col items-center">
+                <div className="w-11 h-11 mb-4 rounded-xl bg-gradient-to-br from-[#C9A84C]/15 to-[#C9A84C]/05 border border-[#C9A84C]/10 flex items-center justify-center group-hover:scale-110 group-hover:border-[#C9A84C]/20 transition-all duration-500">
                   <f.icon className="w-5 h-5 text-[#C9A84C]/70 group-hover:text-[#C9A84C] transition-colors duration-500" strokeWidth={1.5} />
                 </div>
                 <h4 className="text-white/80 font-bold text-sm mb-2 group-hover:text-white/95 transition-colors">{f.title}</h4>
@@ -639,130 +637,120 @@ function EidiyaLuckGenerator() {
           ))}
         </div>
 
-        {/* ── Steps Timeline ── */}
-        <div className="relative flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-0 mb-16 sm:mb-24">
-          {/* Connecting line (desktop) */}
-          <div className="hidden sm:block absolute top-6 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-[#C9A84C]/20 to-transparent" />
+        {/* ═══ Steps ═══ */}
+        <div className="w-full flex justify-center mb-14 sm:mb-20">
+          <div className="relative flex flex-col sm:flex-row items-center gap-8 sm:gap-14">
+            {/* Connecting line (desktop) */}
+            <div className="hidden sm:block absolute top-6 left-12 right-12 h-px bg-gradient-to-r from-[#C9A84C]/15 via-[#C9A84C]/20 to-[#C9A84C]/15" />
 
-          {steps.map((s, i) => (
-            <div key={i} className="flex flex-col sm:flex-row items-center gap-4 sm:gap-0 sm:flex-1">
-              <div className="flex flex-col items-center text-center relative z-10">
+            {steps.map((s, i) => (
+              <div key={i} className="flex flex-col items-center text-center relative z-10">
                 {/* Step number circle */}
-                <div className="w-12 h-12 rounded-full mb-4 flex items-center justify-center relative">
+                <div className="w-12 h-12 rounded-full mb-3 flex items-center justify-center relative">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#C9A84C]/20 to-[#C9A84C]/05 border border-[#C9A84C]/15" />
                   <div className="absolute inset-1 rounded-full bg-[#0a0b14]" />
                   <span className="relative text-[#C9A84C] text-lg font-black">{s.num}</span>
                 </div>
                 <h4 className="text-white/80 font-bold text-sm mb-1">{s.title}</h4>
-                <p className="text-white/30 text-xs">{s.desc}</p>
+                <p className="text-white/30 text-xs max-w-[140px]">{s.desc}</p>
+
+                {/* Mobile connector */}
+                {i < steps.length - 1 && (
+                  <div className="sm:hidden w-px h-6 mt-4 bg-gradient-to-b from-[#C9A84C]/15 to-transparent" />
+                )}
               </div>
-              {i < steps.length - 1 && (
-                <div className="hidden sm:flex items-center justify-center flex-1">
-                  <div className="w-8 h-8 rounded-full bg-[#0a0b14] border border-[#C9A84C]/10 flex items-center justify-center">
-                    <span className="text-[#C9A84C]/40 text-sm">←</span>
-                  </div>
-                </div>
-              )}
-              {i < steps.length - 1 && (
-                <div className="sm:hidden w-px h-6 bg-gradient-to-b from-[#C9A84C]/15 to-transparent" />
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* ── Generator Card — Premium Glass ── */}
-        <div className="flex flex-col items-center w-full">
-          <div
-            className="w-full max-w-lg rounded-3xl p-7 sm:p-10 relative overflow-hidden"
-            style={{
-              background: 'linear-gradient(160deg, rgba(201,168,76,0.06) 0%, rgba(10,11,20,0.95) 40%, rgba(10,11,20,0.98) 100%)',
-              border: '1px solid rgba(201,168,76,0.12)',
-              boxShadow: '0 0 80px rgba(201,168,76,0.04), 0 25px 50px rgba(0,0,0,0.4)',
-            }}
-          >
-            {/* Decorative corner glow */}
-            <div className="absolute top-0 right-0 w-40 h-40 bg-[#C9A84C]/[0.04] rounded-full blur-[60px] pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#C9A84C]/[0.03] rounded-full blur-[50px] pointer-events-none" />
-
-            <div className="relative">
-              {/* Card header */}
-              <div className="text-center mb-8">
-                <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-[#C9A84C]/15 to-[#C9A84C]/05 border border-[#C9A84C]/10 flex items-center justify-center">
-                  <Zap className="w-6 h-6 text-[#C9A84C]" strokeWidth={1.5} />
-                </div>
-                <h3 className="text-white/95 font-black text-xl mb-2">أنشئ رابط العيدية</h3>
-                <p className="text-white/35 text-sm leading-relaxed">اكتب اسمك وشارك الرابط مع أي شخص تبي تعيّده</p>
-              </div>
-
-              {/* Name input */}
-              <div className="mb-6">
-                <label className="block text-white/50 text-sm font-semibold mb-3">اسمك (المُعَيِّد)</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => { setName(e.target.value); setCopied(false) }}
-                  placeholder="مثال: أبو فهد"
-                  className="unified-input"
-                />
-              </div>
-
-              {/* Generated link */}
-              {name.trim() && (
-                <div className="mb-6 animate-fade-up">
-                  <label className="block text-white/35 text-xs font-semibold mb-2.5">الرابط</label>
-                  <div className="flex items-center gap-2 bg-white/[0.03] border border-white/[0.07] rounded-xl px-4 py-3.5">
-                    <span className="text-white/40 text-xs truncate flex-1 font-mono" dir="ltr">{link}</span>
-                    <button
-                      onClick={copyLink}
-                      className={`shrink-0 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 ${
-                        copied
-                          ? 'bg-green-500/12 text-green-400 border border-green-500/15'
-                          : 'bg-[#C9A84C]/08 text-[#C9A84C] border border-[#C9A84C]/12 hover:bg-[#C9A84C]/15 hover:border-[#C9A84C]/25'
-                      }`}
-                    >
-                      {copied ? '✔ تم' : 'انسخ'}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Buttons */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button
-                  onClick={shareWa}
-                  disabled={!name.trim()}
-                  className={`btn-gold w-full justify-center ${!name.trim() ? 'opacity-30 cursor-not-allowed' : ''}`}
-                >
-                  <Share2 className="w-4 h-4" />
-                  <span>أرسل عبر واتساب</span>
-                </button>
-                <button
-                  onClick={copyLink}
-                  disabled={!name.trim()}
-                  className={`btn-outline-gold w-full justify-center ${!name.trim() ? 'opacity-30 cursor-not-allowed' : ''}`}
-                >
-                  {copied ? '✔ تم النسخ!' : 'انسخ الرابط'}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* How it works hint — subtle bottom note */}
-          <div className="w-full max-w-lg mt-10">
-            <div className="flex items-center justify-center gap-3 mb-3">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#C9A84C]/10" />
-              <span className="text-[#C9A84C]/50 text-xs font-bold tracking-wider">وش يشوف المستلم؟</span>
-              <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#C9A84C]/10" />
-            </div>
-            <p className="text-white/25 text-xs text-center leading-loose">
-              يفتح الرابط ← يشوف اسمك ← يضغط "لفّ العداد" ← العداد يدور ٣ ثواني ← يطلع المبلغ العشوائي مع ردة فعل ساحرة
-            </p>
+            ))}
           </div>
         </div>
+
+        {/* ═══ Generator Card ═══ */}
+        <div
+          className="w-full max-w-md rounded-3xl p-7 sm:p-10 relative overflow-hidden"
+          style={{
+            background: 'linear-gradient(160deg, rgba(201,168,76,0.06) 0%, rgba(10,11,20,0.95) 40%, rgba(10,11,20,0.98) 100%)',
+            border: '1px solid rgba(201,168,76,0.12)',
+            boxShadow: '0 0 80px rgba(201,168,76,0.04), 0 25px 50px rgba(0,0,0,0.4)',
+          }}
+        >
+          <div className="absolute top-0 right-0 w-40 h-40 bg-[#C9A84C]/[0.04] rounded-full blur-[60px] pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#C9A84C]/[0.03] rounded-full blur-[50px] pointer-events-none" />
+
+          <div className="relative flex flex-col items-center">
+            {/* Card header */}
+            <div className="text-center mb-8 w-full">
+              <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-[#C9A84C]/15 to-[#C9A84C]/05 border border-[#C9A84C]/10 flex items-center justify-center">
+                <Zap className="w-6 h-6 text-[#C9A84C]" strokeWidth={1.5} />
+              </div>
+              <h3 className="text-white/95 font-black text-xl mb-2">أنشئ رابط العيدية</h3>
+              <p className="text-white/35 text-sm leading-relaxed">اكتب اسمك وشارك الرابط مع أي شخص تبي تعيّده</p>
+            </div>
+
+            {/* Name input */}
+            <div className="mb-6 w-full">
+              <label className="block text-white/50 text-sm font-semibold mb-3 text-right">اسمك (المُعَيِّد)</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => { setName(e.target.value); setCopied(false) }}
+                placeholder="مثال: أبو فهد"
+                className="unified-input w-full"
+              />
+            </div>
+
+            {/* Generated link */}
+            {name.trim() && (
+              <div className="mb-6 w-full animate-fade-up">
+                <label className="block text-white/35 text-xs font-semibold mb-2.5 text-right">الرابط</label>
+                <div className="flex items-center gap-2 bg-white/[0.03] border border-white/[0.07] rounded-xl px-4 py-3.5">
+                  <span className="text-white/40 text-xs truncate flex-1 font-mono" dir="ltr">{link}</span>
+                  <button
+                    onClick={copyLink}
+                    className={`shrink-0 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 ${
+                      copied
+                        ? 'bg-green-500/12 text-green-400 border border-green-500/15'
+                        : 'bg-[#C9A84C]/08 text-[#C9A84C] border border-[#C9A84C]/12 hover:bg-[#C9A84C]/15 hover:border-[#C9A84C]/25'
+                    }`}
+                  >
+                    {copied ? '✔ تم' : 'انسخ'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Buttons */}
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                onClick={shareWa}
+                disabled={!name.trim()}
+                className={`btn-gold w-full justify-center ${!name.trim() ? 'opacity-30 cursor-not-allowed' : ''}`}
+              >
+                <Share2 className="w-4 h-4" />
+                <span>أرسل عبر واتساب</span>
+              </button>
+              <button
+                onClick={copyLink}
+                disabled={!name.trim()}
+                className={`btn-outline-gold w-full justify-center ${!name.trim() ? 'opacity-30 cursor-not-allowed' : ''}`}
+              >
+                {copied ? '✔ تم النسخ!' : 'انسخ الرابط'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ═══ Bottom hint ═══ */}
+        <div className="w-full max-w-md mt-10">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#C9A84C]/10" />
+            <span className="text-[#C9A84C]/50 text-xs font-bold tracking-wider">وش يشوف المستلم؟</span>
+            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#C9A84C]/10" />
+          </div>
+          <p className="text-white/25 text-xs text-center leading-loose">
+            يفتح الرابط ← يشوف اسمك ← يضغط "لفّ العداد" ← العداد يدور ٣ ثواني ← يطلع المبلغ العشوائي مع ردة فعل ساحرة
+          </p>
+        </div>
+
       </div>
-
-      {/* Bottom separator line */}
-      <div className="absolute left-0 bottom-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C]/10 to-transparent" />
     </section>
   )
 }
