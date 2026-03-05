@@ -767,23 +767,21 @@ export default function LandingPage() {
       {/* ─────────────────────────────────────────────────────────────────────
           CTA
           ───────────────────────────────────────────────────────────────────── */}
-      <section className="section-container bg-[#060709] py-20 sm:py-32">
-        <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
+      <section className="section-container bg-[#060709] py-24 sm:py-32">
+        <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
         <div className="section-inner max-w-xl text-center flex flex-col items-center">
-          <div className="mb-8 sm:mb-10 w-full flex justify-center">
-            <img src="/images/logo.png" alt="سَلِّم" className="h-16 sm:h-20 w-auto opacity-80" />
+          <div className="mb-10 w-full flex justify-center">
+            <img src="/images/logo.png" alt="سَلِّم" className="h-20 sm:h-24 w-auto opacity-90" />
           </div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white/90 mb-4 sm:mb-5">جاهز تصمّم بطاقتك؟</h2>
-          <p className="text-white/30 text-sm leading-relaxed mb-10 sm:mb-12 px-4">
+          <h2 className="section-title mb-5">جاهز تصمّم بطاقتك؟</h2>
+          <p className="section-subtitle mb-12 px-4 mx-auto">
             صمّم بطاقة فريدة وأرسلها لمن تحب في أقل من دقيقة
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/editor" className="group btn-gold">
-              <span>ابدأ الآن مجاناً</span>
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            </Link>
-          </div>
+          <Link to="/editor" className="group btn-gold">
+            <span>ابدأ الآن مجاناً</span>
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          </Link>
         </div>
       </section>
     </div>
