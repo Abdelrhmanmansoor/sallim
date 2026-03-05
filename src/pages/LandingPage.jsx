@@ -258,9 +258,9 @@ function EidiyaCalculator() {
     <section className="py-20 bg-[#f8fafc]">
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="max-w-xl mx-auto">
-          <div className="text-center mb-10">
+          <div className="text-center mb-12">
             <span className="section-label">تسلية</span>
-            <h2 className="section-title mb-3">كم تستاهل عيدية؟</h2>
+            <h2 className="section-title mt-3 mb-4">كم تستاهل عيدية؟</h2>
             <p className="text-[#64748b] text-[15px]">جاوب على ٨ أسئلة وبنحسب لك عيديتك المستحقة</p>
           </div>
 
@@ -348,12 +348,12 @@ function EidiyaCalculator() {
                     </div>
                   )}
 
-                  <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button onClick={shareWa} className="btn-gold w-full justify-center"><Share2 className="w-4 h-4" /><span>شارك نتيجتك</span></button>
                     <button onClick={reset} className="btn-outline-gold w-full justify-center !bg-transparent !text-white/60 !border-white/10 hover:!bg-white/5">جرّب مرة ثانية</button>
                   </div>
 
-                  <div className="mt-4 pt-4 border-t border-white/[0.06]">
+                  <div className="mt-5 pt-5 border-t border-white/[0.06]">
                     <Link to="/editor" className="btn-gold w-full justify-center"><Send className="w-4 h-4" /><span>صمّم بطاقة عيدية</span></Link>
                   </div>
                 </div>
@@ -404,16 +404,16 @@ function EidiyaLuckGenerator() {
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="max-w-2xl mx-auto">
           {/* Heading */}
-          <div className="text-center mb-10">
+          <div className="text-center mb-12">
             <span className="section-label"><Sparkles className="w-3.5 h-3.5" /> ميزة جديدة</span>
-            <h2 className="section-title mb-3">عيديتك بحظك!</h2>
+            <h2 className="section-title mt-3 mb-4">عيديتك بحظك!</h2>
             <p className="text-[#64748b] text-[15px] leading-relaxed max-w-lg mx-auto">
               أنشئ رابط عيدية عشوائي وأرسله لأصدقائك — المستلم يلفّ العداد ويطلع له مبلغ مع ردة فعل مضحكة
             </p>
           </div>
 
           {/* Features */}
-          <div className="grid grid-cols-2 gap-4 mb-10">
+          <div className="grid grid-cols-2 gap-5 mb-12">
             {luckFeatures.map((f, i) => (
               <div key={i} className="rounded-xl border border-[#e2e8f0] bg-white p-5 text-center hover:border-[#bfdbfe] hover:shadow-sm transition-all">
                 <div className="w-10 h-10 mx-auto mb-3 rounded-lg bg-[#eff6ff] border border-[#dbeafe] flex items-center justify-center">
@@ -426,7 +426,7 @@ function EidiyaLuckGenerator() {
           </div>
 
           {/* Steps */}
-          <div className="flex items-start justify-center gap-12 mb-10">
+          <div className="flex items-start justify-center gap-12 mb-12">
             {steps.map((s, i) => (
               <div key={i} className="flex flex-col items-center text-center">
                 <div className="w-10 h-10 rounded-full mb-2 bg-[#eff6ff] border border-[#dbeafe] flex items-center justify-center">
@@ -440,12 +440,12 @@ function EidiyaLuckGenerator() {
 
           {/* Generator Card */}
           <div className="max-w-md mx-auto">
-            <div className="rounded-2xl bg-white border border-[#e2e8f0] p-6 sm:p-8 shadow-sm">
-              <div className="text-center mb-6">
+            <div className="rounded-2xl bg-white border border-[#e2e8f0] p-7 sm:p-9 shadow-sm">
+              <div className="text-center mb-8">
                 <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[#eff6ff] border border-[#dbeafe] flex items-center justify-center">
                   <Zap className="w-5 h-5 text-[#1d4ed8]" strokeWidth={1.5} />
                 </div>
-                <h3 className="text-[#0f172a] font-bold text-lg mb-1">أنشئ رابط العيدية</h3>
+                <h3 className="text-[#0f172a] font-bold text-lg mb-2">أنشئ رابط العيدية</h3>
                 <p className="text-[#64748b] text-sm">اكتب اسمك وشارك الرابط</p>
               </div>
 
@@ -637,15 +637,15 @@ function QuickCardCreator() {
   return (
     <section className="py-20 bg-white">
       <div className="max-w-[1200px] mx-auto px-6">
-        <div className="text-center mb-10">
+        <div className="text-center mb-12">
           <span className="section-label">بطاقات جاهزة</span>
-          <h2 className="section-title mb-3">اختر تصميم واكتب اسمك فقط</h2>
-          <p className="section-subtitle mx-auto">٤ تصاميم احترافية جاهزة — فقط اكتب الاسم وحمّل البطاقة</p>
+          <h2 className="section-title mt-3 mb-4">اختر تصميم واكتب اسمك فقط</h2>
+          <p className="section-subtitle mx-auto text-center">٤ تصاميم احترافية جاهزة — فقط اكتب الاسم وحمّل البطاقة</p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
+        <div className="flex flex-col lg:flex-row gap-10 items-start">
           {/* Controls */}
-          <div className="flex-1 min-w-0 space-y-6">
+          <div className="flex-1 min-w-0 space-y-8">
             <div>
               <label className="text-xs font-bold text-[#64748b] block mb-3">اختر التصميم</label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -673,7 +673,7 @@ function QuickCardCreator() {
             </div>
 
             {/* Name input + color in a clean card */}
-            <div className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] p-5 space-y-5">
+            <div className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] p-6 space-y-6">
               <div>
                 <label className="text-sm font-bold text-[#0f172a] block mb-2">اكتب الاسم على البطاقة</label>
                 <input type="text" value={name} onChange={e => setName(e.target.value)} dir="rtl" placeholder="مثلاً: محمد"
@@ -736,7 +736,7 @@ function QuickCardCreator() {
           </div>
 
           {/* Preview */}
-          <div className="w-full lg:w-[380px] flex flex-col items-center lg:sticky lg:top-24">
+            <div className="w-full lg:w-[400px] flex flex-col items-center lg:sticky lg:top-24">
             <div className="rounded-2xl border border-[#e2e8f0] bg-white p-3 shadow-sm w-full">
               <canvas ref={canvasRef} className="w-full aspect-square rounded-xl" style={{ imageRendering: 'auto' }} />
             </div>
@@ -787,15 +787,15 @@ export default function LandingPage() {
           </div>
 
           {/* Stats */}
-          <div className="max-w-lg mx-auto grid grid-cols-3 gap-4">
+          <div className="max-w-lg mx-auto grid grid-cols-3 gap-5">
             {[
               { n: '+100', l: 'عبارة جاهزة' },
               { n: '20', l: 'قالب أنيق' },
               { n: '1080', l: 'دقة التصدير' },
             ].map((s, i) => (
-              <div key={i} className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-4 text-center">
+              <div key={i} className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-5 text-center">
                 <div className="text-[#1d4ed8] text-xl font-black tabular-nums">{s.n}</div>
-                <div className="text-[#64748b] text-xs mt-1">{s.l}</div>
+                <div className="text-[#64748b] text-xs mt-1.5">{s.l}</div>
               </div>
             ))}
           </div>
@@ -817,11 +817,11 @@ export default function LandingPage() {
       {/* ── HOW IT WORKS ── */}
       <section className="py-20 bg-[#f8fafc]">
         <div className="max-w-[1200px] mx-auto px-6">
-          <div className="text-center mb-12">
+          <div className="text-center mb-14">
             <span className="section-label">الخطوات</span>
-            <h2 className="section-title">كيف تصمّن بطاقتك</h2>
+            <h2 className="section-title mt-3">كيف تصمّن بطاقتك</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4">
             <StepCard num={1} icon={Layers}  title="اختر القالب"  desc="تصفّح القوالب الجاهزة أو ارفع تصميمك الخاص من لوحة التحكم" />
             <StepCard num={2} icon={Palette}  title="خصّص البطاقة" desc="اختر الخط والعبارة والألوان واكتب اسم المُرسل والمُستلم" />
             <StepCard num={3} icon={Send}     title="أرسل أو حمّل" desc="صدّر بصيغة PNG أو PDF أو أرسل مباشرة عبر واتساب" />
@@ -848,7 +848,7 @@ export default function LandingPage() {
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               </Link>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-5">
               <Feature icon={Type}       title="خطوط عربية أصيلة"   desc="8 مخطوطات تشمل أميري وشهرزاد والقاهرة ولطيف وغيرها" />
               <Feature icon={FileText}   title="أكثر من 100 عبارة"  desc="عبارات رسمية وعائلية وتجارية وشعرية لكل مناسبة" />
               <Feature icon={Send}       title="إرسال عبر واتساب"   desc="أرسل البطاقة مباشرة لأحبابك عبر واتساب" />
@@ -863,11 +863,11 @@ export default function LandingPage() {
       <section className="py-20 bg-[#f8fafc]">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-10">
+            <div className="text-center mb-12">
               <span className="section-label">الأسئلة</span>
-              <h2 className="section-title">أسئلة شائعة</h2>
+              <h2 className="section-title mt-3">أسئلة شائعة</h2>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {faqs.map((f, i) => (
                 <FAQ key={i} q={f.q} a={f.a} isOpen={openFaq === i} toggle={() => setOpenFaq(openFaq === i ? null : i)} />
               ))}
@@ -877,12 +877,12 @@ export default function LandingPage() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="py-20 bg-white">
+      <section className="py-24 bg-white">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="max-w-xl mx-auto text-center">
-            <img src="/images/logo.png" alt="سَلِّم" className="h-16 w-auto mx-auto mb-6 opacity-90" />
-            <h2 className="section-title mb-4">جاهز تصمّم بطاقتك؟</h2>
-            <p className="section-subtitle mx-auto mb-8">
+            <img src="/images/logo.png" alt="سَلِّم" className="h-16 w-auto mx-auto mb-8 opacity-90" />
+            <h2 className="section-title mb-5">جاهز تصمّن بطاقتك؟</h2>
+            <p className="section-subtitle mx-auto mb-10 text-center">
               صمّم بطاقة فريدة وأرسلها لمن تحب في أقل من دقيقة
             </p>
             <Link to="/editor" className="group btn-gold !px-8 !py-3.5">

@@ -1,4 +1,4 @@
-๏ปฟimport { useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { useEditorStore } from '../store'
 import { generateWhatsAppLink, parseCSV } from '../utils/export'
 import { templates } from '../data/templates'
@@ -12,7 +12,7 @@ export default function SendPage() {
   const [sendMode, setSendMode] = useState('eidiya')
   const [phone, setPhone] = useState('')
   const [name, setName] = useState('')
-  const [message, setMessage] = useState('ุนูุฏ ู…ุจุงุฑู ููู ุนุงู… ูุฃูุชู… ุจุฎูุฑ')
+  const [message, setMessage] = useState('ฺํฯ ใศวั฿ ๆ฿แ ฺวใ ๆรไสใ ศฮํั')
   const [csvData, setCsvData] = useState([])
   const [csvFileName, setCsvFileName] = useState('')
   const [interval, setInterval] = useState(5)
@@ -24,7 +24,7 @@ export default function SendPage() {
   // Link Card state
   const [linkName, setLinkName] = useState('')
   const [linkTemplate, setLinkTemplate] = useState(1)
-  const [linkGreeting, setLinkGreeting] = useState('ูู ุนุงู… ูุฃูุชู… ุจุฎูุฑ')
+  const [linkGreeting, setLinkGreeting] = useState('฿แ ฺวใ ๆรไสใ ศฮํั')
   const [generatedLink, setGeneratedLink] = useState('')
   const [linkCopied, setLinkCopied] = useState(false)
 
@@ -35,12 +35,12 @@ export default function SendPage() {
   const [eidiyaSenderName, setEidiyaSenderName] = useState('')
   const [eidiyaLink, setEidiyaLink] = useState('')
   const [eidiyaLinkCopied, setEidiyaLinkCopied] = useState(false)
-  const [eidiyaCurrency, setEidiyaCurrency] = useState('ุฑูุงู')
+  const [eidiyaCurrency, setEidiyaCurrency] = useState('ัํวแ')
   const [eidiyaDialect, setEidiyaDialect] = useState('sa')
 
   const handleGenerateLink = () => {
     if (!linkName.trim()) {
-      toast.error('ุงูุชุจ ุงุณู… ุงูู…ุณุชูู… ุฃููุงู')
+      toast.error('ว฿สศ วำใ วแใำสแใ รๆแว๐')
       return
     }
     const params = new URLSearchParams({
@@ -50,24 +50,24 @@ export default function SendPage() {
     })
     const url = `${window.location.origin}/card?${params.toString()}`
     setGeneratedLink(url)
-    toast.success('ุชู… ุฅูุดุงุก ุงูุฑุงุจุท!')
+    toast.success('สใ ลไิวม วแัวศุ!')
   }
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(generatedLink).then(() => {
       setLinkCopied(true)
-      toast.success('ุชู… ูุณุฎ ุงูุฑุงุจุท!')
+      toast.success('สใ ไำฮ วแัวศุ!')
       setTimeout(() => setLinkCopied(false), 2000)
-    }).catch(() => toast.error('ูู… ูุชู…ูู ู…ู ุงููุณุฎ'))
+    }).catch(() => toast.error('แใ ไสใ฿ไ ใไ วแไำฮ'))
   }
 
   const handleGenerateEidiya = () => {
     if (!eidiyaSenderName.trim()) {
-      toast.error('ุงูุชุจ ุงุณู…ู ุฃููุงู')
+      toast.error('ว฿สศ วำใ฿ รๆแว๐')
       return
     }
     if (eidiyaMin >= eidiyaMax) {
-      toast.error('ุงูุญุฏ ุงูุฃูุตู ูุงุฒู… ูููู ุฃูุจุฑ ู…ู ุงูุฃุฏูู')
+      toast.error('วแอฯ วแรÞี์ แวาใ ํ฿ๆไ ร฿ศั ใไ วแรฯไ์')
       return
     }
     const params = new URLSearchParams({
@@ -80,25 +80,25 @@ export default function SendPage() {
     })
     const url = `${window.location.origin}/eidiya?${params.toString()}`
     setEidiyaLink(url)
-    toast.success('ุชู… ุฅูุดุงุก ุฑุงุจุท ุงูุนูุฏูุฉ!')
+    toast.success('สใ ลไิวม ัวศุ วแฺํฯํษ!')
   }
 
   const handleCopyEidiya = () => {
     navigator.clipboard.writeText(eidiyaLink).then(() => {
       setEidiyaLinkCopied(true)
-      toast.success('ุชู… ูุณุฎ ุฑุงุจุท ุงูุนูุฏูุฉ!')
+      toast.success('สใ ไำฮ ัวศุ วแฺํฯํษ!')
       setTimeout(() => setEidiyaLinkCopied(false), 2000)
-    }).catch(() => toast.error('ูู… ูุชู…ูู ู…ู ุงููุณุฎ'))
+    }).catch(() => toast.error('แใ ไสใ฿ไ ใไ วแไำฮ'))
   }
 
   const handleSingleSend = () => {
     if (!phone) {
-      toast.error('ุฃุฏุฎู ุฑูู… ุงููุงุชู')
+      toast.error('รฯฮแ ัÞใ วแๅวสÝ')
       return
     }
     const link = generateWhatsAppLink(phone, message)
     window.open(link, '_blank')
-    toast.success('ุชู… ูุชุญ ูุงุชุณุงุจ!')
+    toast.success('สใ Ýสอ ๆวสำวศ!')
   }
 
   const handleCSVUpload = (e) => {
@@ -110,9 +110,9 @@ export default function SendPage() {
         const data = parseCSV(ev.target.result)
         setCsvData(data)
         setCsvFileName(file.name)
-        toast.success(`ุชู… ุชุญู…ูู ${data.length} ุฌูุฉ ุงุชุตุงู!`)
+        toast.success(`สใ สอใํแ ${data.length} ฬๅษ วสีวแ!`)
       } catch (err) {
-        toast.error('ุฎุทุฃ ูู ูุฑุงุกุฉ ุงูู…ูู. ุชุฃูุฏ ู…ู ุงูุชูุณูู ุงูุตุญูุญ.')
+        toast.error('ฮุร Ýํ Þัวมษ วแใแÝ. สร฿ฯ ใไ วแสไำํÞ วแีอํอ.')
       }
     }
     reader.readAsText(file)
@@ -120,7 +120,7 @@ export default function SendPage() {
 
   const handleBulkSend = async () => {
     if (csvData.length === 0) {
-      toast.error('ูู… ุจุฑูุน ู…ูู CSV ุฃููุงู')
+      toast.error('Þใ ศัÝฺ ใแÝ CSV รๆแว๐')
       return
     }
     setIsSending(true)
@@ -128,8 +128,8 @@ export default function SendPage() {
 
     for (let i = 0; i < csvData.length; i++) {
       const row = csvData[i]
-      const personalMessage = message.replace('{name}', row['ุงูุงุณู…'] || row['name'] || '')
-      const phoneNum = row['ุงูุฑูู…'] || row['phone'] || row['ุฑูู…'] || ''
+      const personalMessage = message.replace('{name}', row['วแวำใ'] || row['name'] || '')
+      const phoneNum = row['วแัÞใ'] || row['phone'] || row['ัÞใ'] || ''
       
       if (phoneNum) {
         const link = generateWhatsAppLink(phoneNum, personalMessage)
@@ -144,7 +144,7 @@ export default function SendPage() {
     }
 
     setIsSending(false)
-    toast.success(`ุชู… ุฅุฑุณุงู ${csvData.length} ุฑุณุงูุฉ ุจูุฌุงุญ!`)
+    toast.success(`สใ ลัำวแ ${csvData.length} ัำวแษ ศไฬวอ!`)
   }
 
   return (
@@ -152,21 +152,21 @@ export default function SendPage() {
       <Toaster position="top-center" toastOptions={{ style: { background: '#17012C', color: '#f0f0f0', border: '1px solid rgba(106,71,237,0.3)' } }} />
 
       <div className="max-w-6xl mx-auto">
-        {/* Header โ€” Premium */}
+        {/* Header — Premium */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-[#6A47ED]/10 border border-[#6A47ED]/20 rounded-full px-5 py-2 mb-5">
             <BsSend className="text-[#8B6CF6] text-xs" />
-            <span className="text-[#A78BFA] text-xs font-medium">ุทุฑู ุฅุฑุณุงู ู…ุชุนุฏุฏุฉ</span>
+            <span className="text-[#A78BFA] text-xs font-medium">ุัÞ ลัำวแ ใสฺฯฯษ</span>
           </div>
           <h1 className="text-3xl md:text-5xl font-black mb-4">
-            <span className="gradient-gold-text">ุฃุฑุณู ุจุทุงูุชู</span>
-            <span className="text-[#0F172A]"> ุจุฃูุงูุฉ</span>
+            <span className="gradient-gold-text">รัำแ ศุวÞส฿</span>
+            <span className="text-[#0F172A]"> ศรไวÞษ</span>
           </h1>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">ุฃุฑุณู ุจุทุงูุงุช ุงูุนูุฏ ูุฃุญุจุงุจู ุนุจุฑ ูุงุชุณุงุจุ ุชููุฌุฑุงู…ุ ุจุฑูุฏ ุฅููุชุฑูููุ ุฃู ุญู…ู‘ููุง ุจุฌูุฏุฉ ุนุงููุฉ</p>
+          <p className="text-gray-400 text-lg max-w-xl mx-auto">รัำแ ศุวÞวส วแฺํฯ แรอศวศ฿ ฺศั ๆวสำวศก สแํฬัวใก ศัํฯ ลแ฿สัๆไํก รๆ อใ๘แๅว ศฬๆฯษ ฺวแํษ</p>
           
           {/* Quick visual steps */}
           <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-6 max-w-md mx-auto">
-            {['ุตู…ู‘ู…', 'ุงุฎุชุฑ ุงูุทุฑููุฉ', 'ุฃุฑุณู'].map((s, i) => (
+            {['ีใ๘ใ', 'วฮสั วแุัํÞษ', 'รัำแ'].map((s, i) => (
               <div key={i} className="rounded-xl bg-white/[0.02] border border-white/5 py-2.5 px-2 text-center">
                 <div className="w-6 h-6 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center mx-auto mb-1.5">{i + 1}</div>
                 <span className="text-gray-300 text-xs font-medium">{s}</span>
@@ -175,20 +175,20 @@ export default function SendPage() {
           </div>
         </div>
 
-        {/* Mode Selector โ€” Premium Tabs */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 mb-10">
+        {/* Mode Selector — Premium Tabs */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-12">
           {[
-            { id: 'eidiya', icon: <BsGift />, label: 'ุนูุฏูุฉ ุจุญุธู', desc: 'ุนุฏุงุฏ ุนุดูุงุฆู' },
-            { id: 'link', icon: <BsLink45Deg />, label: 'ุจุทุงูุฉ ุฑุงุจุท', desc: 'ุฑุงุจุท ู…ุฎุตุต' },
-            { id: 'single', icon: <BsPersonPlus />, label: 'ุฅุฑุณุงู ูุฑุฏู', desc: 'ุดุฎุต ูุงุญุฏ' },
-            { id: 'bulk', icon: <BsPeople />, label: 'ุฅุฑุณุงู ุฌู…ุงุนู', desc: 'ูุงุฆู…ุฉ CSV' },
-            { id: 'share', icon: <HiShare />, label: 'ู…ุดุงุฑูุฉ ุณุฑูุนุฉ', desc: 'ูู ุงูู…ูุตุงุช' },
-            { id: 'zip', icon: <BsFileZip />, label: 'ุชุญู…ูู ZIP', desc: 'ุจุทุงูุงุช ู…ุฎุตุตุฉ' },
+            { id: 'eidiya', icon: <BsGift />, label: 'ฺํฯํษ ศอู฿', desc: 'ฺฯวฯ ฺิๆวฦํ' },
+            { id: 'link', icon: <BsLink45Deg />, label: 'ศุวÞษ ัวศุ', desc: 'ัวศุ ใฮีี' },
+            { id: 'single', icon: <BsPersonPlus />, label: 'ลัำวแ Ýัฯํ', desc: 'ิฮี ๆวอฯ' },
+            { id: 'bulk', icon: <BsPeople />, label: 'ลัำวแ ฬใวฺํ', desc: 'Þวฦใษ CSV' },
+            { id: 'share', icon: <HiShare />, label: 'ใิวั฿ษ ำัํฺษ', desc: '฿แ วแใไีวส' },
+            { id: 'zip', icon: <BsFileZip />, label: 'สอใํแ ZIP', desc: 'ศุวÞวส ใฮีีษ' },
           ].map((mode) => (
             <button
               key={mode.id}
               onClick={() => setSendMode(mode.id)}
-              className={`flex flex-col items-center justify-center gap-1.5 px-4 py-4 rounded-2xl text-sm font-medium transition-all min-h-[106px] border ${
+              className={`flex flex-col items-center justify-center gap-2 px-4 py-5 rounded-2xl text-sm font-medium transition-all min-h-[112px] border ${
                 sendMode === mode.id
                   ? 'bg-[#6A47ED] text-white shadow-lg shadow-[#6A47ED]/20 border-[#6A47ED]/30'
                   : 'glass text-gray-300 hover:text-white border-white/5 hover:border-[#6A47ED]/20'
@@ -201,16 +201,16 @@ export default function SendPage() {
           ))}
         </div>
 
-        {/* โ•โ•โ• Eidiya Luck Spinner โ•โ•โ• */}
+        {/* ??? Eidiya Luck Spinner ??? */}
         {sendMode === 'eidiya' && (
-          <div className="glass rounded-3xl p-8 md:p-10 max-w-lg mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
-            <div className="flex items-center gap-4 mb-8">
+          <div className="glass rounded-3xl p-8 md:p-12 max-w-lg mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
+            <div className="flex items-center gap-4 mb-10">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#6A47ED]/30 to-[#5234c7]/20 flex items-center justify-center border border-[#6A47ED]/20">
                 <BsGift className="text-[#8B6CF6] text-2xl" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-white">ุนูุฏูุชู ุจุญุธู!</h3>
-                <p className="text-gray-400 text-sm">ุฃูุดุฆ ุฑุงุจุท ุนูุฏูุฉ โ€” ุงูู…ุณุชูู… ููู ุงูุนุฏุงุฏ ููุดูู ุญุธู</p>
+                <h3 className="text-xl font-black text-white">ฺํฯํส฿ ศอู฿!</h3>
+                <p className="text-gray-400 text-sm">รไิฦ ัวศุ ฺํฯํษ — วแใำสแใ ํแÝ วแฺฯวฯ ๆํิๆÝ อูๅ</p>
               </div>
             </div>
 
@@ -219,7 +219,7 @@ export default function SendPage() {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-6 h-6 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">1</div>
-                  <label className="text-sm text-[#8B6CF6] font-bold">ุงุณู…ู (ุงูู…ูุนูููู‘ุฏ)</label>
+                  <label className="text-sm text-[#8B6CF6] font-bold">วำใ฿ (วแใ๕ฺ๓ํ๖๘ฯ)</label>
                 </div>
                 <input
                   type="text"
@@ -227,7 +227,7 @@ export default function SendPage() {
                   onChange={(e) => { setEidiyaSenderName(e.target.value); setEidiyaLink('') }}
                   className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-base text-center focus:border-[#6A47ED]/50 focus:outline-none focus:ring-1 focus:ring-[#6A47ED]/20 transition-all"
                   dir="rtl"
-                  placeholder="ุฃุจู ุนุจุฏุงููู"
+                  placeholder="รศๆ ฺศฯวแแๅ"
                 />
               </div>
 
@@ -235,7 +235,7 @@ export default function SendPage() {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-6 h-6 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">2</div>
-                  <label className="text-sm text-[#8B6CF6] font-bold">ุงูููุฌุฉ ูุงูุนู…ูุฉ</label>
+                  <label className="text-sm text-[#8B6CF6] font-bold">วแแๅฬษ ๆวแฺใแษ</label>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <select
@@ -243,24 +243,24 @@ export default function SendPage() {
                     onChange={(e) => setEidiyaDialect(e.target.value)}
                     className="bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-[#6A47ED]/50 focus:outline-none appearance-none text-center"
                   >
-                    <option value="sa" className="bg-gray-900">ุณุนูุฏู</option>
-                    <option value="ae" className="bg-gray-900">ุฅู…ุงุฑุงุชู</option>
-                    <option value="kw" className="bg-gray-900">ูููุชู</option>
-                    <option value="bh" className="bg-gray-900">ุจุญุฑููู</option>
-                    <option value="qa" className="bg-gray-900">ูุทุฑู</option>
-                    <option value="om" className="bg-gray-900">ุนูู…ุงูู</option>
+                    <option value="sa" className="bg-gray-900">ำฺๆฯํ</option>
+                    <option value="ae" className="bg-gray-900">ลใวัวสํ</option>
+                    <option value="kw" className="bg-gray-900">฿ๆํสํ</option>
+                    <option value="bh" className="bg-gray-900">ศอัํไํ</option>
+                    <option value="qa" className="bg-gray-900">Þุัํ</option>
+                    <option value="om" className="bg-gray-900">ฺ๕ใวไํ</option>
                   </select>
                   <select
                     value={eidiyaCurrency}
                     onChange={(e) => setEidiyaCurrency(e.target.value)}
                     className="bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-[#6A47ED]/50 focus:outline-none appearance-none text-center"
                   >
-                    <option value="ุฑูุงู" className="bg-gray-900">ุฑูุงู</option>
-                    <option value="ุฏุฑูู…" className="bg-gray-900">ุฏุฑูู…</option>
-                    <option value="ุฏููุงุฑ" className="bg-gray-900">ุฏููุงุฑ</option>
-                    <option value="ุฏููุงุฑ ุจุญุฑููู" className="bg-gray-900">ุฏููุงุฑ ุจุญุฑููู</option>
-                    <option value="ุฑูุงู ูุทุฑู" className="bg-gray-900">ุฑูุงู ูุทุฑู</option>
-                    <option value="ุฑูุงู ุนูู…ุงูู" className="bg-gray-900">ุฑูุงู ุนูู…ุงูู</option>
+                    <option value="ัํวแ" className="bg-gray-900">ัํวแ</option>
+                    <option value="ฯัๅใ" className="bg-gray-900">ฯัๅใ</option>
+                    <option value="ฯํไวั" className="bg-gray-900">ฯํไวั</option>
+                    <option value="ฯํไวั ศอัํไํ" className="bg-gray-900">ฯํไวั ศอัํไํ</option>
+                    <option value="ัํวแ Þุัํ" className="bg-gray-900">ัํวแ Þุัํ</option>
+                    <option value="ัํวแ ฺ๕ใวไํ" className="bg-gray-900">ัํวแ ฺ๕ใวไํ</option>
                   </select>
                 </div>
               </div>
@@ -269,11 +269,11 @@ export default function SendPage() {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-6 h-6 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">3</div>
-                  <label className="text-sm text-[#8B6CF6] font-bold">ู…ุจูุบ ุงูุนูุฏูุฉ</label>
+                  <label className="text-sm text-[#8B6CF6] font-bold">ใศแÛ วแฺํฯํษ</label>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-gray-500 block mb-1 text-center">ุงูุญุฏ ุงูุฃุฏูู</label>
+                    <label className="text-xs text-gray-500 block mb-1 text-center">วแอฯ วแรฯไ์</label>
                     <input
                       type="number"
                       value={eidiyaMin}
@@ -283,7 +283,7 @@ export default function SendPage() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 block mb-1 text-center">ุงูุญุฏ ุงูุฃูุตู</label>
+                    <label className="text-xs text-gray-500 block mb-1 text-center">วแอฯ วแรÞี์</label>
                     <input
                       type="number"
                       value={eidiyaMax}
@@ -293,14 +293,14 @@ export default function SendPage() {
                     />
                   </div>
                 </div>
-                <p className="text-gray-400 text-xs text-center mt-2">ุงูุนุฏุงุฏ ููููู ุนุดูุงุฆู ุจูู {eidiyaMin} ู {eidiyaMax} {eidiyaCurrency}</p>
+                <p className="text-gray-400 text-xs text-center mt-2">วแฺฯวฯ ๅํๆÞÝ ฺิๆวฦํ ศํไ {eidiyaMin} ๆ {eidiyaMax} {eidiyaCurrency}</p>
               </div>
 
               {/* Attempts */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-6 h-6 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">4</div>
-                  <label className="text-sm text-[#8B6CF6] font-bold">ุนุฏุฏ ุงูู…ุญุงููุงุช</label>
+                  <label className="text-sm text-[#8B6CF6] font-bold">ฺฯฯ วแใอวๆแวส</label>
                 </div>
                 <div className="flex items-center justify-center gap-4">
                   {[1, 2, 3, 5].map((n) => (
@@ -317,7 +317,7 @@ export default function SendPage() {
                     </button>
                   ))}
                 </div>
-                <p className="text-gray-400 text-xs text-center mt-2">ุงูู…ุณุชูู… ููุฏุฑ ููู ุงูุนุฏุงุฏ {eidiyaAttempts === 1 ? 'ู…ุฑุฉ ูุงุญุฏุฉ' : `${eidiyaAttempts} ู…ุฑุงุช`} ุจุณ</p>
+                <p className="text-gray-400 text-xs text-center mt-2">วแใำสแใ ํÞฯั ํแÝ วแฺฯวฯ {eidiyaAttempts === 1 ? 'ใัษ ๆวอฯษ' : `${eidiyaAttempts} ใัวส`} ศำ</p>
               </div>
 
               {/* Generate Button */}
@@ -326,7 +326,7 @@ export default function SendPage() {
                 className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-l from-[#6A47ED] to-[#8B6FF5] text-white font-black text-lg transition-all hover:shadow-xl hover:shadow-[#6A47ED]/30 hover:scale-[1.02]"
               >
                 <BsDice5 className="text-xl" />
-                ุฃูุดุฆ ุฑุงุจุท ุงูุนูุฏูุฉ
+                รไิฦ ัวศุ วแฺํฯํษ
               </button>
 
               {/* Generated Link */}
@@ -348,7 +348,7 @@ export default function SendPage() {
                           : 'bg-[#6A47ED] text-white hover:scale-105'
                       }`}
                     >
-                      {eidiyaLinkCopied ? 'โ“ ุชู… ุงููุณุฎ' : 'ูุณุฎ'}
+                      {eidiyaLinkCopied ? '? สใ วแไำฮ' : 'ไำฮ'}
                     </button>
                   </div>
 
@@ -356,22 +356,22 @@ export default function SendPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={() => {
-                        const text = encodeURIComponent(`ุนูุฏูุชู ู…ู ${eidiyaSenderName}ุ ุฌุฑู‘ุจ ุญุธู\n\n${eidiyaLink}`)
+                        const text = encodeURIComponent(`ฺํฯํส฿ ใไ ${eidiyaSenderName}ก ฬั๘ศ อู฿\n\n${eidiyaLink}`)
                         window.open(`https://wa.me/?text=${text}`, '_blank')
                       }}
                       className="flex items-center justify-center gap-2 p-3 rounded-xl bg-green-600/10 border border-green-500/20 hover:bg-green-600/20 text-green-400 font-bold text-sm transition-all"
                     >
-                      <BsWhatsapp /> ูุงุชุณุงุจ
+                      <BsWhatsapp /> ๆวสำวศ
                     </button>
                     <button
                       onClick={() => {
                         const url = encodeURIComponent(eidiyaLink)
-                        const text = encodeURIComponent(`ุนูุฏูุชู ู…ู ${eidiyaSenderName}ุ ุฌุฑู‘ุจ ุญุธู`)
+                        const text = encodeURIComponent(`ฺํฯํส฿ ใไ ${eidiyaSenderName}ก ฬั๘ศ อู฿`)
                         window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank')
                       }}
                       className="flex items-center justify-center gap-2 p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/20 text-blue-400 font-bold text-sm transition-all"
                     >
-                      <BsTelegram /> ุชููุฌุฑุงู…
+                      <BsTelegram /> สแํฬัวใ
                     </button>
                   </div>
 
@@ -381,7 +381,7 @@ export default function SendPage() {
                     rel="noopener noreferrer"
                     className="block text-center text-[#8B6CF6] hover:text-[#A78BFA] text-sm transition-colors"
                   >
-                    ู…ุนุงููุฉ ุงูุนูุฏูุฉ
+                    ใฺวํไษ วแฺํฯํษ
                   </a>
                 </div>
               )}
@@ -389,16 +389,16 @@ export default function SendPage() {
           </div>
         )}
 
-        {/* โ•โ•โ• Link Card (my-card.one style) โ•โ•โ• */}
+        {/* ??? Link Card (my-card.one style) ??? */}
         {sendMode === 'link' && (
-          <div className="glass rounded-3xl p-8 md:p-10 max-w-2xl mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
-            <div className="flex items-center gap-4 mb-8">
+          <div className="glass rounded-3xl p-8 md:p-12 max-w-2xl mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
+            <div className="flex items-center gap-4 mb-10">
               <div className="w-14 h-14 rounded-2xl bg-[#6A47ED]/20 flex items-center justify-center border border-[#6A47ED]/10">
                 <BsLink45Deg className="text-[#8B6CF6] text-2xl" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-white">ุฃูุดุฆ ุจุทุงูุฉ ุฑุงุจุท</h3>
-                <p className="text-gray-400 text-sm">ุงุฎุชุฑ ุจุทุงูุฉุ ุงูุชุจ ุงูุงุณู…ุ ูุดุงุฑู ุงูุฑุงุจุท โ€” ููุชุญูุง ุงูู…ุณุชูู… ู…ุจุงุดุฑุฉ</p>
+                <h3 className="text-xl font-black text-white">รไิฦ ศุวÞษ ัวศุ</h3>
+                <p className="text-gray-400 text-sm">วฮสั ศุวÞษก ว฿สศ วแวำใก ๆิวั฿ วแัวศุ — ํÝสอๅว วแใำสแใ ใศวิัษ</p>
               </div>
             </div>
 
@@ -407,7 +407,7 @@ export default function SendPage() {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-7 h-7 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">1</div>
-                  <label className="text-sm text-[#8B6CF6] font-bold">ุงุณู… ุงูู…ุณุชูู…</label>
+                  <label className="text-sm text-[#8B6CF6] font-bold">วำใ วแใำสแใ</label>
                 </div>
                 <input
                   type="text"
@@ -415,7 +415,7 @@ export default function SendPage() {
                   onChange={(e) => { setLinkName(e.target.value); setGeneratedLink('') }}
                   className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-lg text-center focus:border-[#6A47ED]/50 focus:outline-none focus:ring-1 focus:ring-[#6A47ED]/20 transition-all"
                   dir="rtl"
-                  placeholder="ุงูุชุจ ุงูุงุณู… ููุง..."
+                  placeholder="ว฿สศ วแวำใ ๅไว..."
                 />
               </div>
 
@@ -423,7 +423,7 @@ export default function SendPage() {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-7 h-7 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">2</div>
-                  <label className="text-sm text-[#8B6CF6] font-bold">ุงุฎุชุฑ ุงูุจุทุงูุฉ</label>
+                  <label className="text-sm text-[#8B6CF6] font-bold">วฮสั วแศุวÞษ</label>
                 </div>
                 <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 max-h-[280px] overflow-y-auto pr-1 custom-scrollbar">
                   {templates.map((t) => (
@@ -451,7 +451,7 @@ export default function SendPage() {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-7 h-7 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">3</div>
-                  <label className="text-sm text-[#8B6CF6] font-bold">ูุต ุงูุชููุฆุฉ</label>
+                  <label className="text-sm text-[#8B6CF6] font-bold">ไี วแสๅไฦษ</label>
                 </div>
                 <textarea
                   value={linkGreeting}
@@ -459,7 +459,7 @@ export default function SendPage() {
                   className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-base text-center resize-none focus:border-[#6A47ED]/50 focus:outline-none focus:ring-1 focus:ring-[#6A47ED]/20 transition-all"
                   rows={2}
                   dir="rtl"
-                  placeholder="ูู ุนุงู… ูุฃูุชู… ุจุฎูุฑ"
+                  placeholder="฿แ ฺวใ ๆรไสใ ศฮํั"
                 />
               </div>
 
@@ -469,7 +469,7 @@ export default function SendPage() {
                 className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-[#6A47ED] text-white font-black text-lg transition-all hover:shadow-xl hover:shadow-[#6A47ED]/20 hover:scale-[1.02]"
               >
                 <BsSend className="text-xl" />
-                ุนุฑุถ ุงูุจุทุงูุฉ
+                ฺัึ วแศุวÞษ
               </button>
 
               {/* Generated Link & Share */}
@@ -491,7 +491,7 @@ export default function SendPage() {
                           : 'bg-[#6A47ED] text-white hover:scale-105'
                       }`}
                     >
-                      {linkCopied ? 'โ“ ุชู… ุงููุณุฎ' : 'ูุณุฎ ุงูุฑุงุจุท'}
+                      {linkCopied ? '? สใ วแไำฮ' : 'ไำฮ วแัวศุ'}
                     </button>
                   </div>
 
@@ -499,35 +499,35 @@ export default function SendPage() {
                   <div className="grid grid-cols-3 gap-3">
                     <button
                       onClick={() => {
-                        const text = encodeURIComponent(`${linkGreeting} ูุง ${linkName}\n\n${generatedLink}`)
+                        const text = encodeURIComponent(`${linkGreeting} ํว ${linkName}\n\n${generatedLink}`)
                         window.open(`https://wa.me/?text=${text}`, '_blank')
                       }}
                       className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-green-600/10 border border-green-500/20 hover:bg-green-600/20 transition-all"
                     >
                       <BsWhatsapp className="text-green-400 text-xl" />
-                      <span className="text-green-300 text-xs font-bold">ูุงุชุณุงุจ</span>
+                      <span className="text-green-300 text-xs font-bold">ๆวสำวศ</span>
                     </button>
                     <button
                       onClick={() => {
                         const url = encodeURIComponent(generatedLink)
-                        const text = encodeURIComponent(`${linkGreeting} ูุง ${linkName}`)
+                        const text = encodeURIComponent(`${linkGreeting} ํว ${linkName}`)
                         window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank')
                       }}
                       className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/20 transition-all"
                     >
                       <BsTelegram className="text-blue-400 text-xl" />
-                      <span className="text-blue-300 text-xs font-bold">ุชููุฌุฑุงู…</span>
+                      <span className="text-blue-300 text-xs font-bold">สแํฬัวใ</span>
                     </button>
                     <button
                       onClick={() => {
-                        const text = encodeURIComponent(`${linkGreeting} ูุง ${linkName}\n\n`)
+                        const text = encodeURIComponent(`${linkGreeting} ํว ${linkName}\n\n`)
                         const url = encodeURIComponent(generatedLink)
                         window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank')
                       }}
                       className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
                     >
-                      <span className="text-white font-bold text-lg">๐•</span>
-                      <span className="text-gray-300 text-xs font-bold">ุชููุชุฑ</span>
+                      <span className="text-white font-bold text-lg">??</span>
+                      <span className="text-gray-300 text-xs font-bold">สๆํสั</span>
                     </button>
                   </div>
 
@@ -538,7 +538,7 @@ export default function SendPage() {
                     rel="noopener noreferrer"
                     className="block text-center text-[#8B6CF6] hover:text-[#A78BFA] text-sm transition-colors"
                   >
-                    ู…ุนุงููุฉ ุงูุจุทุงูุฉ
+                    ใฺวํไษ วแศุวÞษ
                   </a>
                 </div>
               )}
@@ -546,27 +546,27 @@ export default function SendPage() {
 
             {/* Counter */}
             <div className="mt-8 pt-5 border-t border-white/5 text-center">
-              <p className="text-gray-400 text-xs">ุนุฏุฏ ุงูุจุทุงูุงุช ุงูู…ููุดุฃุฉ: <span className="text-[#8B6CF6] font-bold">ูฅ,ูคูฅู +</span></p>
+              <p className="text-gray-400 text-xs">ฺฯฯ วแศุวÞวส วแใ๕ไิรษ: <span className="text-[#8B6CF6] font-bold">5,450+</span></p>
             </div>
           </div>
         )}
 
-        {/* โ•โ•โ• Single Send โ•โ•โ• */}
+        {/* ??? Single Send ??? */}
         {sendMode === 'single' && (
-          <div className="glass rounded-3xl p-8 md:p-10 max-w-lg mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
-            <div className="flex items-center gap-4 mb-8">
+          <div className="glass rounded-3xl p-8 md:p-12 max-w-lg mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
+            <div className="flex items-center gap-4 mb-10">
               <div className="w-14 h-14 rounded-2xl bg-green-500/20 flex items-center justify-center border border-green-500/10">
                 <BsWhatsapp className="text-green-400 text-2xl" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-white">ุฅุฑุณุงู ูุฑุฏู</h3>
-                <p className="text-gray-400 text-sm">ุฃุฑุณู ุจุทุงูุฉ ูุงุฎุฑุฉ ูุดุฎุต ูุงุญุฏ ุนุจุฑ ูุงุชุณุงุจ</p>
+                <h3 className="text-xl font-black text-white">ลัำวแ Ýัฯํ</h3>
+                <p className="text-gray-400 text-sm">รัำแ ศุวÞษ Ýวฮัษ แิฮี ๆวอฯ ฺศั ๆวสำวศ</p>
               </div>
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-6">
               <div>
-                <label className="text-sm text-[#8B6CF6] font-medium block mb-2">ุฑูู… ุงููุงุชู (ู…ุน ุฑู…ุฒ ุงูุฏููุฉ)</label>
+                <label className="text-sm text-[#8B6CF6] font-medium block mb-2">ัÞใ วแๅวสÝ (ใฺ ัใา วแฯๆแษ)</label>
                 <div className="relative">
                   <input
                     type="tel"
@@ -581,19 +581,19 @@ export default function SendPage() {
               </div>
               
               <div>
-                <label className="text-sm text-[#8B6CF6] font-medium block mb-2">ุงุณู… ุงูู…ุณุชูู… (ุงุฎุชูุงุฑู)</label>
+                <label className="text-sm text-[#8B6CF6] font-medium block mb-2">วำใ วแใำสแใ (วฮสํวัํ)</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-base focus:border-[#6A47ED]/50 focus:outline-none focus:ring-1 focus:ring-[#6A47ED]/20 transition-all"
                   dir="rtl"
-                  placeholder="ุฃุญู…ุฏ"
+                  placeholder="รอใฯ"
                 />
               </div>
 
               <div>
-                <label className="text-sm text-[#8B6CF6] font-medium block mb-2">ูุต ุงูุฑุณุงูุฉ</label>
+                <label className="text-sm text-[#8B6CF6] font-medium block mb-2">ไี วแัำวแษ</label>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -608,31 +608,31 @@ export default function SendPage() {
                 className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-green-600 hover:bg-green-500 text-white font-bold text-lg transition-all hover:shadow-xl hover:shadow-green-500/20 hover:scale-[1.02]"
               >
                 <BsWhatsapp className="text-xl" />
-                ุฅุฑุณุงู ุนุจุฑ ูุงุชุณุงุจ
+                ลัำวแ ฺศั ๆวสำวศ
               </button>
               
-              <p className="text-center text-gray-400 text-xs">ุณูุชู… ูุชุญ ูุงุชุณุงุจ ุจุฑุณุงูุฉ ุฌุงูุฒุฉ ููุฅุฑุณุงู</p>
+              <p className="text-center text-gray-400 text-xs">ำํสใ Ýสอ ๆวสำวศ ศัำวแษ ฬวๅาษ แแลัำวแ</p>
             </div>
           </div>
         )}
 
-        {/* โ•โ•โ• Bulk Send โ•โ•โ• */}
+        {/* ??? Bulk Send ??? */}
         {sendMode === 'bulk' && (
-          <div className="glass rounded-3xl p-8 md:p-10 max-w-lg mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
-            <div className="flex items-center gap-4 mb-8">
+          <div className="glass rounded-3xl p-8 md:p-12 max-w-lg mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
+            <div className="flex items-center gap-4 mb-10">
               <div className="w-14 h-14 rounded-2xl bg-[#6A47ED]/20 flex items-center justify-center border border-[#6A47ED]/10">
                 <BsPeople className="text-[#8B6CF6] text-2xl" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-white">ุฅุฑุณุงู ุฌู…ุงุนู</h3>
-                <p className="text-gray-400 text-sm">ุงุฑูุน ู…ูู CSV ุจุงูุฃุณู…ุงุก ูุงูุฃุฑูุงู…</p>
+                <h3 className="text-xl font-black text-white">ลัำวแ ฬใวฺํ</h3>
+                <p className="text-gray-400 text-sm">วัÝฺ ใแÝ CSV ศวแรำใวม ๆวแรัÞวใ</p>
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               {/* CSV Upload */}
               <div
-                className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center hover:border-[#6A47ED]/30 transition-colors cursor-pointer"
+                className="border-2 border-dashed border-white/10 rounded-xl p-10 text-center hover:border-[#6A47ED]/30 transition-colors cursor-pointer"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <input
@@ -642,9 +642,9 @@ export default function SendPage() {
                   className="hidden"
                   onChange={handleCSVUpload}
                 />
-                <BsUpload className="text-3xl text-gray-500 mx-auto mb-3" />
-                <p className="text-gray-400 text-sm">ุงุถุบุท ูุฑูุน ู…ูู CSV</p>
-                <p className="text-gray-400 text-xs mt-1">ุงูุชูุณูู: ุงูุงุณู…ุ ุงูุฑูู… (ุณุทุฑ ููู ุดุฎุต)</p>
+                <BsUpload className="text-3xl text-gray-500 mx-auto mb-4" />
+                <p className="text-gray-400 text-sm font-semibold">วึÛุ แัÝฺ ใแÝ CSV</p>
+                <p className="text-gray-400 text-xs mt-2">วแสไำํÞ: วแวำใก วแัÞใ (ำุั แ฿แ ิฮี)</p>
               </div>
 
               {csvFileName && (
@@ -652,14 +652,14 @@ export default function SendPage() {
                   <BsFileZip className="text-green-400" />
                   <div>
                     <p className="text-green-300 text-sm font-medium">{csvFileName}</p>
-                    <p className="text-green-400/70 text-xs">{csvData.length} ุฌูุฉ ุงุชุตุงู</p>
+                    <p className="text-green-400/70 text-xs">{csvData.length} ฬๅษ วสีวแ</p>
                   </div>
                 </div>
               )}
 
               <div>
                 <label className="text-sm text-gray-400 block mb-1">
-                  ูุต ุงูุฑุณุงูุฉ <span className="text-[#8B6CF6]">(ุงุณุชุฎุฏู… {'{name}'} ูุงุณู… ุงูู…ุณุชูู…)</span>
+                  ไี วแัำวแษ <span className="text-[#8B6CF6]">(วำสฮฯใ {'{name}'} แวำใ วแใำสแใ)</span>
                 </label>
                 <textarea
                   value={message}
@@ -667,14 +667,14 @@ export default function SendPage() {
                   className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm resize-none focus:border-[#6A47ED]/50 focus:outline-none"
                   rows={4}
                   dir="rtl"
-                  placeholder="ุนูุฏ ู…ุจุงุฑู ูุง {name}ุ ูู ุนุงู… ูุฃูุช ุจุฎูุฑ"
+                  placeholder="ฺํฯ ใศวั฿ ํว {name}ก ฿แ ฺวใ ๆรไส ศฮํั"
                 />
               </div>
 
               <div>
                 <label className="text-sm text-gray-400 flex items-center gap-2 mb-1">
                   <BsClock />
-                  ุงููุงุตู ุงูุฒู…ูู ุจูู ุงูุฑุณุงุฆู: <span className="text-[#8B6CF6]">{interval} ุซูุงูู</span>
+                  วแÝวีแ วแาใไํ ศํไ วแัำวฦแ: <span className="text-[#8B6CF6]">{interval} หๆวไ๒</span>
                 </label>
                 <input
                   type="range"
@@ -685,15 +685,15 @@ export default function SendPage() {
                   className="w-full accent-[#6A47ED]"
                 />
                 <div className="flex justify-between text-xs text-gray-500 mt-1">
-                  <span>3 ุซูุงูู</span>
-                  <span>10 ุซูุงูู</span>
+                  <span>3 หๆวไ๒</span>
+                  <span>10 หๆวไ๒</span>
                 </div>
               </div>
 
               {isSending && (
                 <div className="bg-[#6A47ED]/10 border border-[#6A47ED]/20 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[#A78BFA] text-sm">ุฌุงุฑู ุงูุฅุฑุณุงู...</span>
+                    <span className="text-[#A78BFA] text-sm">ฬวัํ วแลัำวแ...</span>
                     <span className="text-[#8B6CF6] text-sm font-bold">{sentCount}/{csvData.length}</span>
                   </div>
                   <div className="w-full bg-white/10 rounded-full h-2">
@@ -711,22 +711,22 @@ export default function SendPage() {
                 className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[#6A47ED] text-white font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <BsSend />
-                {isSending ? 'ุฌุงุฑู ุงูุฅุฑุณุงู...' : `ุฅุฑุณุงู ูู€ ${csvData.length} ุดุฎุต`}
+                {isSending ? 'ฬวัํ วแลัำวแ...' : `ลัำวแ แÜ ${csvData.length} ิฮี`}
               </button>
             </div>
           </div>
         )}
 
-        {/* โ•โ•โ• Quick Share โ•โ•โ• */}
+        {/* ??? Quick Share ??? */}
         {sendMode === 'share' && (
-          <div className="glass rounded-3xl p-8 md:p-10 max-w-lg mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
-            <div className="flex items-center gap-4 mb-8">
+          <div className="glass rounded-3xl p-8 md:p-12 max-w-lg mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
+            <div className="flex items-center gap-4 mb-10">
               <div className="w-14 h-14 rounded-2xl bg-[#6A47ED]/20 flex items-center justify-center border border-[#6A47ED]/10">
                 <HiShare className="text-[#8B6CF6] text-2xl" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-white">ู…ุดุงุฑูุฉ ุณุฑูุนุฉ</h3>
-                <p className="text-gray-400 text-sm">ุดุงุฑู ุชููุฆุชู ุนุจุฑ ุฃู ู…ูุตุฉ ุจุถุบุทุฉ ูุงุญุฏุฉ</p>
+                <h3 className="text-xl font-black text-white">ใิวั฿ษ ำัํฺษ</h3>
+                <p className="text-gray-400 text-sm">ิวั฿ สๅไฦส฿ ฺศั รํ ใไีษ ศึÛุษ ๆวอฯษ</p>
               </div>
             </div>
 
@@ -737,10 +737,10 @@ export default function SendPage() {
                   navigator.clipboard.writeText(window.location.origin + '/editor')
                     .then(() => {
                       setCopied(true)
-                      toast.success('ุชู… ูุณุฎ ุงูุฑุงุจุท!')
+                      toast.success('สใ ไำฮ วแัวศุ!')
                       setTimeout(() => setCopied(false), 2000)
                     })
-                    .catch(() => toast.error('ูู… ูุชู…ูู ู…ู ุงููุณุฎ'))
+                    .catch(() => toast.error('แใ ไสใ฿ไ ใไ วแไำฮ'))
                 }}
                 className="w-full flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group"
               >
@@ -748,15 +748,15 @@ export default function SendPage() {
                   {copied ? <BsCheck2 className="text-green-400 text-lg" /> : <BsLink45Deg className="text-gray-400 text-lg group-hover:text-white transition-colors" />}
                 </div>
                 <div className="text-right">
-                  <p className="text-white text-sm font-bold">{copied ? 'ุชู… ุงููุณุฎ!' : 'ูุณุฎ ุฑุงุจุท ุงูู…ุญุฑุฑ'}</p>
-                  <p className="text-gray-400 text-xs">ุดุงุฑู ุฑุงุจุท ุงูู…ูุตุฉ ู…ุน ุฃุตุฏูุงุฆู</p>
+                  <p className="text-white text-sm font-bold">{copied ? 'สใ วแไำฮ!' : 'ไำฮ ัวศุ วแใอัั'}</p>
+                  <p className="text-gray-400 text-xs">ิวั฿ ัวศุ วแใไีษ ใฺ รีฯÞวฦ฿</p>
                 </div>
               </button>
 
               {/* WhatsApp */}
               <button
                 onClick={() => {
-                  const text = encodeURIComponent(`${message}\n\nุตู…ู‘ู… ุจุทุงูุชู ู…ู ููุง: ${window.location.origin}/editor`)
+                  const text = encodeURIComponent(`${message}\n\nีใ๘ใ ศุวÞส฿ ใไ ๅไว: ${window.location.origin}/editor`)
                   window.open(`https://wa.me/?text=${text}`, '_blank')
                 }}
                 className="w-full flex items-center gap-3 p-4 rounded-xl bg-green-600/10 border border-green-500/20 hover:bg-green-600/20 transition-all group"
@@ -765,8 +765,8 @@ export default function SendPage() {
                   <BsWhatsapp className="text-green-400 text-lg" />
                 </div>
                 <div className="text-right">
-                  <p className="text-white text-sm font-bold">ูุงุชุณุงุจ</p>
-                  <p className="text-gray-400 text-xs">ุดุงุฑู ุงูุชููุฆุฉ ูู ูุงุชุณุงุจ</p>
+                  <p className="text-white text-sm font-bold">ๆวสำวศ</p>
+                  <p className="text-gray-400 text-xs">ิวั฿ วแสๅไฦษ Ýํ ๆวสำวศ</p>
                 </div>
               </button>
 
@@ -783,8 +783,8 @@ export default function SendPage() {
                   <BsTelegram className="text-blue-400 text-lg" />
                 </div>
                 <div className="text-right">
-                  <p className="text-white text-sm font-bold">ุชููุฌุฑุงู…</p>
-                  <p className="text-gray-400 text-xs">ุดุงุฑู ุงูุชููุฆุฉ ูู ุชููุฌุฑุงู…</p>
+                  <p className="text-white text-sm font-bold">สแํฬัวใ</p>
+                  <p className="text-gray-400 text-xs">ิวั฿ วแสๅไฦษ Ýํ สแํฬัวใ</p>
                 </div>
               </button>
 
@@ -798,19 +798,19 @@ export default function SendPage() {
                 className="w-full flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group"
               >
                 <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">๐•</span>
+                  <span className="text-white font-bold text-sm">??</span>
                 </div>
                 <div className="text-right">
-                  <p className="text-white text-sm font-bold">ุชููุชุฑ / X</p>
-                  <p className="text-gray-400 text-xs">ุบุฑู‘ุฏ ุจุชููุฆุชู</p>
+                  <p className="text-white text-sm font-bold">สๆํสั / X</p>
+                  <p className="text-gray-400 text-xs">Ûั๘ฯ ศสๅไฦส฿</p>
                 </div>
               </button>
 
               {/* Email */}
               <button
                 onClick={() => {
-                  const subject = encodeURIComponent('ุชููุฆุฉ ุนูุฏ ู…ุจุงุฑู')
-                  const body = encodeURIComponent(`${message}\n\nุตู…ู‘ู… ุจุทุงูุชู ุงูุฎุงุตุฉ ู…ู:\n${window.location.origin}/editor`)
+                  const subject = encodeURIComponent('สๅไฦษ ฺํฯ ใศวั฿')
+                  const body = encodeURIComponent(`${message}\n\nีใ๘ใ ศุวÞส฿ วแฮวีษ ใไ:\n${window.location.origin}/editor`)
                   window.open(`mailto:?subject=${subject}&body=${body}`)
                 }}
                 className="w-full flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group"
@@ -819,15 +819,15 @@ export default function SendPage() {
                   <BsEnvelope className="text-purple-400 text-lg" />
                 </div>
                 <div className="text-right">
-                  <p className="text-white text-sm font-bold">ุจุฑูุฏ ุฅููุชุฑููู</p>
-                  <p className="text-gray-400 text-xs">ุฃุฑุณู ุจุงูุจุฑูุฏ ุงูุฅููุชุฑููู</p>
+                  <p className="text-white text-sm font-bold">ศัํฯ ลแ฿สัๆไํ</p>
+                  <p className="text-gray-400 text-xs">รัำแ ศวแศัํฯ วแลแ฿สัๆไํ</p>
                 </div>
               </button>
             </div>
 
             {/* Customize Message */}
             <div className="mt-6 pt-5 border-t border-white/5">
-              <label className="text-sm text-gray-400 block mb-2">ุชุฎุตูุต ูุต ุงูู…ุดุงุฑูุฉ</label>
+              <label className="text-sm text-gray-400 block mb-2">สฮีํี ไี วแใิวั฿ษ</label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -839,28 +839,28 @@ export default function SendPage() {
           </div>
         )}
 
-        {/* โ•โ•โ• ZIP Download โ•โ•โ• */}
+        {/* ??? ZIP Download ??? */}
         {sendMode === 'zip' && (
-          <div className="glass rounded-3xl p-8 md:p-10 max-w-lg mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
-            <div className="flex items-center gap-4 mb-8">
+          <div className="glass rounded-3xl p-8 md:p-12 max-w-lg mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
+            <div className="flex items-center gap-4 mb-10">
               <div className="w-14 h-14 rounded-2xl bg-[#6A47ED]/20 flex items-center justify-center border border-[#6A47ED]/10">
                 <BsFileZip className="text-[#8B6CF6] text-2xl" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-white">ุชุญู…ูู ZIP</h3>
-                <p className="text-gray-400 text-sm">ุญู…ู‘ู ุฌู…ูุน ุงูุจุทุงูุงุช ุงูู…ุฎุตุตุฉ ูู ู…ูู ูุงุญุฏ</p>
+                <h3 className="text-xl font-black text-white">สอใํแ ZIP</h3>
+                <p className="text-gray-400 text-sm">อใ๘แ ฬใํฺ วแศุวÞวส วแใฮีีษ Ýํ ใแÝ ๆวอฯ</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-6 text-center">
                 <BsFileZip className="text-5xl text-purple-400 mx-auto mb-3" />
-                <h4 className="text-white font-bold mb-2">ุชูููุฏ ุจุทุงูุงุช ู…ุฎุตุตุฉ</h4>
+                <h4 className="text-white font-bold mb-2">สๆแํฯ ศุวÞวส ใฮีีษ</h4>
                 <p className="text-gray-400 text-sm mb-4">
-                  ุงุฑูุน ู…ูู CSV ุจุงูุฃุณู…ุงุก ูุณูุชู… ุชูููุฏ ุจุทุงูุฉ ู…ุฎุตุตุฉ ููู ุดุฎุต ูุชุญู…ูููุง ูู ู…ูู ZIP
+                  วัÝฺ ใแÝ CSV ศวแรำใวม ๆำํสใ สๆแํฯ ศุวÞษ ใฮีีษ แ฿แ ิฮี ๆสอใํแๅว Ýํ ใแÝ ZIP
                 </p>
                 <p className="text-purple-300 text-xs">
-                  ูุฐู ุงูู…ูุฒุฉ ุชุญุชุงุฌ ุงุดุชุฑุงู <span className="font-bold">ุงูุดุฑูุงุช</span> ุฃู <span className="font-bold">ุงูู…ูุฒุน</span>
+                  ๅะๅ วแใําษ สอสวฬ วิสัว฿ <span className="font-bold">วแิั฿วส</span> รๆ <span className="font-bold">วแใๆาฺ</span>
                 </p>
               </div>
 
@@ -876,11 +876,11 @@ export default function SendPage() {
                   onChange={handleCSVUpload}
                 />
                 <BsUpload className="text-2xl text-gray-500 mx-auto mb-2" />
-                <p className="text-gray-400 text-sm">ุฑูุน ู…ูู CSV</p>
+                <p className="text-gray-400 text-sm">ัÝฺ ใแÝ CSV</p>
               </div>
 
               {csvData.length > 0 && (
-                <p className="text-green-400 text-sm text-center">โ“ {csvData.length} ุงุณู… ุฌุงูุฒ ููุชูููุฏ</p>
+                <p className="text-green-400 text-sm text-center">? {csvData.length} วำใ ฬวๅา แแสๆแํฯ</p>
               )}
 
               <Link
@@ -888,7 +888,7 @@ export default function SendPage() {
                 className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl border border-purple-500/30 text-purple-300 font-medium hover:bg-purple-500/10 transition-all"
               >
                 <BsSend />
-                ุชุฑููุฉ ููุงุดุชุฑุงู ุงูู…ูุงุณุจ
+                สัÞํษ แแวิสัว฿ วแใไวำศ
               </Link>
             </div>
           </div>
@@ -896,13 +896,13 @@ export default function SendPage() {
 
         {/* Quick Link to Editor */}
         <div className="text-center mt-10">
-          <p className="text-gray-500 text-sm mb-3">ูู… ุชุตู…ู… ุจุทุงูุชู ุจุนุฏุ</p>
+          <p className="text-gray-500 text-sm mb-3">แใ สีใใ ศุวÞส฿ ศฺฯฟ</p>
           <Link
             to="/editor"
             className="inline-flex items-center gap-2 text-[#8B6CF6] hover:text-[#A78BFA] transition-colors"
           >
             <BsSend />
-            ุงุฐูุจ ูู…ุญุฑุฑ ุงูุจุทุงูุงุช
+            วะๅศ แใอัั วแศุวÞวส
           </Link>
         </div>
       </div>

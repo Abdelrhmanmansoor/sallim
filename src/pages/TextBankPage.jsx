@@ -61,7 +61,7 @@ export default function TextBankPage() {
       
       <div className="max-w-7xl mx-auto">
         {/* Premium Hero */}
-        <section className="relative overflow-hidden rounded-[2rem] border border-[#6A47ED]/25 bg-gradient-to-br from-[#241047]/95 via-[#1a0838]/96 to-[#12052d]/98 px-6 sm:px-8 md:px-12 py-8 md:py-10 mb-10 shadow-[0_30px_80px_rgba(5,0,16,0.55)]">
+        <section className="relative overflow-hidden rounded-[2rem] border border-[#6A47ED]/25 bg-gradient-to-br from-[#241047]/95 via-[#1a0838]/96 to-[#12052d]/98 px-6 sm:px-10 md:px-14 py-12 md:py-16 mb-12 shadow-[0_30px_80px_rgba(5,0,16,0.55)]">
           <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-[#6A47ED]/20 blur-3xl pointer-events-none" />
           <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-[#C6F806]/10 blur-3xl pointer-events-none" />
 
@@ -80,22 +80,22 @@ export default function TextBankPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 w-full max-w-[320px]">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-center">
+            <div className="grid grid-cols-2 gap-4 w-full max-w-[340px]">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-center">
                 <p className="text-[#C6F806] text-2xl font-black tabular-nums">{greetingTexts.length}+</p>
-                <p className="text-white/55 text-xs mt-1">نص جاهز</p>
+                <p className="text-white/55 text-xs mt-1.5">نص جاهز</p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-center">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-center">
                 <p className="text-[#A78BFA] text-2xl font-black tabular-nums">{textCategories.length}</p>
-                <p className="text-white/55 text-xs mt-1">تصنيف</p>
+                <p className="text-white/55 text-xs mt-1.5">تصنيف</p>
               </div>
             </div>
           </div>
         </section>
 
         {/* Search + categories */}
-        <section className="glass-card rounded-3xl p-4 sm:p-6 mb-8">
-          <div className="relative mb-5">
+        <section className="glass-card rounded-3xl p-6 sm:p-8 mb-10">
+          <div className="relative mb-6">
             <BsSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-[#C6F806]/70" />
             <input
               type="text"
@@ -107,7 +107,7 @@ export default function TextBankPage() {
             />
           </div>
 
-          <div className="flex flex-wrap gap-2.5">
+          <div className="flex flex-wrap gap-3">
             <button
               onClick={() => setActiveCategory('all')}
               className={`px-4 py-2.5 rounded-full text-sm font-bold transition-all ${
@@ -141,7 +141,7 @@ export default function TextBankPage() {
         </section>
 
         {/* Results Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
           <p className="text-white/65 text-sm">
             عرض <span className="text-[#C6F806] font-black tabular-nums">{filteredTexts.length}</span> نص
           </p>
@@ -166,11 +166,11 @@ export default function TextBankPage() {
         </div>
 
         {/* Texts Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredTexts.map((item, i) => (
             <div
               key={item.id}
-              className="group relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#241047]/95 via-[#1a0838]/95 to-[#120529]/98 p-5 shadow-[0_16px_42px_rgba(4,0,14,0.42)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[#C6F806]/30 hover:shadow-[0_22px_56px_rgba(36,16,87,0.5)] animate-fade-in-up"
+              className="group relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#241047]/95 via-[#1a0838]/95 to-[#120529]/98 p-6 shadow-[0_16px_42px_rgba(4,0,14,0.42)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[#C6F806]/30 hover:shadow-[0_22px_56px_rgba(36,16,87,0.5)] animate-fade-in-up"
               style={{ animationDelay: `${(i % 12) * 0.03}s` }}
             >
               <div className="absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-[#C6F806]/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
