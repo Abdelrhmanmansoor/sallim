@@ -330,9 +330,9 @@ function EidiyaLuckGenerator() {
         </div>
 
         {/* Generator Card */}
-        <div className="max-w-lg mx-auto">
+        <div className="flex flex-col items-center w-full">
           <div 
-            className="rounded-3xl p-6 sm:p-10 transition-all duration-500 bg-[#C9A84C]/[0.03] border-[1.5px] border-[#C9A84C]/12"
+            className="w-full max-w-lg rounded-3xl p-6 sm:p-10 transition-all duration-500 bg-[#C9A84C]/[0.03] border-[1.5px] border-[#C9A84C]/12"
             style={{ boxShadow: '0 0 60px rgba(201,168,76,0.04)' }}
           >
             <div className="text-center mb-6 sm:mb-8">
@@ -393,7 +393,7 @@ function EidiyaLuckGenerator() {
           </div>
 
           {/* How it works hint */}
-          <div className="mt-6 sm:mt-8 rounded-2xl p-5 sm:p-6 text-center bg-[#C9A84C]/[0.04] border border-[#C9A84C]/10">
+          <div className="w-full max-w-lg mt-6 sm:mt-8 rounded-2xl p-5 sm:p-6 text-center bg-[#C9A84C]/[0.04] border border-[#C9A84C]/10">
             <p className="text-[#C9A84C] font-bold text-sm sm:text-base mb-3">💡 وش يشوف المستلم؟</p>
             <p className="text-white/30 text-xs sm:text-sm leading-loose">
               يفتح الرابط ← يشوف اسمك ← يضغط "لفّ العداد" ← العداد يدور ٣ ثواني
@@ -491,13 +491,13 @@ export default function LandingPage() {
           <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(600px,100vw)] h-[300px] bg-[#d4b96b]/[0.04] rounded-full blur-[150px]" />
         </div>
 
-        <div className="relative z-10 text-center max-w-3xl mx-auto w-full">
+        <div className="relative z-10 text-center max-w-3xl mx-auto w-full flex flex-col items-center">
           {/* Logo */}
-          <div className="animate-fade-up mb-6 sm:mb-8">
+          <div className="animate-fade-up mb-6 sm:mb-8 w-full flex justify-center">
             <img 
               src="/images/logo.png" 
               alt="سَلِّم" 
-              className="h-36 sm:h-44 md:h-56 lg:h-72 w-auto mx-auto drop-shadow-[0_0_60px_rgba(212,185,107,0.2)]" 
+              className="h-36 sm:h-44 md:h-56 lg:h-72 w-auto drop-shadow-[0_0_60px_rgba(212,185,107,0.2)]" 
             />
           </div>
 
@@ -627,9 +627,9 @@ export default function LandingPage() {
       <section className="section-container bg-[#060709] py-20 sm:py-32">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
 
-        <div className="section-inner max-w-xl text-center">
-          <div className="mb-8 sm:mb-10 mx-auto">
-            <img src="/images/logo.png" alt="سَلِّم" className="h-16 sm:h-20 w-auto mx-auto opacity-80" />
+        <div className="section-inner max-w-xl text-center flex flex-col items-center">
+          <div className="mb-8 sm:mb-10 w-full flex justify-center">
+            <img src="/images/logo.png" alt="سَلِّم" className="h-16 sm:h-20 w-auto opacity-80" />
           </div>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white/90 mb-4 sm:mb-5">جاهز تصمّم بطاقتك؟</h2>
           <p className="text-white/30 text-sm leading-relaxed mb-10 sm:mb-12 px-4">

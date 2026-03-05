@@ -1,6 +1,8 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
+import { useState } from 'react'
 import Navbar from './components/Layout/Navbar'
 import Footer from './components/Layout/Footer'
+import WhatsAppFloat from './components/WhatsAppFloat'
 import LandingPage from './pages/LandingPage'
 import EditorPage from './pages/EditorPage'
 import TextBankPage from './pages/TextBankPage'
@@ -46,6 +48,9 @@ export default function App() {
       
       {/* Footer */}
       {!isBusiness && <Footer />}
+      
+      {/* WhatsApp floating button */}
+      <WhatsAppFloat />
     </div>
   )
 }
