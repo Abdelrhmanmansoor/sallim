@@ -6,6 +6,7 @@ import EditorPage from './pages/EditorPage'
 import TextBankPage from './pages/TextBankPage'
 import SendPage from './pages/SendPage'
 import DashboardPage from './pages/DashboardPage'
+import AdminPage from './pages/AdminPage'
 import PricingPage from './pages/PricingPage'
 import CardViewPage from './pages/CardViewPage'
 import EidiyaPage from './pages/EidiyaPage'
@@ -16,7 +17,7 @@ export default function App() {
   const showParticles = location.pathname === '/' || location.pathname === '/dashboard'
   
   return (
-    <div className="min-h-screen bg-[#08090d] text-white font-cairo relative" dir="rtl">
+    <div className="min-h-screen bg-[#08090d] text-white font-zain relative" dir="rtl">
       {showParticles && <EidParticles />}
       <Navbar />
       <main className="relative z-10">
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/texts" element={<TextBankPage />} />
           <Route path="/send" element={<SendPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/card" element={<CardViewPage />} />
           <Route path="/eidiya" element={<EidiyaPage />} />
