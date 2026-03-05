@@ -128,10 +128,10 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState(null)
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen w-full bg-[#060709]">
 
       {/* ─── HERO ─── */}
-      <section className="relative min-h-[94vh] flex flex-col items-center justify-center px-4">
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 w-full">
         {/* Background elements */}
         <div className="absolute inset-0 pointer-events-none">
           {/* Central glow */}
@@ -195,10 +195,10 @@ export default function LandingPage() {
       </section>
 
       {/* ─── HOW IT WORKS ─── */}
-      <section className="py-24 px-4 relative bg-[#060709]">
+      <section className="py-20 px-4 relative bg-[#060709] w-full">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
 
-        <div className="max-w-5xl mx-auto relative z-10">
+        <div className="max-w-5xl mx-auto relative z-10 w-full">
           <div className="text-center mb-16">
             <span className="inline-block text-gold-500/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-3">الخطوات</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-white/90">
@@ -215,10 +215,10 @@ export default function LandingPage() {
       </section>
 
       {/* ─── FEATURES ─── */}
-      <section className="py-24 px-4 relative bg-[#060709]">
+      <section className="py-20 px-4 relative bg-[#060709] w-full">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
 
-        <div className="max-w-5xl mx-auto relative z-10">
+        <div className="max-w-5xl mx-auto relative z-10 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             {/* Left: text */}
             <div>
@@ -255,10 +255,10 @@ export default function LandingPage() {
       </section>
 
       {/* ─── FAQ ─── */}
-      <section className="py-24 px-4 relative bg-[#060709]">
+      <section className="py-20 px-4 relative bg-[#060709] w-full">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
 
-        <div className="max-w-2xl mx-auto relative z-10">
+        <div className="max-w-2xl mx-auto relative z-10 w-full">
           <div className="text-center mb-14">
             <span className="inline-block text-gold-500/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-3">الأسئلة</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-white/90">أسئلة شائعة</h2>
@@ -273,10 +273,10 @@ export default function LandingPage() {
       </section>
 
       {/* ─── CTA ─── */}
-      <section className="py-24 px-4 relative bg-[#060709]">
+      <section className="py-20 px-4 relative bg-[#060709] w-full">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
 
-        <div className="max-w-xl mx-auto text-center relative z-10">
+        <div className="max-w-xl mx-auto text-center relative z-10 w-full">
           <div className="w-14 h-14 rounded-2xl bg-gold-500/[0.07] flex items-center justify-center mb-8 mx-auto">
             <Sparkles className="w-6 h-6 text-gold-400" strokeWidth={1.5} />
           </div>

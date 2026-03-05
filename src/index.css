@@ -1,5 +1,30 @@
 @import "tailwindcss";
 
+/* ═══ Base Styles ═══ */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #060709;
+  color: #ffffff;
+  font-family: 'Zain', system-ui, sans-serif;
+  direction: rtl;
+  text-align: right;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 /* ═══ Zain Font ═══ */
 @font-face { font-family: 'Zain'; src: url('/fonts/zain-200.ttf') format('truetype'); font-weight: 200; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Zain'; src: url('/fonts/zain-400.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
