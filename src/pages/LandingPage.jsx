@@ -130,7 +130,7 @@ export default function LandingPage() {
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             </Link>
             <Link
-              to="/dashboard"
+              to="/business"
               className="group inline-flex items-center gap-3 px-10 py-4 rounded-xl border-2 border-[#d4b96b]/30 text-[#d4b96b] font-bold text-[15px] hover:bg-[#d4b96b]/10 hover:border-[#d4b96b]/50 transition-all duration-300"
             >
               <Building2 className="w-5 h-5" />
@@ -252,7 +252,7 @@ export default function LandingPage() {
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             </Link>
             <Link
-              to="/dashboard"
+              to="/business"
               className="group inline-flex items-center gap-3 px-10 py-4 rounded-xl border-2 border-[#d4b96b]/30 text-[#d4b96b] font-bold text-[15px] hover:bg-[#d4b96b]/10 transition-all duration-300"
             >
               <Building2 className="w-5 h-5" />

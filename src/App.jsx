@@ -8,6 +8,7 @@ import SendPage from './pages/SendPage'
 import DashboardPage from './pages/DashboardPage'
 import AdminPage from './pages/AdminPage'
 import PricingPage from './pages/PricingPage'
+import BusinessPage from './pages/BusinessPage'
 import CardViewPage from './pages/CardViewPage'
 import EidiyaPage from './pages/EidiyaPage'
 import EidParticles from './components/effects/EidParticles'
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/business" element={<BusinessPage />} />
           <Route path="/card" element={<CardViewPage />} />
           <Route path="/eidiya" element={<EidiyaPage />} />
         </Routes>
