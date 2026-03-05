@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowLeft, Palette, Type, Send, Download,
@@ -36,26 +36,73 @@ function MarqueeTicker() {
 /* ═══════════════════════════════════════════════════════════════════════════
    EIDIYA CALCULATOR
    ═══════════════════════════════════════════════════════════════════════════ */
-const reactions = [
-  { min: 5,    max: 15,   emoji: '😑', title: 'يعني... مشكور',                desc: 'الله يجزاك خير، بس كان في أمل 🙂',                              glow: 'rgba(120,120,130,0.10)', border: 'rgba(120,120,130,0.15)', bg: 'rgba(120,120,130,0.04)' },
-  { min: 16,   max: 30,   emoji: '🙂', title: 'ماشي، لا بأس',                  desc: 'يكفي على اللي ما يكفي',                                            glow: 'rgba(160,160,170,0.12)', border: 'rgba(160,160,170,0.18)', bg: 'rgba(160,160,170,0.05)' },
-  { min: 31,   max: 75,   emoji: '😊', title: 'تمام، الله يعطيك',              desc: 'هذا شي، الله يبارك فيك',                                            glow: 'rgba(201,168,76,0.12)',  border: 'rgba(201,168,76,0.18)',  bg: 'rgba(201,168,76,0.04)'  },
-  { min: 76,   max: 150,  emoji: '😄', title: 'الحين كلام!',                    desc: 'عيد صح والله! ربي يحفظك',                                          glow: 'rgba(201,168,76,0.20)',  border: 'rgba(201,168,76,0.28)',  bg: 'rgba(201,168,76,0.06)'  },
-  { min: 151,  max: 499,  emoji: '🤩', title: 'يبيييه!!',                        desc: 'والله هذا كرم أصيل، الله لا يحرمنا منك',                          glow: 'rgba(201,168,76,0.30)',  border: 'rgba(201,168,76,0.38)',  bg: 'rgba(201,168,76,0.08)'  },
-  { min: 500,  max: 999,  emoji: '🥹', title: 'دموع الفرح 😭',                desc: 'ما كنت أتوقع... ربي يزيدك ويبارك لك',                              glow: 'rgba(201,168,76,0.40)',  border: 'rgba(201,168,76,0.50)',  bg: 'rgba(201,168,76,0.10)'  },
-  { min: 1000, max: 2000, emoji: '🤯', title: 'هذا مو عيدية... هذا راتب!!',  desc: 'أنت مو شخص، أنت مؤسسة خيرية بكاملها 🏛️', glow: 'rgba(201,168,76,0.55)',  border: 'rgba(201,168,76,0.65)',  bg: 'rgba(201,168,76,0.14)'  },
+/* ── Quiz Data ── */
+const quizQuestions = [
+  {
+    question: 'كم عمرك؟',
+    emoji: '🎂',
+    options: [
+      { label: '👶 أقل من ١٢ — طفل ومدلّع', points: 40 },
+      { label: '🧒 ١٢ – ١٨ — مراهق طموح', points: 30 },
+      { label: '🧑 ١٩ – ٣٠ — شاب وبادي عليك', points: 20 },
+      { label: '👨 فوق ٣٠ — "أنا اللي أعيّد"', points: 12 },
+    ],
+  },
+  {
+    question: 'وجهك وقت تاخذ العيدية؟',
+    emoji: '🤑',
+    options: [
+      { label: '😍 فرحة طفل صغير — ما أقدر أخفيها', points: 25 },
+      { label: '😎 كول ومتحكّم — ما أبيّن شي', points: 15 },
+      { label: '🥺 تمثيل درامي عشان يزيد المبلغ', points: 35 },
+      { label: '😐 بوكر فيس احترافي كامل', points: 5 },
+    ],
+  },
+  {
+    question: 'علاقتك بأقاربك هالسنة؟',
+    emoji: '👨‍👩‍👧‍👦',
+    options: [
+      { label: '💕 أزورهم كل فترة — العلاقة حديد', points: 30 },
+      { label: '🤲 أحضر المناسبات بس', points: 20 },
+      { label: '📱 أكتفي بستيكرات واتساب', points: 10 },
+      { label: '👻 اختفيت من الخريطة تماماً', points: 5 },
+    ],
+  },
+  {
+    question: 'ساعدت في تجهيزات العيد؟',
+    emoji: '🧹',
+    options: [
+      { label: '🦸 أنا قائد عمليات التجهيز!', points: 35 },
+      { label: '🙋 ساعدت على قد ما أقدر', points: 20 },
+      { label: '📺 كنت أشجّع الفريق من الكنبة', points: 10 },
+      { label: '🏃 طلعت "مشوار ضروري" وقت الشغل', points: 5 },
+    ],
+  },
+  {
+    question: 'لو أحد عطاك ١٠ ريال عيدية؟',
+    emoji: '💸',
+    options: [
+      { label: '🤲 الحمدلله — كل ريال نعمة', points: 30 },
+      { label: '😊 أبتسم وآخذها بكل حب', points: 22 },
+      { label: '😤 أقول "بس عشرة؟!" بصوت عالي', points: 8 },
+      { label: '🫡 أرجعها: "خلها لك يا عم"', points: 35 },
+    ],
+  },
 ]
-const quickPicks = [10, 50, 100, 500, 1000]
 
-function getReaction(val) {
-  for (const r of reactions) if (val >= r.min && val <= r.max) return r
-  return reactions[0]
-}
+const quizResults = [
+  { min: 0,   max: 55,  amount: 5,    emoji: '💀', title: '٥ ريال — والرحمة زيادة!',         desc: 'اشتغل على علاقاتك وارجع السنة الجاية 😂',                         glow: 'rgba(120,120,130,0.10)', border: 'rgba(120,120,130,0.15)', bg: 'rgba(120,120,130,0.04)' },
+  { min: 56,  max: 85,  amount: 50,   emoji: '😅', title: '٥٠ ريال — مو وحشة!',              desc: 'فيك خير بس تحتاج تشتغل على نفسك شوي',                              glow: 'rgba(160,160,170,0.12)', border: 'rgba(160,160,170,0.18)', bg: 'rgba(160,160,170,0.05)' },
+  { min: 86,  max: 115, amount: 200,  emoji: '😄', title: '٢٠٠ ريال — مستاهل والله!',        desc: 'واضح إنك إنسان محترم ومحبوب عند الناس',                             glow: 'rgba(201,168,76,0.20)',  border: 'rgba(201,168,76,0.28)',  bg: 'rgba(201,168,76,0.06)'  },
+  { min: 116, max: 145, amount: 500,  emoji: '🤩', title: '٥٠٠ ريال — ماشاءالله عليك!',      desc: 'كرمك وطيبتك واصلة — ربي يحفظك ويزيدك',                              glow: 'rgba(201,168,76,0.35)',  border: 'rgba(201,168,76,0.45)',  bg: 'rgba(201,168,76,0.08)'  },
+  { min: 146, max: 200, amount: 1000, emoji: '🥹', title: '١٬٠٠٠ ريال — أنت كنز بشري!',     desc: 'العالم يحتاج ناس زيك — الله يسعدك ويوفقك دايماً',                   glow: 'rgba(201,168,76,0.55)',  border: 'rgba(201,168,76,0.65)',  bg: 'rgba(201,168,76,0.14)'  },
+]
 
+/* ── Confetti ── */
 function Confetti({ active }) {
   const [particles, setParticles] = useState([])
-  
-  useState(() => {
+
+  useEffect(() => {
     if (!active) { setParticles([]); return }
     const ps = Array.from({ length: 30 }, (_, i) => ({
       id: i,
@@ -69,7 +116,7 @@ function Confetti({ active }) {
   }, [active])
 
   if (!active) return null
-  
+
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
       {particles.map(p => (
@@ -90,144 +137,242 @@ function Confetti({ active }) {
   )
 }
 
+/* ── Quiz Calculator ── */
 function EidiyaCalculator() {
-  const [value, setValue] = useState(50)
-  const [emojiKey, setEmojiKey] = useState(0)
-  const prevReactionRef = useRef(null)
-  const reaction = getReaction(value)
-  const pct = ((value - 5) / (2000 - 5)) * 100
+  const [step, setStep] = useState(0)         // 0 = intro, 1-5 = questions, 6 = result
+  const [answers, setAnswers] = useState([])
+  const [selected, setSelected] = useState(null)
+  const [totalScore, setTotalScore] = useState(0)
+  const [animatedAmount, setAnimatedAmount] = useState(0)
+  const [fadeIn, setFadeIn] = useState(true)
 
-  const onChange = useCallback((e) => {
-    const v = Number(e.target.value)
-    setValue(v)
-    const r = getReaction(v)
-    if (!prevReactionRef.current || prevReactionRef.current.title !== r.title) {
-      setEmojiKey(k => k + 1)
-      prevReactionRef.current = r
-    }
-  }, [])
+  const totalQ = quizQuestions.length
+
+  const getResult = useCallback(() => {
+    for (const r of quizResults) if (totalScore >= r.min && totalScore <= r.max) return r
+    return quizResults[0]
+  }, [totalScore])
+
+  /* Count-up animation when result appears */
+  useEffect(() => {
+    if (step !== totalQ + 1) return
+    const result = getResult()
+    const target = result.amount
+    const steps = 30
+    const increment = target / steps
+    let current = 0
+    const interval = setInterval(() => {
+      current += increment
+      if (current >= target) {
+        setAnimatedAmount(target)
+        clearInterval(interval)
+      } else {
+        setAnimatedAmount(Math.round(current))
+      }
+    }, 50)
+    return () => clearInterval(interval)
+  }, [step, totalScore, getResult])
+
+  const fadeTransition = (callback) => {
+    setFadeIn(false)
+    setTimeout(() => {
+      callback()
+      setTimeout(() => setFadeIn(true), 50)
+    }, 200)
+  }
+
+  const handleStart = () => fadeTransition(() => setStep(1))
+
+  const handleSelect = (idx) => {
+    if (selected !== null) return
+    setSelected(idx)
+
+    const points = quizQuestions[step - 1].options[idx].points
+    setTimeout(() => {
+      const newAnswers = [...answers, points]
+      setAnswers(newAnswers)
+
+      fadeTransition(() => {
+        setSelected(null)
+        if (step >= totalQ) {
+          const total = newAnswers.reduce((a, b) => a + b, 0)
+          setTotalScore(total)
+          setStep(totalQ + 1)
+        } else {
+          setStep(step + 1)
+        }
+      })
+    }, 400)
+  }
+
+  const reset = () => {
+    fadeTransition(() => {
+      setStep(0)
+      setAnswers([])
+      setSelected(null)
+      setTotalScore(0)
+      setAnimatedAmount(0)
+    })
+  }
 
   const shareWa = () => {
-    const text = `عيديتي هالسنة ${toAr(value)} ريال 🤩 — ${reaction.title}`
+    const result = getResult()
+    const text = `حاسبة العيدية قالت إني أستاهل ${result.title} 🎉\nكم تستاهل أنت؟ جرّب:\n${window.location.origin}`
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
   }
+
+  const result = step > totalQ ? getResult() : null
+  const pct = step > 0 && step <= totalQ ? (step / totalQ) * 100 : step > totalQ ? 100 : 0
+  const cardStyle = result
+    ? { background: result.bg, border: `1.5px solid ${result.border}`, boxShadow: `0 0 80px ${result.glow}, 0 0 160px ${result.glow}` }
+    : { background: 'rgba(201,168,76,0.04)', border: '1.5px solid rgba(201,168,76,0.12)', boxShadow: '0 0 60px rgba(201,168,76,0.04)' }
 
   return (
     <section className="section-container bg-[#0A0A0A] py-20 sm:py-28">
       <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C]/10 to-transparent" />
-      
+
       <div className="section-inner max-w-xl">
         {/* Section heading */}
         <div className="text-center mb-12 sm:mb-16">
           <span className="inline-block text-[#C9A84C]/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-4">تسلية</span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white/90 mb-4">حاسبة العيدية</h2>
-          <p className="text-white/30 text-sm mt-4 leading-relaxed">حرّك السلايدر وشوف ردة الفعل 😄</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white/90 mb-4">كم تستاهل عيدية؟ 🧮</h2>
+          <p className="text-white/30 text-sm mt-4 leading-relaxed">جاوب على ٥ أسئلة وبنحسب لك عيديتك المستحقة!</p>
         </div>
 
         {/* Card */}
-        <div
-          className="relative rounded-3xl p-6 sm:p-10 transition-all duration-500 overflow-hidden"
-          style={{
-            background: reaction.bg,
-            border: `1.5px solid ${reaction.border}`,
-            boxShadow: `0 0 80px ${reaction.glow}, 0 0 160px ${reaction.glow}`,
-          }}
-        >
-          <Confetti active={value >= 1000} />
+        <div className="relative rounded-3xl p-6 sm:p-10 transition-all duration-500 overflow-hidden" style={cardStyle}>
+          {result && <Confetti active={result.amount >= 500} />}
 
-          {/* Amount display */}
-          <div className="text-center mb-8 relative z-10">
-            <div className="text-5xl sm:text-7xl font-black text-white tabular-nums leading-none mb-2 eidiya-num-transition">
-              {toAr(value)}
+          {/* Progress bar — visible during quiz & result */}
+          {step > 0 && (
+            <div className="relative z-10 mb-8">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-white/25 text-[11px] font-bold">
+                  {step <= totalQ ? `سؤال ${toAr(step)} من ${toAr(totalQ)}` : '✨ النتيجة'}
+                </span>
+                <span className="text-[#C9A84C]/70 text-[11px] font-bold">{toAr(Math.round(pct))}٪</span>
+              </div>
+              <div className="w-full h-2 rounded-full bg-white/[0.04] overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-700 ease-out"
+                  style={{
+                    width: `${pct}%`,
+                    background: 'linear-gradient(90deg, #5a5a60 0%, #C9A84C 50%, #f3ead0 100%)',
+                  }}
+                />
+              </div>
             </div>
-            <span className="text-[#C9A84C] text-lg font-bold">ريال</span>
-          </div>
+          )}
 
-          {/* Slider */}
-          <div className="relative z-10 mb-6">
-            <input
-              type="range"
-              min={5}
-              max={2000}
-              step={1}
-              value={value}
-              onChange={onChange}
-              className="eidiya-slider w-full"
-              style={{ '--pct': `${pct}%` }}
-            />
-            <div className="flex justify-between mt-2 text-white/20 text-[11px] font-bold">
-              <span>{toAr(2000)}</span>
-              <span>{toAr(5)}</span>
-            </div>
-          </div>
+          {/* Animated content area */}
+          <div className={`relative z-10 transition-all duration-200 ${fadeIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
 
-          {/* Quick picks */}
-          <div className="flex flex-wrap justify-center gap-2 mb-8 relative z-10">
-            {quickPicks.map(q => (
-              <button
-                key={q}
-                onClick={() => { setValue(q); const r = getReaction(q); if (!prevReactionRef.current || prevReactionRef.current.title !== r.title) { setEmojiKey(k => k + 1); prevReactionRef.current = r } }}
-                className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
-                  value === q
-                    ? 'bg-gradient-to-br from-[#c4a44e] to-[#d4b96b] text-[#0A0A0A] shadow-lg shadow-[#C9A84C]/20 scale-105'
-                    : 'bg-white/[0.03] text-white/40 border border-white/[0.06] hover:bg-white/[0.07] hover:text-white/70 hover:border-white/[0.10]'
-                }`}
-              >
-                {toAr(q)}
-              </button>
-            ))}
-          </div>
+            {/* ── INTRO SCREEN ── */}
+            {step === 0 && (
+              <div className="text-center py-6">
+                <div className="text-6xl sm:text-7xl mb-6 animate-emoji-pop">🧮</div>
+                <h3 className="text-white/90 font-bold text-xl sm:text-2xl mb-3">اكتشف عيديتك المستحقة!</h3>
+                <p className="text-white/35 text-sm leading-[1.9] mb-8 max-w-sm mx-auto">
+                  ٥ أسئلة سريعة عن شخصيتك وعلاقاتك — وبنقول لك كم تستاهل عيدية هالسنة بناءً على سلوكك الاجتماعي 😄
+                </p>
+                <button onClick={handleStart} className="btn-gold !py-4 !px-10 !text-base mx-auto">
+                  يلا نبدأ! 🚀
+                </button>
+              </div>
+            )}
 
-          {/* Generosity meter */}
-          <div className="relative z-10 mb-8">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-white/25 text-[11px] font-bold">مقياس الكرم</span>
-              <span className="text-[#C9A84C]/70 text-[11px] font-bold">{toAr(Math.round(pct))}٪</span>
-            </div>
-            <div className="w-full h-2.5 rounded-full bg-white/[0.04] overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-500 ease-out"
-                style={{
-                  width: `${pct}%`,
-                  background: `linear-gradient(90deg, #5a5a60 0%, #C9A84C ${Math.min(pct * 2, 100)}%, #f3ead0 100%)`,
-                  boxShadow: pct > 40 ? `0 0 12px rgba(201,168,76,${pct / 250})` : 'none',
-                }}
-              />
-            </div>
-          </div>
+            {/* ── QUESTION SCREEN ── */}
+            {step >= 1 && step <= totalQ && (
+              <div className="py-2">
+                <div className="text-center mb-8">
+                  <div className="text-5xl sm:text-6xl mb-4">{quizQuestions[step - 1].emoji}</div>
+                  <h3 className="text-white/90 font-bold text-lg sm:text-xl">{quizQuestions[step - 1].question}</h3>
+                </div>
+                <div className="space-y-3">
+                  {quizQuestions[step - 1].options.map((opt, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleSelect(i)}
+                      disabled={selected !== null}
+                      className={`w-full text-right px-5 py-4 rounded-2xl text-sm sm:text-[15px] font-medium transition-all duration-300 ${
+                        selected === i
+                          ? 'bg-gradient-to-br from-[#c4a44e] to-[#d4b96b] text-[#0A0A0A] scale-[1.02] shadow-lg shadow-[#C9A84C]/20'
+                          : selected !== null
+                            ? 'bg-white/[0.02] text-white/20 border border-white/[0.04] cursor-not-allowed'
+                            : 'bg-white/[0.03] text-white/60 border border-white/[0.06] hover:bg-white/[0.06] hover:text-white/80 hover:border-[#C9A84C]/20 hover:scale-[1.01]'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
-          {/* Reaction Card */}
-          <div
-            className="relative z-10 rounded-2xl p-5 sm:p-6 text-center transition-all duration-500"
-            style={{
-              background: 'rgba(255,255,255,0.02)',
-              border: `1px solid ${reaction.border}`,
-            }}
-          >
-            <div key={emojiKey} className="text-5xl sm:text-6xl mb-4 animate-emoji-pop">
-              {reaction.emoji}
-            </div>
-            <h3 className="text-white font-bold text-lg sm:text-xl mb-2">{reaction.title}</h3>
-            <p className="text-white/40 text-sm leading-relaxed">{reaction.desc}</p>
-          </div>
+            {/* ── RESULT SCREEN ── */}
+            {step > totalQ && result && (
+              <div className="text-center py-4">
+                <div className="text-6xl sm:text-7xl mb-4 animate-emoji-pop">{result.emoji}</div>
+                <div className="text-5xl sm:text-7xl font-black text-white tabular-nums leading-none mb-2">
+                  {toAr(animatedAmount)}
+                </div>
+                <span className="text-[#C9A84C] text-lg font-bold">ريال</span>
 
-          {/* Action Buttons */}
-          <div className="relative z-10 mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Link to="/editor" className="btn-gold w-full justify-center">
-              <Send className="w-4 h-4" />
-              <span>أرسل عيدية — صمّم بطاقتك</span>
-            </Link>
-            <button onClick={shareWa} className="btn-outline-gold w-full justify-center">
-              <Share2 className="w-4 h-4" />
-              <span>شارك عبر واتساب</span>
-            </button>
-          </div>
+                {/* Verdict card */}
+                <div
+                  className="mt-6 rounded-2xl p-5 sm:p-6 text-center transition-all duration-500"
+                  style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${result.border}` }}
+                >
+                  <h3 className="text-white font-bold text-lg sm:text-xl mb-2">{result.title}</h3>
+                  <p className="text-white/40 text-sm leading-relaxed">{result.desc}</p>
+                </div>
 
-          {/* Hint */}
-          <div className="relative z-10 mt-6 rounded-2xl p-4 sm:p-5 text-center bg-[#C9A84C]/[0.04] border border-[#C9A84C]/10">
-            <p className="text-white/50 text-sm leading-relaxed">
-              💡 <span className="text-[#C9A84C] font-bold">أرسل عيدية حقيقية!</span> صمّم بطاقة تهنئة مع المبلغ واسمك واسم المستلم — وشاركها مباشرة عبر واتساب
-            </p>
+                {/* Deserving meter */}
+                <div className="mt-6 text-right">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-white/25 text-[11px] font-bold">مقياس الاستحقاق</span>
+                    <span className="text-[#C9A84C]/70 text-[11px] font-bold">{toAr(Math.round(Math.min((totalScore / 165) * 100, 100)))}٪</span>
+                  </div>
+                  <div className="w-full h-2.5 rounded-full bg-white/[0.04] overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-1000 ease-out"
+                      style={{
+                        width: `${Math.min((totalScore / 165) * 100, 100)}%`,
+                        background: `linear-gradient(90deg, #5a5a60 0%, #C9A84C ${Math.min((totalScore / 165) * 200, 100)}%, #f3ead0 100%)`,
+                        boxShadow: totalScore > 80 ? `0 0 12px rgba(201,168,76,${totalScore / 400})` : 'none',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Action buttons */}
+                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <button onClick={shareWa} className="btn-gold w-full justify-center">
+                    <Share2 className="w-4 h-4" />
+                    <span>شارك نتيجتك</span>
+                  </button>
+                  <button onClick={reset} className="btn-outline-gold w-full justify-center">
+                    🔄 جرّب مرة ثانية
+                  </button>
+                </div>
+
+                {/* Design CTA */}
+                <div className="mt-6 pt-6 border-t border-white/[0.06]">
+                  <Link to="/editor" className="btn-gold w-full justify-center !bg-gradient-to-br !from-[#c4a44e] !to-[#d4b96b] !text-[#0A0A0A]">
+                    <Send className="w-4 h-4" />
+                    <span>صمّم بطاقة عيدية وأرسلها</span>
+                  </Link>
+                </div>
+
+                {/* Fun hint */}
+                <div className="mt-6 rounded-2xl p-4 sm:p-5 text-center bg-[#C9A84C]/[0.04] border border-[#C9A84C]/10">
+                  <p className="text-white/50 text-sm leading-relaxed">
+                    💡 <span className="text-[#C9A84C] font-bold">أرسل عيدية حقيقية!</span> صمّم بطاقة تهنئة مع المبلغ — وشاركها عبر واتساب
+                  </p>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
       </div>
@@ -408,20 +553,24 @@ function EidiyaLuckGenerator() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   FAQ
+   FAQ - Modern Design
    ═══════════════════════════════════════════════════════════════════════════ */
 function FAQ({ q, a, isOpen, toggle }) {
   return (
-    <div className="border border-white/[0.06] rounded-2xl overflow-hidden transition-colors hover:border-[#d4b96b]/20">
-      <button onClick={toggle} className="w-full flex items-center justify-between p-4 sm:p-5 text-right group">
-        <span className="text-white/85 text-sm sm:text-[15px] font-medium group-hover:text-white transition-colors">{q}</span>
-        <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mr-4 transition-all ${isOpen ? 'bg-[#d4b96b]/15 rotate-180' : 'bg-white/[0.03]'}`}>
-          <ChevronDown className={`w-3.5 h-3.5 transition-colors ${isOpen ? 'text-[#d4b96b]' : 'text-white/30'}`} />
+    <div className={`faq-item ${isOpen ? 'open' : ''}`}>
+      <button onClick={toggle} className="w-full flex items-center justify-between p-5 text-right group">
+        <span className="text-white/90 text-[15px] font-medium group-hover:text-white transition-colors">{q}</span>
+        <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mr-4 transition-all duration-300 ${
+          isOpen 
+            ? 'bg-gradient-to-br from-[#d4b96b]/20 to-[#d4b96b]/10 rotate-180' 
+            : 'bg-white/[0.04] hover:bg-white/[0.06]'
+        }`}>
+          <ChevronDown className={`w-4 h-4 transition-colors ${isOpen ? 'text-[#d4b96b]' : 'text-white/40'}`} />
         </div>
       </button>
       <div className={`grid transition-all duration-300 ease-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="overflow-hidden">
-          <p className="px-4 sm:px-5 pb-4 sm:pb-5 text-white/40 text-sm leading-relaxed">{a}</p>
+          <p className="px-5 pb-5 text-white/50 text-sm leading-relaxed">{a}</p>
         </div>
       </div>
     </div>
@@ -437,37 +586,33 @@ const faqs = [
 ]
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   STEP CARD
+   STEP CARD - Modern Design
    ═══════════════════════════════════════════════════════════════════════════ */
 function StepCard({ num, icon: Icon, title, desc }) {
   return (
-    <div className="group h-full">
-      <div className="relative bg-white/[0.02] border border-white/[0.05] rounded-3xl p-6 sm:p-8 hover:border-[#d4b96b]/15 transition-all duration-500 h-full">
-        <div className="absolute -top-3 right-6 bg-[#060709] px-3">
-          <span className="text-[#d4b96b]/40 text-[11px] font-bold tracking-wider">0{num}</span>
-        </div>
-        <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-2xl bg-[#d4b96b]/[0.07] flex items-center justify-center mb-5 sm:mb-6 group-hover:bg-[#d4b96b]/[0.12] transition-colors">
-          <Icon className="w-4 sm:w-5 h-4 sm:h-5 text-[#d4b96b]" strokeWidth={1.5} />
-        </div>
-        <h3 className="text-white/90 font-bold text-base sm:text-lg mb-2">{title}</h3>
-        <p className="text-white/35 text-xs sm:text-[14px] leading-relaxed">{desc}</p>
+    <div className="step-card h-full">
+      <div className="step-number">0{num}</div>
+      <div className="step-icon">
+        <Icon className="w-5 h-5" strokeWidth={1.5} />
       </div>
+      <h3 className="text-white/95 font-bold text-lg mb-3">{title}</h3>
+      <p className="text-white/40 text-sm leading-relaxed">{desc}</p>
     </div>
   )
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   FEATURE ROW
+   FEATURE ROW - Modern Design
    ═══════════════════════════════════════════════════════════════════════════ */
 function Feature({ icon: Icon, title, desc }) {
   return (
-    <div className="flex gap-4 sm:gap-5 group">
-      <div className="w-9 sm:w-10 h-9 sm:h-10 rounded-xl bg-white/[0.025] border border-white/[0.04] flex items-center justify-center shrink-0 group-hover:border-[#d4b96b]/15 group-hover:bg-[#d4b96b]/[0.05] transition-all duration-300">
-        <Icon className="w-4 h-4 text-[#d4b96b]/60 group-hover:text-[#d4b96b] transition-colors" strokeWidth={1.5} />
+    <div className="feature-card">
+      <div className="feature-icon">
+        <Icon className="w-5 h-5" strokeWidth={1.5} />
       </div>
       <div className="min-w-0">
-        <h3 className="text-white/85 font-semibold text-sm sm:text-[15px] mb-1 group-hover:text-white transition-colors">{title}</h3>
-        <p className="text-white/30 text-xs sm:text-sm leading-relaxed">{desc}</p>
+        <h3 className="text-white/95 font-semibold text-[15px] mb-1.5">{title}</h3>
+        <p className="text-white/40 text-sm leading-relaxed">{desc}</p>
       </div>
     </div>
   )
@@ -516,15 +661,15 @@ export default function LandingPage() {
           </div>
 
           {/* Quick stats */}
-          <div className="animate-fade-up delay-3 mt-12 sm:mt-16 flex items-center justify-center gap-6 sm:gap-10 text-center">
+          <div className="animate-fade-up delay-3 mt-12 sm:mt-16 flex items-center justify-center gap-8 sm:gap-12">
             {[
               { n: '+100', l: 'عبارة تهنئة' },
               { n: '20', l: 'قالب جاهز' },
               { n: '8', l: 'خطوط عربية' },
             ].map((s, i) => (
-              <div key={i} className="flex flex-col">
-                <span className="text-[#d4b96b] text-lg sm:text-xl font-bold">{s.n}</span>
-                <span className="text-white/20 text-[10px] sm:text-[11px] mt-0.5">{s.l}</span>
+              <div key={i} className="stat-item">
+                <div className="stat-value">{s.n}</div>
+                <div className="stat-label">{s.l}</div>
               </div>
             ))}
           </div>
@@ -549,13 +694,11 @@ export default function LandingPage() {
       {/* ─────────────────────────────────────────────────────────────────────
           HOW IT WORKS
           ───────────────────────────────────────────────────────────────────── */}
-      <section className="section-container bg-[#060709] py-20 sm:py-32">
+      <section className="section-container bg-[#060709] py-24 sm:py-32">
         <div className="section-inner max-w-5xl">
-          <div className="text-center mb-12 sm:mb-20">
-            <span className="inline-block text-[#d4b96b]/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-4">الخطوات</span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white/90">
-              كيف تصمّم بطاقتك
-            </h2>
+          <div className="text-center mb-16 sm:mb-20">
+            <span className="section-label">الخطوات</span>
+            <h2 className="section-title">كيف تصمّم بطاقتك</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
@@ -569,28 +712,28 @@ export default function LandingPage() {
       {/* ─────────────────────────────────────────────────────────────────────
           FEATURES
           ───────────────────────────────────────────────────────────────────── */}
-      <section className="section-container bg-[#060709] py-20 sm:py-32">
-        <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
+      <section className="section-container bg-[#060709] py-24 sm:py-32">
+        <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
         <div className="section-inner max-w-5xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
             <div>
-              <span className="inline-block text-[#d4b96b]/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-4">المميزات</span>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white/90 mb-4 sm:mb-5">
+              <span className="section-label">المميزات</span>
+              <h2 className="section-title mb-5">
                 كل ما تحتاجه
                 <br />
                 <span className="text-white/40">في منصة واحدة</span>
               </h2>
-              <p className="text-white/30 text-sm sm:text-[15px] leading-relaxed mb-8 sm:mb-10">
+              <p className="section-subtitle mb-10">
                 صمّم بطاقات احترافية بخطوط عربية أصيلة وعبارات مختارة بعناية — ثم أرسلها لمن تحب مباشرة.
               </p>
               <Link to="/editor" className="group btn-ghost-gold">
                 <span>جرّب المحرر الآن</span>
-                <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               </Link>
             </div>
 
-            <div className="space-y-6 sm:space-y-8">
+            <div className="space-y-4">
               <Feature icon={Type}       title="خطوط عربية أصيلة"   desc="8 مخطوطات تشمل أميري وشهرزاد والقاهرة ولطيف وغيرها" />
               <Feature icon={FileText}   title="أكثر من 100 عبارة"  desc="عبارات رسمية وعائلية وتجارية وشعرية لكل مناسبة" />
               <Feature icon={Send}       title="إرسال عبر واتساب"   desc="أرسل البطاقة مباشرة لأحبابك عبر واتساب" />
@@ -604,13 +747,13 @@ export default function LandingPage() {
       {/* ─────────────────────────────────────────────────────────────────────
           FAQ
           ───────────────────────────────────────────────────────────────────── */}
-      <section className="section-container bg-[#060709] py-20 sm:py-32">
-        <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
+      <section className="section-container bg-[#060709] py-24 sm:py-32">
+        <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
         <div className="section-inner max-w-2xl">
           <div className="text-center mb-12 sm:mb-16">
-            <span className="inline-block text-[#d4b96b]/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-4">الأسئلة</span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white/90">أسئلة شائعة</h2>
+            <span className="section-label">الأسئلة</span>
+            <h2 className="section-title">أسئلة شائعة</h2>
           </div>
 
           <div className="space-y-3">

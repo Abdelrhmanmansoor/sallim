@@ -33,7 +33,7 @@ export default function Navbar() {
 
         {/* Logo - centered on mobile, left on desktop */}
         <Link to="/" className="flex items-center justify-center absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 md:order-first">
-          <span className="text-2xl font-bold gradient-gold-text whitespace-nowrap">سَلِّم</span>
+          <img src="/images/logo.png" alt="سَلِّم" className="h-10 sm:h-12 w-auto" />
         </Link>
 
         {/* Desktop nav */}
