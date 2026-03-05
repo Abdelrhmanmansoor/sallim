@@ -507,17 +507,15 @@ function EidiyaCalculator() {
               </div>
             )}
 
-            {/* Loading / Slot Machine Screen */}
+            {/* Loading Screen */}
             {step > totalQ && slotSpinning && (
               <div className="rounded-3xl bg-gradient-to-b from-amber-500/20 to-yellow-500/10 border border-amber-500/30 p-10 backdrop-blur-xl text-center">
-                <div className="text-6xl mb-6 animate-spin-slow">🎰</div>
-                <h3 className="text-white text-2xl font-black mb-3">جاري حساب عيديتك...</h3>
-                <div className="flex justify-center gap-2 mb-6">
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className="w-16 h-20 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center overflow-hidden">
-                      <div className="animate-slot-spin text-3xl">
-                        💰💎🏆👑💵
-                      </div>
+                <div className="text-6xl mb-6 animate-bounce-slow">✨</div>
+                <h3 className="text-white text-2xl font-black mb-3">جاري تحليل شخصيتك...</h3>
+                <div className="flex justify-center gap-3 mb-6">
+                  {axisLabels.map((a) => (
+                    <div key={a.key} className="w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center">
+                      <span className="text-xl">{a.icon}</span>
                     </div>
                   ))}
                 </div>
@@ -634,12 +632,12 @@ function EidiyaLuckGenerator() {
 
   const shareWa = () => {
     if (!link) return
-    const text = `🎰 عيديتك بحظك! لفّ العداد وشوف كم عيديتك من ${name.trim()} 🌙\n${link}`
+    const text = `� أرسلت لك عيديتي المفاجأة! اختر فانوسك واكشف مبلغك من ${name.trim()} 🌙\n${link}`
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
   }
 
   const luckFeatures = [
-    { icon: Shuffle, title: 'عشوائي بالكامل', desc: 'مبلغ عشوائي من ٥ إلى ٢٬٠٠٠ ريال' },
+    { icon: Shuffle, title: 'مفاجأة ممتعة', desc: 'مبلغ مخفيّ في ٣ فوانيس للاختيار' },
     { icon: MessageCircle, title: 'ردود فعل مضحكة', desc: '٧ ردود فعل بالسعودية' },
     { icon: Smartphone, title: 'يعمل على كل جهاز', desc: 'بدون تحميل أي شي' },
     { icon: Link2, title: 'شارك بسهولة', desc: 'انسخ الرابط أو أرسله واتساب' },
@@ -648,7 +646,7 @@ function EidiyaLuckGenerator() {
   const steps = [
     { num: '١', title: 'اكتب اسمك', desc: 'عشان المستلم يعرف مين يعيّده' },
     { num: '٢', title: 'شارك الرابط', desc: 'واتساب أو نسخ' },
-    { num: '٣', title: 'يلفّ العداد!', desc: 'يشوف حظه 🎰' },
+    { num: '٣', title: 'يختار فانوسه', desc: 'يكشف مبلغه المفاجئ 🌙' },
   ]
 
   return (
@@ -658,9 +656,9 @@ function EidiyaLuckGenerator() {
           {/* Heading */}
           <div className="text-center mb-12">
             <span className="section-label"><Sparkles className="w-3.5 h-3.5" /> ميزة جديدة</span>
-            <h2 className="section-title mt-3 mb-4">عيديتك بحظك!</h2>
+            <h2 className="section-title mt-3 mb-4">عيدية مفاجأة 🎁</h2>
             <p className="text-[#64748b] text-[15px] leading-relaxed max-w-lg mx-auto">
-              أنشئ رابط عيدية عشوائي وأرسله لأصدقائك — المستلم يلفّ العداد ويطلع له مبلغ مع ردة فعل مضحكة
+              أنشئ رابط عيدية مفاجأة وأرسله لأصدقائك — المستلم يختار فانوسه ويكشف مبلغه مع دعاء جميل
             </p>
           </div>
 
@@ -809,11 +807,29 @@ function Feature({ icon: Icon, title, desc }) {
 /* ═══════════════════════════════════════════════════════════════════════════
    QUICK CARD CREATOR
    ═══════════════════════════════════════════════════════════════════════════ */
-const quickDesigns = [
+
+// All 20 templates with design settings
+const allDesigns = [
   { id: 1, label: 'كلاسيكي', image: '/templates/1.png', greeting: 'عيد مبارك', sub: 'كل عام وأنتم بخير', nameY: 0.82, greetingY: 0.30, subY: 0.48, greetingSize: 90, subSize: 42, nameSize: 64, textColor: '#ffffff' },
   { id: 2, label: 'أنيق', image: '/templates/2.png', greeting: 'عساكم من عوّاده', sub: 'تقبّل الله طاعتكم', nameY: 0.80, greetingY: 0.28, subY: 0.46, greetingSize: 82, subSize: 40, nameSize: 60, textColor: '#ffffff' },
   { id: 3, label: 'حديث', image: '/templates/3.png', greeting: 'كل عام وأنتم بخير', sub: 'أعاده الله عليكم بالخير واليُمن', nameY: 0.83, greetingY: 0.25, subY: 0.44, greetingSize: 78, subSize: 36, nameSize: 62, textColor: '#ffffff' },
   { id: 4, label: 'فاخر', image: '/templates/4.png', greeting: 'عيدكم مبارك', sub: 'وعساكم من العايدين الفايزين', nameY: 0.81, greetingY: 0.27, subY: 0.45, greetingSize: 85, subSize: 38, nameSize: 62, textColor: '#ffffff' },
+  { id: 5, label: 'ذهبي', image: '/templates/5.png', greeting: 'عيد سعيد', sub: 'أدام الله أفراحكم', nameY: 0.82, greetingY: 0.28, subY: 0.46, greetingSize: 85, subSize: 38, nameSize: 62, textColor: '#ffffff' },
+  { id: 6, label: 'ملكي', image: '/templates/6.png', greeting: 'تقبّل الله طاعتكم', sub: 'وكل عام وأنتم بخير', nameY: 0.80, greetingY: 0.26, subY: 0.44, greetingSize: 80, subSize: 36, nameSize: 60, textColor: '#ffffff' },
+  { id: 7, label: 'بسيط', image: '/templates/7.png', greeting: 'عيد مبارك', sub: 'أعاده الله علينا وعليكم', nameY: 0.82, greetingY: 0.28, subY: 0.46, greetingSize: 85, subSize: 38, nameSize: 62, textColor: '#ffffff' },
+  { id: 8, label: 'راقي', image: '/templates/8.png', greeting: 'كل عام وأنتم بخير', sub: 'عساكم من عوّاده', nameY: 0.81, greetingY: 0.27, subY: 0.45, greetingSize: 82, subSize: 38, nameSize: 60, textColor: '#ffffff' },
+  { id: 9, label: 'عصري', image: '/templates/9.png', greeting: 'عيدكم سعيد', sub: 'تقبّل الله طاعتكم', nameY: 0.82, greetingY: 0.28, subY: 0.46, greetingSize: 85, subSize: 38, nameSize: 62, textColor: '#ffffff' },
+  { id: 10, label: 'تراثي', image: '/templates/10.png', greeting: 'عيد مبارك', sub: 'وعساكم من الفايزين', nameY: 0.80, greetingY: 0.26, subY: 0.44, greetingSize: 85, subSize: 38, nameSize: 60, textColor: '#ffffff' },
+  { id: 11, label: 'فخم', image: '/templates/11.png', greeting: 'كل عام وأنتم بخير', sub: 'أعاده الله عليكم باليمن', nameY: 0.82, greetingY: 0.28, subY: 0.46, greetingSize: 82, subSize: 36, nameSize: 62, textColor: '#ffffff' },
+  { id: 12, label: 'مميز', image: '/templates/12.png', greeting: 'عساكم من عوّاده', sub: 'كل عام وأنتم بخير', nameY: 0.81, greetingY: 0.27, subY: 0.45, greetingSize: 85, subSize: 38, nameSize: 60, textColor: '#ffffff' },
+  { id: 13, label: 'أصيل', image: '/templates/13.png', greeting: 'تقبّل الله طاعتكم', sub: 'عيد مبارك', nameY: 0.82, greetingY: 0.28, subY: 0.46, greetingSize: 80, subSize: 40, nameSize: 62, textColor: '#ffffff' },
+  { id: 14, label: 'جميل', image: '/templates/14.png', greeting: 'عيد سعيد', sub: 'كل عام وأنتم بألف خير', nameY: 0.80, greetingY: 0.26, subY: 0.44, greetingSize: 85, subSize: 36, nameSize: 60, textColor: '#ffffff' },
+  { id: 15, label: 'رائع', image: '/templates/15.png', greeting: 'عيدكم مبارك', sub: 'أعاده الله عليكم', nameY: 0.82, greetingY: 0.28, subY: 0.46, greetingSize: 85, subSize: 38, nameSize: 62, textColor: '#ffffff' },
+  { id: 16, label: 'مبدع', image: '/templates/16.png', greeting: 'كل عام وأنتم بخير', sub: 'عساكم من العايدين', nameY: 0.81, greetingY: 0.27, subY: 0.45, greetingSize: 82, subSize: 38, nameSize: 60, textColor: '#ffffff' },
+  { id: 17, label: 'خليجي', image: '/templates/17.png', greeting: 'عيد مبارك', sub: 'تقبّل الله طاعتكم', nameY: 0.82, greetingY: 0.28, subY: 0.46, greetingSize: 85, subSize: 38, nameSize: 62, textColor: '#ffffff' },
+  { id: 18, label: 'سعودي', image: '/templates/18.png', greeting: 'عساكم من عوّاده', sub: 'كل عام وأنتم بخير', nameY: 0.80, greetingY: 0.26, subY: 0.44, greetingSize: 85, subSize: 38, nameSize: 60, textColor: '#ffffff' },
+  { id: 19, label: 'إماراتي', image: '/templates/19.png', greeting: 'عيدكم سعيد', sub: 'أدام الله أفراحكم', nameY: 0.82, greetingY: 0.28, subY: 0.46, greetingSize: 82, subSize: 36, nameSize: 62, textColor: '#ffffff' },
+  { id: 20, label: 'كويتي', image: '/templates/20.png', greeting: 'كل عام وأنتم بخير', sub: 'عساكم من الفايزين', nameY: 0.81, greetingY: 0.27, subY: 0.45, greetingSize: 85, subSize: 38, nameSize: 60, textColor: '#ffffff' },
 ]
 
 const nameColors = [
@@ -826,7 +842,7 @@ const nameColors = [
 ]
 
 function QuickCardCreator() {
-  const [selectedId, setSelectedId] = useState(quickDesigns[0].id)
+  const [selectedId, setSelectedId] = useState(allDesigns[0].id)
   const [name, setName] = useState('')
   const [multiNames, setMultiNames] = useState('')
   const [isMultiMode, setIsMultiMode] = useState(false)
@@ -836,7 +852,7 @@ function QuickCardCreator() {
   const canvasRef = useRef(null)
   const [canvasReady, setCanvasReady] = useState(false)
   const [loadedImg, setLoadedImg] = useState(null)
-  const selectedDesign = quickDesigns.find(d => d.id === selectedId) || quickDesigns[0]
+  const selectedDesign = allDesigns.find(d => d.id === selectedId) || allDesigns[0]
 
   useEffect(() => {
     if (!selectedDesign?.image) return
@@ -959,7 +975,7 @@ function QuickCardCreator() {
         <div className="text-center mb-12">
           <span className="section-label">بطاقات جاهزة</span>
           <h2 className="section-title mt-3 mb-4">اختر تصميم واكتب اسمك فقط</h2>
-          <p className="section-subtitle mx-auto text-center">٤ تصاميم احترافية جاهزة — فقط اكتب الاسم وحمّل البطاقة</p>
+          <p className="section-subtitle mx-auto text-center">٢٠ تصميم احترافي — فقط اكتب الاسم وحمّل البطاقة</p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-10 items-start">
@@ -967,31 +983,43 @@ function QuickCardCreator() {
           <div className="flex-1 min-w-0 space-y-8">
             <div>
               <label className="text-xs font-bold text-[#64748b] block mb-3">اختر التصميم</label>
-              {/* Infinite auto-scrolling carousel */}
-              <div className="overflow-hidden rounded-2xl" onMouseEnter={e => e.currentTarget.querySelector('.carousel-track')?.classList.add('paused')} onMouseLeave={e => e.currentTarget.querySelector('.carousel-track')?.classList.remove('paused')} onTouchStart={e => e.currentTarget.querySelector('.carousel-track')?.classList.add('paused')} onTouchEnd={e => e.currentTarget.querySelector('.carousel-track')?.classList.remove('paused')}>
-                <div className="carousel-track flex gap-3" style={{ width: 'max-content', direction: 'ltr' }}>
-                  {[...quickDesigns, ...quickDesigns].map((d, i) => (
-                    <button key={i} onClick={() => setSelectedId(d.id)}
-                      className={`group relative flex-none w-[130px] aspect-[3/4] rounded-2xl overflow-hidden transition-all duration-200 ${
+              {/* Infinite auto-scrolling carousel - all 20 templates */}
+              <div className="relative overflow-hidden rounded-2xl">
+                {/* Gradient fade edges */}
+                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+                
+                <div 
+                  className="carousel-track-infinite flex gap-3"
+                  onMouseEnter={e => e.currentTarget.style.animationPlayState = 'paused'}
+                  onMouseLeave={e => e.currentTarget.style.animationPlayState = 'running'}
+                  onTouchStart={e => e.currentTarget.style.animationPlayState = 'paused'}
+                  onTouchEnd={e => e.currentTarget.style.animationPlayState = 'running'}
+                >
+                  {/* Duplicate the array 4 times for seamless infinite loop */}
+                  {[...allDesigns, ...allDesigns, ...allDesigns, ...allDesigns].map((d, i) => (
+                    <button key={`${d.id}-${i}`} onClick={() => setSelectedId(d.id)}
+                      className={`group relative flex-none w-[110px] sm:w-[130px] aspect-[3/4] rounded-2xl overflow-hidden transition-all duration-200 ${
                         selectedId === d.id
-                          ? 'ring-2 ring-[#1d4ed8] shadow-lg scale-[1.04]'
-                          : 'ring-1 ring-[#e2e8f0] hover:ring-[#93c5fd] opacity-80 hover:opacity-100 hover:scale-[1.02]'
+                          ? 'ring-2 ring-[#d4af37] shadow-lg scale-[1.05] z-20'
+                          : 'ring-1 ring-[#e2e8f0] hover:ring-[#d4af37]/50 opacity-75 hover:opacity-100 hover:scale-[1.02]'
                       }`}>
                       <img src={d.image} alt={d.label} className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none' }} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent pointer-events-none" />
-                      <div className="absolute bottom-0 inset-x-0 p-2.5 text-right">
-                        <span className="text-white text-[12px] font-black drop-shadow-sm block">{d.label}</span>
-                        <span className="text-white/60 text-[9px]">{d.greeting}</span>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+                      <div className="absolute bottom-0 inset-x-0 p-2 text-right">
+                        <span className="text-white text-[11px] font-black drop-shadow-sm block">{d.label}</span>
+                        <span className="text-white/50 text-[8px]">{d.greeting}</span>
                       </div>
                       {selectedId === d.id && (
-                        <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#1d4ed8] flex items-center justify-center shadow">
-                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                        <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-gradient-to-br from-[#d4af37] to-[#f4e4a6] flex items-center justify-center shadow-lg">
+                          <svg className="w-3 h-3 text-[#1e1b4b]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                         </div>
                       )}
                     </button>
                   ))}
                 </div>
               </div>
+              <p className="text-center text-[#94a3b8] text-xs mt-3">٢٠ تصميم متاح — مرّر للاستعراض</p>
             </div>
 
             {/* Name input + color in a clean card */}

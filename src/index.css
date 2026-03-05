@@ -1820,3 +1820,25 @@ input, textarea, select {
 .animate-shimmer {
   animation: shimmer-game 2s ease-in-out infinite;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   INFINITE TEMPLATE CAROUSEL
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes carousel-scroll-infinite {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.carousel-track-infinite {
+  display: flex;
+  gap: 0.75rem;
+  width: max-content;
+  animation: carousel-scroll-infinite 60s linear infinite;
+  will-change: transform;
+  direction: ltr;
+}
+
+.carousel-track-infinite:hover {
+  animation-play-state: paused;
+}
