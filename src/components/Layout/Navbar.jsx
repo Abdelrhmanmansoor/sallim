@@ -60,7 +60,7 @@ export default function Navbar() {
           </Link>
           <Link
             to="/editor"
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-l from-gold-600 to-gold-500 text-[#060709] text-[13px] font-bold hover:from-gold-500 hover:to-gold-400 transition-all shadow-sm shadow-gold-500/10"
+            className="btn-gold !py-2.5 !px-5 !text-[13px] !rounded-xl !gap-1.5"
           >
             ابدأ التصميم
           </Link>
@@ -99,7 +99,7 @@ export default function Navbar() {
             <Link
               to="/editor"
               onClick={() => setOpen(false)}
-              className="block py-3 text-sm text-center rounded-xl bg-gradient-to-l from-gold-600 to-gold-500 text-[#060709] font-bold"
+              className="btn-gold w-full !text-sm !py-3"
             >
               ابدأ التصميم
             </Link>

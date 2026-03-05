@@ -71,11 +71,7 @@ function PricingCard({ title, subtitle, price, period, features, cta, ctaLink, h
           href={ctaLink}
           target="_blank"
           rel="noopener noreferrer"
-          className={`w-full py-4 rounded-xl font-bold text-[15px] text-center transition-all duration-300 inline-flex items-center justify-center gap-2 ${
-            highlight
-              ? 'bg-[#d4b96b] text-[#060709] hover:bg-[#e0c97d] shadow-lg shadow-[#d4b96b]/15'
-              : 'bg-white/[0.04] border border-white/[0.08] text-white/70 hover:bg-white/[0.08] hover:text-white'
-          }`}
+          className={`w-full justify-center ${highlight ? 'btn-gold' : 'btn-outline-gold'}`}
         >
           <MessageCircle className="w-4 h-4" />
           {cta}
@@ -83,11 +79,7 @@ function PricingCard({ title, subtitle, price, period, features, cta, ctaLink, h
       ) : (
         <Link
           to={ctaLink}
-          className={`w-full py-4 rounded-xl font-bold text-[15px] text-center transition-all duration-300 inline-flex items-center justify-center gap-2 ${
-            highlight
-              ? 'bg-[#d4b96b] text-[#060709] hover:bg-[#e0c97d] shadow-lg shadow-[#d4b96b]/15'
-              : 'bg-white/[0.04] border border-white/[0.08] text-white/70 hover:bg-white/[0.08] hover:text-white'
-          }`}
+          className={`w-full justify-center ${highlight ? 'btn-gold' : 'btn-outline-gold'}`}
         >
           {cta}
           <ArrowLeft className="w-4 h-4" />
@@ -131,7 +123,7 @@ export default function BusinessPage() {
               href={waLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-3 px-10 py-4 rounded-xl bg-[#d4b96b] text-[#060709] font-bold text-[15px] hover:bg-[#e0c97d] transition-all duration-300 shadow-lg shadow-[#d4b96b]/15 hover:shadow-[#d4b96b]/25"
+              className="group btn-gold"
             >
               <MessageCircle className="w-5 h-5" />
               تواصل معنا عبر واتساب
@@ -139,7 +131,7 @@ export default function BusinessPage() {
             </a>
             <Link
               to="/editor"
-              className="group inline-flex items-center gap-3 px-10 py-4 rounded-xl border-2 border-[#d4b96b]/30 text-[#d4b96b] font-bold text-[15px] hover:bg-[#d4b96b]/10 hover:border-[#d4b96b]/50 transition-all duration-300"
+              className="group btn-outline-gold"
             >
               جرّب المحرر مجاناً
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
@@ -296,7 +288,7 @@ export default function BusinessPage() {
               href={waLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-3 px-10 py-4 rounded-xl bg-[#d4b96b] text-[#060709] font-bold text-[15px] hover:bg-[#e0c97d] transition-all duration-300 shadow-lg shadow-[#d4b96b]/15"
+              className="group btn-gold"
             >
               <MessageCircle className="w-5 h-5" />
               تواصل واتساب
@@ -304,7 +296,7 @@ export default function BusinessPage() {
             </a>
             <Link
               to="/"
-              className="text-[#d4b96b] text-sm font-medium hover:text-[#e0c97d] transition-colors inline-flex items-center gap-2"
+              className="group btn-ghost-gold"
             >
               العودة للرئيسية
               <ArrowLeft className="w-3.5 h-3.5" />

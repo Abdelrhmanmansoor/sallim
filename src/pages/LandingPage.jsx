@@ -162,10 +162,10 @@ function EidiyaCalculator() {
               <button
                 key={q}
                 onClick={() => { setValue(q); const r = getReaction(q); if (!prevReactionRef.current || prevReactionRef.current.title !== r.title) { setEmojiKey(k => k + 1); prevReactionRef.current = r } }}
-                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 ${
+                className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
                   value === q
-                    ? 'bg-[#C9A84C] text-[#0A0A0A] shadow-lg shadow-[#C9A84C]/20'
-                    : 'bg-white/[0.04] text-white/50 border border-white/[0.06] hover:bg-white/[0.08] hover:text-white/80'
+                    ? 'bg-gradient-to-br from-[#c4a44e] to-[#d4b96b] text-[#0A0A0A] shadow-lg shadow-[#C9A84C]/20 scale-105'
+                    : 'bg-white/[0.03] text-white/40 border border-white/[0.06] hover:bg-white/[0.07] hover:text-white/70 hover:border-white/[0.10]'
                 }`}
               >
                 {toAr(q)}
@@ -206,14 +206,30 @@ function EidiyaCalculator() {
             <p className="text-white/40 text-sm leading-[1.8]">{reaction.desc}</p>
           </div>
 
-          {/* WhatsApp share */}
-          <button
-            onClick={shareWa}
-            className="relative z-10 mt-8 w-full py-4 rounded-xl bg-[#C9A84C] text-[#0A0A0A] font-bold text-[15px] hover:bg-[#d4b96b] transition-all duration-300 shadow-lg shadow-[#C9A84C]/15 inline-flex items-center justify-center gap-2"
-          >
-            <Share2 className="w-4 h-4" />
-            شارك عيديتك عبر واتساب
-          </button>
+          {/* Action Buttons */}
+          <div className="relative z-10 mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Link
+              to="/editor"
+              className="btn-gold w-full justify-center"
+            >
+              <Send className="w-4 h-4" />
+              أرسل عيدية — صمّم بطاقتك
+            </Link>
+            <button
+              onClick={shareWa}
+              className="btn-outline-gold w-full justify-center"
+            >
+              <Share2 className="w-4 h-4" />
+              شارك عبر واتساب
+            </button>
+          </div>
+
+          {/* Send Eidiya hint */}
+          <div className="relative z-10 mt-6 rounded-2xl p-5 text-center" style={{ background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.10)' }}>
+            <p className="text-white/50 text-sm leading-[1.8]">
+              💡 <span className="text-[#C9A84C] font-bold">أرسل عيدية حقيقية!</span> صمّم بطاقة تهنئة مع المبلغ واسمك واسم المستلم — وشاركها مباشرة عبر واتساب
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -310,18 +326,12 @@ export default function LandingPage() {
 
           {/* CTA Group — Companies + Individuals */}
           <div className="animate-fade-up delay-2 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              to="/editor"
-              className="group inline-flex items-center gap-3 px-10 py-4 rounded-xl bg-[#d4b96b] text-[#060709] font-bold text-[15px] hover:bg-[#e0c97d] transition-all duration-300 shadow-lg shadow-[#d4b96b]/15 hover:shadow-[#d4b96b]/25"
-            >
+            <Link to="/editor" className="group btn-gold">
               <Users className="w-5 h-5" />
               ابدأ مجاناً — للأفراد
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             </Link>
-            <Link
-              to="/business"
-              className="group inline-flex items-center gap-3 px-10 py-4 rounded-xl border-2 border-[#d4b96b]/30 text-[#d4b96b] font-bold text-[15px] hover:bg-[#d4b96b]/10 hover:border-[#d4b96b]/50 transition-all duration-300"
-            >
+            <Link to="/business" className="group btn-outline-gold">
               <Building2 className="w-5 h-5" />
               للشركات والمؤسسات
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
@@ -384,10 +394,7 @@ export default function LandingPage() {
               <p className="text-white/30 text-[15px] leading-[1.8] mb-10">
                 صمّم بطاقات احترافية بخطوط عربية أصيلة وعبارات مختارة بعناية — ثم أرسلها لمن تحب مباشرة.
               </p>
-              <Link
-                to="/editor"
-                className="inline-flex items-center gap-2 text-[#d4b96b] text-sm font-medium hover:text-[#e0c97d] transition-colors group"
-              >
+              <Link to="/editor" className="group btn-ghost-gold">
                 جرّب المحرر الآن
                 <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
               </Link>
@@ -436,17 +443,11 @@ export default function LandingPage() {
             صمّم بطاقة فريدة وأرسلها لمن تحب في أقل من دقيقة
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              to="/editor"
-              className="group inline-flex items-center gap-3 px-10 py-4 rounded-xl bg-[#d4b96b] text-[#060709] font-bold text-[15px] hover:bg-[#e0c97d] transition-all duration-300 shadow-lg shadow-[#d4b96b]/15"
-            >
+            <Link to="/editor" className="group btn-gold">
               ابدأ الآن مجاناً
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             </Link>
-            <Link
-              to="/business"
-              className="group inline-flex items-center gap-3 px-10 py-4 rounded-xl border-2 border-[#d4b96b]/30 text-[#d4b96b] font-bold text-[15px] hover:bg-[#d4b96b]/10 transition-all duration-300"
-            >
+            <Link to="/business" className="group btn-outline-gold">
               <Building2 className="w-5 h-5" />
               حلول الشركات
             </Link>
