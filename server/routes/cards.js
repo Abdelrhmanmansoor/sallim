@@ -1,0 +1,106 @@
+import { Router } from 'express'
+import Card from '../models/Card.js'
+import Stats from '../models/Stats.js'
+
+const router = Router()
+
+// ═══ Create a card (save to DB) ═══
+router.post('/', async (req, res) => {
+  try {
+    const { mainText, subText, senderName, recipientName, templateId, theme, font, fontSize, textColor } = req.body
+
+    if (!mainText || !templateId) {
+      return res.status(400).json({ success: false, error: 'mainText و templateId مطلوبين' })
+    }
+
+    const card = await Card.create({
+      mainText: mainText.slice(0, 500),
+      subText: (subText || '').slice(0, 500),
+      senderName: (senderName || '').slice(0, 100),
+      recipientName: (recipientName || '').slice(0, 100),
+      templateId,
+      theme: theme || 'golden',
+      font: font || 'cairo',
+      fontSize: fontSize || 42,
+      textColor: textColor || '#ffffff',
+      createdByIp: req.ip,
+    })
+
+    // Update stats
+    await Stats.incrementToday('cardsCreated')
+
+    res.status(201).json({
+      success: true,
+      data: {
+        shareId: card.shareId,
+        shareUrl: `${process.env.CLIENT_URL || ''}/card/${card.shareId}`,
+        createdAt: card.createdAt,
+      },
+    })
+  } catch (error) {
+    console.error('Card creation error:', error)
+    res.status(500).json({ success: false, error: 'حدث خطأ في إنشاء البطاقة' })
+  }
+})
+
+// ═══ Get card by shareId ═══
+router.get('/:shareId', async (req, res) => {
+  try {
+    const card = await Card.findOne({
+      shareId: req.params.shareId,
+      status: 'active',
+    })
+
+    if (!card) {
+      return res.status(404).json({ success: false, error: 'البطاقة غير موجودة' })
+    }
+
+    // Increment view count (non-blocking)
+    card.viewCount += 1
+    card.save().catch(() => {})
+    Stats.incrementToday('cardViews').catch(() => {})
+
+    res.json({
+      success: true,
+      data: {
+        mainText: card.mainText,
+        subText: card.subText,
+        senderName: card.senderName,
+        recipientName: card.recipientName,
+        templateId: card.templateId,
+        theme: card.theme,
+        font: card.font,
+        fontSize: card.fontSize,
+        textColor: card.textColor,
+        viewCount: card.viewCount,
+        createdAt: card.createdAt,
+      },
+    })
+  } catch (error) {
+    console.error('Card fetch error:', error)
+    res.status(500).json({ success: false, error: 'حدث خطأ' })
+  }
+})
+
+// ═══ Get public stats ═══
+router.get('/public/stats', async (req, res) => {
+  try {
+    const totalCards = await Card.countDocuments({ status: 'active' })
+    const totalViews = await Card.aggregate([
+      { $match: { status: 'active' } },
+      { $group: { _id: null, total: { $sum: '$viewCount' } } },
+    ])
+
+    res.json({
+      success: true,
+      data: {
+        totalCards,
+        totalViews: totalViews[0]?.total || 0,
+      },
+    })
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'حدث خطأ' })
+  }
+})
+
+export default router

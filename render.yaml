@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: sallim-api
+    runtime: node
+    region: frankfurt  # Closest to Gulf/Middle East
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && node index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false  # Set manually in Render dashboard
+      - key: CLIENT_URL
+        sync: false  # Set after Vercel deploy

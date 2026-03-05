@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useWhiteLabelStore } from '../store'
-import { BsGear, BsPalette, BsGlobe, BsKey, BsShield, BsBarChart, BsPeople, BsFileText, BsTrash, BsTrendingUp, BsCalendar, BsClock } from 'react-icons/bs'
+import { BsGear, BsPalette, BsGlobe, BsKey, BsShield, BsBarChart, BsPeople, BsFileText, BsTrash, BsGraphUp, BsCalendar, BsClock } from 'react-icons/bs'
 import { HiPhotograph, HiTemplate } from 'react-icons/hi'
 import toast, { Toaster } from 'react-hot-toast'
 
@@ -269,7 +269,7 @@ export default function DashboardPage() {
                     <span className="text-gray-400 text-xs">{stat.label}</span>
                   </div>
                   <span className="text-green-400 text-xs font-medium bg-green-500/10 px-2 py-1 rounded-full flex items-center gap-1">
-                    <BsTrendingUp className="text-[10px]" />
+                    <BsGraphUp className="text-[10px]" />
                     {stat.change}
                   </span>
                 </div>
