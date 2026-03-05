@@ -89,7 +89,7 @@ const faqs = [
 /* ═══ Step Card ═══ */
 function StepCard({ num, icon: Icon, title, desc, delay }) {
   return (
-    <div className={`animate-fade-up delay-${delay} group`}>
+    <div className="group" style={{ animationDelay: `${delay * 0.1}s` }}>
       <div className="relative bg-white/[0.015] border border-white/[0.05] rounded-3xl p-8 hover:border-gold-500/15 transition-all duration-500 h-full">
         {/* Step number */}
         <div className="absolute -top-3 right-6 bg-[#060709] px-3">
@@ -128,7 +128,7 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState(null)
 
   return (
-    <div className="min-h-screen overflow-hidden">
+    <div className="min-h-screen">
 
       {/* ─── HERO ─── */}
       <section className="relative min-h-[94vh] flex flex-col items-center justify-center px-4">
@@ -195,10 +195,10 @@ export default function LandingPage() {
       </section>
 
       {/* ─── HOW IT WORKS ─── */}
-      <section className="py-28 px-4 relative">
+      <section className="py-24 px-4 relative bg-[#060709]">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
 
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-5xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <span className="inline-block text-gold-500/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-3">الخطوات</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-white/90">
@@ -215,10 +215,10 @@ export default function LandingPage() {
       </section>
 
       {/* ─── FEATURES ─── */}
-      <section className="py-28 px-4 relative">
+      <section className="py-24 px-4 relative bg-[#060709]">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
 
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-5xl mx-auto relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             {/* Left: text */}
             <div>
@@ -255,10 +255,10 @@ export default function LandingPage() {
       </section>
 
       {/* ─── FAQ ─── */}
-      <section className="py-28 px-4 relative">
+      <section className="py-24 px-4 relative bg-[#060709]">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
 
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto relative z-10">
           <div className="text-center mb-14">
             <span className="inline-block text-gold-500/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-3">الأسئلة</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-white/90">أسئلة شائعة</h2>
@@ -273,10 +273,10 @@ export default function LandingPage() {
       </section>
 
       {/* ─── CTA ─── */}
-      <section className="py-28 px-4 relative">
+      <section className="py-24 px-4 relative bg-[#060709]">
         <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
 
-        <div className="max-w-xl mx-auto text-center">
+        <div className="max-w-xl mx-auto text-center relative z-10">
           <div className="w-14 h-14 rounded-2xl bg-gold-500/[0.07] flex items-center justify-center mb-8 mx-auto">
             <Sparkles className="w-6 h-6 text-gold-400" strokeWidth={1.5} />
           </div>
