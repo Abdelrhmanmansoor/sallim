@@ -7,11 +7,6 @@ const platformLinks = [
   { to: '/pricing', label: 'الأسعار' },
 ]
 
-const adminLinks = [
-  { to: '/admin',     label: 'لوحة التحكم' },
-  { to: '/business',  label: 'بوابة الشركات' },
-]
-
 const resourceLinks = [
   { to: '/',        label: 'الصفحة الرئيسية' },
   { to: '/pricing', label: 'الباقات' },
@@ -21,10 +16,10 @@ const resourceLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-[#1B3F9B] rounded-t-[2rem] mt-0">
-      <div className="max-w-[1200px] mx-auto px-6 pt-16 pb-10">
-        {/* Main 4-column grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
+    <footer className="bg-[#1d4ed8] rounded-t-[2rem] mt-0">
+      <div className="container-main pt-16 pb-10">
+        {/* Main 3-column grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mb-14">
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-5">
@@ -57,19 +52,6 @@ export default function Footer() {
                 <Link key={l.to} to={l.to} className="text-white/70 text-sm hover:text-white transition-colors w-fit">{l.label}</Link>
               ))}
             </div>
-          </div>
-
-          {/* Admin */}
-          <div>
-            <h4 className="text-white/40 text-[11px] font-bold tracking-wider uppercase mb-5">للشركات والإدارة</h4>
-            <div className="flex flex-col gap-3 mb-6">
-              {adminLinks.map(l => (
-                <Link key={l.to} to={l.to} className="text-white/70 text-sm hover:text-white transition-colors w-fit">{l.label}</Link>
-              ))}
-            </div>
-            <Link to="/business" className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-white/20 text-white/80 text-xs font-bold hover:bg-white/10 transition-all w-full">
-              اطلب باقة شركة
-            </Link>
           </div>
         </div>
 

@@ -39,7 +39,7 @@ export default function Navbar() {
           ? 'bg-white/95 backdrop-blur-xl border-b border-[#e2e8f0] shadow-sm'
           : 'bg-white/90 backdrop-blur-lg border-b border-transparent'
       }`}>
-        <div className="max-w-[1200px] mx-auto px-6 h-[72px] flex items-center justify-between relative">
+        <div className="container-main h-[72px] flex items-center justify-between relative">
 
           {/* Left side - empty on mobile for centering balance */}
           <div className="w-10 md:hidden" />
@@ -72,12 +72,6 @@ export default function Navbar() {
               <Sparkles className="w-3.5 h-3.5 text-[#F59E0B]" />
               تجربة فاخرة
             </span>
-            <Link
-              to="/admin"
-              className="px-4 py-2 rounded-full text-[13px] border border-transparent text-[#64748B] hover:text-[#0F172A] hover:border-[#BFDBFE] hover:bg-[#F8FAFC] transition-all"
-            >
-              التحكم
-            </Link>
             <Link
               to="/editor"
               className="btn-gold !py-2.5 !px-6 !text-[13px] !rounded-full !gap-1.5"
@@ -132,10 +126,7 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div className="pt-4 mt-4 border-t border-[#DBEAFE] space-y-2">
-            <Link to="/admin" onClick={() => setOpen(false)} className="block px-4 py-3 text-sm text-[#64748B] rounded-2xl border border-transparent hover:border-[#BFDBFE] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-colors">
-              لوحة التحكم
-            </Link>
+          <div className="pt-4 mt-4 border-t border-[#DBEAFE]">
             <Link
               to="/editor"
               onClick={() => setOpen(false)}

@@ -26,7 +26,7 @@ function TabButton({ active, icon, label, onClick }) {
     <button
       onClick={onClick}
       className={`flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
-        active ? 'bg-[#6A47ED]/20 text-[#C6F806] shadow-inner shadow-[#6A47ED]/10' : 'text-gray-400 hover:text-white hover:bg-white/5'
+        active ? 'bg-[#2563eb]/20 text-[#3b82f6] shadow-inner shadow-[#2563eb]/10' : 'text-gray-400 hover:text-white hover:bg-white/5'
       }`}
     >
       {icon}
@@ -67,7 +67,7 @@ function DraggableText({ text, x, y, width, fontSize, fontFamily, fill, align, o
 }
 
 /* ═══ Color picker row ═══ */
-const quickColors = ['#ffffff', '#000000', '#6A47ED', '#C6F806', '#fbbf24', '#ef4444', '#4ade80', '#f472b6', '#93c5fd', '#c4b5fd', '#f97316', '#14b8a6']
+const quickColors = ['#ffffff', '#000000', '#2563eb', '#3b82f6', '#fbbf24', '#ef4444', '#4ade80', '#f472b6', '#93c5fd', '#c4b5fd', '#f97316', '#14b8a6']
 
 function ColorRow({ value, onChange, label }) {
   return (
@@ -78,7 +78,7 @@ function ColorRow({ value, onChange, label }) {
           <button
             key={c}
             onClick={() => onChange(c)}
-            className={`w-6 h-6 rounded-full border transition-all ${value === c ? 'ring-2 ring-[#C6F806] scale-110 border-white/40' : 'border-white/10 hover:scale-105'}`}
+            className={`w-6 h-6 rounded-full border transition-all ${value === c ? 'ring-2 ring-[#3b82f6] scale-110 border-white/40' : 'border-white/10 hover:scale-105'}`}
             style={{ backgroundColor: c }}
           />
         ))}
@@ -294,8 +294,8 @@ export default function EditorPage() {
             <div ref={containerRef} className="w-full max-w-[540px]">
               <div className="glass rounded-2xl p-3 mb-4 relative">
                 {/* Drag hint badge */}
-                <div className="absolute top-4 right-4 z-20 bg-[#6A47ED]/80 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 pointer-events-none">
-                  <BsArrowsMove className="text-[#C6F806]" /> اسحب أو استخدم الأسهم
+                <div className="absolute top-4 right-4 z-20 bg-[#2563eb]/80 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 pointer-events-none">
+                  <BsArrowsMove className="text-[#3b82f6]" /> اسحب أو استخدم الأسهم
                 </div>
 
                 <Stage
@@ -428,10 +428,10 @@ export default function EditorPage() {
               <div className="space-y-3">
                 {/* Download Buttons */}
                 <div className="flex gap-3 justify-center">
-                  <button onClick={handleExportPNG} className="flex items-center gap-2 px-6 py-3 rounded-full bg-[#6A47ED] text-white font-bold hover:shadow-lg hover:shadow-[#6A47ED]/30 transition-all hover:scale-105">
+                  <button onClick={handleExportPNG} className="flex items-center gap-2 px-6 py-3 rounded-full bg-[#2563eb] text-white font-bold hover:shadow-lg hover:shadow-[#2563eb]/30 transition-all hover:scale-105">
                     <BsDownload /> تحميل PNG
                   </button>
-                  <button onClick={handleExportPDF} className="flex items-center gap-2 px-6 py-3 rounded-full border border-[#6A47ED]/30 text-[#8B6CF6] font-medium hover:bg-[#6A47ED]/10 transition-all hover:scale-105">
+                  <button onClick={handleExportPDF} className="flex items-center gap-2 px-6 py-3 rounded-full border border-[#2563eb]/30 text-[#8B6CF6] font-medium hover:bg-[#2563eb]/10 transition-all hover:scale-105">
                     <BsFilePdf /> تحميل PDF
                   </button>
                 </div>
@@ -486,11 +486,11 @@ export default function EditorPage() {
                 {/* ═══ TEMPLATES TAB ═══ */}
                 {activeTab === 'templates' && (
                   <div className="space-y-4">
-                    <h3 className="text-sm font-bold text-[#C6F806] mb-3">اختر القالب</h3>
+                    <h3 className="text-sm font-bold text-[#3b82f6] mb-3">اختر القالب</h3>
                     
                     {/* Upload new template */}
                     <div className="mb-4">
-                      <label className="block border-2 border-dashed border-white/10 rounded-xl p-4 text-center hover:border-[#6A47ED]/30 transition-colors cursor-pointer">
+                      <label className="block border-2 border-dashed border-white/10 rounded-xl p-4 text-center hover:border-[#2563eb]/30 transition-colors cursor-pointer">
                         <input
                           type="file"
                           accept="image/*"
@@ -540,7 +540,7 @@ export default function EditorPage() {
                           }}
                           className={`relative aspect-square rounded-xl overflow-hidden transition-all hover:scale-105 cursor-pointer ${
                             store.selectedTemplate === t.id
-                              ? 'ring-2 ring-[#6A47ED] shadow-lg shadow-[#6A47ED]/20'
+                              ? 'ring-2 ring-[#2563eb] shadow-lg shadow-[#2563eb]/20'
                               : 'ring-1 ring-white/10'
                           }`}
                         >
@@ -600,7 +600,7 @@ export default function EditorPage() {
                             onClick={() => store.setActiveElement(el.key)}
                             className={`p-2.5 rounded-xl text-xs font-bold transition-all text-right flex items-center gap-2 ${
                               store.activeElement === el.key 
-                                ? 'bg-[#6A47ED]/20 text-[#C6F806] ring-1 ring-[#6A47ED]/40' 
+                                ? 'bg-[#2563eb]/20 text-[#3b82f6] ring-1 ring-[#2563eb]/40' 
                                 : 'bg-white/5 text-gray-400 hover:bg-white/10'
                             }`}
                           >
@@ -612,63 +612,63 @@ export default function EditorPage() {
                     </div>
 
                     {/* Main Text */}
-                    <div className={`p-3 rounded-xl transition-all ${store.activeElement === 'mainText' ? 'bg-[#6A47ED]/10 ring-1 ring-[#6A47ED]/30' : 'bg-white/[0.02]'}`}>
-                      <label className="text-sm font-bold text-[#C6F806] block mb-2">✨ النص الرئيسي</label>
+                    <div className={`p-3 rounded-xl transition-all ${store.activeElement === 'mainText' ? 'bg-[#2563eb]/10 ring-1 ring-[#2563eb]/30' : 'bg-white/[0.02]'}`}>
+                      <label className="text-sm font-bold text-[#3b82f6] block mb-2">✨ النص الرئيسي</label>
                       <textarea
                         value={store.mainText}
                         onChange={(e) => store.setMainText(e.target.value)}
                         onFocus={() => store.setActiveElement('mainText')}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm resize-none focus:border-[#6A47ED]/50 focus:outline-none"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm resize-none focus:border-[#2563eb]/50 focus:outline-none"
                         rows={2}
                         dir="rtl"
                         placeholder="عيد مبارك..."
                       />
                       <div className="mt-2">
                         <label className="text-xs text-gray-400 block mb-1">حجم الخط: {store.fontSize}</label>
-                        <input type="range" min={16} max={80} value={store.fontSize} onChange={(e) => store.setFontSize(Number(e.target.value))} className="w-full accent-[#6A47ED]" />
+                        <input type="range" min={16} max={80} value={store.fontSize} onChange={(e) => store.setFontSize(Number(e.target.value))} className="w-full accent-[#2563eb]" />
                       </div>
                     </div>
 
                     {/* Sub Text */}
-                    <div className={`p-3 rounded-xl transition-all ${store.activeElement === 'subText' ? 'bg-[#6A47ED]/10 ring-1 ring-[#6A47ED]/30' : 'bg-white/[0.02]'}`}>
-                      <label className="text-sm font-bold text-[#C6F806] block mb-2">📝 النص الفرعي</label>
+                    <div className={`p-3 rounded-xl transition-all ${store.activeElement === 'subText' ? 'bg-[#2563eb]/10 ring-1 ring-[#2563eb]/30' : 'bg-white/[0.02]'}`}>
+                      <label className="text-sm font-bold text-[#3b82f6] block mb-2">📝 النص الفرعي</label>
                       <textarea
                         value={store.subText}
                         onChange={(e) => store.setSubText(e.target.value)}
                         onFocus={() => store.setActiveElement('subText')}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm resize-none focus:border-[#6A47ED]/50 focus:outline-none"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm resize-none focus:border-[#2563eb]/50 focus:outline-none"
                         rows={2}
                         dir="rtl"
                         placeholder="كل عام وأنتم بخير"
                       />
                       <div className="mt-2">
                         <label className="text-xs text-gray-400 block mb-1">حجم الخط: {store.subFontSize}</label>
-                        <input type="range" min={10} max={52} value={store.subFontSize} onChange={(e) => store.setSubFontSize(Number(e.target.value))} className="w-full accent-[#6A47ED]" />
+                        <input type="range" min={10} max={52} value={store.subFontSize} onChange={(e) => store.setSubFontSize(Number(e.target.value))} className="w-full accent-[#2563eb]" />
                       </div>
                     </div>
 
                     {/* Names */}
                     <div className="grid grid-cols-2 gap-3">
-                      <div className={`p-3 rounded-xl transition-all ${store.activeElement === 'recipientName' ? 'bg-[#6A47ED]/10 ring-1 ring-[#6A47ED]/30' : 'bg-white/[0.02]'}`}>
+                      <div className={`p-3 rounded-xl transition-all ${store.activeElement === 'recipientName' ? 'bg-[#2563eb]/10 ring-1 ring-[#2563eb]/30' : 'bg-white/[0.02]'}`}>
                         <label className="text-xs font-bold text-gray-300 block mb-1.5">🎯 اسم المُستلِم</label>
                         <input
                           type="text"
                           value={store.recipientName}
                           onChange={(e) => store.setRecipientName(e.target.value)}
                           onFocus={() => store.setActiveElement('recipientName')}
-                          className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white text-sm focus:border-[#6A47ED]/50 focus:outline-none"
+                          className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white text-sm focus:border-[#2563eb]/50 focus:outline-none"
                           dir="rtl"
                           placeholder="اسم المستلم"
                         />
                       </div>
-                      <div className={`p-3 rounded-xl transition-all ${store.activeElement === 'senderName' ? 'bg-[#6A47ED]/10 ring-1 ring-[#6A47ED]/30' : 'bg-white/[0.02]'}`}>
+                      <div className={`p-3 rounded-xl transition-all ${store.activeElement === 'senderName' ? 'bg-[#2563eb]/10 ring-1 ring-[#2563eb]/30' : 'bg-white/[0.02]'}`}>
                         <label className="text-xs font-bold text-gray-300 block mb-1.5">✍️ اسم المُرسِل</label>
                         <input
                           type="text"
                           value={store.senderName}
                           onChange={(e) => store.setSenderName(e.target.value)}
                           onFocus={() => store.setActiveElement('senderName')}
-                          className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white text-sm focus:border-[#6A47ED]/50 focus:outline-none"
+                          className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white text-sm focus:border-[#2563eb]/50 focus:outline-none"
                           dir="rtl"
                           placeholder="اسمك"
                         />
@@ -677,8 +677,8 @@ export default function EditorPage() {
 
                     {/* Ready-made texts */}
                     <div>
-                      <label className="text-sm font-bold text-[#C6F806] block mb-2">📚 نصوص جاهزة</label>
-                      <input type="text" value={searchText} onChange={(e) => setSearchText(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white text-sm mb-2 focus:border-[#6A47ED]/50 focus:outline-none" dir="rtl" placeholder="ابحث في النصوص..." />
+                      <label className="text-sm font-bold text-[#3b82f6] block mb-2">📚 نصوص جاهزة</label>
+                      <input type="text" value={searchText} onChange={(e) => setSearchText(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white text-sm mb-2 focus:border-[#2563eb]/50 focus:outline-none" dir="rtl" placeholder="ابحث في النصوص..." />
                       <div className="space-y-2 max-h-48 overflow-y-auto">
                         {filteredTexts.map((t) => (
                           <button
@@ -688,7 +688,7 @@ export default function EditorPage() {
                               store.setSubText(t.text.length > 40 ? t.text.substring(40) : '')
                               toast.success('تم تحديد النص')
                             }}
-                            className="w-full text-right p-2 rounded-lg bg-white/5 hover:bg-[#6A47ED]/10 text-gray-300 text-xs leading-relaxed transition-all border border-transparent hover:border-[#6A47ED]/20"
+                            className="w-full text-right p-2 rounded-lg bg-white/5 hover:bg-[#2563eb]/10 text-gray-300 text-xs leading-relaxed transition-all border border-transparent hover:border-[#2563eb]/20"
                             dir="rtl"
                           >
                             {t.text.substring(0, 80)}...
@@ -702,13 +702,13 @@ export default function EditorPage() {
                 {/* Fonts Tab */}
                 {activeTab === 'fonts' && (
                   <div className="space-y-3">
-                    <h3 className="text-sm font-bold text-[#C6F806] mb-3">اختر الخط</h3>
+                    <h3 className="text-sm font-bold text-[#3b82f6] mb-3">اختر الخط</h3>
                     {fonts.map((f) => (
                       <button
                         key={f.id}
                         onClick={() => store.setFont(f.id)}
                         className={`w-full text-right p-4 rounded-xl transition-all ${
-                          store.selectedFont === f.id ? 'bg-[#6A47ED]/20 ring-2 ring-[#6A47ED]' : 'bg-white/5 hover:bg-white/10'
+                          store.selectedFont === f.id ? 'bg-[#2563eb]/20 ring-2 ring-[#2563eb]' : 'bg-white/5 hover:bg-white/10'
                         }`}
                       >
                         <span className="text-lg text-white block" style={{ fontFamily: f.family }}>بسم الله الرحمن الرحيم</span>
@@ -721,7 +721,7 @@ export default function EditorPage() {
                 {/* ═══ COLORS TAB ═══ */}
                 {activeTab === 'colors' && (
                   <div className="space-y-5">
-                    <h3 className="text-sm font-bold text-[#C6F806] mb-1">لون كل عنصر — تحكّم فردي</h3>
+                    <h3 className="text-sm font-bold text-[#3b82f6] mb-1">لون كل عنصر — تحكّم فردي</h3>
                     <p className="text-gray-500 text-[11px] mb-3">كل نص في البطاقة له لون مستقل — غيّره حسب رغبتك</p>
                     
                     <ColorRow value={store.textColor} onChange={store.setTextColor} label="✨ لون النص الرئيسي" />
@@ -739,7 +739,7 @@ export default function EditorPage() {
                 {/* ═══ EFFECTS TAB ═══ */}
                 {activeTab === 'effects' && (
                   <div className="space-y-5">
-                    <h3 className="text-sm font-bold text-[#C6F806] mb-1">تأثيرات خرافية</h3>
+                    <h3 className="text-sm font-bold text-[#3b82f6] mb-1">تأثيرات خرافية</h3>
                     <p className="text-gray-500 text-[11px] mb-3">ظل، حدود، شفافية، تدوير — كل شي تحت سيطرتك</p>
 
                     {/* Text Shadow */}
@@ -747,7 +747,7 @@ export default function EditorPage() {
                       <span className="text-sm text-white font-medium">🌑 ظل النصوص</span>
                       <button
                         onClick={() => store.setTextShadow(!store.textShadow)}
-                        className={`w-12 h-6 rounded-full transition-all relative ${store.textShadow ? 'bg-[#6A47ED]' : 'bg-white/10'}`}
+                        className={`w-12 h-6 rounded-full transition-all relative ${store.textShadow ? 'bg-[#2563eb]' : 'bg-white/10'}`}
                       >
                         <div className={`w-5 h-5 rounded-full bg-white absolute top-0.5 transition-all ${store.textShadow ? 'right-0.5' : 'right-[22px]'}`} />
                       </button>
@@ -759,7 +759,7 @@ export default function EditorPage() {
                         <span className="text-sm text-white font-medium">🖊️ حدود النص</span>
                         <button
                           onClick={() => store.setTextStroke(!store.textStroke)}
-                          className={`w-12 h-6 rounded-full transition-all relative ${store.textStroke ? 'bg-[#6A47ED]' : 'bg-white/10'}`}
+                          className={`w-12 h-6 rounded-full transition-all relative ${store.textStroke ? 'bg-[#2563eb]' : 'bg-white/10'}`}
                         >
                           <div className={`w-5 h-5 rounded-full bg-white absolute top-0.5 transition-all ${store.textStroke ? 'right-0.5' : 'right-[22px]'}`} />
                         </button>
@@ -767,7 +767,7 @@ export default function EditorPage() {
                       {store.textStroke && (
                         <div>
                           <label className="text-xs text-gray-400 block mb-1">سمك الحدود: {store.textStrokeWidth}</label>
-                          <input type="range" min={0.5} max={5} step={0.5} value={store.textStrokeWidth} onChange={(e) => store.setTextStrokeWidth(Number(e.target.value))} className="w-full accent-[#6A47ED]" />
+                          <input type="range" min={0.5} max={5} step={0.5} value={store.textStrokeWidth} onChange={(e) => store.setTextStrokeWidth(Number(e.target.value))} className="w-full accent-[#2563eb]" />
                         </div>
                       )}
                     </div>
@@ -777,14 +777,14 @@ export default function EditorPage() {
                       <span className="text-sm text-white font-medium block">🌫️ طبقة خلفية (لتوضيح النص)</span>
                       <div>
                         <label className="text-xs text-gray-400 block mb-1">الشفافية: {Math.round(store.overlayOpacity * 100)}%</label>
-                        <input type="range" min={0} max={0.8} step={0.05} value={store.overlayOpacity} onChange={(e) => store.setOverlayOpacity(Number(e.target.value))} className="w-full accent-[#6A47ED]" />
+                        <input type="range" min={0} max={0.8} step={0.05} value={store.overlayOpacity} onChange={(e) => store.setOverlayOpacity(Number(e.target.value))} className="w-full accent-[#2563eb]" />
                       </div>
                       <div className="flex gap-2">
                         {['#000000', '#17012C', '#ffffff', '#0a1628'].map(c => (
                           <button
                             key={c}
                             onClick={() => store.setOverlayColor(c)}
-                            className={`w-7 h-7 rounded-full border transition-all ${store.overlayColor === c ? 'ring-2 ring-[#C6F806] border-white/30' : 'border-white/10'}`}
+                            className={`w-7 h-7 rounded-full border transition-all ${store.overlayColor === c ? 'ring-2 ring-[#3b82f6] border-white/30' : 'border-white/10'}`}
                             style={{ backgroundColor: c }}
                           />
                         ))}
@@ -796,11 +796,11 @@ export default function EditorPage() {
                       <span className="text-sm text-white font-medium block">🔄 تدوير النصوص</span>
                       <div>
                         <label className="text-xs text-gray-400 block mb-1">النص الرئيسي: {store.mainTextRotation}°</label>
-                        <input type="range" min={-45} max={45} value={store.mainTextRotation} onChange={(e) => store.setMainTextRotation(Number(e.target.value))} className="w-full accent-[#6A47ED]" />
+                        <input type="range" min={-45} max={45} value={store.mainTextRotation} onChange={(e) => store.setMainTextRotation(Number(e.target.value))} className="w-full accent-[#2563eb]" />
                       </div>
                       <div>
                         <label className="text-xs text-gray-400 block mb-1">النص الفرعي: {store.subTextRotation}°</label>
-                        <input type="range" min={-45} max={45} value={store.subTextRotation} onChange={(e) => store.setSubTextRotation(Number(e.target.value))} className="w-full accent-[#6A47ED]" />
+                        <input type="range" min={-45} max={45} value={store.subTextRotation} onChange={(e) => store.setSubTextRotation(Number(e.target.value))} className="w-full accent-[#2563eb]" />
                       </div>
                     </div>
 
@@ -829,11 +829,11 @@ export default function EditorPage() {
                       <div className="flex justify-center">
                         <div className="grid grid-cols-3 gap-1.5 w-fit">
                           <div />
-                          <button onClick={() => { const posMap = { mainText: [store.mainTextPos, store.setMainTextPos], subText: [store.subTextPos, store.setSubTextPos], senderName: [store.senderPos, store.setSenderPos], recipientName: [store.recipientPos, store.setRecipientPos] }; const [pos, set] = posMap[store.activeElement]; set({ ...pos, y: Math.max(0, pos.y - 2/stageSize.width) }) }} className="w-10 h-10 rounded-lg bg-white/10 text-white font-bold hover:bg-[#6A47ED]/30 transition-all flex items-center justify-center text-lg">↑</button>
+                          <button onClick={() => { const posMap = { mainText: [store.mainTextPos, store.setMainTextPos], subText: [store.subTextPos, store.setSubTextPos], senderName: [store.senderPos, store.setSenderPos], recipientName: [store.recipientPos, store.setRecipientPos] }; const [pos, set] = posMap[store.activeElement]; set({ ...pos, y: Math.max(0, pos.y - 2/stageSize.width) }) }} className="w-10 h-10 rounded-lg bg-white/10 text-white font-bold hover:bg-[#2563eb]/30 transition-all flex items-center justify-center text-lg">↑</button>
                           <div />
-                          <button onClick={() => { const posMap = { mainText: [store.mainTextPos, store.setMainTextPos], subText: [store.subTextPos, store.setSubTextPos], senderName: [store.senderPos, store.setSenderPos], recipientName: [store.recipientPos, store.setRecipientPos] }; const [pos, set] = posMap[store.activeElement]; set({ ...pos, x: Math.min(1, pos.x + 2/stageSize.width) }) }} className="w-10 h-10 rounded-lg bg-white/10 text-white font-bold hover:bg-[#6A47ED]/30 transition-all flex items-center justify-center text-lg">→</button>
-                          <button onClick={() => { const posMap = { mainText: [store.mainTextPos, store.setMainTextPos], subText: [store.subTextPos, store.setSubTextPos], senderName: [store.senderPos, store.setSenderPos], recipientName: [store.recipientPos, store.setRecipientPos] }; const [pos, set] = posMap[store.activeElement]; set({ ...pos, y: Math.min(1, pos.y + 2/stageSize.width) }) }} className="w-10 h-10 rounded-lg bg-white/10 text-white font-bold hover:bg-[#6A47ED]/30 transition-all flex items-center justify-center text-lg">↓</button>
-                          <button onClick={() => { const posMap = { mainText: [store.mainTextPos, store.setMainTextPos], subText: [store.subTextPos, store.setSubTextPos], senderName: [store.senderPos, store.setSenderPos], recipientName: [store.recipientPos, store.setRecipientPos] }; const [pos, set] = posMap[store.activeElement]; set({ ...pos, x: Math.max(0, pos.x - 2/stageSize.width) }) }} className="w-10 h-10 rounded-lg bg-white/10 text-white font-bold hover:bg-[#6A47ED]/30 transition-all flex items-center justify-center text-lg">←</button>
+                          <button onClick={() => { const posMap = { mainText: [store.mainTextPos, store.setMainTextPos], subText: [store.subTextPos, store.setSubTextPos], senderName: [store.senderPos, store.setSenderPos], recipientName: [store.recipientPos, store.setRecipientPos] }; const [pos, set] = posMap[store.activeElement]; set({ ...pos, x: Math.min(1, pos.x + 2/stageSize.width) }) }} className="w-10 h-10 rounded-lg bg-white/10 text-white font-bold hover:bg-[#2563eb]/30 transition-all flex items-center justify-center text-lg">→</button>
+                          <button onClick={() => { const posMap = { mainText: [store.mainTextPos, store.setMainTextPos], subText: [store.subTextPos, store.setSubTextPos], senderName: [store.senderPos, store.setSenderPos], recipientName: [store.recipientPos, store.setRecipientPos] }; const [pos, set] = posMap[store.activeElement]; set({ ...pos, y: Math.min(1, pos.y + 2/stageSize.width) }) }} className="w-10 h-10 rounded-lg bg-white/10 text-white font-bold hover:bg-[#2563eb]/30 transition-all flex items-center justify-center text-lg">↓</button>
+                          <button onClick={() => { const posMap = { mainText: [store.mainTextPos, store.setMainTextPos], subText: [store.subTextPos, store.setSubTextPos], senderName: [store.senderPos, store.setSenderPos], recipientName: [store.recipientPos, store.setRecipientPos] }; const [pos, set] = posMap[store.activeElement]; set({ ...pos, x: Math.max(0, pos.x - 2/stageSize.width) }) }} className="w-10 h-10 rounded-lg bg-white/10 text-white font-bold hover:bg-[#2563eb]/30 transition-all flex items-center justify-center text-lg">←</button>
                         </div>
                       </div>
                     </div>
@@ -843,8 +843,8 @@ export default function EditorPage() {
                 {/* ═══ LOGO TAB ═══ */}
                 {activeTab === 'logo' && (
                   <div className="space-y-4">
-                    <h3 className="text-sm font-bold text-[#C6F806] mb-3">شعار / صورة</h3>
-                    <div className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center hover:border-[#6A47ED]/30 transition-colors cursor-pointer">
+                    <h3 className="text-sm font-bold text-[#3b82f6] mb-3">شعار / صورة</h3>
+                    <div className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center hover:border-[#2563eb]/30 transition-colors cursor-pointer">
                       <input type="file" accept="image/*" className="hidden" id="logo-upload" onChange={(e) => {
                         const file = e.target.files[0]
                         if (file) {

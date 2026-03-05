@@ -11,26 +11,27 @@ import { templates } from '../data/templates'
 const toAr = (n) => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d])
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   MARQUEE TICKER
+   MARQUEE TICKER - Infinite Loop
    ═══════════════════════════════════════════════════════════════════════════ */
 function MarqueeTicker() {
   const items = [
-    'أكثر من ٥٠،٠٠٠ بطاقة صُمِّمت هذا العيد',
-    'قوالب جديدة كل أسبوع',
-    'تصدير 1080px مجانًا',
-    'مشاركة مباشرة عبر واتساب',
-    'محرر عربي احترافي وسريع',
+    '🌙 منصة رسمية لتصميم بطاقات العيد',
+    '✨ أكثر من ٥٠،٠٠٠ بطاقة صُمِّمت هذا العيد',
+    '🎨 قوالب فاخرة جديدة كل أسبوع',
+    '📱 تصدير 1080px مجانًا',
+    '💬 مشاركة مباشرة عبر واتساب',
+    '🖋️ محرر عربي احترافي وسريع',
   ]
-  const repeated = [...items, ...items, ...items]
+  // Duplicate items multiple times for seamless infinite loop
+  const repeated = [...items, ...items, ...items, ...items]
 
   return (
-    <div className="w-full bg-[#f8fafc] border-y border-[#e2e8f0]">
-      <div className="max-w-[1200px] mx-auto px-6">
+    <div className="w-full bg-gradient-to-r from-[#fef9e7] via-[#fdf3c7] to-[#fef9e7] border-y-2 border-[#d4af37]/30">
+      <div className="container-main">
         <div className="relative overflow-hidden py-4">
           <div className="flex animate-marquee whitespace-nowrap">
             {repeated.map((item, i) => (
-              <span key={i} className="mx-6 inline-flex items-center gap-2.5 text-[#475569] text-sm font-medium">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#1d4ed8]" />
+              <span key={i} className="mx-8 inline-flex items-center gap-2.5 text-[#92400e] text-sm font-semibold">
                 {item}
               </span>
             ))}
@@ -198,7 +199,28 @@ function EidiyaCalculator() {
   const [scoreTotals, setScoreTotals] = useState(null)
   const [animatedAmount, setAnimatedAmount] = useState(0)
   const [fadeIn, setFadeIn] = useState(true)
+  const [showCelebration, setShowCelebration] = useState(false)
   const totalQ = quizQuestions.length
+
+  // Sound effects for result
+  const playResultSound = useCallback(() => {
+    try {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)()
+      const frequencies = [523.25, 659.25, 783.99, 1046.50]
+      frequencies.forEach((freq, i) => {
+        const osc = audioContext.createOscillator()
+        const gain = audioContext.createGain()
+        osc.connect(gain)
+        gain.connect(audioContext.destination)
+        osc.frequency.value = freq
+        osc.type = 'sine'
+        gain.gain.setValueAtTime(0.12, audioContext.currentTime)
+        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.2)
+        osc.start(audioContext.currentTime + i * 0.1)
+        osc.stop(audioContext.currentTime + 1.2)
+      })
+    } catch (e) {}
+  }, [])
 
   const getResult = useCallback(() => {
     for (const r of quizResults) if (totalScore >= r.min && totalScore <= r.max) return r
@@ -209,16 +231,16 @@ function EidiyaCalculator() {
     if (step !== totalQ + 1) return
     const result = getResult()
     const target = result.amount
-    const steps = 40
-    const increment = target / steps
+    playResultSound()
+    setShowCelebration(true)
     let current = 0
     const interval = setInterval(() => {
-      current += increment
+      current += target / 40
       if (current >= target) { setAnimatedAmount(target); clearInterval(interval) }
       else setAnimatedAmount(Math.round(current))
     }, 40)
     return () => clearInterval(interval)
-  }, [step, totalScore, getResult])
+  }, [step, totalScore, getResult, playResultSound])
 
   const fadeTransition = (callback) => {
     setFadeIn(false)
@@ -243,7 +265,7 @@ function EidiyaCalculator() {
     }, 400)
   }
 
-  const reset = () => fadeTransition(() => { setStep(0); setAnswerData([]); setSelected(null); setTotalScore(0); setScoreTotals(null); setAnimatedAmount(0) })
+  const reset = () => { setShowCelebration(false); fadeTransition(() => { setStep(0); setAnswerData([]); setSelected(null); setTotalScore(0); setScoreTotals(null); setAnimatedAmount(0) }) }
 
   const shareWa = () => {
     const result = getResult()
@@ -255,26 +277,29 @@ function EidiyaCalculator() {
   const pct = step > 0 && step <= totalQ ? (step / totalQ) * 100 : step > totalQ ? 100 : 0
 
   return (
-    <section className="py-20 bg-[#f8fafc]">
-      <div className="max-w-[1200px] mx-auto px-6">
+    <section className="section-spacing bg-gradient-to-b from-[#f8fafc] to-[#fef9e7]/30">
+      <div className="container-main">
         <div className="max-w-xl mx-auto">
           <div className="text-center mb-12">
-            <span className="section-label">تسلية</span>
-            <h2 className="section-title mt-3 mb-4">كم تستاهل عيدية؟</h2>
+            <span className="official-badge">
+              <Gift className="w-4 h-4" />
+              تسلية العيد
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-[#0f172a] mt-4 mb-4">كم تستاهل عيدية؟</h2>
             <p className="text-[#64748b] text-[15px]">جاوب على ٨ أسئلة وبنحسب لك عيديتك المستحقة</p>
           </div>
 
-          <div className="relative rounded-2xl p-6 sm:p-8 bg-[#0f172a] border border-[#1e293b] shadow-lg overflow-hidden">
+          <div className="eidiya-card-luxury relative overflow-hidden">
             {result && <Confetti active={result.amount >= 500} />}
 
             {step > 0 && (
               <div className="relative z-10 mb-6">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-white/30 text-xs font-medium">{step <= totalQ ? `سؤال ${toAr(step)} من ${toAr(totalQ)}` : 'النتيجة'}</span>
-                  <span className="text-[#3b82f6] text-xs font-bold">{toAr(Math.round(pct))}٪</span>
+                  <span className="text-white/40 text-xs font-medium">{step <= totalQ ? `سؤال ${toAr(step)} من ${toAr(totalQ)}` : '🎉 النتيجة'}</span>
+                  <span className="text-[#d4af37] text-xs font-bold">{toAr(Math.round(pct))}٪</span>
                 </div>
-                <div className="w-full h-1.5 rounded-full bg-white/5 overflow-hidden">
-                  <div className="h-full rounded-full bg-[#2563eb] transition-all duration-700 ease-out" style={{ width: `${pct}%` }} />
+                <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden">
+                  <div className="h-full rounded-full bg-gradient-to-r from-[#d4af37] to-[#f4e4a6] transition-all duration-700 ease-out" style={{ width: `${pct}%` }} />
                 </div>
               </div>
             )}
@@ -400,8 +425,8 @@ function EidiyaLuckGenerator() {
   ]
 
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-[1200px] mx-auto px-6">
+    <section className="section-spacing bg-white">
+      <div className="container-main">
         <div className="max-w-2xl mx-auto">
           {/* Heading */}
           <div className="text-center mb-12">
@@ -563,8 +588,11 @@ const nameColors = [
 function QuickCardCreator() {
   const [selectedId, setSelectedId] = useState(quickDesigns[0].id)
   const [name, setName] = useState('')
+  const [multiNames, setMultiNames] = useState('')
+  const [isMultiMode, setIsMultiMode] = useState(false)
   const [nameColor, setNameColor] = useState('#ffffff')
   const [showAll, setShowAll] = useState(false)
+  const [exporting, setExporting] = useState(false)
   const canvasRef = useRef(null)
   const [canvasReady, setCanvasReady] = useState(false)
   const [loadedImg, setLoadedImg] = useState(null)
@@ -623,6 +651,57 @@ function QuickCardCreator() {
     link.href = canvas.toDataURL('image/png', 1.0); document.body.appendChild(link); link.click(); document.body.removeChild(link)
   }, [])
 
+  // Generate card for a specific name
+  const generateCardForName = useCallback((singleName, img, design) => {
+    return new Promise((resolve) => {
+      const tempCanvas = document.createElement('canvas')
+      const size = 1080
+      tempCanvas.width = size; tempCanvas.height = size
+      const ctx = tempCanvas.getContext('2d')
+      ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, size, size)
+      ctx.drawImage(img, 0, 0, size, size)
+      ctx.fillStyle = 'rgba(0,0,0,0.15)'; ctx.fillRect(0, 0, size, size)
+      const fontBase = "'Cairo', sans-serif"
+      ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = design.textColor
+      ctx.shadowColor = 'rgba(0,0,0,0.7)'; ctx.shadowBlur = 16
+      ctx.font = `900 ${design.greetingSize}px ${fontBase}`
+      ctx.fillText(design.greeting, size / 2, size * design.greetingY, size * 0.9); ctx.restore()
+      ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = design.textColor
+      ctx.globalAlpha = 0.85; ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 10
+      ctx.font = `600 ${design.subSize}px ${fontBase}`
+      ctx.fillText(design.sub, size / 2, size * design.subY, size * 0.9); ctx.restore()
+      ctx.save(); ctx.strokeStyle = nameColor; ctx.globalAlpha = 0.3; ctx.lineWidth = 2
+      const lineW = 200; ctx.beginPath()
+      ctx.moveTo(size / 2 - lineW, size * (design.nameY - 0.05))
+      ctx.lineTo(size / 2 + lineW, size * (design.nameY - 0.05)); ctx.stroke(); ctx.restore()
+      if (singleName.trim()) {
+        ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = nameColor
+        ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 14
+        ctx.font = `bold ${design.nameSize}px ${fontBase}`
+        ctx.fillText(singleName, size / 2, size * design.nameY, size * 0.85); ctx.restore()
+      }
+      resolve({ canvas: tempCanvas, name: singleName })
+    })
+  }, [nameColor])
+
+  // Export multiple cards
+  const handleExportMultiple = useCallback(async () => {
+    if (!loadedImg || !multiNames.trim()) return
+    setExporting(true)
+    const names = multiNames.split(/[,،\n]+/).map(n => n.trim()).filter(n => n)
+    for (let i = 0; i < names.length; i++) {
+      const { canvas, name: cardName } = await generateCardForName(names[i], loadedImg, selectedDesign)
+      const link = document.createElement('a')
+      link.download = `eid-card-${cardName.replace(/\s+/g, '-')}-${i + 1}.png`
+      link.href = canvas.toDataURL('image/png', 1.0)
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      await new Promise(r => setTimeout(r, 300))
+    }
+    setExporting(false)
+  }, [loadedImg, multiNames, selectedDesign, generateCardForName])
+
   const handleWhatsApp = useCallback(async () => {
     const canvas = canvasRef.current; if (!canvas) return
     try {
@@ -635,8 +714,8 @@ function QuickCardCreator() {
   }, [handleDownload])
 
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-[1200px] mx-auto px-6">
+    <section className="section-spacing bg-white">
+      <div className="container-main">
         <div className="text-center mb-12">
           <span className="section-label">بطاقات جاهزة</span>
           <h2 className="section-title mt-3 mb-4">اختر تصميم واكتب اسمك فقط</h2>
@@ -673,12 +752,40 @@ function QuickCardCreator() {
             </div>
 
             {/* Name input + color in a clean card */}
-            <div className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] p-6 space-y-6">
-              <div>
-                <label className="text-sm font-bold text-[#0f172a] block mb-2">اكتب الاسم على البطاقة</label>
-                <input type="text" value={name} onChange={e => setName(e.target.value)} dir="rtl" placeholder="مثلاً: محمد"
-                  className="unified-input w-full text-center text-lg" />
+            <div className="luxury-card space-y-6">
+              {/* Toggle between single/multi name mode */}
+              <div className="flex gap-2 p-1 bg-[#f1f5f9] rounded-xl">
+                <button onClick={() => setIsMultiMode(false)} className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-bold transition-all ${!isMultiMode ? 'bg-white shadow-sm text-[#0f172a]' : 'text-[#64748b] hover:text-[#0f172a]'}`}>
+                  اسم واحد
+                </button>
+                <button onClick={() => setIsMultiMode(true)} className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-bold transition-all ${isMultiMode ? 'bg-white shadow-sm text-[#0f172a]' : 'text-[#64748b] hover:text-[#0f172a]'}`}>
+                  أسماء متعددة ✨
+                </button>
               </div>
+
+              {!isMultiMode ? (
+                <div>
+                  <label className="text-sm font-bold text-[#0f172a] block mb-2">اكتب الاسم على البطاقة</label>
+                  <input type="text" value={name} onChange={e => setName(e.target.value)} dir="rtl" placeholder="مثلاً: محمد"
+                    className="unified-input w-full text-center text-lg" />
+                </div>
+              ) : (
+                <div>
+                  <label className="text-sm font-bold text-[#0f172a] block mb-2">اكتب عدة أسماء (كل اسم في سطر أو افصل بفاصلة)</label>
+                  <textarea 
+                    value={multiNames} 
+                    onChange={e => setMultiNames(e.target.value)} 
+                    dir="rtl" 
+                    placeholder="محمد&#10;فاطمة&#10;أحمد&#10;سارة"
+                    rows={4}
+                    className="unified-input w-full text-center resize-none" 
+                  />
+                  <p className="text-[#64748b] text-xs mt-2 text-center">
+                    {multiNames.split(/[,،\n]+/).filter(n => n.trim()).length > 0 && 
+                      `سيتم تحميل ${multiNames.split(/[,،\n]+/).filter(n => n.trim()).length} بطاقة`}
+                  </p>
+                </div>
+              )}
 
               <div>
                 <label className="text-xs font-bold text-[#64748b] block mb-2">لون الاسم</label>
@@ -696,14 +803,29 @@ function QuickCardCreator() {
               </div>
 
               <div className="flex gap-3">
-                <button onClick={handleDownload} disabled={!canvasReady}
-                  className="flex-1 btn-gold justify-center disabled:opacity-40 disabled:cursor-not-allowed">
-                  <Download className="w-4 h-4" /> تحميل البطاقة
-                </button>
-                <button onClick={handleWhatsApp} disabled={!canvasReady}
-                  className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 font-bold hover:bg-green-100 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-                  <MessageCircle className="w-4 h-4" /> واتساب
-                </button>
+                {!isMultiMode ? (
+                  <>
+                    <button onClick={handleDownload} disabled={!canvasReady}
+                      className="flex-1 btn-gold-official justify-center disabled:opacity-40 disabled:cursor-not-allowed">
+                      <Download className="w-4 h-4" /> تحميل البطاقة
+                    </button>
+                    <button onClick={handleWhatsApp} disabled={!canvasReady}
+                      className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 font-bold hover:bg-green-100 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                      <MessageCircle className="w-4 h-4" /> واتساب
+                    </button>
+                  </>
+                ) : (
+                  <button 
+                    onClick={handleExportMultiple} 
+                    disabled={!canvasReady || !multiNames.trim() || exporting}
+                    className="w-full btn-gold-official justify-center disabled:opacity-40 disabled:cursor-not-allowed">
+                    {exporting ? (
+                      <><span className="w-4 h-4 border-2 border-[#1e293b] border-t-transparent rounded-full animate-spin" /> جاري التحميل...</>
+                    ) : (
+                      <><Download className="w-4 h-4" /> تحميل {multiNames.split(/[,،\n]+/).filter(n => n.trim()).length || ''} بطاقة</>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
 
@@ -758,8 +880,32 @@ export default function LandingPage() {
     <div className="w-full overflow-x-hidden bg-white">
 
       {/* ── HERO ── */}
-      <section className="pt-28 pb-20 bg-white">
-        <div className="max-w-[1200px] mx-auto px-6">
+      <section className="pt-28 pb-20 bg-white relative overflow-hidden">
+
+        {/* Mobile-only family background banner */}
+        <div className="absolute inset-0 md:hidden pointer-events-none select-none">
+          <img
+            src="/images/family-banner.jpg"
+            alt=""
+            aria-hidden="true"
+            className="w-full h-full object-cover object-[center_30%]"
+            style={{ opacity: 0.18 }}
+          />
+          {/* Deep gradient overlay — top & bottom fade to white */}
+          <div className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(to bottom, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 35%, rgba(255,255,255,0.55) 65%, rgba(255,255,255,0.92) 100%)'
+            }}
+          />
+          {/* Subtle dark vignette for depth */}
+          <div className="absolute inset-0"
+            style={{
+              background: 'radial-gradient(ellipse at center, transparent 40%, rgba(15,23,42,0.18) 100%)'
+            }}
+          />
+        </div>
+
+        <div className="container-main relative z-10">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <div className="inline-flex items-center gap-2 rounded-full bg-[#eff6ff] border border-[#dbeafe] px-4 py-2 text-[13px] font-semibold text-[#1d4ed8] mb-6">
               <Sparkles className="w-3.5 h-3.5" />
@@ -815,8 +961,8 @@ export default function LandingPage() {
       <EidiyaLuckGenerator />
 
       {/* ── HOW IT WORKS ── */}
-      <section className="py-20 bg-[#f8fafc]">
-        <div className="max-w-[1200px] mx-auto px-6">
+      <section className="section-spacing bg-[#f8fafc]">
+        <div className="container-main">
           <div className="text-center mb-14">
             <span className="section-label">الخطوات</span>
             <h2 className="section-title mt-3">كيف تصمّن بطاقتك</h2>
@@ -830,8 +976,8 @@ export default function LandingPage() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section className="py-20 bg-white">
-        <div className="max-w-[1200px] mx-auto px-6">
+      <section className="section-spacing bg-white">
+        <div className="container-main">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             <div>
               <span className="section-label">المميزات</span>
@@ -860,8 +1006,8 @@ export default function LandingPage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section className="py-20 bg-[#f8fafc]">
-        <div className="max-w-[1200px] mx-auto px-6">
+      <section className="section-spacing bg-[#f8fafc]">
+        <div className="container-main">
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-12">
               <span className="section-label">الأسئلة</span>
@@ -877,8 +1023,8 @@ export default function LandingPage() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[1200px] mx-auto px-6">
+      <section className="section-spacing-lg bg-white">
+        <div className="container-main">
           <div className="max-w-xl mx-auto text-center">
             <img src="/images/logo.png" alt="سَلِّم" className="h-16 w-auto mx-auto mb-8 opacity-90" />
             <h2 className="section-title mb-5">جاهز تصمّن بطاقتك؟</h2>
