@@ -893,68 +893,78 @@ export default function LandingPage() {
     <div className="w-full overflow-x-hidden bg-white">
 
       {/* ── HERO ── */}
-      <section className="pt-28 pb-20 bg-[#060412] md:bg-white relative overflow-hidden">
+      <section className="relative overflow-hidden min-h-[100svh] md:min-h-0 md:pt-28 md:pb-20 bg-[#060412] md:bg-white">
 
-        {/* Mobile-only family background banner */}
+        {/* Mobile-only family background banner — full portrait height */}
         <div className="absolute inset-0 md:hidden pointer-events-none select-none">
           <img
             src="/images/family-banner.jpg"
             alt=""
             aria-hidden="true"
-            className="w-full h-full object-cover object-[center_22%]"
-            style={{ opacity: 0.62 }}
+            className="w-full h-full object-cover object-top"
+            style={{ opacity: 0.80 }}
           />
-          {/* Dark atmospheric overlay — heavier at top for text readability */}
-          <div className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(to bottom, rgba(6,4,18,0.80) 0%, rgba(6,4,18,0.45) 45%, rgba(6,4,18,0.68) 100%)'
-            }}
-          />
-          {/* Side vignette for cinematic depth */}
-          <div className="absolute inset-0"
-            style={{
-              background: 'radial-gradient(ellipse at center, transparent 35%, rgba(4,2,14,0.45) 100%)'
-            }}
-          />
+          {/* Cinematic gradient — heavy dark at top & bottom, open in middle */}
+          <div className="absolute inset-0" style={{
+            background: 'linear-gradient(to bottom, rgba(6,4,18,0.78) 0%, rgba(6,4,18,0.12) 32%, rgba(6,4,18,0.10) 62%, rgba(6,4,18,0.90) 100%)'
+          }} />
+          {/* Side vignette for depth */}
+          <div className="absolute inset-0" style={{
+            background: 'radial-gradient(ellipse at center, transparent 42%, rgba(4,2,14,0.52) 100%)'
+          }} />
         </div>
 
-        <div className="container-main relative z-10">
-          <div className="max-w-3xl mx-auto text-center mb-12">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/15 md:bg-[#eff6ff] border border-white/25 md:border-[#dbeafe] px-4 py-2 text-[13px] font-semibold text-white md:text-[#1d4ed8] mb-6">
-              <Sparkles className="w-3.5 h-3.5" />
-              تجربة تصميم احترافية
-            </div>
+        {/* Content — flex column on mobile to fill full screen height */}
+        <div className="container-main relative z-10 flex flex-col justify-between md:block min-h-[100svh] md:min-h-0 pt-28 pb-10 md:py-0">
 
-            <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black leading-[1.25] text-white md:text-[#0f172a] mb-6">
-              صمّم بطاقة عيد
-              <span className="block gradient-gold-text">بشكل فاخر خلال دقائق</span>
-            </h1>
+          {/* Text block */}
+          <div className="max-w-3xl mx-auto text-center md:mb-12">
 
-            <p className="text-white/80 md:text-[#64748b] text-lg leading-relaxed max-w-xl mx-auto mb-8">
-              منصة عربية حديثة لتصميم بطاقات تهنئة العيد وإرسالها مباشرة عبر واتساب — بدون تسجيل أو تعقيد.
-            </p>
+            {/* Luxury glass card wrapper — mobile only */}
+            <div className="
+              backdrop-blur-2xl
+              bg-white/[0.06]
+              border border-white/[0.14]
+              rounded-3xl px-6 py-8
+              shadow-[0_8px_48px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.09)]
+              md:bg-transparent md:border-0 md:shadow-none md:backdrop-blur-none md:rounded-none md:p-0
+            ">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/15 md:bg-[#eff6ff] border border-white/25 md:border-[#dbeafe] px-4 py-2 text-[13px] font-semibold text-white md:text-[#1d4ed8] mb-5 md:mb-6">
+                <Sparkles className="w-3.5 h-3.5" />
+                تجربة تصميم احترافية
+              </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link to="/editor" className="btn-gold !px-8 !py-3.5">
-                ابدأ التصميم الآن
-                <ArrowLeft className="w-4 h-4" />
-              </Link>
-              <Link to="/send" className="btn-outline-gold !px-7 !py-3.5">
-                جرّب الإرسال الذكي
-              </Link>
+              <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black leading-[1.25] text-white md:text-[#0f172a] mb-4 md:mb-6">
+                صمّم بطاقة عيد
+                <span className="block gradient-gold-text">بشكل فاخر خلال دقائق</span>
+              </h1>
+
+              <p className="text-white/78 md:text-[#64748b] text-[15px] md:text-lg leading-relaxed max-w-xl mx-auto mb-7 md:mb-8">
+                منصة عربية حديثة لتصميم بطاقات تهنئة العيد وإرسالها مباشرة عبر واتساب — بدون تسجيل أو تعقيد.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Link to="/editor" className="btn-gold !px-8 !py-3.5 w-full sm:w-auto justify-center">
+                  ابدأ التصميم الآن
+                  <ArrowLeft className="w-4 h-4" />
+                </Link>
+                <Link to="/send" className="btn-outline-gold !px-7 !py-3.5 w-full sm:w-auto justify-center">
+                  جرّب الإرسال الذكي
+                </Link>
+              </div>
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="max-w-lg mx-auto grid grid-cols-3 gap-5">
+          {/* Stats — pinned to bottom on mobile, normal flow on desktop */}
+          <div className="max-w-lg mx-auto w-full grid grid-cols-3 gap-4 md:gap-5 mt-8 md:mt-0">
             {[
               { n: '+100', l: 'عبارة جاهزة' },
               { n: '20', l: 'قالب أنيق' },
               { n: '1080', l: 'دقة التصدير' },
             ].map((s, i) => (
-              <div key={i} className="rounded-xl border border-white/20 md:border-[#e2e8f0] bg-white/10 md:bg-[#f8fafc] backdrop-blur-sm md:backdrop-blur-none px-4 py-5 text-center">
+              <div key={i} className="rounded-xl border border-white/[0.18] md:border-[#e2e8f0] bg-white/[0.08] md:bg-[#f8fafc] backdrop-blur-xl md:backdrop-blur-none px-3 py-4 text-center shadow-[0_4px_24px_rgba(0,0,0,0.35)] md:shadow-none">
                 <div className="text-[#C6F806] md:text-[#1d4ed8] text-xl font-black tabular-nums">{s.n}</div>
-                <div className="text-white/65 md:text-[#64748b] text-xs mt-1.5">{s.l}</div>
+                <div className="text-white/62 md:text-[#64748b] text-xs mt-1.5">{s.l}</div>
               </div>
             ))}
           </div>
