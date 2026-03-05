@@ -47,12 +47,12 @@ body {
   --color-gold-100: #f3ead0;
   --color-gold-200: #e8d6a0;
   --color-gold-300: #d4b96b;
-  --color-gold-400: #c4a44e;
-  --color-gold-500: #b8963a;
-  --color-gold-600: #9a7b2c;
-  --color-gold-700: #745c20;
-  --color-gold-800: #4d3d15;
-  --color-gold-900: #30260d;
+  --color-gold-400: #d4b96b;
+  --color-gold-500: #d4b96b;
+  --color-gold-600: #c4a44e;
+  --color-gold-700: #9a7b2c;
+  --color-gold-800: #745c20;
+  --color-gold-900: #4d3d15;
 
   --color-surface-0:   #060709;
   --color-surface-50:  #0a0c10;
@@ -107,13 +107,13 @@ body {
 
 /* ═══ Utility ═══ */
 .gradient-gold-text {
-  background: linear-gradient(135deg, #d4b96b 0%, #f3ead0 35%, #c4a44e 65%, #b8963a 100%);
+  background: linear-gradient(135deg, #d4b96b 0%, #f3ead0 35%, #d4b96b 65%, #c4a44e 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.gradient-gold { background: linear-gradient(135deg, #b8963a, #d4b96b, #b8963a); }
+.gradient-gold { background: linear-gradient(135deg, #c4a44e, #d4b96b, #c4a44e); }
 
 .glass {
   background: rgba(255,255,255,0.02);
@@ -220,3 +220,12 @@ body {
   transition: opacity 0.3s ease;
 }
 .card-glow:hover::after { opacity: 1; }
+
+/* ═══ Marquee ═══ */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-33.333%); }
+}
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}

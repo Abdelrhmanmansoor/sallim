@@ -49,10 +49,12 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom */}
-        <div className="mt-16 pt-6 border-t border-white/[0.03] flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-white/15 text-xs">© {new Date().getFullYear()} سَلِّم — جميع الحقوق محفوظة</p>
-          <p className="text-white/15 text-xs">تابع لمؤسسة سليمان</p>
+        {/* Bottom — Gold Bar */}
+        <div className="mt-16 pt-6 border-t border-[#d4b96b]/20">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#d4b96b] rounded-xl px-6 py-4">
+            <p className="text-[#060709] text-xs font-bold">© {new Date().getFullYear()} سَلِّم — جميع الحقوق محفوظة</p>
+            <p className="text-[#060709]/70 text-xs">تابع لمؤسسة سليمان</p>
+          </div>
         </div>
       </div>
     </footer>
