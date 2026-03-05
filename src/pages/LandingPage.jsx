@@ -1,20 +1,21 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowLeft, Palette, Type, Send, Download,
   Building2, ChevronDown,
-  Layers, FileText, Shield, Users,
+  Layers, FileText, Shield, Users, Share2,
 } from 'lucide-react'
+
+/* ═══ Helpers ═══ */
+const toAr = (n) => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d])
 
 /* ═══ Marquee Ticker ═══ */
 function MarqueeTicker() {
   const items = [
-    '🌙 كل عام وأنتم بخير',
-    '✨ عيدكم مبارك',
-    '🎉 سَلِّم — منصة بطاقات تهنئة العيد',
-    '💛 تقبّل الله طاعتكم',
-    '🌙 عساكم من عوّاده',
-    '✨ صمّم بطاقتك مجاناً',
+    '✦ أكثر من ٥٠،٠٠٠ بطاقة صُمِّمت هذا العيد',
+    '✦ قوالب جديدة كل أسبوع',
+    '✦ جودة ١٠٨٠ بيكسل مجاناً',
+    '✦ إرسال مباشر عبر واتساب',
   ]
   const repeated = [...items, ...items, ...items]
 
@@ -28,6 +29,194 @@ function MarqueeTicker() {
         ))}
       </div>
     </div>
+  )
+}
+
+/* ═══ Eidiya Calculator ═══ */
+const reactions = [
+  { min: 5,    max: 15,   emoji: '😑', title: 'يعني... مشكور',                desc: 'الله يجزاك خير، بس كان في أمل 🙂',                              glow: 'rgba(120,120,130,0.10)', border: 'rgba(120,120,130,0.15)', bg: 'rgba(120,120,130,0.04)' },
+  { min: 16,   max: 30,   emoji: '🙂', title: 'ماشي، لا بأس',                  desc: 'يكفي على اللي ما يكفي',                                            glow: 'rgba(160,160,170,0.12)', border: 'rgba(160,160,170,0.18)', bg: 'rgba(160,160,170,0.05)' },
+  { min: 31,   max: 75,   emoji: '😊', title: 'تمام، الله يعطيك',              desc: 'هذا شي، الله يبارك فيك',                                            glow: 'rgba(201,168,76,0.12)',  border: 'rgba(201,168,76,0.18)',  bg: 'rgba(201,168,76,0.04)'  },
+  { min: 76,   max: 150,  emoji: '😄', title: 'الحين كلام!',                    desc: 'عيد صح والله! ربي يحفظك',                                          glow: 'rgba(201,168,76,0.20)',  border: 'rgba(201,168,76,0.28)',  bg: 'rgba(201,168,76,0.06)'  },
+  { min: 151,  max: 499,  emoji: '🤩', title: 'يبيييه!!',                        desc: 'والله هذا كرم أصيل، الله لا يحرمنا منك',                          glow: 'rgba(201,168,76,0.30)',  border: 'rgba(201,168,76,0.38)',  bg: 'rgba(201,168,76,0.08)'  },
+  { min: 500,  max: 999,  emoji: '🥹', title: 'دموع الفرح 😭',                desc: 'ما كنت أتوقع... ربي يزيدك ويبارك لك',                              glow: 'rgba(201,168,76,0.40)',  border: 'rgba(201,168,76,0.50)',  bg: 'rgba(201,168,76,0.10)'  },
+  { min: 1000, max: 2000, emoji: '🤯', title: 'هذا مو عيدية... هذا راتب!!',  desc: 'أنت مو شخص، أنت مؤسسة خيرية بكاملها 🏛️', glow: 'rgba(201,168,76,0.55)',  border: 'rgba(201,168,76,0.65)',  bg: 'rgba(201,168,76,0.14)'  },
+]
+const quickPicks = [10, 50, 100, 500, 1000]
+
+function getReaction(val) {
+  for (const r of reactions) if (val >= r.min && val <= r.max) return r
+  return reactions[0]
+}
+
+/* Confetti particle */
+function Confetti({ active }) {
+  const [particles, setParticles] = useState([])
+  useEffect(() => {
+    if (!active) { setParticles([]); return }
+    const ps = Array.from({ length: 30 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      delay: Math.random() * 0.6,
+      dur: 1.2 + Math.random() * 1.2,
+      size: 4 + Math.random() * 6,
+      color: ['#C9A84C', '#d4b96b', '#f3ead0', '#fff', '#e0c97d'][Math.floor(Math.random() * 5)],
+    }))
+    setParticles(ps)
+  }, [active])
+  if (!active) return null
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
+      {particles.map(p => (
+        <span
+          key={p.id}
+          className="absolute rounded-full animate-confetti"
+          style={{
+            left: `${p.x}%`,
+            width: p.size,
+            height: p.size,
+            backgroundColor: p.color,
+            animationDelay: `${p.delay}s`,
+            animationDuration: `${p.dur}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+function EidiyaCalculator() {
+  const [value, setValue] = useState(50)
+  const [emojiKey, setEmojiKey] = useState(0)
+  const prevReactionRef = useRef(null)
+  const reaction = getReaction(value)
+  const pct = ((value - 5) / (2000 - 5)) * 100
+
+  const onChange = useCallback((e) => {
+    const v = Number(e.target.value)
+    setValue(v)
+    const r = getReaction(v)
+    if (!prevReactionRef.current || prevReactionRef.current.title !== r.title) {
+      setEmojiKey(k => k + 1)
+      prevReactionRef.current = r
+    }
+  }, [])
+
+  const shareWa = () => {
+    const text = `عيديتي هالسنة ${toAr(value)} ريال 🤩 — ${reaction.title}`
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
+  }
+
+  return (
+    <section className="py-28 px-4 relative w-full" style={{ backgroundColor: '#0A0A0A' }}>
+      <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C]/10 to-transparent" />
+
+      <div className="max-w-xl mx-auto relative z-10">
+        {/* Section heading */}
+        <div className="text-center mb-14">
+          <span className="inline-block text-[#C9A84C]/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-3">تسلية</span>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white/90">حاسبة العيدية</h2>
+          <p className="text-white/30 text-sm mt-3">حرّك السلايدر وشوف ردة الفعل 😄</p>
+        </div>
+
+        {/* Card */}
+        <div
+          className="relative rounded-3xl p-8 sm:p-10 transition-all duration-500 overflow-hidden"
+          style={{
+            background: reaction.bg,
+            border: `1.5px solid ${reaction.border}`,
+            boxShadow: `0 0 80px ${reaction.glow}, 0 0 160px ${reaction.glow}`,
+          }}
+        >
+          <Confetti active={value >= 1000} />
+
+          {/* Amount display */}
+          <div className="text-center mb-8 relative z-10">
+            <div className="text-6xl sm:text-7xl font-black text-white tabular-nums leading-none mb-2 eidiya-num-transition">
+              {toAr(value)}
+            </div>
+            <span className="text-[#C9A84C] text-lg font-bold">ريال</span>
+          </div>
+
+          {/* Slider */}
+          <div className="relative z-10 mb-6">
+            <input
+              type="range"
+              min={5}
+              max={2000}
+              step={1}
+              value={value}
+              onChange={onChange}
+              className="eidiya-slider w-full"
+              style={{ '--pct': `${pct}%` }}
+            />
+            <div className="flex justify-between mt-2 text-white/20 text-[11px] font-bold">
+              <span>{toAr(2000)}</span>
+              <span>{toAr(5)}</span>
+            </div>
+          </div>
+
+          {/* Quick picks */}
+          <div className="flex flex-wrap justify-center gap-2 mb-8 relative z-10">
+            {quickPicks.map(q => (
+              <button
+                key={q}
+                onClick={() => { setValue(q); const r = getReaction(q); if (!prevReactionRef.current || prevReactionRef.current.title !== r.title) { setEmojiKey(k => k + 1); prevReactionRef.current = r } }}
+                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 ${
+                  value === q
+                    ? 'bg-[#C9A84C] text-[#0A0A0A] shadow-lg shadow-[#C9A84C]/20'
+                    : 'bg-white/[0.04] text-white/50 border border-white/[0.06] hover:bg-white/[0.08] hover:text-white/80'
+                }`}
+              >
+                {toAr(q)}
+              </button>
+            ))}
+          </div>
+
+          {/* Generosity meter */}
+          <div className="relative z-10 mb-8">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-white/25 text-[11px] font-bold">مقياس الكرم</span>
+              <span className="text-[#C9A84C]/70 text-[11px] font-bold">{toAr(Math.round(pct))}٪</span>
+            </div>
+            <div className="w-full h-2.5 rounded-full bg-white/[0.04] overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500 ease-out"
+                style={{
+                  width: `${pct}%`,
+                  background: `linear-gradient(90deg, #5a5a60 0%, #C9A84C ${Math.min(pct * 2, 100)}%, #f3ead0 100%)`,
+                  boxShadow: pct > 40 ? `0 0 12px rgba(201,168,76,${pct / 250})` : 'none',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Reaction Card */}
+          <div
+            className="relative z-10 rounded-2xl p-6 text-center transition-all duration-500"
+            style={{
+              background: 'rgba(255,255,255,0.02)',
+              border: `1px solid ${reaction.border}`,
+            }}
+          >
+            <div key={emojiKey} className="text-6xl mb-4 animate-emoji-pop">
+              {reaction.emoji}
+            </div>
+            <h3 className="text-white font-bold text-xl mb-2">{reaction.title}</h3>
+            <p className="text-white/40 text-sm leading-[1.8]">{reaction.desc}</p>
+          </div>
+
+          {/* WhatsApp share */}
+          <button
+            onClick={shareWa}
+            className="relative z-10 mt-8 w-full py-4 rounded-xl bg-[#C9A84C] text-[#0A0A0A] font-bold text-[15px] hover:bg-[#d4b96b] transition-all duration-300 shadow-lg shadow-[#C9A84C]/15 inline-flex items-center justify-center gap-2"
+          >
+            <Share2 className="w-4 h-4" />
+            شارك عيديتك عبر واتساب
+          </button>
+        </div>
+      </div>
+    </section>
   )
 }
 
@@ -157,6 +346,9 @@ export default function LandingPage() {
 
       {/* ─── MARQUEE TICKER ─── */}
       <MarqueeTicker />
+
+      {/* ─── EIDIYA CALCULATOR ─── */}
+      <EidiyaCalculator />
 
       {/* ─── HOW IT WORKS ─── */}
       <section className="py-28 px-4 relative bg-[#060709] w-full">
