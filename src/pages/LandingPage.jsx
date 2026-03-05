@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowLeft, Palette, Type, Send, Download,
@@ -136,52 +136,53 @@ const quizQuestions = [
 ]
 
 /* ── 12 Result tiers with personality analysis ── */
+/* Score range: min=21, max=187 (verified from all 8 questions) */
 const quizResults = [
-  { min: 0,   max: 25,  amount: 1,     emoji: '💀', title: 'ريال واحد بس',
+  { min: 0,   max: 35,  amount: 1,     emoji: '💀', title: 'ريال واحد بس',
     desc: 'يا صاحبي.. لازم تشتغل على نفسك جد! الصلة والكرم والأدب كلهم يحتاجون مراجعة شاملة.',
     analysis: 'صلة الرحم: معدومة | الكرم: غائب | الأدب: يحتاج مراجعة',
     glow: 'rgba(100,100,110,0.08)', border: 'rgba(100,100,110,0.12)', bg: 'rgba(100,100,110,0.03)' },
-  { min: 26,  max: 50,  amount: 5,     emoji: '😑', title: '٥ ريال — الرحمة زيادة',
+  { min: 36,  max: 50,  amount: 5,     emoji: '😑', title: '٥ ريال — الرحمة زيادة',
     desc: 'الحمدلله إنك لقيت أحد يعيّدك أصلاً! ابدأ السنة الجاية من بدري — زُر أقاربك ورحّب بضيوفك.',
     analysis: 'صلة الرحم: ضعيفة جداً | الكرم: بالكاد | الأدب: فيه أمل',
     glow: 'rgba(120,120,130,0.10)', border: 'rgba(120,120,130,0.15)', bg: 'rgba(120,120,130,0.04)' },
-  { min: 51,  max: 75,  amount: 10,    emoji: '😶', title: '١٠ ريال — الله يعطيك',
+  { min: 51,  max: 65,  amount: 10,    emoji: '😶', title: '١٠ ريال — الله يعطيك',
     desc: 'مو أسوأ شي بس مو أحسن شي — عندك بذرة خير بس تحتاج تسقيها بصلة الرحم والكرم.',
     analysis: 'صلة الرحم: تحت المتوسط | الكرم: خجول | الأدب: لا بأس',
     glow: 'rgba(140,140,150,0.12)', border: 'rgba(140,140,150,0.18)', bg: 'rgba(140,140,150,0.04)' },
-  { min: 76,  max: 100, amount: 25,    emoji: '🙂', title: '٢٥ ريال — ماشي الحال',
+  { min: 66,  max: 80,  amount: 25,    emoji: '🙂', title: '٢٥ ريال — ماشي الحال',
     desc: 'فيك خير بس مختبي! تحتاج تبادر أكثر — زُر أهلك، ساعد في التجهيزات، ورحّب بالضيوف.',
     analysis: 'صلة الرحم: متوسطة | الكرم: موجود | الأدب: محترم',
     glow: 'rgba(160,160,170,0.14)', border: 'rgba(160,160,170,0.20)', bg: 'rgba(160,160,170,0.05)' },
-  { min: 101, max: 130, amount: 50,    emoji: '😊', title: '٥٠ ريال — تمام التمام',
+  { min: 81,  max: 95,  amount: 50,    emoji: '😊', title: '٥٠ ريال — تمام التمام',
     desc: 'أنت شخص طيّب ومحترم — الناس تحبك وتقدّرك. شوي كمان وتصير من نجوم العيد!',
     analysis: 'صلة الرحم: جيدة | الكرم: واضح | الأدب: عالي | الجهد: لا بأس',
     glow: 'rgba(201,168,76,0.12)', border: 'rgba(201,168,76,0.18)', bg: 'rgba(201,168,76,0.04)' },
-  { min: 131, max: 160, amount: 100,   emoji: '😄', title: '١٠٠ ريال — الحين صار كلام',
+  { min: 96,  max: 110, amount: 100,   emoji: '😄', title: '١٠٠ ريال — الحين صار كلام',
     desc: 'ماشاء الله عليك — واصل وعندك من الطيب والأدب شي كبير. أقاربك فخورين فيك!',
     analysis: 'صلة الرحم: قوية | الكرم: جميل | الأدب: ممتاز | الروح: حلوة',
     glow: 'rgba(201,168,76,0.20)', border: 'rgba(201,168,76,0.28)', bg: 'rgba(201,168,76,0.06)' },
-  { min: 161, max: 195, amount: 200,   emoji: '🤩', title: '٢٠٠ ريال — مستوى عالي',
+  { min: 111, max: 125, amount: 200,   emoji: '🤩', title: '٢٠٠ ريال — مستوى عالي',
     desc: 'أنت من الناس اللي تشرّف أهلها — كريم ومحترم وعندك روح حلوة. ربي يحفظك!',
     analysis: 'صلة الرحم: ممتازة | الكرم: أصيل | الأدب: راقي | الجهد: مميز',
     glow: 'rgba(201,168,76,0.30)', border: 'rgba(201,168,76,0.38)', bg: 'rgba(201,168,76,0.08)' },
-  { min: 196, max: 230, amount: 350,   emoji: '🥰', title: '٣٥٠ ريال — قلب طيّب ماشاءالله',
+  { min: 126, max: 140, amount: 350,   emoji: '🥰', title: '٣٥٠ ريال — قلب طيّب ماشاءالله',
     desc: 'كرم وأدب وصلة رحم — أنت الشخص اللي الكل يتمنى يكون جنبه في العيد. ربي يزيدك!',
     analysis: 'صلة الرحم: قدوة | الكرم: فوق المتوسط | الأدب: عالي جداً | الروح: مشرقة',
     glow: 'rgba(201,168,76,0.38)', border: 'rgba(201,168,76,0.48)', bg: 'rgba(201,168,76,0.10)' },
-  { min: 231, max: 260, amount: 500,   emoji: '🥹', title: '٥٠٠ ريال — مستوى البركة',
+  { min: 141, max: 152, amount: 500,   emoji: '🥹', title: '٥٠٠ ريال — مستوى البركة',
     desc: 'الله يبارك فيك وفي أهلك. أنت من الناس اللي ترفع رأس عايلتها!',
     analysis: 'صلة الرحم: يُحتذى بها | الكرم: حاتمي | الأدب: استثنائي | الجهد: دائم',
     glow: 'rgba(201,168,76,0.45)', border: 'rgba(201,168,76,0.55)', bg: 'rgba(201,168,76,0.12)' },
-  { min: 261, max: 290, amount: 750,   emoji: '👏', title: '٧٥٠ ريال — والله ما تستاهل أقل',
+  { min: 153, max: 165, amount: 750,   emoji: '👏', title: '٧٥٠ ريال — والله ما تستاهل أقل',
     desc: 'أنت مو إنسان عادي — أنت نعمة على أهلك وأقاربك. صلة رحمك وكرمك وأدبك ما لهم مثيل!',
     analysis: 'كل المحاور: فوق الممتاز | شخصية: نادرة ومميزة',
     glow: 'rgba(201,168,76,0.50)', border: 'rgba(201,168,76,0.60)', bg: 'rgba(201,168,76,0.13)' },
-  { min: 291, max: 320, amount: 1000,  emoji: '🏆', title: '١٬٠٠٠ ريال — أسطورة العيد',
+  { min: 166, max: 180, amount: 1000,  emoji: '🏆', title: '١٬٠٠٠ ريال — أسطورة العيد',
     desc: 'أنت مؤسسة خيرية ماشية على رجلين — الله يجزاك خير ويبارك فيك ويجعلك قدوة للكل!',
     analysis: 'كل المحاور: الحد الأقصى | شخصية: أسطورية',
     glow: 'rgba(201,168,76,0.55)', border: 'rgba(201,168,76,0.65)', bg: 'rgba(201,168,76,0.14)' },
-  { min: 321, max: 999, amount: 2000,  emoji: '👑', title: '٢٬٠٠٠ ريال — ملك العيد بلا منازع',
+  { min: 181, max: 999, amount: 2000,  emoji: '👑', title: '٢٬٠٠٠ ريال — ملك العيد بلا منازع',
     desc: 'مافي أحد يوصل لهالمستوى غيرك — كرم حاتمي، أدب ملكي، صلة رحم أسطورية. أنت قصة نجاح بذاتك!',
     analysis: 'تقييم استثنائي في كل محور — ١٪ فقط يوصلون لهالمرحلة',
     glow: 'rgba(201,168,76,0.65)', border: 'rgba(201,168,76,0.75)', bg: 'rgba(201,168,76,0.18)' },
@@ -242,11 +243,11 @@ function calcScores(answers) {
 
 /* ── Axis labels for the breakdown ── */
 const axisLabels = [
-  { key: 'silah', label: 'صلة الرحم', max: 45 },
-  { key: 'karam', label: 'الكرم', max: 40 },
-  { key: 'adab',  label: 'الأدب', max: 45 },
-  { key: 'juhd',  label: 'الجهد', max: 30 },
-  { key: 'ruh',   label: 'الروح', max: 35 },
+  { key: 'silah', label: 'صلة الرحم', max: 46 },
+  { key: 'karam', label: 'الكرم', max: 45 },
+  { key: 'adab',  label: 'الأدب', max: 50 },
+  { key: 'juhd',  label: 'الجهد', max: 33 },
+  { key: 'ruh',   label: 'الروح', max: 45 },
 ]
 
 /* ── Quiz Calculator ── */
@@ -494,15 +495,15 @@ function EidiyaCalculator() {
                 <div className="mt-5 text-right">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-white/25 text-[11px] font-bold">مقياس الاستحقاق</span>
-                    <span className="text-[#C9A84C]/60 text-[11px] font-bold">{toAr(Math.round(Math.min((totalScore / 320) * 100, 100)))}٪</span>
+                    <span className="text-[#C9A84C]/60 text-[11px] font-bold">{toAr(Math.round(Math.min((totalScore / 187) * 100, 100)))}٪</span>
                   </div>
                   <div className="w-full h-2 rounded-full bg-white/[0.04] overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-1000 ease-out"
                       style={{
-                        width: `${Math.min((totalScore / 320) * 100, 100)}%`,
+                        width: `${Math.min((totalScore / 187) * 100, 100)}%`,
                         background: `linear-gradient(90deg, #5a5a60 0%, #C9A84C 50%, #f3ead0 100%)`,
-                        boxShadow: totalScore > 160 ? `0 0 12px rgba(201,168,76,${Math.min(totalScore / 500, 0.5)})` : 'none',
+                        boxShadow: totalScore > 100 ? `0 0 12px rgba(201,168,76,${Math.min(totalScore / 300, 0.5)})` : 'none',
                       }}
                     />
                   </div>
