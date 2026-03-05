@@ -1638,3 +1638,50 @@ input, textarea, select {
   color: #d4af37;
   font-size: 1.25rem;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LUXURY FAQ STYLES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.faq-item-luxury {
+  position: relative;
+  background: linear-gradient(145deg, #ffffff 0%, #fefdfb 100%);
+  transition: all 0.3s ease;
+}
+
+.faq-item-luxury:first-child {
+  border-radius: 18px 18px 0 0;
+}
+
+.faq-item-luxury:last-child {
+  border-radius: 0 0 18px 18px;
+}
+
+.faq-item-luxury:only-child {
+  border-radius: 18px;
+}
+
+.faq-item-luxury:hover {
+  background: linear-gradient(145deg, #fefdfb 0%, #fef9e7 100%);
+}
+
+.faq-item-luxury.open {
+  background: linear-gradient(145deg, #fef9e7 0%, #fdf3c7 100%);
+}
+
+.faq-item-luxury::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  background: linear-gradient(180deg, #d4af37, #f4e4a6);
+  border-radius: 0 3px 3px 0;
+  transition: height 0.3s ease;
+}
+
+.faq-item-luxury.open::after {
+  height: 60%;
+}

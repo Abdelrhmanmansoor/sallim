@@ -512,20 +512,33 @@ function EidiyaLuckGenerator() {
 /* ═══════════════════════════════════════════════════════════════════════════
    FAQ
    ═══════════════════════════════════════════════════════════════════════════ */
-function FAQ({ q, a, isOpen, toggle }) {
+function FAQ({ q, a, isOpen, toggle, index }) {
   return (
-    <div className={`faq-item ${isOpen ? 'open' : ''}`}>
+    <div className={`faq-item-luxury ${isOpen ? 'open' : ''}`}>
       <button onClick={toggle} className="w-full flex items-center justify-between p-5 text-right group">
-        <span className="text-[#0f172a] text-[15px] font-medium">{q}</span>
-        <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mr-4 transition-all duration-200 ${
-          isOpen ? 'bg-[#eff6ff] rotate-180' : 'bg-[#f1f5f9]'
+        <div className="flex items-center gap-4">
+          <span className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-sm font-bold transition-all duration-300 ${
+            isOpen 
+              ? 'bg-gradient-to-br from-[#d4af37] to-[#f4e4a6] text-[#1e1b4b]' 
+              : 'bg-[#fef9e7] text-[#92400e] border border-[#d4af37]/30'
+          }`}>
+            {String(index + 1).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d])}
+          </span>
+          <span className={`text-[15px] font-semibold transition-colors ${isOpen ? 'text-[#92400e]' : 'text-[#0f172a]'}`}>{q}</span>
+        </div>
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
+          isOpen 
+            ? 'bg-gradient-to-br from-[#d4af37] to-[#f4e4a6] rotate-180' 
+            : 'bg-[#fef9e7] border border-[#d4af37]/30'
         }`}>
-          <ChevronDown className={`w-4 h-4 ${isOpen ? 'text-[#1d4ed8]' : 'text-[#64748b]'}`} />
+          <ChevronDown className={`w-4 h-4 transition-colors ${isOpen ? 'text-[#1e1b4b]' : 'text-[#92400e]'}`} />
         </div>
       </button>
       <div className={`grid transition-all duration-300 ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="overflow-hidden">
-          <p className="px-5 pb-5 text-[#64748b] text-sm leading-relaxed">{a}</p>
+          <div className="px-5 pb-5 pr-[4.5rem]">
+            <p className="text-[#64748b] text-sm leading-relaxed">{a}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -880,7 +893,7 @@ export default function LandingPage() {
     <div className="w-full overflow-x-hidden bg-white">
 
       {/* ── HERO ── */}
-      <section className="pt-28 pb-20 bg-white relative overflow-hidden">
+      <section className="pt-28 pb-20 bg-[#060412] md:bg-white relative overflow-hidden">
 
         {/* Mobile-only family background banner */}
         <div className="absolute inset-0 md:hidden pointer-events-none select-none">
@@ -888,36 +901,36 @@ export default function LandingPage() {
             src="/images/family-banner.jpg"
             alt=""
             aria-hidden="true"
-            className="w-full h-full object-cover object-[center_30%]"
-            style={{ opacity: 0.18 }}
+            className="w-full h-full object-cover object-[center_22%]"
+            style={{ opacity: 0.62 }}
           />
-          {/* Deep gradient overlay — top & bottom fade to white */}
+          {/* Dark atmospheric overlay — heavier at top for text readability */}
           <div className="absolute inset-0"
             style={{
-              background: 'linear-gradient(to bottom, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 35%, rgba(255,255,255,0.55) 65%, rgba(255,255,255,0.92) 100%)'
+              background: 'linear-gradient(to bottom, rgba(6,4,18,0.80) 0%, rgba(6,4,18,0.45) 45%, rgba(6,4,18,0.68) 100%)'
             }}
           />
-          {/* Subtle dark vignette for depth */}
+          {/* Side vignette for cinematic depth */}
           <div className="absolute inset-0"
             style={{
-              background: 'radial-gradient(ellipse at center, transparent 40%, rgba(15,23,42,0.18) 100%)'
+              background: 'radial-gradient(ellipse at center, transparent 35%, rgba(4,2,14,0.45) 100%)'
             }}
           />
         </div>
 
         <div className="container-main relative z-10">
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <div className="inline-flex items-center gap-2 rounded-full bg-[#eff6ff] border border-[#dbeafe] px-4 py-2 text-[13px] font-semibold text-[#1d4ed8] mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/15 md:bg-[#eff6ff] border border-white/25 md:border-[#dbeafe] px-4 py-2 text-[13px] font-semibold text-white md:text-[#1d4ed8] mb-6">
               <Sparkles className="w-3.5 h-3.5" />
               تجربة تصميم احترافية
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black leading-[1.25] text-[#0f172a] mb-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black leading-[1.25] text-white md:text-[#0f172a] mb-6">
               صمّم بطاقة عيد
               <span className="block gradient-gold-text">بشكل فاخر خلال دقائق</span>
             </h1>
 
-            <p className="text-[#64748b] text-lg leading-relaxed max-w-xl mx-auto mb-8">
+            <p className="text-white/80 md:text-[#64748b] text-lg leading-relaxed max-w-xl mx-auto mb-8">
               منصة عربية حديثة لتصميم بطاقات تهنئة العيد وإرسالها مباشرة عبر واتساب — بدون تسجيل أو تعقيد.
             </p>
 
@@ -939,9 +952,9 @@ export default function LandingPage() {
               { n: '20', l: 'قالب أنيق' },
               { n: '1080', l: 'دقة التصدير' },
             ].map((s, i) => (
-              <div key={i} className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-5 text-center">
-                <div className="text-[#1d4ed8] text-xl font-black tabular-nums">{s.n}</div>
-                <div className="text-[#64748b] text-xs mt-1.5">{s.l}</div>
+              <div key={i} className="rounded-xl border border-white/20 md:border-[#e2e8f0] bg-white/10 md:bg-[#f8fafc] backdrop-blur-sm md:backdrop-blur-none px-4 py-5 text-center">
+                <div className="text-[#C6F806] md:text-[#1d4ed8] text-xl font-black tabular-nums">{s.n}</div>
+                <div className="text-white/65 md:text-[#64748b] text-xs mt-1.5">{s.l}</div>
               </div>
             ))}
           </div>
@@ -1006,17 +1019,37 @@ export default function LandingPage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section className="section-spacing bg-[#f8fafc]">
+      <section className="section-spacing bg-gradient-to-b from-[#fef9e7]/50 to-[#f8fafc]">
         <div className="container-main">
           <div className="max-w-2xl mx-auto">
+            {/* Luxury Header */}
             <div className="text-center mb-12">
-              <span className="section-label">الأسئلة</span>
-              <h2 className="section-title mt-3">أسئلة شائعة</h2>
+              <span className="official-badge">
+                <Sparkles className="w-4 h-4" />
+                الأسئلة الشائعة
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black text-[#0f172a] mt-4 mb-3">كل ما تحتاج معرفته</h2>
+              <div className="flex items-center justify-center gap-3">
+                <span className="w-12 h-[2px] bg-gradient-to-r from-transparent to-[#d4af37]"></span>
+                <span className="text-[#d4af37]">✦</span>
+                <span className="w-12 h-[2px] bg-gradient-to-l from-transparent to-[#d4af37]"></span>
+              </div>
             </div>
-            <div className="space-y-4">
-              {faqs.map((f, i) => (
-                <FAQ key={i} q={f.q} a={f.a} isOpen={openFaq === i} toggle={() => setOpenFaq(openFaq === i ? null : i)} />
-              ))}
+
+            {/* FAQ Items with Luxury Border Container */}
+            <div className="luxury-card !p-0 overflow-hidden">
+              <div className="divide-y divide-[#d4af37]/10">
+                {faqs.map((f, i) => (
+                  <FAQ key={i} q={f.q} a={f.a} isOpen={openFaq === i} toggle={() => setOpenFaq(openFaq === i ? null : i)} index={i} />
+                ))}
+              </div>
+            </div>
+
+            {/* Bottom decoration */}
+            <div className="flex items-center justify-center mt-8 gap-2 text-[#d4af37]/60">
+              <span className="text-lg">✦</span>
+              <span className="text-xs font-medium">لديك سؤال آخر؟ تواصل معنا</span>
+              <span className="text-lg">✦</span>
             </div>
           </div>
         </div>
