@@ -27,10 +27,10 @@ export default function Navbar() {
         ? 'bg-[#060709]/90 backdrop-blur-2xl border-b border-white/[0.04] shadow-lg shadow-black/20' 
         : 'bg-transparent'
     }`}>
-      <div className="max-w-6xl mx-auto px-5 h-[68px] flex items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5">
-          <img src="/images/logo.png" alt="سَلِّم" className="h-9 w-auto" />
+      <div className="max-w-6xl mx-auto px-5 h-[68px] flex items-center justify-between relative">
+        {/* Logo - centered on mobile, left on desktop */}
+        <Link to="/" className="flex items-center justify-center absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0">
+          <span className="text-2xl font-bold gradient-gold-text whitespace-nowrap">سَلِّم</span>
         </Link>
 
         {/* Desktop nav */}
