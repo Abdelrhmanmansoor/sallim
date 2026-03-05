@@ -582,7 +582,7 @@ function EidiyaLuckGenerator() {
   ]
 
   return (
-    <section className="section-container bg-[#070810] py-28 sm:py-40 overflow-hidden">
+    <section className="w-full relative bg-[#070810] py-28 sm:py-40 overflow-hidden">
       {/* ── Ambient Decorations ── */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-[#C9A84C]/[0.03] rounded-full blur-[120px]" />
@@ -595,10 +595,11 @@ function EidiyaLuckGenerator() {
       <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C]/15 to-transparent" />
       <div className="absolute left-0 bottom-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C]/10 to-transparent" />
 
-      <div className="section-inner max-w-2xl">
+      {/* ── Main Content: flex column, everything centered ── */}
+      <div className="relative flex flex-col items-center px-5 sm:px-8" style={{ maxWidth: '680px', margin: '0 auto' }}>
 
         {/* ═══ Section Heading ═══ */}
-        <div className="text-center mb-14 sm:mb-20">
+        <div className="text-center w-full mb-14 sm:mb-20">
           <div className="inline-flex items-center gap-2.5 bg-gradient-to-r from-[#C9A84C]/[0.08] to-[#C9A84C]/[0.04] border border-[#C9A84C]/15 rounded-full px-5 py-2.5 mb-7 backdrop-blur-sm">
             <Sparkles className="w-4 h-4 text-[#C9A84C]" />
             <span className="text-[#C9A84C] text-sm font-semibold tracking-wide">ميزة جديدة — تسلية العيد</span>
@@ -606,7 +607,7 @@ function EidiyaLuckGenerator() {
           <h2 className="text-4xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white/90 to-white/60 mb-6 leading-tight">
             عيديتك بحظك!
           </h2>
-          <p className="text-white/40 text-base sm:text-lg leading-relaxed max-w-lg mx-auto">
+          <p className="text-white/40 text-base sm:text-lg leading-relaxed" style={{ maxWidth: '480px', margin: '0 auto' }}>
             أنشئ رابط عيدية عشوائي وأرسله لأصدقائك وعائلتك —
             <br className="hidden sm:block" />
             المستلم يلفّ العداد ويطلع له مبلغ عشوائي مع ردة فعل مضحكة!
@@ -614,7 +615,7 @@ function EidiyaLuckGenerator() {
         </div>
 
         {/* ═══ Features Grid — 2×2 centered ═══ */}
-        <div className="grid grid-cols-2 gap-4 sm:gap-5 mb-14 sm:mb-20 max-w-xl mx-auto">
+        <div className="w-full grid grid-cols-2 gap-4 sm:gap-5 mb-14 sm:mb-20" style={{ maxWidth: '560px', margin: '0 auto 3.5rem auto' }}>
           {luckFeatures.map((f, i) => (
             <div
               key={i}
@@ -638,23 +639,22 @@ function EidiyaLuckGenerator() {
         </div>
 
         {/* ═══ Steps — centered row ═══ */}
-        <div className="flex items-start justify-center gap-10 sm:gap-16 mb-14 sm:mb-20 mx-auto">
+        <div className="flex items-start justify-center gap-10 sm:gap-16 mb-14 sm:mb-20">
           {steps.map((s, i) => (
             <div key={i} className="flex flex-col items-center text-center">
-              {/* Step number circle */}
               <div className="w-12 h-12 rounded-full mb-3 flex items-center justify-center relative">
                 <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#C9A84C]/20 to-[#C9A84C]/05 border border-[#C9A84C]/15" />
                 <div className="absolute inset-1 rounded-full bg-[#0a0b14]" />
                 <span className="relative text-[#C9A84C] text-lg font-black">{s.num}</span>
               </div>
               <h4 className="text-white/80 font-bold text-sm mb-1">{s.title}</h4>
-              <p className="text-white/30 text-xs max-w-[120px]">{s.desc}</p>
+              <p className="text-white/30 text-xs" style={{ maxWidth: '120px' }}>{s.desc}</p>
             </div>
           ))}
         </div>
 
         {/* ═══ Generator Card — centered ═══ */}
-        <div className="max-w-md mx-auto">
+        <div className="w-full" style={{ maxWidth: '448px' }}>
           <div
             className="rounded-3xl p-7 sm:p-10 relative overflow-hidden"
             style={{
@@ -669,8 +669,10 @@ function EidiyaLuckGenerator() {
             <div className="relative">
               {/* Card header */}
               <div className="text-center mb-8">
-                <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-[#C9A84C]/15 to-[#C9A84C]/05 border border-[#C9A84C]/10 flex items-center justify-center">
-                  <Zap className="w-6 h-6 text-[#C9A84C]" strokeWidth={1.5} />
+                <div className="flex justify-center mb-5">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C9A84C]/15 to-[#C9A84C]/05 border border-[#C9A84C]/10 flex items-center justify-center">
+                    <Zap className="w-6 h-6 text-[#C9A84C]" strokeWidth={1.5} />
+                  </div>
                 </div>
                 <h3 className="text-white/95 font-black text-xl mb-2">أنشئ رابط العيدية</h3>
                 <p className="text-white/35 text-sm leading-relaxed">اكتب اسمك وشارك الرابط مع أي شخص تبي تعيّده</p>
@@ -678,7 +680,7 @@ function EidiyaLuckGenerator() {
 
               {/* Name input */}
               <div className="mb-6">
-                <label className="block text-white/50 text-sm font-semibold mb-3 text-right">اسمك (المُعَيِّد)</label>
+                <label className="block text-white/50 text-sm font-semibold mb-3 text-center">اسمك (المُعَيِّد)</label>
                 <input
                   type="text"
                   value={name}
@@ -691,7 +693,7 @@ function EidiyaLuckGenerator() {
               {/* Generated link */}
               {name.trim() && (
                 <div className="mb-6 animate-fade-up">
-                  <label className="block text-white/35 text-xs font-semibold mb-2.5 text-right">الرابط</label>
+                  <label className="block text-white/35 text-xs font-semibold mb-2.5 text-center">الرابط</label>
                   <div className="flex items-center gap-2 bg-white/[0.03] border border-white/[0.07] rounded-xl px-4 py-3.5">
                     <span className="text-white/40 text-xs truncate flex-1 font-mono" dir="ltr">{link}</span>
                     <button
