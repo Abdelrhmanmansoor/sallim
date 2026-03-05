@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowLeft, Palette, Type, Send, Download,
   ChevronDown, Layers, FileText, Shield, Share2, Gift,
   Shuffle, Smartphone, MessageCircle, Link2, Sparkles, Zap,
 } from 'lucide-react'
+import { templates } from '../data/templates'
 
 /* ═══ Helpers ═══ */
 const toAr = (n) => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d])
@@ -14,21 +15,27 @@ const toAr = (n) => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d])
    ═══════════════════════════════════════════════════════════════════════════ */
 function MarqueeTicker() {
   const items = [
-    '✦ أكثر من ٥٠،٠٠٠ بطاقة صُمِّمت هذا العيد',
-    '✦ قوالب جديدة كل أسبوع',
-    '✦ جودة ١٠٨٠ بيكسل مجاناً',
-    '✦ إرسال مباشر عبر واتساب',
+    'أكثر من ٥٠،٠٠٠ بطاقة صُمِّمت هذا العيد',
+    'قوالب جديدة كل أسبوع',
+    'تصدير 1080px مجانًا',
+    'مشاركة مباشرة عبر واتساب',
+    'محرر عربي احترافي وسريع',
   ]
   const repeated = [...items, ...items, ...items]
 
   return (
-    <div className="w-full overflow-hidden bg-[#d4b96b]">
-      <div className="flex animate-marquee whitespace-nowrap py-3">
-        {repeated.map((item, i) => (
-          <span key={i} className="mx-8 text-[#060709] text-sm font-bold">
-            {item}
-          </span>
-        ))}
+    <div className="w-full bg-[#f8fafc] border-y border-[#e2e8f0]">
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="relative overflow-hidden py-4">
+          <div className="flex animate-marquee whitespace-nowrap">
+            {repeated.map((item, i) => (
+              <span key={i} className="mx-6 inline-flex items-center gap-2.5 text-[#475569] text-sm font-medium">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#1d4ed8]" />
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -37,9 +44,6 @@ function MarqueeTicker() {
 /* ═══════════════════════════════════════════════════════════════════════════
    EIDIYA CALCULATOR
    ═══════════════════════════════════════════════════════════════════════════ */
-/* ── Multi-dimensional scoring: كل إجابة تأثر على محاور مختلفة ── */
-/*  silah = صلة رحم | karam = كرم وسخاء | adab = أدب واحترام |
-    juhd = جهد ومساعدة | ruh = روح وحيوية                         */
 
 const quizQuestions = [
   {
@@ -136,113 +140,21 @@ const quizQuestions = [
   },
 ]
 
-/* ── 12 Result tiers with personality analysis ── */
-/* Score range: min=21, max=187 (verified from all 8 questions) */
 const quizResults = [
-  { min: 0,   max: 35,  amount: 1,     emoji: '💀', title: 'ريال واحد بس',
-    desc: 'يا صاحبي.. لازم تشتغل على نفسك جد! الصلة والكرم والأدب كلهم يحتاجون مراجعة شاملة.',
-    analysis: 'صلة الرحم: معدومة | الكرم: غائب | الأدب: يحتاج مراجعة',
-    glow: 'rgba(100,100,110,0.08)', border: 'rgba(100,100,110,0.12)', bg: 'rgba(100,100,110,0.03)' },
-  { min: 36,  max: 50,  amount: 5,     emoji: '😑', title: '٥ ريال — الرحمة زيادة',
-    desc: 'الحمدلله إنك لقيت أحد يعيّدك أصلاً! ابدأ السنة الجاية من بدري — زُر أقاربك ورحّب بضيوفك.',
-    analysis: 'صلة الرحم: ضعيفة جداً | الكرم: بالكاد | الأدب: فيه أمل',
-    glow: 'rgba(120,120,130,0.10)', border: 'rgba(120,120,130,0.15)', bg: 'rgba(120,120,130,0.04)' },
-  { min: 51,  max: 65,  amount: 10,    emoji: '😶', title: '١٠ ريال — الله يعطيك',
-    desc: 'مو أسوأ شي بس مو أحسن شي — عندك بذرة خير بس تحتاج تسقيها بصلة الرحم والكرم.',
-    analysis: 'صلة الرحم: تحت المتوسط | الكرم: خجول | الأدب: لا بأس',
-    glow: 'rgba(140,140,150,0.12)', border: 'rgba(140,140,150,0.18)', bg: 'rgba(140,140,150,0.04)' },
-  { min: 66,  max: 80,  amount: 25,    emoji: '🙂', title: '٢٥ ريال — ماشي الحال',
-    desc: 'فيك خير بس مختبي! تحتاج تبادر أكثر — زُر أهلك، ساعد في التجهيزات، ورحّب بالضيوف.',
-    analysis: 'صلة الرحم: متوسطة | الكرم: موجود | الأدب: محترم',
-    glow: 'rgba(160,160,170,0.14)', border: 'rgba(160,160,170,0.20)', bg: 'rgba(160,160,170,0.05)' },
-  { min: 81,  max: 95,  amount: 50,    emoji: '😊', title: '٥٠ ريال — تمام التمام',
-    desc: 'أنت شخص طيّب ومحترم — الناس تحبك وتقدّرك. شوي كمان وتصير من نجوم العيد!',
-    analysis: 'صلة الرحم: جيدة | الكرم: واضح | الأدب: عالي | الجهد: لا بأس',
-    glow: 'rgba(201,168,76,0.12)', border: 'rgba(201,168,76,0.18)', bg: 'rgba(201,168,76,0.04)' },
-  { min: 96,  max: 110, amount: 100,   emoji: '😄', title: '١٠٠ ريال — الحين صار كلام',
-    desc: 'ماشاء الله عليك — واصل وعندك من الطيب والأدب شي كبير. أقاربك فخورين فيك!',
-    analysis: 'صلة الرحم: قوية | الكرم: جميل | الأدب: ممتاز | الروح: حلوة',
-    glow: 'rgba(201,168,76,0.20)', border: 'rgba(201,168,76,0.28)', bg: 'rgba(201,168,76,0.06)' },
-  { min: 111, max: 125, amount: 200,   emoji: '🤩', title: '٢٠٠ ريال — مستوى عالي',
-    desc: 'أنت من الناس اللي تشرّف أهلها — كريم ومحترم وعندك روح حلوة. ربي يحفظك!',
-    analysis: 'صلة الرحم: ممتازة | الكرم: أصيل | الأدب: راقي | الجهد: مميز',
-    glow: 'rgba(201,168,76,0.30)', border: 'rgba(201,168,76,0.38)', bg: 'rgba(201,168,76,0.08)' },
-  { min: 126, max: 140, amount: 350,   emoji: '🥰', title: '٣٥٠ ريال — قلب طيّب ماشاءالله',
-    desc: 'كرم وأدب وصلة رحم — أنت الشخص اللي الكل يتمنى يكون جنبه في العيد. ربي يزيدك!',
-    analysis: 'صلة الرحم: قدوة | الكرم: فوق المتوسط | الأدب: عالي جداً | الروح: مشرقة',
-    glow: 'rgba(201,168,76,0.38)', border: 'rgba(201,168,76,0.48)', bg: 'rgba(201,168,76,0.10)' },
-  { min: 141, max: 152, amount: 500,   emoji: '🥹', title: '٥٠٠ ريال — مستوى البركة',
-    desc: 'الله يبارك فيك وفي أهلك. أنت من الناس اللي ترفع رأس عايلتها!',
-    analysis: 'صلة الرحم: يُحتذى بها | الكرم: حاتمي | الأدب: استثنائي | الجهد: دائم',
-    glow: 'rgba(201,168,76,0.45)', border: 'rgba(201,168,76,0.55)', bg: 'rgba(201,168,76,0.12)' },
-  { min: 153, max: 165, amount: 750,   emoji: '👏', title: '٧٥٠ ريال — والله ما تستاهل أقل',
-    desc: 'أنت مو إنسان عادي — أنت نعمة على أهلك وأقاربك. صلة رحمك وكرمك وأدبك ما لهم مثيل!',
-    analysis: 'كل المحاور: فوق الممتاز | شخصية: نادرة ومميزة',
-    glow: 'rgba(201,168,76,0.50)', border: 'rgba(201,168,76,0.60)', bg: 'rgba(201,168,76,0.13)' },
-  { min: 166, max: 180, amount: 1000,  emoji: '🏆', title: '١٬٠٠٠ ريال — أسطورة العيد',
-    desc: 'أنت مؤسسة خيرية ماشية على رجلين — الله يجزاك خير ويبارك فيك ويجعلك قدوة للكل!',
-    analysis: 'كل المحاور: الحد الأقصى | شخصية: أسطورية',
-    glow: 'rgba(201,168,76,0.55)', border: 'rgba(201,168,76,0.65)', bg: 'rgba(201,168,76,0.14)' },
-  { min: 181, max: 999, amount: 2000,  emoji: '👑', title: '٢٬٠٠٠ ريال — ملك العيد بلا منازع',
-    desc: 'مافي أحد يوصل لهالمستوى غيرك — كرم حاتمي، أدب ملكي، صلة رحم أسطورية. أنت قصة نجاح بذاتك!',
-    analysis: 'تقييم استثنائي في كل محور — ١٪ فقط يوصلون لهالمرحلة',
-    glow: 'rgba(201,168,76,0.65)', border: 'rgba(201,168,76,0.75)', bg: 'rgba(201,168,76,0.18)' },
+  { min: 0,   max: 35,  amount: 1,     emoji: '💀', title: 'ريال واحد بس', desc: 'يا صاحبي.. لازم تشتغل على نفسك جد!', analysis: 'صلة الرحم: معدومة | الكرم: غائب', glow: 'rgba(100,100,110,0.08)', border: 'rgba(100,100,110,0.12)', bg: 'rgba(100,100,110,0.03)' },
+  { min: 36,  max: 50,  amount: 5,     emoji: '😑', title: '٥ ريال — الرحمة زيادة', desc: 'الحمدلله إنك لقيت أحد يعيّدك أصلاً!', analysis: 'صلة الرحم: ضعيفة جداً | الكرم: بالكاد', glow: 'rgba(120,120,130,0.10)', border: 'rgba(120,120,130,0.15)', bg: 'rgba(120,120,130,0.04)' },
+  { min: 51,  max: 65,  amount: 10,    emoji: '😶', title: '١٠ ريال — الله يعطيك', desc: 'مو أسوأ شي بس مو أحسن شي', analysis: 'صلة الرحم: تحت المتوسط | الكرم: خجول', glow: 'rgba(140,140,150,0.12)', border: 'rgba(140,140,150,0.18)', bg: 'rgba(140,140,150,0.04)' },
+  { min: 66,  max: 80,  amount: 25,    emoji: '🙂', title: '٢٥ ريال — ماشي الحال', desc: 'فيك خير بس مختبي!', analysis: 'صلة الرحم: متوسطة | الكرم: موجود', glow: 'rgba(160,160,170,0.14)', border: 'rgba(160,160,170,0.20)', bg: 'rgba(160,160,170,0.05)' },
+  { min: 81,  max: 95,  amount: 50,    emoji: '😊', title: '٥٠ ريال — تمام التمام', desc: 'أنت شخص طيّب ومحترم — الناس تحبك وتقدّرك.', analysis: 'صلة الرحم: جيدة | الكرم: واضح | الأدب: عالي', glow: 'rgba(37,99,235,0.12)', border: 'rgba(37,99,235,0.18)', bg: 'rgba(37,99,235,0.04)' },
+  { min: 96,  max: 110, amount: 100,   emoji: '😄', title: '١٠٠ ريال — الحين صار كلام', desc: 'ماشاء الله عليك — واصل!', analysis: 'صلة الرحم: قوية | الكرم: جميل | الأدب: ممتاز', glow: 'rgba(37,99,235,0.20)', border: 'rgba(37,99,235,0.28)', bg: 'rgba(37,99,235,0.06)' },
+  { min: 111, max: 125, amount: 200,   emoji: '🤩', title: '٢٠٠ ريال — مستوى عالي', desc: 'أنت من الناس اللي تشرّف أهلها', analysis: 'صلة الرحم: ممتازة | الكرم: أصيل', glow: 'rgba(37,99,235,0.30)', border: 'rgba(37,99,235,0.38)', bg: 'rgba(37,99,235,0.08)' },
+  { min: 126, max: 140, amount: 350,   emoji: '🥰', title: '٣٥٠ ريال — قلب طيّب', desc: 'الكل يتمنى يكون جنبه في العيد', analysis: 'صلة الرحم: قدوة | الكرم: فوق المتوسط', glow: 'rgba(37,99,235,0.38)', border: 'rgba(37,99,235,0.48)', bg: 'rgba(37,99,235,0.10)' },
+  { min: 141, max: 152, amount: 500,   emoji: '🥹', title: '٥٠٠ ريال — مستوى البركة', desc: 'أنت من الناس اللي ترفع رأس عايلتها!', analysis: 'الكرم: حاتمي | الأدب: استثنائي', glow: 'rgba(37,99,235,0.45)', border: 'rgba(37,99,235,0.55)', bg: 'rgba(37,99,235,0.12)' },
+  { min: 153, max: 165, amount: 750,   emoji: '👏', title: '٧٥٠ ريال — ما تستاهل أقل', desc: 'صلة رحمك وكرمك وأدبك ما لهم مثيل!', analysis: 'كل المحاور: فوق الممتاز', glow: 'rgba(37,99,235,0.50)', border: 'rgba(37,99,235,0.60)', bg: 'rgba(37,99,235,0.13)' },
+  { min: 166, max: 180, amount: 1000,  emoji: '🏆', title: '١٬٠٠٠ ريال — أسطورة العيد', desc: 'أنت مؤسسة خيرية ماشية على رجلين', analysis: 'كل المحاور: الحد الأقصى', glow: 'rgba(37,99,235,0.55)', border: 'rgba(37,99,235,0.65)', bg: 'rgba(37,99,235,0.14)' },
+  { min: 181, max: 999, amount: 2000,  emoji: '👑', title: '٢٬٠٠٠ ريال — ملك العيد', desc: 'كرم حاتمي، أدب ملكي، صلة رحم أسطورية', analysis: 'تقييم استثنائي في كل محور', glow: 'rgba(37,99,235,0.65)', border: 'rgba(37,99,235,0.75)', bg: 'rgba(37,99,235,0.18)' },
 ]
 
-/* ── Confetti ── */
-function Confetti({ active }) {
-  const [particles, setParticles] = useState([])
-
-  useEffect(() => {
-    if (!active) { setParticles([]); return }
-    const ps = Array.from({ length: 30 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      delay: Math.random() * 0.6,
-      dur: 1.2 + Math.random() * 1.2,
-      size: 4 + Math.random() * 6,
-      color: ['#C9A84C', '#d4b96b', '#f3ead0', '#fff', '#e0c97d'][Math.floor(Math.random() * 5)],
-    }))
-    setParticles(ps)
-  }, [active])
-
-  if (!active) return null
-
-  return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
-      {particles.map(p => (
-        <span
-          key={p.id}
-          className="absolute rounded-full animate-confetti"
-          style={{
-            left: `${p.x}%`,
-            width: p.size,
-            height: p.size,
-            backgroundColor: p.color,
-            animationDelay: `${p.delay}s`,
-            animationDuration: `${p.dur}s`,
-          }}
-        />
-      ))}
-    </div>
-  )
-}
-
-/* ── Score calculation helper ── */
-function calcScores(answers) {
-  const totals = { silah: 0, karam: 0, adab: 0, juhd: 0, ruh: 0 }
-  answers.forEach(a => {
-    totals.silah += a.silah || 0
-    totals.karam += a.karam || 0
-    totals.adab += a.adab || 0
-    totals.juhd += a.juhd || 0
-    totals.ruh += a.ruh || 0
-  })
-  const total = totals.silah + totals.karam + totals.adab + totals.juhd + totals.ruh
-  return { totals, total }
-}
-
-/* ── Axis labels for the breakdown ── */
 const axisLabels = [
   { key: 'silah', label: 'صلة الرحم', max: 46 },
   { key: 'karam', label: 'الكرم', max: 45 },
@@ -251,7 +163,33 @@ const axisLabels = [
   { key: 'ruh',   label: 'الروح', max: 45 },
 ]
 
-/* ── Quiz Calculator ── */
+function Confetti({ active }) {
+  const [particles, setParticles] = useState([])
+  useEffect(() => {
+    if (!active) { setParticles([]); return }
+    setParticles(Array.from({ length: 30 }, (_, i) => ({
+      id: i, x: Math.random() * 100, delay: Math.random() * 0.6, dur: 1.2 + Math.random() * 1.2,
+      size: 4 + Math.random() * 6,
+      color: ['#1d4ed8', '#3b82f6', '#93c5fd', '#dbeafe', '#f59e0b'][Math.floor(Math.random() * 5)],
+    })))
+  }, [active])
+  if (!active) return null
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
+      {particles.map(p => (
+        <span key={p.id} className="absolute rounded-full animate-confetti"
+          style={{ left: `${p.x}%`, width: p.size, height: p.size, backgroundColor: p.color, animationDelay: `${p.delay}s`, animationDuration: `${p.dur}s` }} />
+      ))}
+    </div>
+  )
+}
+
+function calcScores(answers) {
+  const totals = { silah: 0, karam: 0, adab: 0, juhd: 0, ruh: 0 }
+  answers.forEach(a => { totals.silah += a.silah || 0; totals.karam += a.karam || 0; totals.adab += a.adab || 0; totals.juhd += a.juhd || 0; totals.ruh += a.ruh || 0 })
+  return { totals, total: totals.silah + totals.karam + totals.adab + totals.juhd + totals.ruh }
+}
+
 function EidiyaCalculator() {
   const [step, setStep] = useState(0)
   const [answerData, setAnswerData] = useState([])
@@ -260,7 +198,6 @@ function EidiyaCalculator() {
   const [scoreTotals, setScoreTotals] = useState(null)
   const [animatedAmount, setAnimatedAmount] = useState(0)
   const [fadeIn, setFadeIn] = useState(true)
-
   const totalQ = quizQuestions.length
 
   const getResult = useCallback(() => {
@@ -268,7 +205,6 @@ function EidiyaCalculator() {
     return quizResults[quizResults.length - 1]
   }, [totalScore])
 
-  /* Count-up animation when result appears */
   useEffect(() => {
     if (step !== totalQ + 1) return
     const result = getResult()
@@ -278,22 +214,15 @@ function EidiyaCalculator() {
     let current = 0
     const interval = setInterval(() => {
       current += increment
-      if (current >= target) {
-        setAnimatedAmount(target)
-        clearInterval(interval)
-      } else {
-        setAnimatedAmount(Math.round(current))
-      }
+      if (current >= target) { setAnimatedAmount(target); clearInterval(interval) }
+      else setAnimatedAmount(Math.round(current))
     }, 40)
     return () => clearInterval(interval)
   }, [step, totalScore, getResult])
 
   const fadeTransition = (callback) => {
     setFadeIn(false)
-    setTimeout(() => {
-      callback()
-      setTimeout(() => setFadeIn(true), 50)
-    }, 200)
+    setTimeout(() => { callback(); setTimeout(() => setFadeIn(true), 50) }, 200)
   }
 
   const handleStart = () => fadeTransition(() => setStep(1))
@@ -301,37 +230,20 @@ function EidiyaCalculator() {
   const handleSelect = (idx) => {
     if (selected !== null) return
     setSelected(idx)
-
     const option = quizQuestions[step - 1].options[idx]
     setTimeout(() => {
       const newAnswerData = [...answerData, option]
-
       fadeTransition(() => {
         setSelected(null)
         if (step >= totalQ) {
           const { totals, total } = calcScores(newAnswerData)
-          setAnswerData(newAnswerData)
-          setScoreTotals(totals)
-          setTotalScore(total)
-          setStep(totalQ + 1)
-        } else {
-          setAnswerData(newAnswerData)
-          setStep(step + 1)
-        }
+          setAnswerData(newAnswerData); setScoreTotals(totals); setTotalScore(total); setStep(totalQ + 1)
+        } else { setAnswerData(newAnswerData); setStep(step + 1) }
       })
     }, 400)
   }
 
-  const reset = () => {
-    fadeTransition(() => {
-      setStep(0)
-      setAnswerData([])
-      setSelected(null)
-      setTotalScore(0)
-      setScoreTotals(null)
-      setAnimatedAmount(0)
-    })
-  }
+  const reset = () => fadeTransition(() => { setStep(0); setAnswerData([]); setSelected(null); setTotalScore(0); setScoreTotals(null); setAnimatedAmount(0) })
 
   const shareWa = () => {
     const result = getResult()
@@ -341,203 +253,112 @@ function EidiyaCalculator() {
 
   const result = step > totalQ ? getResult() : null
   const pct = step > 0 && step <= totalQ ? (step / totalQ) * 100 : step > totalQ ? 100 : 0
-  const cardStyle = result
-    ? { background: result.bg, border: `1.5px solid ${result.border}`, boxShadow: `0 0 80px ${result.glow}, 0 0 160px ${result.glow}` }
-    : { background: 'rgba(201,168,76,0.04)', border: '1.5px solid rgba(201,168,76,0.12)', boxShadow: '0 0 60px rgba(201,168,76,0.04)' }
 
   return (
-    <section className="section-container bg-[#0A0A0A] py-24 sm:py-36">
-      <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C]/10 to-transparent" />
+    <section className="py-20 bg-white">
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="max-w-xl mx-auto">
+          <div className="text-center mb-10">
+            <span className="section-label">تسلية</span>
+            <h2 className="section-title mb-3">كم تستاهل عيدية؟</h2>
+            <p className="text-[#64748b] text-[15px]">جاوب على ٨ أسئلة وبنحسب لك عيديتك المستحقة</p>
+          </div>
 
-      <div className="section-inner max-w-xl">
-        {/* Section heading */}
-        <div className="text-center mb-12 sm:mb-16">
-          <span className="inline-block text-[#C9A84C]/50 text-[11px] font-bold tracking-[0.25em] uppercase mb-4">تسلية</span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white/90 mb-4">كم تستاهل عيدية؟</h2>
-          <p className="text-white/30 text-sm mt-4 leading-relaxed">جاوب على ٨ أسئلة وبنحسب لك عيديتك المستحقة بناءً على شخصيتك</p>
-        </div>
+          <div className="relative rounded-2xl p-6 sm:p-8 bg-[#0f172a] border border-[#1e293b] shadow-lg overflow-hidden">
+            {result && <Confetti active={result.amount >= 500} />}
 
-        {/* Card */}
-        <div className="relative rounded-3xl p-6 sm:p-10 transition-all duration-500 overflow-hidden" style={cardStyle}>
-          {result && <Confetti active={result.amount >= 500} />}
-
-          {/* Progress bar — visible during quiz & result */}
-          {step > 0 && (
-            <div className="relative z-10 mb-8">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-white/25 text-[11px] font-bold">
-                  {step <= totalQ ? `سؤال ${toAr(step)} من ${toAr(totalQ)}` : 'النتيجة'}
-                </span>
-                <span className="text-[#C9A84C]/70 text-[11px] font-bold">{toAr(Math.round(pct))}٪</span>
-              </div>
-              <div className="w-full h-2 rounded-full bg-white/[0.04] overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-700 ease-out"
-                  style={{
-                    width: `${pct}%`,
-                    background: 'linear-gradient(90deg, #5a5a60 0%, #C9A84C 50%, #f3ead0 100%)',
-                  }}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Animated content area */}
-          <div className={`relative z-10 transition-all duration-200 ${fadeIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
-
-            {/* ── INTRO SCREEN ── */}
-            {step === 0 && (
-              <div className="text-center py-8">
-                <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#C9A84C]/20 to-[#C9A84C]/5 border border-[#C9A84C]/15 flex items-center justify-center">
-                  <Gift className="w-9 h-9 text-[#C9A84C]/80" />
+            {step > 0 && (
+              <div className="relative z-10 mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-white/30 text-xs font-medium">{step <= totalQ ? `سؤال ${toAr(step)} من ${toAr(totalQ)}` : 'النتيجة'}</span>
+                  <span className="text-[#3b82f6] text-xs font-bold">{toAr(Math.round(pct))}٪</span>
                 </div>
-                <h3 className="text-white/90 font-bold text-xl sm:text-2xl mb-3">اكتشف عيديتك المستحقة</h3>
-                <p className="text-white/35 text-sm leading-[1.9] mb-8 max-w-sm mx-auto">
-                  ٨ أسئلة سريعة عن شخصيتك وعلاقاتك — وبنحلّل لك كم تستاهل عيدية هالسنة بناءً على ٥ محاور
-                </p>
-                <div className="flex flex-wrap justify-center gap-2 mb-8">
-                  {axisLabels.map(a => (
-                    <span key={a.key} className="text-[11px] text-white/25 bg-white/[0.03] border border-white/[0.06] rounded-full px-3 py-1.5 font-medium">{a.label}</span>
-                  ))}
-                </div>
-                <button onClick={handleStart} className="btn-gold !py-4 !px-10 !text-base mx-auto">
-                  يلا نبدأ
-                </button>
-              </div>
-            )}
-
-            {/* ── QUESTION SCREEN ── */}
-            {step >= 1 && step <= totalQ && (
-              <div className="py-2">
-                <div className="text-center mb-8">
-                  <div className="text-4xl sm:text-5xl mb-4 opacity-80">{quizQuestions[step - 1].emoji}</div>
-                  <h3 className="text-white/90 font-bold text-lg sm:text-xl mb-2">{quizQuestions[step - 1].question}</h3>
-                  {quizQuestions[step - 1].hint && (
-                    <p className="text-white/20 text-xs leading-relaxed max-w-xs mx-auto">{quizQuestions[step - 1].hint}</p>
-                  )}
-                </div>
-                <div className="space-y-3">
-                  {quizQuestions[step - 1].options.map((opt, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleSelect(i)}
-                      disabled={selected !== null}
-                      className={`w-full text-right px-5 py-4 rounded-2xl text-sm font-medium transition-all duration-300 ${
-                        selected === i
-                          ? 'bg-gradient-to-br from-[#c4a44e] to-[#d4b96b] text-[#0A0A0A] scale-[1.02] shadow-lg shadow-[#C9A84C]/10'
-                          : selected !== null
-                            ? 'bg-white/[0.02] text-white/15 cursor-not-allowed'
-                            : 'bg-white/[0.03] text-white/55 hover:bg-white/[0.06] hover:text-white/80'
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
+                <div className="w-full h-1.5 rounded-full bg-white/5 overflow-hidden">
+                  <div className="h-full rounded-full bg-[#2563eb] transition-all duration-700 ease-out" style={{ width: `${pct}%` }} />
                 </div>
               </div>
             )}
 
-            {/* ── RESULT SCREEN ── */}
-            {step > totalQ && result && (
-              <div className="text-center py-4">
-                {/* Amount display */}
-                <div className="mb-2">
-                  <span className="text-3xl opacity-70">{result.emoji}</span>
+            <div className={`relative z-10 transition-all duration-200 ${fadeIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+              {step === 0 && (
+                <div className="text-center py-6">
+                  <div className="w-16 h-16 mx-auto mb-5 rounded-xl bg-[#1e293b] border border-[#334155] flex items-center justify-center">
+                    <Gift className="w-7 h-7 text-[#3b82f6]" />
+                  </div>
+                  <h3 className="text-white/90 font-bold text-xl mb-2">اكتشف عيديتك المستحقة</h3>
+                  <p className="text-white/40 text-sm leading-relaxed mb-6 max-w-sm mx-auto">٨ أسئلة سريعة عن شخصيتك وعلاقاتك</p>
+                  <div className="flex flex-wrap justify-center gap-2 mb-6">
+                    {axisLabels.map(a => (
+                      <span key={a.key} className="text-[11px] text-white/25 bg-white/[0.03] border border-white/[0.06] rounded-full px-2.5 py-1">{a.label}</span>
+                    ))}
+                  </div>
+                  <button onClick={handleStart} className="btn-gold mx-auto">يلا نبدأ</button>
                 </div>
-                <div className="text-5xl sm:text-7xl font-black text-white tabular-nums leading-none mb-1">
-                  {toAr(animatedAmount)}
-                </div>
-                <span className="text-[#C9A84C]/80 text-base font-bold tracking-wide">ريال سعودي</span>
+              )}
 
-                {/* Verdict card */}
-                <div className="mt-6 rounded-2xl bg-white/[0.03] border border-white/[0.08] p-5 text-center" style={{ borderColor: result.border }}>
-                  <h3 className="text-white/90 font-bold text-lg mb-2">{result.title}</h3>
-                  <p className="text-white/35 text-sm leading-relaxed">{result.desc}</p>
+              {step >= 1 && step <= totalQ && (
+                <div className="py-2">
+                  <div className="text-center mb-6">
+                    <div className="text-4xl mb-3">{quizQuestions[step - 1].emoji}</div>
+                    <h3 className="text-white/90 font-bold text-lg mb-1">{quizQuestions[step - 1].question}</h3>
+                    {quizQuestions[step - 1].hint && <p className="text-white/25 text-xs">{quizQuestions[step - 1].hint}</p>}
+                  </div>
+                  <div className="space-y-2.5">
+                    {quizQuestions[step - 1].options.map((opt, i) => (
+                      <button key={i} onClick={() => handleSelect(i)} disabled={selected !== null}
+                        className={`w-full text-right px-4 py-3.5 rounded-xl text-sm font-medium transition-all ${
+                          selected === i ? 'bg-[#1d4ed8] text-white' : selected !== null ? 'bg-white/[0.02] text-white/15 cursor-not-allowed' : 'bg-white/[0.03] text-white/55 hover:bg-[#1d4ed8]/15 hover:text-white/80'
+                        }`}>{opt.label}</button>
+                    ))}
+                  </div>
                 </div>
+              )}
 
-                {/* 5-Axis Breakdown */}
-                {scoreTotals && (
-                  <div className="mt-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] p-5">
-                    <h4 className="text-white/40 text-xs font-bold tracking-wider mb-4 text-center">تحليل الشخصية</h4>
-                    <div className="space-y-3">
-                      {axisLabels.map(axis => {
-                        const val = scoreTotals[axis.key] || 0
-                        const pctAxis = Math.min((val / axis.max) * 100, 100)
-                        return (
-                          <div key={axis.key}>
-                            <div className="flex justify-between items-center mb-1">
-                              <span className="text-white/40 text-xs font-medium">{axis.label}</span>
-                              <span className="text-[#C9A84C]/50 text-xs font-bold">{toAr(Math.round(pctAxis))}٪</span>
+              {step > totalQ && result && (
+                <div className="text-center py-4">
+                  <div className="mb-2"><span className="text-3xl">{result.emoji}</span></div>
+                  <div className="text-5xl sm:text-6xl font-black text-white tabular-nums leading-none mb-1">{toAr(animatedAmount)}</div>
+                  <span className="text-[#3b82f6] text-sm font-bold">ريال سعودي</span>
+
+                  <div className="mt-5 rounded-xl bg-white/[0.03] border border-white/[0.08] p-4 text-center">
+                    <h3 className="text-white/90 font-bold text-base mb-1">{result.title}</h3>
+                    <p className="text-white/40 text-sm">{result.desc}</p>
+                  </div>
+
+                  {scoreTotals && (
+                    <div className="mt-4 rounded-xl bg-white/[0.02] border border-white/[0.06] p-4">
+                      <h4 className="text-white/40 text-xs font-bold mb-3 text-center">تحليل الشخصية</h4>
+                      <div className="space-y-2.5">
+                        {axisLabels.map(axis => {
+                          const val = scoreTotals[axis.key] || 0
+                          const pctAxis = Math.min((val / axis.max) * 100, 100)
+                          return (
+                            <div key={axis.key}>
+                              <div className="flex justify-between items-center mb-1">
+                                <span className="text-white/40 text-xs">{axis.label}</span>
+                                <span className="text-[#3b82f6]/60 text-xs font-bold">{toAr(Math.round(pctAxis))}٪</span>
+                              </div>
+                              <div className="w-full h-1 rounded-full bg-white/[0.04] overflow-hidden">
+                                <div className="h-full rounded-full bg-[#2563eb] transition-all duration-1000 ease-out" style={{ width: `${pctAxis}%` }} />
+                              </div>
                             </div>
-                            <div className="w-full h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
-                              <div
-                                className="h-full rounded-full transition-all duration-1000 ease-out"
-                                style={{
-                                  width: `${pctAxis}%`,
-                                  background: pctAxis > 60
-                                    ? 'linear-gradient(90deg, #C9A84C, #f3ead0)'
-                                    : pctAxis > 30
-                                      ? 'linear-gradient(90deg, #8a8a90, #C9A84C)'
-                                      : 'linear-gradient(90deg, #5a5a60, #8a8a90)',
-                                }}
-                              />
-                            </div>
-                          </div>
-                        )
-                      })}
+                          )
+                        })}
+                      </div>
                     </div>
-                    {result.analysis && (
-                      <p className="text-white/20 text-[11px] leading-relaxed mt-4 pt-3 border-t border-white/[0.04] text-center">{result.analysis}</p>
-                    )}
-                  </div>
-                )}
+                  )}
 
-                {/* Overall deserving meter */}
-                <div className="mt-5 text-right">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-white/25 text-[11px] font-bold">مقياس الاستحقاق</span>
-                    <span className="text-[#C9A84C]/60 text-[11px] font-bold">{toAr(Math.round(Math.min((totalScore / 187) * 100, 100)))}٪</span>
+                  <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button onClick={shareWa} className="btn-gold w-full justify-center"><Share2 className="w-4 h-4" /><span>شارك نتيجتك</span></button>
+                    <button onClick={reset} className="btn-outline-gold w-full justify-center !bg-transparent !text-white/60 !border-white/10 hover:!bg-white/5">جرّب مرة ثانية</button>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-white/[0.04] overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-1000 ease-out"
-                      style={{
-                        width: `${Math.min((totalScore / 187) * 100, 100)}%`,
-                        background: `linear-gradient(90deg, #5a5a60 0%, #C9A84C 50%, #f3ead0 100%)`,
-                        boxShadow: totalScore > 100 ? `0 0 12px rgba(201,168,76,${Math.min(totalScore / 300, 0.5)})` : 'none',
-                      }}
-                    />
+
+                  <div className="mt-4 pt-4 border-t border-white/[0.06]">
+                    <Link to="/editor" className="btn-gold w-full justify-center"><Send className="w-4 h-4" /><span>صمّم بطاقة عيدية</span></Link>
                   </div>
                 </div>
-
-                {/* Action buttons */}
-                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <button onClick={shareWa} className="btn-gold w-full justify-center">
-                    <Share2 className="w-4 h-4" />
-                    <span>شارك نتيجتك</span>
-                  </button>
-                  <button onClick={reset} className="btn-outline-gold w-full justify-center">
-                    جرّب مرة ثانية
-                  </button>
-                </div>
-
-                {/* Design CTA */}
-                <div className="mt-6 pt-6 border-t border-white/[0.06]">
-                  <Link to="/editor" className="btn-gold w-full justify-center !bg-gradient-to-br !from-[#c4a44e] !to-[#d4b96b] !text-[#0A0A0A]">
-                    <Send className="w-4 h-4" />
-                    <span>صمّم بطاقة عيدية وأرسلها</span>
-                  </Link>
-                </div>
-
-                {/* Fun hint */}
-                <div className="mt-5 rounded-xl bg-white/[0.02] border border-white/[0.05] p-4">
-                  <p className="text-white/35 text-xs leading-relaxed text-center">
-                    <span className="text-[#C9A84C]/70 font-semibold">أرسل عيدية حقيقية</span> — صمّم بطاقة تهنئة مع المبلغ وشاركها عبر واتساب
-                  </p>
-                </div>
-              </div>
-            )}
-
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -556,10 +377,7 @@ function EidiyaLuckGenerator() {
 
   const copyLink = () => {
     if (!link) return
-    navigator.clipboard.writeText(link).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
+    navigator.clipboard.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000) })
   }
 
   const shareWa = () => {
@@ -569,205 +387,120 @@ function EidiyaLuckGenerator() {
   }
 
   const luckFeatures = [
-    { icon: Shuffle, title: 'عشوائي بالكامل', desc: 'العداد يختار مبلغ عشوائي من ٥ إلى ٢٬٠٠٠ ريال — مافي أحد يعرف النتيجة' },
-    { icon: MessageCircle, title: 'ردود فعل مضحكة', desc: '٧ ردود فعل بالسعودية — من "يعني... مشكور" إلى "هذا مو عيدية... هذا راتب"' },
-    { icon: Smartphone, title: 'يعمل على كل جهاز', desc: 'الرابط يفتح مباشرة على أي جوال أو كمبيوتر — بدون تحميل أي شي' },
-    { icon: Link2, title: 'شارك بسهولة', desc: 'انسخ الرابط أو أرسله واتساب — المستلم يضغط ويلفّ فوراً' },
+    { icon: Shuffle, title: 'عشوائي بالكامل', desc: 'مبلغ عشوائي من ٥ إلى ٢٬٠٠٠ ريال' },
+    { icon: MessageCircle, title: 'ردود فعل مضحكة', desc: '٧ ردود فعل بالسعودية' },
+    { icon: Smartphone, title: 'يعمل على كل جهاز', desc: 'بدون تحميل أي شي' },
+    { icon: Link2, title: 'شارك بسهولة', desc: 'انسخ الرابط أو أرسله واتساب' },
   ]
 
   const steps = [
     { num: '١', title: 'اكتب اسمك', desc: 'عشان المستلم يعرف مين يعيّده' },
-    { num: '٢', title: 'شارك الرابط', desc: 'واتساب أو نسخ — حسب ما تبي' },
-    { num: '٣', title: 'يلفّ العداد!', desc: 'المستلم يضغط ويشوف حظه 🎰' },
+    { num: '٢', title: 'شارك الرابط', desc: 'واتساب أو نسخ' },
+    { num: '٣', title: 'يلفّ العداد!', desc: 'يشوف حظه 🎰' },
   ]
 
   return (
-    <section className="w-full relative bg-[#070810] py-28 sm:py-40 overflow-hidden">
-      {/* ── Ambient Decorations ── */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-[#C9A84C]/[0.03] rounded-full blur-[120px]" />
-        <div className="absolute bottom-20 right-0 w-[400px] h-[400px] bg-[#C9A84C]/[0.02] rounded-full blur-[100px]" />
-        <div className="absolute bottom-40 left-0 w-[300px] h-[300px] bg-[#C9A84C]/[0.015] rounded-full blur-[80px]" />
-        <div className="absolute inset-0 opacity-[0.012]" style={{ backgroundImage: 'radial-gradient(circle, #C9A84C 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
-      </div>
-
-      {/* Top / Bottom separator */}
-      <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C]/15 to-transparent" />
-      <div className="absolute left-0 bottom-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C]/10 to-transparent" />
-
-      {/* ── Main Content: flex column, everything centered ── */}
-      <div className="relative flex flex-col items-center px-5 sm:px-8" style={{ maxWidth: '680px', margin: '0 auto' }}>
-
-        {/* ═══ Section Heading ═══ */}
-        <div className="text-center w-full mb-14 sm:mb-20">
-          <div className="inline-flex items-center gap-2.5 bg-gradient-to-r from-[#C9A84C]/[0.08] to-[#C9A84C]/[0.04] border border-[#C9A84C]/15 rounded-full px-5 py-2.5 mb-7 backdrop-blur-sm">
-            <Sparkles className="w-4 h-4 text-[#C9A84C]" />
-            <span className="text-[#C9A84C] text-sm font-semibold tracking-wide">ميزة جديدة — تسلية العيد</span>
+    <section className="py-20 bg-[#f8fafc]">
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="max-w-2xl mx-auto">
+          {/* Heading */}
+          <div className="text-center mb-10">
+            <span className="section-label"><Sparkles className="w-3.5 h-3.5" /> ميزة جديدة</span>
+            <h2 className="section-title mb-3">عيديتك بحظك!</h2>
+            <p className="text-[#64748b] text-[15px] leading-relaxed max-w-lg mx-auto">
+              أنشئ رابط عيدية عشوائي وأرسله لأصدقائك — المستلم يلفّ العداد ويطلع له مبلغ مع ردة فعل مضحكة
+            </p>
           </div>
-          <h2 className="text-4xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white/90 to-white/60 mb-6 leading-tight">
-            عيديتك بحظك!
-          </h2>
-          <p className="text-white/40 text-base sm:text-lg leading-relaxed" style={{ maxWidth: '480px', margin: '0 auto' }}>
-            أنشئ رابط عيدية عشوائي وأرسله لأصدقائك وعائلتك —
-            <br className="hidden sm:block" />
-            المستلم يلفّ العداد ويطلع له مبلغ عشوائي مع ردة فعل مضحكة!
-          </p>
-        </div>
 
-        {/* ═══ Features Grid — 2×2 centered ═══ */}
-        <div className="w-full grid grid-cols-2 gap-4 sm:gap-5 mb-14 sm:mb-20" style={{ maxWidth: '560px', margin: '0 auto 3.5rem auto' }}>
-          {luckFeatures.map((f, i) => (
-            <div
-              key={i}
-              className="group relative rounded-2xl p-5 sm:p-6 text-center transition-all duration-500 hover:-translate-y-1"
-              style={{
-                background: 'linear-gradient(135deg, rgba(201,168,76,0.04) 0%, rgba(201,168,76,0.01) 100%)',
-                border: '1px solid rgba(201,168,76,0.08)',
-                backdropFilter: 'blur(12px)',
-              }}
-            >
-              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'radial-gradient(circle at center, rgba(201,168,76,0.06) 0%, transparent 70%)' }} />
-              <div className="relative flex flex-col items-center">
-                <div className="w-11 h-11 mb-4 rounded-xl bg-gradient-to-br from-[#C9A84C]/15 to-[#C9A84C]/05 border border-[#C9A84C]/10 flex items-center justify-center group-hover:scale-110 group-hover:border-[#C9A84C]/20 transition-all duration-500">
-                  <f.icon className="w-5 h-5 text-[#C9A84C]/70 group-hover:text-[#C9A84C] transition-colors duration-500" strokeWidth={1.5} />
+          {/* Features */}
+          <div className="grid grid-cols-2 gap-4 mb-10">
+            {luckFeatures.map((f, i) => (
+              <div key={i} className="rounded-xl border border-[#e2e8f0] bg-white p-5 text-center hover:border-[#bfdbfe] hover:shadow-sm transition-all">
+                <div className="w-10 h-10 mx-auto mb-3 rounded-lg bg-[#eff6ff] border border-[#dbeafe] flex items-center justify-center">
+                  <f.icon className="w-4.5 h-4.5 text-[#1d4ed8]" strokeWidth={1.5} />
                 </div>
-                <h4 className="text-white/80 font-bold text-sm mb-2 group-hover:text-white/95 transition-colors">{f.title}</h4>
-                <p className="text-white/30 text-xs leading-relaxed group-hover:text-white/40 transition-colors">{f.desc}</p>
+                <h4 className="text-[#0f172a] font-bold text-sm mb-1">{f.title}</h4>
+                <p className="text-[#64748b] text-xs leading-relaxed">{f.desc}</p>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {/* ═══ Steps — centered row ═══ */}
-        <div className="flex items-start justify-center gap-10 sm:gap-16 mb-14 sm:mb-20">
-          {steps.map((s, i) => (
-            <div key={i} className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-full mb-3 flex items-center justify-center relative">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#C9A84C]/20 to-[#C9A84C]/05 border border-[#C9A84C]/15" />
-                <div className="absolute inset-1 rounded-full bg-[#0a0b14]" />
-                <span className="relative text-[#C9A84C] text-lg font-black">{s.num}</span>
-              </div>
-              <h4 className="text-white/80 font-bold text-sm mb-1">{s.title}</h4>
-              <p className="text-white/30 text-xs" style={{ maxWidth: '120px' }}>{s.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* ═══ Generator Card — centered ═══ */}
-        <div className="w-full" style={{ maxWidth: '448px' }}>
-          <div
-            className="rounded-3xl p-7 sm:p-10 relative overflow-hidden"
-            style={{
-              background: 'linear-gradient(160deg, rgba(201,168,76,0.06) 0%, rgba(10,11,20,0.95) 40%, rgba(10,11,20,0.98) 100%)',
-              border: '1px solid rgba(201,168,76,0.12)',
-              boxShadow: '0 0 80px rgba(201,168,76,0.04), 0 25px 50px rgba(0,0,0,0.4)',
-            }}
-          >
-            <div className="absolute top-0 right-0 w-40 h-40 bg-[#C9A84C]/[0.04] rounded-full blur-[60px] pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#C9A84C]/[0.03] rounded-full blur-[50px] pointer-events-none" />
-
-            <div className="relative">
-              {/* Card header */}
-              <div className="text-center mb-8">
-                <div className="flex justify-center mb-5">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C9A84C]/15 to-[#C9A84C]/05 border border-[#C9A84C]/10 flex items-center justify-center">
-                    <Zap className="w-6 h-6 text-[#C9A84C]" strokeWidth={1.5} />
-                  </div>
+          {/* Steps */}
+          <div className="flex items-start justify-center gap-12 mb-10">
+            {steps.map((s, i) => (
+              <div key={i} className="flex flex-col items-center text-center">
+                <div className="w-10 h-10 rounded-full mb-2 bg-[#eff6ff] border border-[#dbeafe] flex items-center justify-center">
+                  <span className="text-[#1d4ed8] text-sm font-black">{s.num}</span>
                 </div>
-                <h3 className="text-white/95 font-black text-xl mb-2">أنشئ رابط العيدية</h3>
-                <p className="text-white/35 text-sm leading-relaxed">اكتب اسمك وشارك الرابط مع أي شخص تبي تعيّده</p>
+                <h4 className="text-[#0f172a] font-bold text-sm mb-0.5">{s.title}</h4>
+                <p className="text-[#64748b] text-xs">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Generator Card */}
+          <div className="max-w-md mx-auto">
+            <div className="rounded-2xl bg-white border border-[#e2e8f0] p-6 sm:p-8 shadow-sm">
+              <div className="text-center mb-6">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[#eff6ff] border border-[#dbeafe] flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-[#1d4ed8]" strokeWidth={1.5} />
+                </div>
+                <h3 className="text-[#0f172a] font-bold text-lg mb-1">أنشئ رابط العيدية</h3>
+                <p className="text-[#64748b] text-sm">اكتب اسمك وشارك الرابط</p>
               </div>
 
-              {/* Name input */}
-              <div className="mb-6">
-                <label className="block text-white/50 text-sm font-semibold mb-3 text-center">اسمك (المُعَيِّد)</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => { setName(e.target.value); setCopied(false) }}
-                  placeholder="مثال: أبو فهد"
-                  className="unified-input w-full"
-                />
+              <div className="mb-5">
+                <label className="block text-[#475569] text-sm font-semibold mb-2 text-center">اسمك (المُعَيِّد)</label>
+                <input type="text" value={name} onChange={(e) => { setName(e.target.value); setCopied(false) }}
+                  placeholder="مثال: أبو فهد" className="unified-input w-full text-center" />
               </div>
 
-              {/* Generated link */}
               {name.trim() && (
-                <div className="mb-6 animate-fade-up">
-                  <label className="block text-white/35 text-xs font-semibold mb-2.5 text-center">الرابط</label>
-                  <div className="flex items-center gap-2 bg-white/[0.03] border border-white/[0.07] rounded-xl px-4 py-3.5">
-                    <span className="text-white/40 text-xs truncate flex-1 font-mono" dir="ltr">{link}</span>
-                    <button
-                      onClick={copyLink}
-                      className={`shrink-0 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 ${
-                        copied
-                          ? 'bg-green-500/12 text-green-400 border border-green-500/15'
-                          : 'bg-[#C9A84C]/08 text-[#C9A84C] border border-[#C9A84C]/12 hover:bg-[#C9A84C]/15 hover:border-[#C9A84C]/25'
-                      }`}
-                    >
-                      {copied ? '✔ تم' : 'انسخ'}
-                    </button>
+                <div className="mb-5 animate-fade-up">
+                  <label className="block text-[#64748b] text-xs font-semibold mb-2 text-center">الرابط</label>
+                  <div className="flex items-center gap-2 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl px-4 py-3">
+                    <span className="text-[#64748b] text-xs truncate flex-1 font-mono" dir="ltr">{link}</span>
+                    <button onClick={copyLink}
+                      className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                        copied ? 'bg-green-50 text-green-600 border border-green-200' : 'bg-[#eff6ff] text-[#1d4ed8] border border-[#dbeafe] hover:bg-[#dbeafe]'
+                      }`}>{copied ? '✔ تم' : 'انسخ'}</button>
                   </div>
                 </div>
               )}
 
-              {/* Buttons */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button
-                  onClick={shareWa}
-                  disabled={!name.trim()}
-                  className={`btn-gold w-full justify-center ${!name.trim() ? 'opacity-30 cursor-not-allowed' : ''}`}
-                >
-                  <Share2 className="w-4 h-4" />
-                  <span>أرسل عبر واتساب</span>
+                <button onClick={shareWa} disabled={!name.trim()} className={`btn-gold w-full justify-center ${!name.trim() ? 'opacity-30 cursor-not-allowed' : ''}`}>
+                  <Share2 className="w-4 h-4" /><span>أرسل واتساب</span>
                 </button>
-                <button
-                  onClick={copyLink}
-                  disabled={!name.trim()}
-                  className={`btn-outline-gold w-full justify-center ${!name.trim() ? 'opacity-30 cursor-not-allowed' : ''}`}
-                >
+                <button onClick={copyLink} disabled={!name.trim()} className={`btn-outline-gold w-full justify-center ${!name.trim() ? 'opacity-30 cursor-not-allowed' : ''}`}>
                   {copied ? '✔ تم النسخ!' : 'انسخ الرابط'}
                 </button>
               </div>
             </div>
           </div>
-
-          {/* ═══ Bottom hint ═══ */}
-          <div className="mt-10">
-            <div className="flex items-center justify-center gap-3 mb-3">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#C9A84C]/10" />
-              <span className="text-[#C9A84C]/50 text-xs font-bold tracking-wider">وش يشوف المستلم؟</span>
-              <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#C9A84C]/10" />
-            </div>
-            <p className="text-white/25 text-xs text-center leading-loose">
-              يفتح الرابط ← يشوف اسمك ← يضغط "لفّ العداد" ← العداد يدور ٣ ثواني ← يطلع المبلغ العشوائي مع ردة فعل ساحرة
-            </p>
-          </div>
         </div>
-
       </div>
     </section>
   )
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   FAQ - Modern Design
+   FAQ
    ═══════════════════════════════════════════════════════════════════════════ */
 function FAQ({ q, a, isOpen, toggle }) {
   return (
     <div className={`faq-item ${isOpen ? 'open' : ''}`}>
       <button onClick={toggle} className="w-full flex items-center justify-between p-5 text-right group">
-        <span className="text-white/90 text-[15px] font-medium group-hover:text-white transition-colors">{q}</span>
-        <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mr-4 transition-all duration-300 ${
-          isOpen 
-            ? 'bg-gradient-to-br from-[#d4b96b]/20 to-[#d4b96b]/10 rotate-180' 
-            : 'bg-white/[0.04] hover:bg-white/[0.06]'
+        <span className="text-[#0f172a] text-[15px] font-medium">{q}</span>
+        <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mr-4 transition-all duration-200 ${
+          isOpen ? 'bg-[#eff6ff] rotate-180' : 'bg-[#f1f5f9]'
         }`}>
-          <ChevronDown className={`w-4 h-4 transition-colors ${isOpen ? 'text-[#d4b96b]' : 'text-white/40'}`} />
+          <ChevronDown className={`w-4 h-4 ${isOpen ? 'text-[#1d4ed8]' : 'text-[#64748b]'}`} />
         </div>
       </button>
-      <div className={`grid transition-all duration-300 ease-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+      <div className={`grid transition-all duration-300 ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="overflow-hidden">
-          <p className="px-5 pb-5 text-white/50 text-sm leading-relaxed">{a}</p>
+          <p className="px-5 pb-5 text-[#64748b] text-sm leading-relaxed">{a}</p>
         </div>
       </div>
     </div>
@@ -783,122 +516,312 @@ const faqs = [
 ]
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   STEP CARD - Modern Design
+   STEP & FEATURE COMPONENTS
    ═══════════════════════════════════════════════════════════════════════════ */
 function StepCard({ num, icon: Icon, title, desc }) {
   return (
     <div className="step-card h-full">
       <div className="step-number">0{num}</div>
-      <div className="step-icon">
-        <Icon className="w-5 h-5" strokeWidth={1.5} />
-      </div>
-      <h3 className="text-white/95 font-bold text-lg mb-3">{title}</h3>
-      <p className="text-white/40 text-sm leading-relaxed">{desc}</p>
+      <div className="step-icon"><Icon className="w-5 h-5" strokeWidth={1.5} /></div>
+      <h3 className="text-[#0f172a] font-bold text-base mb-2">{title}</h3>
+      <p className="text-[#64748b] text-sm leading-relaxed">{desc}</p>
     </div>
   )
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   FEATURE ROW - Modern Design
-   ═══════════════════════════════════════════════════════════════════════════ */
 function Feature({ icon: Icon, title, desc }) {
   return (
     <div className="feature-card">
-      <div className="feature-icon">
-        <Icon className="w-5 h-5" strokeWidth={1.5} />
-      </div>
+      <div className="feature-icon"><Icon className="w-5 h-5" strokeWidth={1.5} /></div>
       <div className="min-w-0">
-        <h3 className="text-white/95 font-semibold text-[15px] mb-1.5">{title}</h3>
-        <p className="text-white/40 text-sm leading-relaxed">{desc}</p>
+        <h3 className="text-[#0f172a] font-semibold text-[15px] mb-1">{title}</h3>
+        <p className="text-[#64748b] text-sm leading-relaxed">{desc}</p>
       </div>
     </div>
   )
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LANDING PAGE MAIN COMPONENT
+   QUICK CARD CREATOR
+   ═══════════════════════════════════════════════════════════════════════════ */
+const quickDesigns = [
+  { id: 1, label: 'كلاسيكي', image: '/templates/1.png', greeting: 'عيد مبارك', sub: 'كل عام وأنتم بخير', nameY: 0.82, greetingY: 0.30, subY: 0.48, greetingSize: 90, subSize: 42, nameSize: 64, textColor: '#ffffff' },
+  { id: 2, label: 'أنيق', image: '/templates/2.png', greeting: 'عساكم من عوّاده', sub: 'تقبّل الله طاعتكم', nameY: 0.80, greetingY: 0.28, subY: 0.46, greetingSize: 82, subSize: 40, nameSize: 60, textColor: '#ffffff' },
+  { id: 3, label: 'حديث', image: '/templates/3.png', greeting: 'كل عام وأنتم بخير', sub: 'أعاده الله عليكم بالخير واليُمن', nameY: 0.83, greetingY: 0.25, subY: 0.44, greetingSize: 78, subSize: 36, nameSize: 62, textColor: '#ffffff' },
+  { id: 4, label: 'فاخر', image: '/templates/4.png', greeting: 'عيدكم مبارك', sub: 'وعساكم من العايدين الفايزين', nameY: 0.81, greetingY: 0.27, subY: 0.45, greetingSize: 85, subSize: 38, nameSize: 62, textColor: '#ffffff' },
+]
+
+const nameColors = [
+  { id: 'white', color: '#ffffff', label: 'أبيض' },
+  { id: 'gold', color: '#fbbf24', label: 'ذهبي' },
+  { id: 'lime', color: '#C6F806', label: 'ليموني' },
+  { id: 'purple', color: '#c4b5fd', label: 'بنفسجي' },
+  { id: 'pink', color: '#f9a8d4', label: 'وردي' },
+  { id: 'sky', color: '#93c5fd', label: 'سماوي' },
+]
+
+function QuickCardCreator() {
+  const [selectedId, setSelectedId] = useState(quickDesigns[0].id)
+  const [name, setName] = useState('')
+  const [nameColor, setNameColor] = useState('#ffffff')
+  const [showAll, setShowAll] = useState(false)
+  const canvasRef = useRef(null)
+  const [canvasReady, setCanvasReady] = useState(false)
+  const [loadedImg, setLoadedImg] = useState(null)
+  const selectedDesign = quickDesigns.find(d => d.id === selectedId) || quickDesigns[0]
+
+  useEffect(() => {
+    if (!selectedDesign?.image) return
+    const img = new window.Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => { setLoadedImg(img); setCanvasReady(true) }
+    img.onerror = () => setCanvasReady(false)
+    img.src = selectedDesign.image
+  }, [selectedDesign?.image])
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas || !loadedImg) return
+    const size = 1080
+    canvas.width = size; canvas.height = size
+    const ctx = canvas.getContext('2d')
+    ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, size, size)
+    ctx.drawImage(loadedImg, 0, 0, size, size)
+    ctx.fillStyle = 'rgba(0,0,0,0.15)'; ctx.fillRect(0, 0, size, size)
+    const fontBase = "'Cairo', sans-serif"
+
+    ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = selectedDesign.textColor
+    ctx.shadowColor = 'rgba(0,0,0,0.7)'; ctx.shadowBlur = 16
+    ctx.font = `900 ${selectedDesign.greetingSize}px ${fontBase}`
+    ctx.fillText(selectedDesign.greeting, size / 2, size * selectedDesign.greetingY, size * 0.9); ctx.restore()
+
+    ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = selectedDesign.textColor
+    ctx.globalAlpha = 0.85; ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 10
+    ctx.font = `600 ${selectedDesign.subSize}px ${fontBase}`
+    ctx.fillText(selectedDesign.sub, size / 2, size * selectedDesign.subY, size * 0.9); ctx.restore()
+
+    ctx.save(); ctx.strokeStyle = nameColor; ctx.globalAlpha = 0.3; ctx.lineWidth = 2
+    const lineW = 200; ctx.beginPath()
+    ctx.moveTo(size / 2 - lineW, size * (selectedDesign.nameY - 0.05))
+    ctx.lineTo(size / 2 + lineW, size * (selectedDesign.nameY - 0.05)); ctx.stroke(); ctx.restore()
+
+    if (name.trim()) {
+      ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = nameColor
+      ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 14
+      ctx.font = `bold ${selectedDesign.nameSize}px ${fontBase}`
+      ctx.fillText(name, size / 2, size * selectedDesign.nameY, size * 0.85); ctx.restore()
+    } else {
+      ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = 'rgba(255,255,255,0.25)'
+      ctx.font = `500 ${selectedDesign.nameSize * 0.7}px ${fontBase}`
+      ctx.fillText('اكتب الاسم هنا...', size / 2, size * selectedDesign.nameY); ctx.restore()
+    }
+  }, [loadedImg, name, nameColor, selectedDesign])
+
+  const handleDownload = useCallback(() => {
+    const canvas = canvasRef.current; if (!canvas) return
+    const link = document.createElement('a'); link.download = `eid-card-${Date.now()}.png`
+    link.href = canvas.toDataURL('image/png', 1.0); document.body.appendChild(link); link.click(); document.body.removeChild(link)
+  }, [])
+
+  const handleWhatsApp = useCallback(async () => {
+    const canvas = canvasRef.current; if (!canvas) return
+    try {
+      const blob = await new Promise(r => canvas.toBlob(r, 'image/png', 1.0))
+      const file = new File([blob], 'eid-card.png', { type: 'image/png' })
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'بطاقة تهنئة العيد', text: 'عيد مبارك وكل عام وأنتم بخير' })
+      } else { handleDownload(); window.open(`https://wa.me/?text=${encodeURIComponent('عيد مبارك وكل عام وأنتم بخير 🌙')}`, '_blank') }
+    } catch { handleDownload() }
+  }, [handleDownload])
+
+  return (
+    <section className="py-20 bg-white">
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="text-center mb-10">
+          <span className="section-label">بطاقات جاهزة</span>
+          <h2 className="section-title mb-3">اختر تصميم واكتب اسمك فقط</h2>
+          <p className="section-subtitle mx-auto">٤ تصاميم احترافية جاهزة — فقط اكتب الاسم وحمّل البطاقة</p>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+          {/* Controls */}
+          <div className="flex-1 w-full space-y-6">
+            <div>
+              <label className="text-xs font-bold text-[#64748b] block mb-3">اختر التصميم</label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {quickDesigns.map(d => (
+                  <button key={d.id} onClick={() => setSelectedId(d.id)}
+                    className={`group relative aspect-square rounded-xl overflow-hidden transition-all ${
+                      selectedId === d.id ? 'ring-2 ring-[#1d4ed8] shadow-md' : 'ring-1 ring-[#e2e8f0] hover:ring-[#93c5fd]'
+                    }`}>
+                    <img src={d.image} alt={d.label} className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none' }} />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 pointer-events-none">
+                      <span className="text-white text-[13px] font-black drop-shadow-lg">{d.greeting}</span>
+                      <span className="text-white/70 text-[9px] mt-0.5">{d.sub}</span>
+                    </div>
+                    {selectedId === d.id && (
+                      <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#1d4ed8] flex items-center justify-center">
+                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                      </div>
+                    )}
+                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent px-2 pb-2 pt-4">
+                      <span className="text-[11px] text-white font-bold">{d.label}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Name input + color in a clean card */}
+            <div className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] p-5 space-y-5">
+              <div>
+                <label className="text-sm font-bold text-[#0f172a] block mb-2">اكتب الاسم على البطاقة</label>
+                <input type="text" value={name} onChange={e => setName(e.target.value)} dir="rtl" placeholder="مثلاً: محمد"
+                  className="unified-input w-full text-center text-lg" />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-[#64748b] block mb-2">لون الاسم</label>
+                <div className="flex gap-2 flex-wrap">
+                  {nameColors.map(c => (
+                    <button key={c.id} onClick={() => setNameColor(c.color)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${
+                        nameColor === c.color ? 'bg-white border-[#1d4ed8] shadow-sm' : 'bg-white border-[#e2e8f0] hover:border-[#94a3b8]'
+                      }`}>
+                      <span className="w-3.5 h-3.5 rounded-full border border-[#e2e8f0]" style={{ backgroundColor: c.color }} />
+                      <span className="text-[#475569]">{c.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button onClick={handleDownload} disabled={!canvasReady}
+                  className="flex-1 btn-gold justify-center disabled:opacity-40 disabled:cursor-not-allowed">
+                  <Download className="w-4 h-4" /> تحميل البطاقة
+                </button>
+                <button onClick={handleWhatsApp} disabled={!canvasReady}
+                  className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 font-bold hover:bg-green-100 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                  <MessageCircle className="w-4 h-4" /> واتساب
+                </button>
+              </div>
+            </div>
+
+            {templates.length > 4 && (
+              <button onClick={() => setShowAll(v => !v)}
+                className="w-full py-2.5 rounded-xl border border-[#e2e8f0] text-[#64748b] text-sm font-medium hover:bg-[#f8fafc] transition-all flex items-center justify-center gap-2">
+                <ChevronDown className={`w-4 h-4 transition-transform ${showAll ? 'rotate-180' : ''}`} />
+                {showAll ? 'عرض أقل' : `عرض المزيد (${templates.length - 4})`}
+              </button>
+            )}
+
+            {showAll && (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                {templates.slice(4).map(t => (
+                  <Link key={t.id} to="/editor" className="relative aspect-square rounded-xl overflow-hidden ring-1 ring-[#e2e8f0] hover:ring-[#93c5fd] transition-all">
+                    <img src={t.image} alt={t.name} className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none' }} />
+                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent px-1.5 pb-1.5 pt-4">
+                      <span className="text-[9px] text-white">{t.name}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            <Link to="/editor" className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-[#dbeafe] text-[#1d4ed8] text-sm font-bold hover:bg-[#eff6ff] transition-all group">
+              <Palette className="w-4 h-4" />
+              التخصيص الاحترافي — غيّر الخطوط والنصوص والألوان
+              <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+          {/* Preview */}
+          <div className="w-full lg:w-[380px] flex flex-col items-center lg:sticky lg:top-24">
+            <div className="rounded-2xl border border-[#e2e8f0] bg-white p-3 shadow-sm w-full">
+              <canvas ref={canvasRef} className="w-full aspect-square rounded-xl" style={{ imageRendering: 'auto' }} />
+            </div>
+            <p className="text-[#94a3b8] text-xs text-center mt-3">معاينة مباشرة — الصورة تُحمّل بجودة 1080×1080</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LANDING PAGE
    ═══════════════════════════════════════════════════════════════════════════ */
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState(null)
 
   return (
-    <div className="w-full overflow-x-hidden">
+    <div className="w-full overflow-x-hidden bg-white">
 
-      {/* ─────────────────────────────────────────────────────────────────────
-          HERO SECTION
-          ───────────────────────────────────────────────────────────────────── */}
-      <section className="section-container min-h-[100vh] flex flex-col items-center justify-center pt-20 pb-10 px-5">
-        {/* Background glow */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(600px,100vw)] h-[300px] bg-[#d4b96b]/[0.04] rounded-full blur-[150px]" />
-        </div>
+      {/* ── HERO ── */}
+      <section className="pt-28 pb-20 bg-white">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="max-w-3xl mx-auto text-center mb-12">
+            <div className="inline-flex items-center gap-2 rounded-full bg-[#eff6ff] border border-[#dbeafe] px-4 py-2 text-[13px] font-semibold text-[#1d4ed8] mb-6">
+              <Sparkles className="w-3.5 h-3.5" />
+              تجربة تصميم احترافية
+            </div>
 
-        <div className="relative z-10 text-center max-w-3xl mx-auto w-full flex flex-col items-center">
-          {/* Logo */}
-          <div className="animate-fade-up mb-6 sm:mb-8 w-full flex justify-center">
-            <img 
-              src="/images/logo.png" 
-              alt="سَلِّم" 
-              className="h-36 sm:h-44 md:h-56 lg:h-72 w-auto drop-shadow-[0_0_60px_rgba(212,185,107,0.2)]" 
-            />
+            <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black leading-[1.25] text-[#0f172a] mb-6">
+              صمّم بطاقة عيد
+              <span className="block gradient-gold-text">بشكل فاخر خلال دقائق</span>
+            </h1>
+
+            <p className="text-[#64748b] text-lg leading-relaxed max-w-xl mx-auto mb-8">
+              منصة عربية حديثة لتصميم بطاقات تهنئة العيد وإرسالها مباشرة عبر واتساب — بدون تسجيل أو تعقيد.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link to="/editor" className="btn-gold !px-8 !py-3.5">
+                ابدأ التصميم الآن
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+              <Link to="/send" className="btn-outline-gold !px-7 !py-3.5">
+                جرّب الإرسال الذكي
+              </Link>
+            </div>
           </div>
 
-          <p className="animate-fade-up delay-1 text-base sm:text-lg md:text-xl text-white/40 leading-relaxed mb-8 sm:mb-12 max-w-lg mx-auto px-4">
-            منصة احترافية لتصميم بطاقات تهنئة العيد
-            <br />
-            <span className="text-white/55">في ثوانٍ — مجاناً بدون تسجيل</span>
-          </p>
-
-          {/* CTA */}
-          <div className="animate-fade-up delay-2 flex flex-col sm:flex-row items-center justify-center gap-4 px-4">
-            <Link to="/editor" className="group btn-gold">
-              <span>ابدأ التصميم مجاناً</span>
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            </Link>
-          </div>
-
-          {/* Quick stats */}
-          <div className="animate-fade-up delay-3 mt-12 sm:mt-16 flex items-center justify-center gap-8 sm:gap-12">
+          {/* Stats */}
+          <div className="max-w-lg mx-auto grid grid-cols-3 gap-4">
             {[
-              { n: '+100', l: 'عبارة تهنئة' },
-              { n: '20', l: 'قالب جاهز' },
-              { n: '8', l: 'خطوط عربية' },
+              { n: '+100', l: 'عبارة جاهزة' },
+              { n: '20', l: 'قالب أنيق' },
+              { n: '1080', l: 'دقة التصدير' },
             ].map((s, i) => (
-              <div key={i} className="stat-item">
-                <div className="stat-value">{s.n}</div>
-                <div className="stat-label">{s.l}</div>
+              <div key={i} className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-4 text-center">
+                <div className="text-[#1d4ed8] text-xl font-black tabular-nums">{s.n}</div>
+                <div className="text-[#64748b] text-xs mt-1">{s.l}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────────
-          MARQUEE TICKER
-          ───────────────────────────────────────────────────────────────────── */}
+      {/* ── MARQUEE ── */}
       <MarqueeTicker />
 
-      {/* ─────────────────────────────────────────────────────────────────────
-          EIDIYA CALCULATOR
-          ───────────────────────────────────────────────────────────────────── */}
+      {/* ── QUICK CARD CREATOR ── */}
+      <QuickCardCreator />
+
+      {/* ── EIDIYA CALCULATOR ── */}
       <EidiyaCalculator />
 
-      {/* ─────────────────────────────────────────────────────────────────────
-          EIDIYA LUCK GENERATOR
-          ───────────────────────────────────────────────────────────────────── */}
+      {/* ── EIDIYA LUCK ── */}
       <EidiyaLuckGenerator />
 
-      {/* ─────────────────────────────────────────────────────────────────────
-          HOW IT WORKS
-          ───────────────────────────────────────────────────────────────────── */}
-      <section className="section-container bg-[#060709] py-24 sm:py-32">
-        <div className="section-inner max-w-5xl">
-          <div className="text-center mb-16 sm:mb-20">
+      {/* ── HOW IT WORKS ── */}
+      <section className="py-20 bg-white">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="text-center mb-12">
             <span className="section-label">الخطوات</span>
             <h2 className="section-title">كيف تصمّم بطاقتك</h2>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <StepCard num={1} icon={Layers}  title="اختر القالب"  desc="تصفّح القوالب الجاهزة أو ارفع تصميمك الخاص من لوحة التحكم" />
             <StepCard num={2} icon={Palette}  title="خصّص البطاقة" desc="اختر الخط والعبارة والألوان واكتب اسم المُرسل والمُستلم" />
             <StepCard num={3} icon={Send}     title="أرسل أو حمّل" desc="صدّر بصيغة PNG أو PDF أو أرسل مباشرة عبر واتساب" />
@@ -906,22 +829,18 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────────
-          FEATURES
-          ───────────────────────────────────────────────────────────────────── */}
-      <section className="section-container bg-[#060709] py-24 sm:py-32">
-        <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
-
-        <div className="section-inner max-w-5xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+      {/* ── FEATURES ── */}
+      <section className="py-20 bg-[#f8fafc]">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             <div>
               <span className="section-label">المميزات</span>
-              <h2 className="section-title mb-5">
+              <h2 className="section-title mb-4">
                 كل ما تحتاجه
                 <br />
-                <span className="text-white/40">في منصة واحدة</span>
+                <span className="text-[#64748b] font-bold">في منصة واحدة</span>
               </h2>
-              <p className="section-subtitle mb-10">
+              <p className="section-subtitle mb-8">
                 صمّم بطاقات احترافية بخطوط عربية أصيلة وعبارات مختارة بعناية — ثم أرسلها لمن تحب مباشرة.
               </p>
               <Link to="/editor" className="group btn-ghost-gold">
@@ -929,7 +848,6 @@ export default function LandingPage() {
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               </Link>
             </div>
-
             <div className="space-y-4">
               <Feature icon={Type}       title="خطوط عربية أصيلة"   desc="8 مخطوطات تشمل أميري وشهرزاد والقاهرة ولطيف وغيرها" />
               <Feature icon={FileText}   title="أكثر من 100 عبارة"  desc="عبارات رسمية وعائلية وتجارية وشعرية لكل مناسبة" />
@@ -941,44 +859,37 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────────
-          FAQ
-          ───────────────────────────────────────────────────────────────────── */}
-      <section className="section-container bg-[#060709] py-24 sm:py-32">
-        <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
-
-        <div className="section-inner max-w-2xl">
-          <div className="text-center mb-12 sm:mb-16">
-            <span className="section-label">الأسئلة</span>
-            <h2 className="section-title">أسئلة شائعة</h2>
-          </div>
-
-          <div className="space-y-3">
-            {faqs.map((f, i) => (
-              <FAQ key={i} q={f.q} a={f.a} isOpen={openFaq === i} toggle={() => setOpenFaq(openFaq === i ? null : i)} />
-            ))}
+      {/* ── FAQ ── */}
+      <section className="py-20 bg-white">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="max-w-2xl mx-auto">
+            <div className="text-center mb-10">
+              <span className="section-label">الأسئلة</span>
+              <h2 className="section-title">أسئلة شائعة</h2>
+            </div>
+            <div className="space-y-3">
+              {faqs.map((f, i) => (
+                <FAQ key={i} q={f.q} a={f.a} isOpen={openFaq === i} toggle={() => setOpenFaq(openFaq === i ? null : i)} />
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────────
-          CTA
-          ───────────────────────────────────────────────────────────────────── */}
-      <section className="section-container bg-[#060709] py-24 sm:py-32">
-        <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
-
-        <div className="section-inner max-w-xl text-center flex flex-col items-center">
-          <div className="mb-10 w-full flex justify-center">
-            <img src="/images/logo.png" alt="سَلِّم" className="h-20 sm:h-24 w-auto opacity-90" />
+      {/* ── CTA ── */}
+      <section className="py-20 bg-[#f8fafc]">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="max-w-xl mx-auto text-center">
+            <img src="/images/logo.png" alt="سَلِّم" className="h-16 w-auto mx-auto mb-6 opacity-90" />
+            <h2 className="section-title mb-4">جاهز تصمّم بطاقتك؟</h2>
+            <p className="section-subtitle mx-auto mb-8">
+              صمّم بطاقة فريدة وأرسلها لمن تحب في أقل من دقيقة
+            </p>
+            <Link to="/editor" className="group btn-gold !px-8 !py-3.5">
+              <span>ابدأ الآن مجاناً</span>
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            </Link>
           </div>
-          <h2 className="section-title mb-5">جاهز تصمّم بطاقتك؟</h2>
-          <p className="section-subtitle mb-12 px-4 mx-auto">
-            صمّم بطاقة فريدة وأرسلها لمن تحب في أقل من دقيقة
-          </p>
-          <Link to="/editor" className="group btn-gold">
-            <span>ابدأ الآن مجاناً</span>
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          </Link>
         </div>
       </section>
     </div>

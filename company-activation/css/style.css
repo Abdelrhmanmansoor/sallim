@@ -1,21 +1,21 @@
-/**
+﻿/**
  * ═══════════════════════════════════════════════════════════════════════════════
  * Company Activation System - Styles
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 :root {
-    --bg-primary: #0a0a0f;
-    --bg-secondary: #12121a;
+    --bg-primary: #17012C;
+    --bg-secondary: #1A0536;
     --bg-card: rgba(255, 255, 255, 0.02);
     --border-color: rgba(255, 255, 255, 0.08);
-    --border-gold: rgba(201, 168, 76, 0.2);
+    --border-purple: rgba(106, 71, 237, 0.2);
     --text-primary: rgba(255, 255, 255, 0.95);
     --text-secondary: rgba(255, 255, 255, 0.6);
     --text-muted: rgba(255, 255, 255, 0.35);
-    --gold: #d4b96b;
-    --gold-light: #f3ead0;
-    --gold-dark: #c4a44e;
+    --purple: #6A47ED;
+    --purple-light: #C6F806;
+    --purple-dark: #5234C7;
     --danger: #ef4444;
     --success: #22c55e;
     --radius-sm: 8px;
@@ -71,8 +71,8 @@ body {
 }
 
 .card-gold {
-    border-color: var(--border-gold);
-    background: rgba(201, 168, 76, 0.03);
+    border-color: var(--border-purple);
+    background: rgba(106, 71, 237, 0.03);
 }
 
 .card-header {
@@ -125,8 +125,8 @@ body {
 }
 
 .form-input:focus {
-    border-color: var(--gold);
-    background: rgba(201, 168, 76, 0.03);
+    border-color: var(--purple);
+    background: rgba(106, 71, 237, 0.03);
 }
 
 .form-input:disabled {
@@ -169,13 +169,13 @@ body {
 }
 
 .btn-gold {
-    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-    color: #0a0a0f;
+    background: linear-gradient(135deg, var(--purple-dark), var(--purple));
+    color: #17012C;
 }
 
 .btn-gold:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(201, 168, 76, 0.25);
+    box-shadow: 0 8px 24px rgba(106, 71, 237, 0.25);
 }
 
 .btn-outline {
@@ -185,8 +185,8 @@ body {
 }
 
 .btn-outline:hover:not(:disabled) {
-    border-color: var(--gold);
-    color: var(--gold);
+    border-color: var(--purple);
+    color: var(--purple);
 }
 
 .btn-danger {
@@ -269,7 +269,7 @@ body {
 
 .tab.active {
     background: var(--bg-secondary);
-    color: var(--gold);
+    color: var(--purple);
 }
 
 .tab-content {
@@ -294,8 +294,8 @@ body {
 }
 
 .logo-upload:hover {
-    border-color: var(--gold);
-    background: rgba(201, 168, 76, 0.02);
+    border-color: var(--purple);
+    background: rgba(106, 71, 237, 0.02);
 }
 
 .logo-upload.has-logo {
@@ -356,8 +356,8 @@ body {
 .company-tier {
     font-size: 0.75rem;
     padding: 0.25rem 0.75rem;
-    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-    color: #0a0a0f;
+    background: linear-gradient(135deg, var(--purple-dark), var(--purple));
+    color: #17012C;
     border-radius: 100px;
     font-weight: 600;
 }
@@ -379,7 +379,7 @@ body {
 .stat-value {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--gold);
+    color: var(--purple);
     margin-bottom: 0.25rem;
 }
 
@@ -436,7 +436,7 @@ body {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .text-center { text-align: center; }
-.text-gold { color: var(--gold); }
+.text-gold { color: var(--purple); }
 .text-muted { color: var(--text-muted); }
 .text-danger { color: var(--danger); }
 .text-success { color: var(--success); }

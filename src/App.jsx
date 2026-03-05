@@ -1,5 +1,4 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { useState } from 'react'
 import Navbar from './components/Layout/Navbar'
 import Footer from './components/Layout/Footer'
 import WhatsAppFloat from './components/WhatsAppFloat'
@@ -18,12 +17,23 @@ import EidParticles from './components/effects/EidParticles'
 
 export default function App() {
   const location = useLocation()
+  const { pathname } = location
   const showParticles = location.pathname === '/' || location.pathname === '/dashboard'
   const isBusiness = location.pathname === '/business'
+  const hideWhatsAppFloat = [
+    '/editor',
+    '/send',
+    '/eidiya',
+    '/eidiya-luck',
+    '/card',
+    '/admin',
+    '/dashboard',
+    '/business',
+  ].includes(pathname)
   
   return (
-    <div className="flex flex-col min-h-screen w-full max-w-full bg-[#060709] text-white font-ibm overflow-x-hidden" dir="rtl">
-      {/* Golden particles background */}
+    <div className="flex flex-col min-h-screen w-full max-w-full bg-white text-[#0F172A] font-ibm overflow-x-hidden" dir="rtl">
+      {/* Accent particles background */}
       {showParticles && <EidParticles />}
       
       {/* Fixed navbar */}
@@ -50,7 +60,7 @@ export default function App() {
       {!isBusiness && <Footer />}
       
       {/* WhatsApp floating button */}
-      <WhatsAppFloat />
+      {!hideWhatsAppFloat && <WhatsAppFloat />}
     </div>
   )
 }

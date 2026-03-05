@@ -1,4 +1,4 @@
-import { useSearchParams, Link } from 'react-router-dom'
+﻿import { useSearchParams, Link } from 'react-router-dom'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { BsDownload, BsWhatsapp, BsCamera, BsMoonStars } from 'react-icons/bs'
 import html2canvas from 'html2canvas'
@@ -177,7 +177,7 @@ export default function EidiyaPage() {
     if (!resultRef.current) return
     try {
       const canvas = await html2canvas(resultRef.current, {
-        backgroundColor: '#08090d',
+        backgroundColor: '#17012C',
         scale: 2,
         useCORS: true,
       })
@@ -194,11 +194,11 @@ export default function EidiyaPage() {
   const triesText = triesLeft === 1 ? t.tries.replace('{n}', triesLeft) : t.triesPlural.replace('{n}', triesLeft)
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden" dir="rtl">
+    <div className="page-shell flex flex-col items-center justify-center px-4 pb-8 relative overflow-hidden" dir="rtl">
       {/* Background effects */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-amber-500/8 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-1/4 right-0 w-[300px] h-[300px] bg-gold-500/5 rounded-full blur-[100px]"></div>
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-[#6A47ED]/8 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-1/4 right-0 w-[300px] h-[300px] bg-purple-500/5 rounded-full blur-[100px]"></div>
       </div>
 
       {/* Confetti */}
@@ -228,22 +228,22 @@ export default function EidiyaPage() {
         {/* Decorative top */}
         <div className="text-center mb-6">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-10 h-px bg-gold-500/30"></div>
-            <span className="text-gold-400/60 text-lg">•</span>
-            <div className="w-10 h-px bg-gold-500/30"></div>
+            <div className="w-10 h-px bg-purple-500/30"></div>
+            <span className="text-purple-400/60 text-lg">•</span>
+            <div className="w-10 h-px bg-purple-500/30"></div>
           </div>
           <h1 className="text-3xl md:text-4xl font-black gradient-gold-text mb-2">{t.title}</h1>
           <p className="text-gray-400 text-base">
-            {t.subtitle} <span className="text-gold-400 font-bold">{senderName}</span>
+            {t.subtitle} <span className="text-purple-400 font-bold">{senderName}</span>
           </p>
         </div>
 
         {/* Spinner Box */}
-        <div className="glass rounded-3xl p-8 border border-gold-500/10 mb-6">
+        <div className="glass rounded-3xl p-8 border border-white/5 hover:border-[#6A47ED]/10 transition-all mb-6">
           {/* Number Display */}
           <div className={`relative rounded-2xl p-8 mb-6 text-center overflow-hidden transition-all duration-500 ${
             phase === 'spinning'
-              ? 'bg-gradient-to-b from-amber-500/10 to-transparent border-2 border-amber-500/30 shadow-lg shadow-amber-500/10'
+              ? 'bg-gradient-to-b from-[#C6F806]/10 to-transparent border-2 border-[#C6F806]/30 shadow-lg shadow-[#C6F806]/10'
               : phase === 'result'
               ? 'bg-gradient-to-b from-green-500/10 to-transparent border-2 border-green-500/30 shadow-lg shadow-green-500/10'
               : 'bg-white/5 border-2 border-white/10'
@@ -263,7 +263,7 @@ export default function EidiyaPage() {
                     }}
                   >
                     {[...Array(10)].map((_, j) => (
-                      <div key={j} className="text-4xl font-black text-gold-400/20 text-center py-2">
+                      <div key={j} className="text-4xl font-black text-purple-400/20 text-center py-2">
                         {Math.floor(Math.random() * 10)}
                       </div>
                     ))}
@@ -279,7 +279,7 @@ export default function EidiyaPage() {
             )}
             {phase === 'spinning' && (
               <div className="relative z-20">
-                <div className="text-6xl md:text-7xl font-black text-amber-400 tabular-nums animate-pulse">
+                <div className="text-6xl md:text-7xl font-black text-[#C6F806] tabular-nums animate-pulse">
                   {displayNum}
                 </div>
               </div>
@@ -290,7 +290,7 @@ export default function EidiyaPage() {
                 <div className="text-6xl md:text-7xl font-black gradient-gold-text tabular-nums">
                   {finalAmount}
                 </div>
-                <p className="text-gold-400 text-lg font-bold mt-2">{currency}</p>
+                <p className="text-purple-400 text-lg font-bold mt-2">{currency}</p>
               </div>
             )}
           </div>
@@ -300,7 +300,7 @@ export default function EidiyaPage() {
             <div className="space-y-3">
               <button
                 onClick={handleSpin}
-                className="w-full py-5 rounded-2xl bg-gradient-to-l from-amber-600 to-yellow-500 text-gray-900 font-black text-xl transition-all hover:shadow-xl hover:shadow-amber-500/30 hover:scale-[1.02] active:scale-95"
+                className="w-full py-5 rounded-2xl bg-gradient-to-l from-[#6A47ED] to-[#8B6FF5] text-white font-black text-xl transition-all hover:shadow-xl hover:shadow-[#6A47ED]/30 hover:scale-[1.02] active:scale-95"
               >
                 {t.spin}
               </button>
@@ -310,7 +310,7 @@ export default function EidiyaPage() {
 
           {phase === 'spinning' && (
             <div className="text-center">
-              <p className="text-amber-400 text-lg font-bold animate-pulse">{t.spinning}</p>
+              <p className="text-[#C6F806] text-lg font-bold animate-pulse">{t.spinning}</p>
             </div>
           )}
 
@@ -319,8 +319,8 @@ export default function EidiyaPage() {
               <p className="text-center text-green-400 font-bold text-lg">{t.congrats}</p>
 
               {/* Screenshot instruction */}
-              <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 text-center">
-                <p className="text-amber-300 text-sm font-bold mb-1">{t.screenshot}</p>
+              <div className="bg-[#C6F806]/10 border border-[#C6F806]/20 rounded-2xl p-4 text-center">
+                <p className="text-[#C6F806] text-sm font-bold mb-1">{t.screenshot}</p>
                 <p className="text-gray-500 text-xs">صوّر لقطة شاشة وأرسلها لـ {senderName} عشان يعطيك عيديتك</p>
               </div>
 
@@ -357,7 +357,7 @@ export default function EidiyaPage() {
           {phase === 'ready' && triesLeft <= 0 && (
             <div className="text-center space-y-3 animate-fadeInUp">
               <p className="text-gray-400 text-lg">{t.noTries}</p>
-              <p className="text-gold-400 font-bold">عيديتك كانت: {finalAmount} {currency}</p>
+              <p className="text-purple-400 font-bold">عيديتك كانت: {finalAmount} {currency}</p>
             </div>
           )}
         </div>
@@ -366,13 +366,13 @@ export default function EidiyaPage() {
         <div className="text-center space-y-2">
           <p className="text-gray-600 text-xs">{t.footer}</p>
           <div className="flex items-center justify-center gap-2">
-            <div className="w-6 h-px bg-gold-500/20"></div>
-            <span className="text-gold-400/30 text-xs">•</span>
-            <div className="w-6 h-px bg-gold-500/20"></div>
+            <div className="w-6 h-px bg-purple-500/20"></div>
+            <span className="text-purple-400/30 text-xs">•</span>
+            <div className="w-6 h-px bg-purple-500/20"></div>
           </div>
-          <Link to="/send" className="inline-flex items-center gap-2 text-gray-500 hover:text-gold-400 text-xs transition-colors">
-            <BsMoonStars className="text-gold-400/50" />
-            أنشئ عيديتك عبر <span className="text-gold-400/70 font-bold">سَلِّم</span>
+          <Link to="/send" className="inline-flex items-center gap-2 text-gray-500 hover:text-purple-400 text-xs transition-colors">
+            <BsMoonStars className="text-purple-400/50" />
+            أنشئ عيديتك عبر <span className="text-purple-400/70 font-bold">سَلِّم</span>
           </Link>
         </div>
       </div>

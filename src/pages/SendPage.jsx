@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+﻿import { useState, useRef } from 'react'
 import { useEditorStore } from '../store'
 import { generateWhatsAppLink, parseCSV } from '../utils/export'
 import { templates } from '../data/templates'
@@ -148,38 +148,35 @@ export default function SendPage() {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-10 px-4 w-full">
-      <Toaster position="top-center" toastOptions={{ style: { background: '#0c0d12', color: '#f0f0f0', border: '1px solid rgba(184,150,58,0.2)' } }} />
+    <div className="page-shell pb-10 px-4">
+      <Toaster position="top-center" toastOptions={{ style: { background: '#17012C', color: '#f0f0f0', border: '1px solid rgba(106,71,237,0.3)' } }} />
 
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header — Premium */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-gold-500/10 border border-gold-500/20 rounded-full px-5 py-2 mb-5">
-            <BsSend className="text-gold-400 text-xs" />
-            <span className="text-gold-300 text-xs font-medium">طرق إرسال متعددة</span>
+          <div className="inline-flex items-center gap-2 bg-[#6A47ED]/10 border border-[#6A47ED]/20 rounded-full px-5 py-2 mb-5">
+            <BsSend className="text-[#8B6CF6] text-xs" />
+            <span className="text-[#A78BFA] text-xs font-medium">طرق إرسال متعددة</span>
           </div>
           <h1 className="text-3xl md:text-5xl font-black mb-4">
             <span className="gradient-gold-text">أرسل بطاقتك</span>
-            <span className="text-white"> بأناقة</span>
+            <span className="text-[#0F172A]"> بأناقة</span>
           </h1>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">أرسل بطاقات العيد لأحبابك عبر واتساب، تليجرام، بريد إلكتروني، أو حمّلها بجودة عالية</p>
           
           {/* Quick visual steps */}
-          <div className="flex items-center justify-center gap-2 mt-6">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-6 max-w-md mx-auto">
             {['صمّم', 'اختر الطريقة', 'أرسل'].map((s, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-6 h-6 rounded-full gradient-gold text-gray-900 text-xs font-bold flex items-center justify-center">{i+1}</div>
-                  <span className="text-gray-400 text-xs">{s}</span>
-                </div>
-                {i < 2 && <div className="w-8 h-px bg-gold-500/30"></div>}
+              <div key={i} className="rounded-xl bg-white/[0.02] border border-white/5 py-2.5 px-2 text-center">
+                <div className="w-6 h-6 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center mx-auto mb-1.5">{i + 1}</div>
+                <span className="text-gray-300 text-xs font-medium">{s}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Mode Selector — Premium Tabs */}
-        <div className="flex flex-wrap justify-center gap-2 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 mb-10">
           {[
             { id: 'eidiya', icon: <BsGift />, label: 'عيدية بحظك', desc: 'عداد عشوائي' },
             { id: 'link', icon: <BsLink45Deg />, label: 'بطاقة رابط', desc: 'رابط مخصص' },
@@ -191,25 +188,25 @@ export default function SendPage() {
             <button
               key={mode.id}
               onClick={() => setSendMode(mode.id)}
-              className={`flex flex-col items-center gap-1 px-5 py-4 rounded-2xl text-sm font-medium transition-all min-w-[100px] border ${
+              className={`flex flex-col items-center justify-center gap-1.5 px-4 py-4 rounded-2xl text-sm font-medium transition-all min-h-[106px] border ${
                 sendMode === mode.id
-                  ? 'gradient-gold text-gray-900 shadow-lg shadow-gold-500/20 border-gold-500/30 scale-105'
-                  : 'glass text-gray-300 hover:text-white border-white/5 hover:border-gold-500/20'
+                  ? 'bg-[#6A47ED] text-white shadow-lg shadow-[#6A47ED]/20 border-[#6A47ED]/30'
+                  : 'glass text-gray-300 hover:text-white border-white/5 hover:border-[#6A47ED]/20'
               }`}
             >
               <span className="text-lg">{mode.icon}</span>
               <span className="font-bold text-xs">{mode.label}</span>
-              <span className={`text-[10px] ${sendMode === mode.id ? 'text-gray-700' : 'text-gray-500'}`}>{mode.desc}</span>
+              <span className={`text-[11px] ${sendMode === mode.id ? 'text-white/80' : 'text-gray-500'}`}>{mode.desc}</span>
             </button>
           ))}
         </div>
 
         {/* ═══ Eidiya Luck Spinner ═══ */}
         {sendMode === 'eidiya' && (
-          <div className="glass rounded-3xl p-8 md:p-10 max-w-lg mx-auto border border-white/5 hover:border-gold-500/10 transition-all">
+          <div className="glass rounded-3xl p-8 md:p-10 max-w-lg mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/30 to-gold-500/20 flex items-center justify-center border border-gold-500/20">
-                <BsGift className="text-gold-400 text-2xl" />
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#6A47ED]/30 to-[#5234c7]/20 flex items-center justify-center border border-[#6A47ED]/20">
+                <BsGift className="text-[#8B6CF6] text-2xl" />
               </div>
               <div>
                 <h3 className="text-xl font-black text-white">عيديتك بحظك!</h3>
@@ -221,14 +218,14 @@ export default function SendPage() {
               {/* Sender Name */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-6 h-6 rounded-full gradient-gold text-gray-900 text-[10px] font-bold flex items-center justify-center">1</div>
-                  <label className="text-sm text-gold-400 font-bold">اسمك (المُعَيِّد)</label>
+                  <div className="w-6 h-6 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">1</div>
+                  <label className="text-sm text-[#8B6CF6] font-bold">اسمك (المُعَيِّد)</label>
                 </div>
                 <input
                   type="text"
                   value={eidiyaSenderName}
                   onChange={(e) => { setEidiyaSenderName(e.target.value); setEidiyaLink('') }}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-base text-center focus:border-gold-500/50 focus:outline-none focus:ring-1 focus:ring-gold-500/20 transition-all"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-base text-center focus:border-[#6A47ED]/50 focus:outline-none focus:ring-1 focus:ring-[#6A47ED]/20 transition-all"
                   dir="rtl"
                   placeholder="أبو عبدالله"
                 />
@@ -237,14 +234,14 @@ export default function SendPage() {
               {/* Dialect & Currency */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-6 h-6 rounded-full gradient-gold text-gray-900 text-[10px] font-bold flex items-center justify-center">2</div>
-                  <label className="text-sm text-gold-400 font-bold">اللهجة والعملة</label>
+                  <div className="w-6 h-6 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">2</div>
+                  <label className="text-sm text-[#8B6CF6] font-bold">اللهجة والعملة</label>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <select
                     value={eidiyaDialect}
                     onChange={(e) => setEidiyaDialect(e.target.value)}
-                    className="bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-gold-500/50 focus:outline-none appearance-none text-center"
+                    className="bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-[#6A47ED]/50 focus:outline-none appearance-none text-center"
                   >
                     <option value="sa" className="bg-gray-900">سعودي</option>
                     <option value="ae" className="bg-gray-900">إماراتي</option>
@@ -256,7 +253,7 @@ export default function SendPage() {
                   <select
                     value={eidiyaCurrency}
                     onChange={(e) => setEidiyaCurrency(e.target.value)}
-                    className="bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-gold-500/50 focus:outline-none appearance-none text-center"
+                    className="bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-[#6A47ED]/50 focus:outline-none appearance-none text-center"
                   >
                     <option value="ريال" className="bg-gray-900">ريال</option>
                     <option value="درهم" className="bg-gray-900">درهم</option>
@@ -271,8 +268,8 @@ export default function SendPage() {
               {/* Amount Range */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-6 h-6 rounded-full gradient-gold text-gray-900 text-[10px] font-bold flex items-center justify-center">3</div>
-                  <label className="text-sm text-gold-400 font-bold">مبلغ العيدية</label>
+                  <div className="w-6 h-6 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">3</div>
+                  <label className="text-sm text-[#8B6CF6] font-bold">مبلغ العيدية</label>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -281,7 +278,7 @@ export default function SendPage() {
                       type="number"
                       value={eidiyaMin}
                       onChange={(e) => { setEidiyaMin(Number(e.target.value)); setEidiyaLink('') }}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-center text-lg font-bold focus:border-gold-500/50 focus:outline-none"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-center text-lg font-bold focus:border-[#6A47ED]/50 focus:outline-none"
                       min={1}
                     />
                   </div>
@@ -291,19 +288,19 @@ export default function SendPage() {
                       type="number"
                       value={eidiyaMax}
                       onChange={(e) => { setEidiyaMax(Number(e.target.value)); setEidiyaLink('') }}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-center text-lg font-bold focus:border-gold-500/50 focus:outline-none"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-center text-lg font-bold focus:border-[#6A47ED]/50 focus:outline-none"
                       min={1}
                     />
                   </div>
                 </div>
-                <p className="text-gray-600 text-xs text-center mt-2">العداد هيوقف عشوائي بين {eidiyaMin} و {eidiyaMax} {eidiyaCurrency}</p>
+                <p className="text-gray-400 text-xs text-center mt-2">العداد هيوقف عشوائي بين {eidiyaMin} و {eidiyaMax} {eidiyaCurrency}</p>
               </div>
 
               {/* Attempts */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-6 h-6 rounded-full gradient-gold text-gray-900 text-[10px] font-bold flex items-center justify-center">4</div>
-                  <label className="text-sm text-gold-400 font-bold">عدد المحاولات</label>
+                  <div className="w-6 h-6 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">4</div>
+                  <label className="text-sm text-[#8B6CF6] font-bold">عدد المحاولات</label>
                 </div>
                 <div className="flex items-center justify-center gap-4">
                   {[1, 2, 3, 5].map((n) => (
@@ -312,34 +309,35 @@ export default function SendPage() {
                       onClick={() => { setEidiyaAttempts(n); setEidiyaLink('') }}
                       className={`w-12 h-12 rounded-xl text-sm font-bold transition-all border ${
                         eidiyaAttempts === n
-                          ? 'gradient-gold text-gray-900 border-gold-500/30 shadow-lg shadow-gold-500/20'
-                          : 'bg-white/5 text-gray-400 border-white/10 hover:border-gold-500/20'
+                          ? 'bg-[#6A47ED] text-white border-[#6A47ED]/30 shadow-lg shadow-[#6A47ED]/20'
+                          : 'bg-white/5 text-gray-400 border-white/10 hover:border-[#6A47ED]/20'
                       }`}
                     >
                       {n}
                     </button>
                   ))}
                 </div>
-                <p className="text-gray-600 text-xs text-center mt-2">المستلم يقدر يلف العداد {eidiyaAttempts === 1 ? 'مرة واحدة' : `${eidiyaAttempts} مرات`} بس</p>
+                <p className="text-gray-400 text-xs text-center mt-2">المستلم يقدر يلف العداد {eidiyaAttempts === 1 ? 'مرة واحدة' : `${eidiyaAttempts} مرات`} بس</p>
               </div>
 
               {/* Generate Button */}
               <button
                 onClick={handleGenerateEidiya}
-                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-l from-amber-600 to-yellow-500 text-gray-900 font-black text-lg transition-all hover:shadow-xl hover:shadow-amber-500/30 hover:scale-[1.02]"
+                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-l from-[#6A47ED] to-[#8B6FF5] text-white font-black text-lg transition-all hover:shadow-xl hover:shadow-[#6A47ED]/30 hover:scale-[1.02]"
               >
-                � أنشئ رابط العيدية
+                <BsDice5 className="text-xl" />
+                أنشئ رابط العيدية
               </button>
 
               {/* Generated Link */}
               {eidiyaLink && (
                 <div className="space-y-4 pt-4 border-t border-white/5 animate-fadeInUp">
-                  <div className="bg-white/5 rounded-2xl p-4 flex items-center gap-3 border border-gold-500/20">
+                  <div className="bg-white/5 rounded-2xl p-4 flex items-center gap-3 border border-[#6A47ED]/20">
                     <input
                       type="text"
                       readOnly
                       value={eidiyaLink}
-                      className="flex-1 bg-transparent text-gold-300 text-sm text-left truncate focus:outline-none"
+                      className="flex-1 bg-transparent text-[#A78BFA] text-sm text-left truncate focus:outline-none"
                       dir="ltr"
                     />
                     <button
@@ -347,7 +345,7 @@ export default function SendPage() {
                       className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
                         eidiyaLinkCopied
                           ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                          : 'gradient-gold text-gray-900 hover:scale-105'
+                          : 'bg-[#6A47ED] text-white hover:scale-105'
                       }`}
                     >
                       {eidiyaLinkCopied ? '✓ تم النسخ' : 'نسخ'}
@@ -381,7 +379,7 @@ export default function SendPage() {
                     href={eidiyaLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block text-center text-gold-400 hover:text-gold-300 text-sm transition-colors"
+                    className="block text-center text-[#8B6CF6] hover:text-[#A78BFA] text-sm transition-colors"
                   >
                     معاينة العيدية
                   </a>
@@ -393,10 +391,10 @@ export default function SendPage() {
 
         {/* ═══ Link Card (my-card.one style) ═══ */}
         {sendMode === 'link' && (
-          <div className="glass rounded-3xl p-8 md:p-10 max-w-2xl mx-auto border border-white/5 hover:border-gold-500/10 transition-all">
+          <div className="glass rounded-3xl p-8 md:p-10 max-w-2xl mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-14 h-14 rounded-2xl bg-gold-500/20 flex items-center justify-center border border-gold-500/10">
-                <BsLink45Deg className="text-gold-400 text-2xl" />
+              <div className="w-14 h-14 rounded-2xl bg-[#6A47ED]/20 flex items-center justify-center border border-[#6A47ED]/10">
+                <BsLink45Deg className="text-[#8B6CF6] text-2xl" />
               </div>
               <div>
                 <h3 className="text-xl font-black text-white">أنشئ بطاقة رابط</h3>
@@ -408,14 +406,14 @@ export default function SendPage() {
               {/* Step 1: Name */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-full gradient-gold text-gray-900 text-xs font-bold flex items-center justify-center">1</div>
-                  <label className="text-sm text-gold-400 font-bold">اسم المستلم</label>
+                  <div className="w-7 h-7 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">1</div>
+                  <label className="text-sm text-[#8B6CF6] font-bold">اسم المستلم</label>
                 </div>
                 <input
                   type="text"
                   value={linkName}
                   onChange={(e) => { setLinkName(e.target.value); setGeneratedLink('') }}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-lg text-center focus:border-gold-500/50 focus:outline-none focus:ring-1 focus:ring-gold-500/20 transition-all"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-lg text-center focus:border-[#6A47ED]/50 focus:outline-none focus:ring-1 focus:ring-[#6A47ED]/20 transition-all"
                   dir="rtl"
                   placeholder="اكتب الاسم هنا..."
                 />
@@ -424,8 +422,8 @@ export default function SendPage() {
               {/* Step 2: Pick Template */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-full gradient-gold text-gray-900 text-xs font-bold flex items-center justify-center">2</div>
-                  <label className="text-sm text-gold-400 font-bold">اختر البطاقة</label>
+                  <div className="w-7 h-7 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">2</div>
+                  <label className="text-sm text-[#8B6CF6] font-bold">اختر البطاقة</label>
                 </div>
                 <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 max-h-[280px] overflow-y-auto pr-1 custom-scrollbar">
                   {templates.map((t) => (
@@ -434,13 +432,13 @@ export default function SendPage() {
                       onClick={() => { setLinkTemplate(t.id); setGeneratedLink('') }}
                       className={`relative rounded-xl overflow-hidden border-2 transition-all aspect-[3/4] group ${
                         linkTemplate === t.id
-                          ? 'border-gold-500 shadow-lg shadow-gold-500/30 scale-105'
-                          : 'border-white/10 hover:border-gold-500/30'
+                          ? 'border-[#6A47ED] shadow-lg shadow-[#6A47ED]/30 scale-105'
+                          : 'border-white/10 hover:border-[#6A47ED]/30'
                       }`}
                     >
                       <img src={t.image} alt={t.name} className="w-full h-full object-cover" />
                       {linkTemplate === t.id && (
-                        <div className="absolute inset-0 bg-gold-500/20 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-[#6A47ED]/20 flex items-center justify-center">
                           <BsCheck2 className="text-white text-2xl drop-shadow-lg" />
                         </div>
                       )}
@@ -452,13 +450,13 @@ export default function SendPage() {
               {/* Step 3: Greeting */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-full gradient-gold text-gray-900 text-xs font-bold flex items-center justify-center">3</div>
-                  <label className="text-sm text-gold-400 font-bold">نص التهنئة</label>
+                  <div className="w-7 h-7 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">3</div>
+                  <label className="text-sm text-[#8B6CF6] font-bold">نص التهنئة</label>
                 </div>
                 <textarea
                   value={linkGreeting}
                   onChange={(e) => { setLinkGreeting(e.target.value); setGeneratedLink('') }}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-base text-center resize-none focus:border-gold-500/50 focus:outline-none focus:ring-1 focus:ring-gold-500/20 transition-all"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-base text-center resize-none focus:border-[#6A47ED]/50 focus:outline-none focus:ring-1 focus:ring-[#6A47ED]/20 transition-all"
                   rows={2}
                   dir="rtl"
                   placeholder="كل عام وأنتم بخير"
@@ -468,7 +466,7 @@ export default function SendPage() {
               {/* Generate Button */}
               <button
                 onClick={handleGenerateLink}
-                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl gradient-gold text-gray-900 font-black text-lg transition-all hover:shadow-xl hover:shadow-gold-500/20 hover:scale-[1.02]"
+                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-[#6A47ED] text-white font-black text-lg transition-all hover:shadow-xl hover:shadow-[#6A47ED]/20 hover:scale-[1.02]"
               >
                 <BsSend className="text-xl" />
                 عرض البطاقة
@@ -477,12 +475,12 @@ export default function SendPage() {
               {/* Generated Link & Share */}
               {generatedLink && (
                 <div className="space-y-4 pt-4 border-t border-white/5 animate-fadeInUp">
-                  <div className="bg-white/5 rounded-2xl p-4 flex items-center gap-3 border border-gold-500/20">
+                  <div className="bg-white/5 rounded-2xl p-4 flex items-center gap-3 border border-[#6A47ED]/20">
                     <input
                       type="text"
                       readOnly
                       value={generatedLink}
-                      className="flex-1 bg-transparent text-gold-300 text-sm text-left truncate focus:outline-none"
+                      className="flex-1 bg-transparent text-[#A78BFA] text-sm text-left truncate focus:outline-none"
                       dir="ltr"
                     />
                     <button
@@ -490,7 +488,7 @@ export default function SendPage() {
                       className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
                         linkCopied
                           ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                          : 'gradient-gold text-gray-900 hover:scale-105'
+                          : 'bg-[#6A47ED] text-white hover:scale-105'
                       }`}
                     >
                       {linkCopied ? '✓ تم النسخ' : 'نسخ الرابط'}
@@ -538,7 +536,7 @@ export default function SendPage() {
                     href={generatedLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block text-center text-gold-400 hover:text-gold-300 text-sm transition-colors"
+                    className="block text-center text-[#8B6CF6] hover:text-[#A78BFA] text-sm transition-colors"
                   >
                     معاينة البطاقة
                   </a>
@@ -548,14 +546,14 @@ export default function SendPage() {
 
             {/* Counter */}
             <div className="mt-8 pt-5 border-t border-white/5 text-center">
-              <p className="text-gray-600 text-xs">عدد البطاقات المُنشأة: <span className="text-gold-400 font-bold">٥,٤٥٠+</span></p>
+              <p className="text-gray-400 text-xs">عدد البطاقات المُنشأة: <span className="text-[#8B6CF6] font-bold">٥,٤٥٠+</span></p>
             </div>
           </div>
         )}
 
         {/* ═══ Single Send ═══ */}
         {sendMode === 'single' && (
-          <div className="glass rounded-3xl p-8 md:p-10 max-w-lg mx-auto border border-white/5 hover:border-gold-500/10 transition-all">
+          <div className="glass rounded-3xl p-8 md:p-10 max-w-lg mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
             <div className="flex items-center gap-4 mb-8">
               <div className="w-14 h-14 rounded-2xl bg-green-500/20 flex items-center justify-center border border-green-500/10">
                 <BsWhatsapp className="text-green-400 text-2xl" />
@@ -568,38 +566,38 @@ export default function SendPage() {
 
             <div className="space-y-5">
               <div>
-                <label className="text-sm text-gold-400 font-medium block mb-2">رقم الهاتف (مع رمز الدولة)</label>
+                <label className="text-sm text-[#8B6CF6] font-medium block mb-2">رقم الهاتف (مع رمز الدولة)</label>
                 <div className="relative">
                   <input
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-base focus:border-gold-500/50 focus:outline-none focus:ring-1 focus:ring-gold-500/20 transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-base focus:border-[#6A47ED]/50 focus:outline-none focus:ring-1 focus:ring-[#6A47ED]/20 transition-all"
                     dir="ltr"
                     placeholder="966501234567"
                   />
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 text-xs">+</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">+</span>
                 </div>
               </div>
               
               <div>
-                <label className="text-sm text-gold-400 font-medium block mb-2">اسم المستلم (اختياري)</label>
+                <label className="text-sm text-[#8B6CF6] font-medium block mb-2">اسم المستلم (اختياري)</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-base focus:border-gold-500/50 focus:outline-none focus:ring-1 focus:ring-gold-500/20 transition-all"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-base focus:border-[#6A47ED]/50 focus:outline-none focus:ring-1 focus:ring-[#6A47ED]/20 transition-all"
                   dir="rtl"
                   placeholder="أحمد"
                 />
               </div>
 
               <div>
-                <label className="text-sm text-gold-400 font-medium block mb-2">نص الرسالة</label>
+                <label className="text-sm text-[#8B6CF6] font-medium block mb-2">نص الرسالة</label>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm resize-none focus:border-gold-500/50 focus:outline-none focus:ring-1 focus:ring-gold-500/20 transition-all"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm resize-none focus:border-[#6A47ED]/50 focus:outline-none focus:ring-1 focus:ring-[#6A47ED]/20 transition-all"
                   rows={4}
                   dir="rtl"
                 />
@@ -613,20 +611,20 @@ export default function SendPage() {
                 إرسال عبر واتساب
               </button>
               
-              <p className="text-center text-gray-600 text-xs">سيتم فتح واتساب برسالة جاهزة للإرسال</p>
+              <p className="text-center text-gray-400 text-xs">سيتم فتح واتساب برسالة جاهزة للإرسال</p>
             </div>
           </div>
         )}
 
         {/* ═══ Bulk Send ═══ */}
         {sendMode === 'bulk' && (
-          <div className="glass rounded-2xl p-8 max-w-lg mx-auto">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-gold-500/20 flex items-center justify-center">
-                <BsPeople className="text-gold-400 text-xl" />
+          <div className="glass rounded-3xl p-8 md:p-10 max-w-lg mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-14 h-14 rounded-2xl bg-[#6A47ED]/20 flex items-center justify-center border border-[#6A47ED]/10">
+                <BsPeople className="text-[#8B6CF6] text-2xl" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">إرسال جماعي</h3>
+                <h3 className="text-xl font-black text-white">إرسال جماعي</h3>
                 <p className="text-gray-400 text-sm">ارفع ملف CSV بالأسماء والأرقام</p>
               </div>
             </div>
@@ -634,7 +632,7 @@ export default function SendPage() {
             <div className="space-y-4">
               {/* CSV Upload */}
               <div
-                className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center hover:border-gold-500/30 transition-colors cursor-pointer"
+                className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center hover:border-[#6A47ED]/30 transition-colors cursor-pointer"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <input
@@ -646,7 +644,7 @@ export default function SendPage() {
                 />
                 <BsUpload className="text-3xl text-gray-500 mx-auto mb-3" />
                 <p className="text-gray-400 text-sm">اضغط لرفع ملف CSV</p>
-                <p className="text-gray-600 text-xs mt-1">التنسيق: الاسم، الرقم (سطر لكل شخص)</p>
+                <p className="text-gray-400 text-xs mt-1">التنسيق: الاسم، الرقم (سطر لكل شخص)</p>
               </div>
 
               {csvFileName && (
@@ -661,12 +659,12 @@ export default function SendPage() {
 
               <div>
                 <label className="text-sm text-gray-400 block mb-1">
-                  نص الرسالة <span className="text-gold-400">(استخدم {'{name}'} لاسم المستلم)</span>
+                  نص الرسالة <span className="text-[#8B6CF6]">(استخدم {'{name}'} لاسم المستلم)</span>
                 </label>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm resize-none focus:border-gold-500/50 focus:outline-none"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm resize-none focus:border-[#6A47ED]/50 focus:outline-none"
                   rows={4}
                   dir="rtl"
                   placeholder="عيد مبارك يا {name}، كل عام وأنت بخير"
@@ -676,7 +674,7 @@ export default function SendPage() {
               <div>
                 <label className="text-sm text-gray-400 flex items-center gap-2 mb-1">
                   <BsClock />
-                  الفاصل الزمني بين الرسائل: <span className="text-gold-400">{interval} ثوانٍ</span>
+                  الفاصل الزمني بين الرسائل: <span className="text-[#8B6CF6]">{interval} ثوانٍ</span>
                 </label>
                 <input
                   type="range"
@@ -684,7 +682,7 @@ export default function SendPage() {
                   max={10}
                   value={interval}
                   onChange={(e) => setInterval(Number(e.target.value))}
-                  className="w-full accent-gold-500"
+                  className="w-full accent-[#6A47ED]"
                 />
                 <div className="flex justify-between text-xs text-gray-500 mt-1">
                   <span>3 ثوانٍ</span>
@@ -693,14 +691,14 @@ export default function SendPage() {
               </div>
 
               {isSending && (
-                <div className="bg-gold-500/10 border border-gold-500/20 rounded-xl p-4">
+                <div className="bg-[#6A47ED]/10 border border-[#6A47ED]/20 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-gold-300 text-sm">جاري الإرسال...</span>
-                    <span className="text-gold-400 text-sm font-bold">{sentCount}/{csvData.length}</span>
+                    <span className="text-[#A78BFA] text-sm">جاري الإرسال...</span>
+                    <span className="text-[#8B6CF6] text-sm font-bold">{sentCount}/{csvData.length}</span>
                   </div>
                   <div className="w-full bg-white/10 rounded-full h-2">
                     <div
-                      className="gradient-gold h-2 rounded-full transition-all duration-500"
+                      className="bg-[#6A47ED] h-2 rounded-full transition-all duration-500"
                       style={{ width: `${(sentCount / csvData.length) * 100}%` }}
                     />
                   </div>
@@ -710,7 +708,7 @@ export default function SendPage() {
               <button
                 onClick={handleBulkSend}
                 disabled={isSending || csvData.length === 0}
-                className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl gradient-gold text-gray-900 font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[#6A47ED] text-white font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <BsSend />
                 {isSending ? 'جاري الإرسال...' : `إرسال لـ ${csvData.length} شخص`}
@@ -721,13 +719,13 @@ export default function SendPage() {
 
         {/* ═══ Quick Share ═══ */}
         {sendMode === 'share' && (
-          <div className="glass rounded-2xl p-8 max-w-lg mx-auto">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                <HiShare className="text-blue-400 text-xl" />
+          <div className="glass rounded-3xl p-8 md:p-10 max-w-lg mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-14 h-14 rounded-2xl bg-[#6A47ED]/20 flex items-center justify-center border border-[#6A47ED]/10">
+                <HiShare className="text-[#8B6CF6] text-2xl" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">مشاركة سريعة</h3>
+                <h3 className="text-xl font-black text-white">مشاركة سريعة</h3>
                 <p className="text-gray-400 text-sm">شارك تهنئتك عبر أي منصة بضغطة واحدة</p>
               </div>
             </div>
@@ -751,7 +749,7 @@ export default function SendPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-white text-sm font-bold">{copied ? 'تم النسخ!' : 'نسخ رابط المحرر'}</p>
-                  <p className="text-gray-500 text-xs">شارك رابط المنصة مع أصدقائك</p>
+                  <p className="text-gray-400 text-xs">شارك رابط المنصة مع أصدقائك</p>
                 </div>
               </button>
 
@@ -768,7 +766,7 @@ export default function SendPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-white text-sm font-bold">واتساب</p>
-                  <p className="text-gray-500 text-xs">شارك التهنئة في واتساب</p>
+                  <p className="text-gray-400 text-xs">شارك التهنئة في واتساب</p>
                 </div>
               </button>
 
@@ -786,7 +784,7 @@ export default function SendPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-white text-sm font-bold">تليجرام</p>
-                  <p className="text-gray-500 text-xs">شارك التهنئة في تليجرام</p>
+                  <p className="text-gray-400 text-xs">شارك التهنئة في تليجرام</p>
                 </div>
               </button>
 
@@ -804,7 +802,7 @@ export default function SendPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-white text-sm font-bold">تويتر / X</p>
-                  <p className="text-gray-500 text-xs">غرّد بتهنئتك</p>
+                  <p className="text-gray-400 text-xs">غرّد بتهنئتك</p>
                 </div>
               </button>
 
@@ -822,7 +820,7 @@ export default function SendPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-white text-sm font-bold">بريد إلكتروني</p>
-                  <p className="text-gray-500 text-xs">أرسل بالبريد الإلكتروني</p>
+                  <p className="text-gray-400 text-xs">أرسل بالبريد الإلكتروني</p>
                 </div>
               </button>
             </div>
@@ -833,7 +831,7 @@ export default function SendPage() {
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm resize-none focus:border-gold-500/50 focus:outline-none"
+                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm resize-none focus:border-[#6A47ED]/50 focus:outline-none"
                 rows={3}
                 dir="rtl"
               />
@@ -843,13 +841,13 @@ export default function SendPage() {
 
         {/* ═══ ZIP Download ═══ */}
         {sendMode === 'zip' && (
-          <div className="glass rounded-2xl p-8 max-w-lg mx-auto">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                <BsFileZip className="text-purple-400 text-xl" />
+          <div className="glass rounded-3xl p-8 md:p-10 max-w-lg mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-14 h-14 rounded-2xl bg-[#6A47ED]/20 flex items-center justify-center border border-[#6A47ED]/10">
+                <BsFileZip className="text-[#8B6CF6] text-2xl" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">تحميل ZIP</h3>
+                <h3 className="text-xl font-black text-white">تحميل ZIP</h3>
                 <p className="text-gray-400 text-sm">حمّل جميع البطاقات المخصصة في ملف واحد</p>
               </div>
             </div>
@@ -901,7 +899,7 @@ export default function SendPage() {
           <p className="text-gray-500 text-sm mb-3">لم تصمم بطاقتك بعد؟</p>
           <Link
             to="/editor"
-            className="inline-flex items-center gap-2 text-gold-400 hover:text-gold-300 transition-colors"
+            className="inline-flex items-center gap-2 text-[#8B6CF6] hover:text-[#A78BFA] transition-colors"
           >
             <BsSend />
             اذهب لمحرر البطاقات

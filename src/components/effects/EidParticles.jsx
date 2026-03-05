@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+﻿import { useEffect, useRef } from 'react'
 
 export default function EidParticles() {
   const canvasRef = useRef(null)
@@ -18,7 +18,7 @@ export default function EidParticles() {
     resize()
     window.addEventListener('resize', resize)
     
-    const colors = ['#b8963a', '#e5c56e', '#c9a84c', '#f5d78e']
+    const colors = ['#6A47ED', '#8B6CF7', '#C6F806', '#A78BFA']
     
     class Particle {
       constructor() {

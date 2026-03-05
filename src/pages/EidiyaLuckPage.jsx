@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+﻿import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { Share2, ArrowLeft, RotateCcw, Gift } from 'lucide-react'
 
@@ -42,7 +42,7 @@ function Confetti({ active }) {
       delay: Math.random() * 0.8,
       dur: 1.5 + Math.random() * 1.5,
       size: 4 + Math.random() * 8,
-      color: ['#C9A84C', '#d4b96b', '#f3ead0', '#fff', '#e0c97d'][Math.floor(Math.random() * 5)],
+      color: ['#6A47ED', '#6A47ED', '#f3ead0', '#fff', '#e0c97d'][Math.floor(Math.random() * 5)],
     }))
     setParticles(ps)
   }, [active])
@@ -123,26 +123,26 @@ export default function EidiyaLuckPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#060709] overflow-x-hidden">
-      <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 w-full overflow-hidden py-32">
+    <div className="page-shell overflow-x-hidden">
+      <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 w-full overflow-hidden py-36">
         {/* Background glow */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-[35%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(500px,90vw)] h-[300px] bg-[#C9A84C]/[0.04] rounded-full blur-[150px]" />
+          <div className="absolute top-[35%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(500px,90vw)] h-[300px] bg-[#DBEAFE]/70 rounded-full blur-[150px]" />
         </div>
 
         <div className="relative z-10 text-center max-w-md mx-auto w-full">
           {/* Header */}
           <div className="mb-5">
-            <span className="inline-flex items-center gap-2 bg-[#C9A84C]/[0.08] border border-[#C9A84C]/15 rounded-full px-5 py-2 text-[#C9A84C] text-sm font-medium">
+            <span className="inline-flex items-center gap-2 bg-[#6A47ED]/[0.08] border border-[#6A47ED]/15 rounded-full px-5 py-2 text-[#6A47ED] text-sm font-medium">
               <Gift className="w-4 h-4" />
               عيديتك بحظّك!
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-black text-white/90 mb-4 leading-[1.5]">
-            <span className="text-[#C9A84C]">{senderName}</span> يعيّدك
+          <h1 className="text-3xl sm:text-4xl font-black text-[#0F172A] mb-4 leading-[1.5]">
+            <span className="text-[#1D4ED8]">{senderName}</span> يعيّدك
           </h1>
-          <p className="text-white/35 text-sm mb-12 leading-[1.9]">
+          <p className="text-[#64748B] text-sm mb-12 leading-[1.9]">
             لفّ العداد وشوف كم عيديتك! 🎰
           </p>
 
@@ -150,14 +150,14 @@ export default function EidiyaLuckPage() {
           <div className="relative rounded-3xl overflow-hidden transition-all duration-700"
             style={{
               background: phase === 'done' && reaction
-                ? `radial-gradient(ellipse at center, ${finalAmount >= 300 ? 'rgba(201,168,76,0.12)' : 'rgba(201,168,76,0.05)'} 0%, rgba(10,10,10,0.95) 70%)`
-                : 'rgba(255,255,255,0.02)',
+                ? `radial-gradient(ellipse at center, ${finalAmount >= 300 ? 'rgba(106,71,237,0.12)' : 'rgba(106,71,237,0.05)'} 0%, rgba(10,10,10,0.95) 70%)`
+                : 'linear-gradient(165deg, rgba(15,23,42,0.95) 0%, rgba(30,41,59,0.95) 100%)',
               border: phase === 'done' && finalAmount >= 300
-                ? '1.5px solid rgba(201,168,76,0.35)'
-                : '1.5px solid rgba(255,255,255,0.06)',
+                ? '1.5px solid rgba(106,71,237,0.35)'
+                : '1.5px solid rgba(147,197,253,0.35)',
               boxShadow: phase === 'done' && finalAmount >= 300
-                ? '0 0 80px rgba(201,168,76,0.15), 0 0 160px rgba(201,168,76,0.05)'
-                : 'none',
+                ? '0 0 80px rgba(106,71,237,0.15), 0 0 160px rgba(106,71,237,0.05)'
+                : '0 16px 55px rgba(15,23,42,0.25)',
             }}
           >
             <Confetti active={phase === 'done' && finalAmount >= 500} />
@@ -166,19 +166,19 @@ export default function EidiyaLuckPage() {
               {/* Number display */}
               <div className="mb-10">
                 <div className={`relative inline-block rounded-2xl px-8 sm:px-10 py-6 transition-all duration-500 max-w-full ${
-                  phase === 'spinning' ? 'bg-[#C9A84C]/[0.08] animate-pulse' : phase === 'done' ? 'bg-[#C9A84C]/[0.10]' : 'bg-white/[0.03]'
+                  phase === 'spinning' ? 'bg-[#6A47ED]/[0.08] animate-pulse' : phase === 'done' ? 'bg-[#6A47ED]/[0.10]' : 'bg-white/[0.03]'
                 }`}
                   style={{
-                    border: phase === 'done' ? '1px solid rgba(201,168,76,0.25)' : '1px solid rgba(255,255,255,0.05)',
+                    border: phase === 'done' ? '1px solid rgba(106,71,237,0.25)' : '1px solid rgba(255,255,255,0.05)',
                   }}
                 >
                   <div className={`text-6xl sm:text-7xl md:text-8xl font-black tabular-nums leading-none transition-all duration-150 break-words ${
-                    phase === 'spinning' ? 'text-[#C9A84C] luck-spin-blur' : phase === 'done' ? 'text-[#C9A84C]' : 'text-white/15'
+                    phase === 'spinning' ? 'text-[#6A47ED] luck-spin-blur' : phase === 'done' ? 'text-[#6A47ED]' : 'text-white/15'
                   }`}>
                     {phase === 'ready' ? '؟؟؟' : toAr(displayNum)}
                   </div>
                   {phase !== 'ready' && (
-                    <span className={`block mt-3 font-bold text-lg transition-colors ${phase === 'done' ? 'text-[#C9A84C]/80' : 'text-[#C9A84C]/40'}`}>
+                    <span className={`block mt-3 font-bold text-lg transition-colors ${phase === 'done' ? 'text-[#6A47ED]/80' : 'text-[#6A47ED]/40'}`}>
                       ريال
                     </span>
                   )}
@@ -205,7 +205,7 @@ export default function EidiyaLuckPage() {
               )}
 
               {phase === 'spinning' && (
-                <div className="flex items-center justify-center gap-3 text-[#C9A84C]/60 font-bold text-lg py-4">
+                <div className="flex items-center justify-center gap-3 text-[#6A47ED]/60 font-bold text-lg py-4">
                   <span className="inline-block animate-spin-slow">🎰</span>
                   جاري اللف...
                 </div>

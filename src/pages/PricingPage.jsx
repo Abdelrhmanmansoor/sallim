@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { pricingPlans } from '../data/templates'
 import { Link } from 'react-router-dom'
 import { BsCheck2, BsX, BsMoonStars, BsInfoCircle } from 'react-icons/bs'
@@ -18,15 +18,15 @@ export default function PricingPage() {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-10 px-4 w-full">
-      <Toaster position="top-center" toastOptions={{ style: { background: '#0c0d12', color: '#f0f0f0', border: '1px solid rgba(184,150,58,0.2)' } }} />
+    <div className="page-shell pb-10 px-4">
+      <Toaster position="top-center" toastOptions={{ style: { background: '#17012C', color: '#f0f0f0', border: '1px solid rgba(106,71,237,0.3)' } }} />
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-gold-500/10 border border-gold-500/20 rounded-full px-5 py-2 mb-6">
-            <BsMoonStars className="text-gold-400" />
-            <span className="text-gold-300 text-sm">أسعار مناسبة للجميع</span>
+          <div className="inline-flex items-center gap-2 bg-[#6A47ED]/10 border border-[#6A47ED]/20 rounded-full px-5 py-2 mb-6">
+            <BsMoonStars className="text-[#8B6CF6]" />
+            <span className="text-[#A78BFA] text-sm">أسعار مناسبة للجميع</span>
           </div>
           <h1 className="text-3xl md:text-5xl font-black mb-4">
             <span className="gradient-gold-text">خطط الاشتراك</span>
@@ -42,13 +42,13 @@ export default function PricingPage() {
             <div
               key={plan.id}
               className={`relative glass rounded-2xl p-8 transition-all hover:scale-105 duration-300 animate-fade-in-up ${
-                plan.popular ? 'ring-2 ring-gold-400 shadow-2xl shadow-gold-500/20' : ''
+                plan.popular ? 'ring-2 ring-[#8B6CF6] shadow-2xl shadow-[#6A47ED]/20' : ''
               }`}
               style={{ animationDelay: `${i * 0.1}s` }}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="gradient-gold text-gray-900 text-xs font-bold px-4 py-1.5 rounded-full">
+                  <span className="bg-[#6A47ED] text-white text-xs font-bold px-4 py-1.5 rounded-full">
                     الأكثر طلباً
                   </span>
                 </div>
@@ -93,7 +93,7 @@ export default function PricingPage() {
                 onClick={() => handleSubscribe(plan)}
                 className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${
                   plan.popular
-                    ? 'gradient-gold text-gray-900 hover:shadow-lg hover:shadow-gold-500/30'
+                    ? 'bg-[#6A47ED] text-white hover:shadow-lg hover:shadow-[#6A47ED]/30'
                     : 'bg-white/5 text-white hover:bg-white/10 border border-white/10'
                 }`}
               >
@@ -108,15 +108,15 @@ export default function PricingPage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
             <div className="glass rounded-2xl p-8 max-w-md w-full animate-fade-in-up">
               <div className="text-center mb-6">
-                <BsMoonStars className="text-4xl text-gold-400 mx-auto mb-3" />
+                <BsMoonStars className="text-4xl text-[#8B6CF6] mx-auto mb-3" />
                 <h3 className="text-xl font-bold text-white">اشتراك {selectedPlan.name}</h3>
                 <p className="text-gray-400 text-sm mt-1">
                   {selectedPlan.price} ريال / {selectedPlan.period}
                 </p>
               </div>
 
-              <div className="bg-gold-500/10 border border-gold-500/20 rounded-xl p-4 mb-6">
-                <h4 className="text-gold-400 font-bold text-sm mb-2">الدفع عبر ويسترن يونيون</h4>
+              <div className="bg-[#6A47ED]/10 border border-[#6A47ED]/20 rounded-xl p-4 mb-6">
+                <h4 className="text-[#8B6CF6] font-bold text-sm mb-2">الدفع عبر ويسترن يونيون</h4>
                 <div className="space-y-2 text-sm text-gray-300">
                   <p>1. قم بتحويل المبلغ عبر ويسترن يونيون</p>
                   <p>2. أرسل إيصال التحويل عبر واتساب</p>
@@ -128,7 +128,7 @@ export default function PricingPage() {
                 <h4 className="text-white font-bold text-sm mb-2">بيانات التحويل:</h4>
                 <div className="space-y-1 text-sm text-gray-400">
                   <p>الاسم: <span className="text-white">مؤسسة سليمان — سَلِّم</span></p>
-                  <p>المبلغ: <span className="text-gold-400 font-bold">{selectedPlan.price} ريال سعودي</span></p>
+                  <p>المبلغ: <span className="text-[#8B6CF6] font-bold">{selectedPlan.price} ريال سعودي</span></p>
                   <p>رقم واتساب للإيصال: <span className="text-white" dir="ltr">+966XXXXXXXXX</span></p>
                 </div>
               </div>
@@ -138,7 +138,7 @@ export default function PricingPage() {
                   onClick={() => {
                     window.open('https://wa.me/966XXXXXXXXX?text=' + encodeURIComponent(`أريد الاشتراك في خطة ${selectedPlan.name} - ${selectedPlan.price} ريال`), '_blank')
                   }}
-                  className="flex-1 py-3 rounded-xl gradient-gold text-gray-900 font-bold text-sm"
+                  className="flex-1 py-3 rounded-xl bg-[#6A47ED] text-white font-bold text-sm"
                 >
                   تواصل واتساب
                 </button>
@@ -169,7 +169,7 @@ export default function PricingPage() {
               <details key={i} className="glass rounded-xl group">
                 <summary className="flex items-center justify-between p-5 cursor-pointer">
                   <span className="text-white font-medium text-sm">{faq.q}</span>
-                  <BsInfoCircle className="text-gold-400 flex-shrink-0 group-open:rotate-45 transition-transform" />
+                  <BsInfoCircle className="text-[#8B6CF6] flex-shrink-0 group-open:rotate-45 transition-transform" />
                 </summary>
                 <div className="px-5 pb-5">
                   <p className="text-gray-400 text-sm leading-relaxed">{faq.a}</p>

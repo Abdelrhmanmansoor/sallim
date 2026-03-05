@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowLeft, Building2, Users, Send, Palette,
@@ -113,22 +113,22 @@ function LoginScreen({ onSuccess }) {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#0A0A0A] flex items-center justify-center px-4 py-20">
+    <div className="min-h-screen w-full bg-[#17012C] flex items-center justify-center px-4 py-20">
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(500px,90vw)] h-[300px] bg-[#C9A84C]/[0.04] rounded-full blur-[150px]" />
+        <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(500px,90vw)] h-[300px] bg-[#6A47ED]/[0.04] rounded-full blur-[150px]" />
       </div>
 
       <div className="relative z-10 w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 bg-[#C9A84C]/[0.08] border border-[#C9A84C]/15 rounded-full px-5 py-2 mb-6">
-            <Building2 className="w-4 h-4 text-[#C9A84C]" />
-            <span className="text-[#C9A84C] text-sm font-medium">بوابة الشركات</span>
+          <div className="inline-flex items-center gap-2 bg-[#6A47ED]/[0.08] border border-[#6A47ED]/15 rounded-full px-5 py-2 mb-6">
+            <Building2 className="w-4 h-4 text-[#6A47ED]" />
+            <span className="text-[#6A47ED] text-sm font-medium">بوابة الشركات</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-white/90 mb-4 leading-[1.4]">
             تسجيل دخول
             <br />
-            <span className="text-[#C9A84C]">الشركات</span>
+            <span className="text-[#6A47ED]">الشركات</span>
           </h1>
           <p className="text-white/35 text-sm leading-[1.9]">
             أدخل بريدك الإلكتروني وكود التفعيل للوصول لمنصة الشركات
@@ -139,7 +139,7 @@ function LoginScreen({ onSuccess }) {
         <form onSubmit={handleSubmit} className="rounded-3xl p-8 sm:p-10" style={{
           background: 'rgba(255,255,255,0.02)',
           border: '1.5px solid rgba(255,255,255,0.06)',
-          boxShadow: '0 0 60px rgba(201,168,76,0.03)',
+          boxShadow: '0 0 60px rgba(106,71,237,0.03)',
         }}>
           {/* Email */}
           <div className="mb-6">
@@ -153,7 +153,7 @@ function LoginScreen({ onSuccess }) {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="company@example.com"
               dir="ltr"
-              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white text-[15px] placeholder:text-white/15 outline-none transition-all duration-300 focus:border-[#C9A84C]/30 focus:bg-[#C9A84C]/[0.03] focus:shadow-[0_0_20px_rgba(201,168,76,0.06)] text-left"
+              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white text-[15px] placeholder:text-white/15 outline-none transition-all duration-300 focus:border-[#6A47ED]/30 focus:bg-[#6A47ED]/[0.03] focus:shadow-[0_0_20px_rgba(106,71,237,0.06)] text-left"
             />
           </div>
 
@@ -169,7 +169,7 @@ function LoginScreen({ onSuccess }) {
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               placeholder="SALLAM-XXXX-XXXX"
               dir="ltr"
-              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white text-[15px] font-mono tracking-wider placeholder:text-white/15 placeholder:font-mono outline-none transition-all duration-300 focus:border-[#C9A84C]/30 focus:bg-[#C9A84C]/[0.03] focus:shadow-[0_0_20px_rgba(201,168,76,0.06)] text-left"
+              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white text-[15px] font-mono tracking-wider placeholder:text-white/15 placeholder:font-mono outline-none transition-all duration-300 focus:border-[#6A47ED]/30 focus:bg-[#6A47ED]/[0.03] focus:shadow-[0_0_20px_rgba(106,71,237,0.06)] text-left"
             />
           </div>
 
@@ -199,7 +199,7 @@ function LoginScreen({ onSuccess }) {
           {/* Hint */}
           <p className="text-white/20 text-xs text-center mt-6 leading-[1.8]">
             ليس لديك كود تفعيل؟ تواصل معنا عبر
-            <a href="https://wa.me/201007835547" target="_blank" rel="noopener noreferrer" className="text-[#C9A84C]/60 hover:text-[#C9A84C] mx-1 transition-colors">واتساب</a>
+            <a href="https://wa.me/201007835547" target="_blank" rel="noopener noreferrer" className="text-[#6A47ED]/60 hover:text-[#6A47ED] mx-1 transition-colors">واتساب</a>
             للحصول على باقة الشركات
           </p>
         </form>
@@ -223,7 +223,7 @@ function OnboardingScreen({ session, onComplete }) {
   const [companyName, setCompanyName] = useState('')
   const [logoPreview, setLogoPreview] = useState(null)
   const [logoData, setLogoData] = useState(null)
-  const [primaryColor, setPrimaryColor] = useState('#C9A84C')
+  const [primaryColor, setPrimaryColor] = useState('#6A47ED')
   const [saving, setSaving] = useState(false)
   const fileRef = useRef(null)
 
@@ -257,20 +257,20 @@ function OnboardingScreen({ session, onComplete }) {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#0A0A0A] flex items-center justify-center px-4 py-20">
+    <div className="min-h-screen w-full bg-[#17012C] flex items-center justify-center px-4 py-20">
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(500px,90vw)] h-[300px] bg-[#C9A84C]/[0.04] rounded-full blur-[150px]" />
+        <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(500px,90vw)] h-[300px] bg-[#6A47ED]/[0.04] rounded-full blur-[150px]" />
       </div>
 
       <div className="relative z-10 w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 bg-[#C9A84C]/[0.08] border border-[#C9A84C]/15 rounded-full px-5 py-2 mb-6">
-            <UserPlus className="w-4 h-4 text-[#C9A84C]" />
-            <span className="text-[#C9A84C] text-sm font-medium">إعداد الحساب</span>
+          <div className="inline-flex items-center gap-2 bg-[#6A47ED]/[0.08] border border-[#6A47ED]/15 rounded-full px-5 py-2 mb-6">
+            <UserPlus className="w-4 h-4 text-[#6A47ED]" />
+            <span className="text-[#6A47ED] text-sm font-medium">إعداد الحساب</span>
           </div>
           <h1 className="text-3xl font-black text-white/90 mb-3 leading-[1.4]">
-            أكمل بيانات <span className="text-[#C9A84C]">شركتك</span>
+            أكمل بيانات <span className="text-[#6A47ED]">شركتك</span>
           </h1>
           <p className="text-white/35 text-sm leading-[1.9]">
             هذه البيانات ستظهر على بطاقاتك وللموظفين
@@ -293,7 +293,7 @@ function OnboardingScreen({ session, onComplete }) {
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               placeholder="مثال: مجموعة الفيصل"
-              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white text-[15px] placeholder:text-white/15 outline-none transition-all duration-300 focus:border-[#C9A84C]/30 focus:bg-[#C9A84C]/[0.03]"
+              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white text-[15px] placeholder:text-white/15 outline-none transition-all duration-300 focus:border-[#6A47ED]/30 focus:bg-[#6A47ED]/[0.03]"
             />
           </div>
 
@@ -308,13 +308,13 @@ function OnboardingScreen({ session, onComplete }) {
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="w-full flex items-center justify-center gap-3 bg-white/[0.03] border-2 border-dashed border-white/[0.08] rounded-xl p-6 hover:border-[#C9A84C]/25 hover:bg-[#C9A84C]/[0.02] transition-all duration-300 group"
+              className="w-full flex items-center justify-center gap-3 bg-white/[0.03] border-2 border-dashed border-white/[0.08] rounded-xl p-6 hover:border-[#6A47ED]/25 hover:bg-[#6A47ED]/[0.02] transition-all duration-300 group"
             >
               {logoPreview ? (
                 <img src={logoPreview} alt="Logo" className="h-16 w-auto object-contain rounded-lg" />
               ) : (
                 <>
-                  <Upload className="w-5 h-5 text-white/20 group-hover:text-[#C9A84C]/60 transition-colors" />
+                  <Upload className="w-5 h-5 text-white/20 group-hover:text-[#6A47ED]/60 transition-colors" />
                   <span className="text-white/25 text-sm group-hover:text-white/40 transition-colors">اضغط لرفع الشعار</span>
                 </>
               )}
@@ -341,7 +341,7 @@ function OnboardingScreen({ session, onComplete }) {
                 <span className="text-white/50 text-sm font-mono" dir="ltr">{primaryColor}</span>
               </div>
               <div className="flex gap-2">
-                {['#C9A84C', '#2563EB', '#059669', '#DC2626', '#7C3AED'].map(c => (
+                {['#6A47ED', '#2563EB', '#059669', '#DC2626', '#7C3AED'].map(c => (
                   <button
                     key={c}
                     type="button"
@@ -376,7 +376,7 @@ function OnboardingScreen({ session, onComplete }) {
 /* COMPANY DASHBOARD              */
 /* ═══════════════════════════════ */
 function DashboardScreen({ session, profile, onLogout }) {
-  const color = profile.primaryColor || '#C9A84C'
+  const color = profile.primaryColor || '#6A47ED'
 
   const features = [
     { icon: Users, title: 'إرسال جماعي', desc: 'أرسل مئات البطاقات دفعة واحدة — كل بطاقة تحمل اسم المستلم تلقائياً', tag: 'متاح' },
@@ -394,7 +394,7 @@ function DashboardScreen({ session, profile, onLogout }) {
   ]
 
   return (
-    <div className="min-h-screen w-full bg-[#0A0A0A] overflow-x-hidden">
+    <div className="min-h-screen w-full bg-[#17012C] overflow-x-hidden">
       {/* ── Dashboard Header ── */}
       <section className="relative pt-28 pb-16 px-4 w-full overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
@@ -594,8 +594,8 @@ export default function BusinessPage() {
 
   if (screen === 'loading') {
     return (
-      <div className="min-h-screen w-full bg-[#0A0A0A] flex items-center justify-center">
-        <span className="inline-block w-8 h-8 border-2 border-[#C9A84C]/30 border-t-[#C9A84C] rounded-full animate-spin" />
+      <div className="min-h-screen w-full bg-[#17012C] flex items-center justify-center">
+        <span className="inline-block w-8 h-8 border-2 border-[#6A47ED]/30 border-t-[#6A47ED] rounded-full animate-spin" />
       </div>
     )
   }

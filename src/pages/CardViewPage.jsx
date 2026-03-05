@@ -1,4 +1,4 @@
-import { useSearchParams, Link } from 'react-router-dom'
+﻿import { useSearchParams, Link } from 'react-router-dom'
 import { templates } from '../data/templates'
 import { useState, useEffect, useRef } from 'react'
 import { BsDownload, BsWhatsapp, BsArrowRight, BsMoonStars } from 'react-icons/bs'
@@ -62,11 +62,11 @@ export default function CardViewPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden">
+    <div className="page-shell flex flex-col items-center justify-center px-4 pb-8 relative overflow-hidden">
       {/* Background glow effects */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gold-500/5 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-amber-500/5 rounded-full blur-[100px]"></div>
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#6A47ED]/5 rounded-full blur-[100px]"></div>
       </div>
 
       {/* Confetti / Sparkles decoration */}
@@ -75,7 +75,7 @@ export default function CardViewPage() {
           {[...Array(12)].map((_, i) => (
             <div
               key={i}
-              className="absolute text-gold-400/40 animate-float"
+              className="absolute text-purple-400/40 animate-float"
               style={{
                 left: `${8 + Math.random() * 84}%`,
                 top: `${5 + Math.random() * 80}%`,
@@ -94,19 +94,19 @@ export default function CardViewPage() {
         
         {/* Header greeting */}
         <div className="text-center mb-8">
-          <p className="text-gold-400/70 text-sm mb-2">بطاقة تهنئة خاصة بـ</p>
+          <p className="text-purple-400/70 text-sm mb-2">بطاقة تهنئة خاصة بـ</p>
           <h1 className="text-4xl md:text-5xl font-black gradient-gold-text mb-1">{name}</h1>
           <div className="flex items-center justify-center gap-3 mt-3">
-            <div className="w-8 h-px bg-gold-500/30"></div>
-            <span className="text-gold-400/50 text-sm">•</span>
-            <div className="w-8 h-px bg-gold-500/30"></div>
+            <div className="w-8 h-px bg-purple-500/30"></div>
+            <span className="text-purple-400/50 text-sm">•</span>
+            <div className="w-8 h-px bg-purple-500/30"></div>
           </div>
         </div>
 
         {/* Card Image */}
         <div className="relative group">
-          <div className="absolute -inset-1 bg-gradient-to-b from-gold-500/20 via-transparent to-gold-500/10 rounded-3xl blur-sm"></div>
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-gold-500/20">
+          <div className="absolute -inset-1 bg-gradient-to-b from-purple-500/20 via-transparent to-purple-500/10 rounded-3xl blur-sm"></div>
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-purple-500/20">
             <img
               src={template.image}
               alt="بطاقة تهنئة"
@@ -129,7 +129,7 @@ export default function CardViewPage() {
         <div className="mt-8 space-y-3">
           <button
             onClick={handleDownload}
-            className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl gradient-gold text-gray-900 font-black text-lg transition-all hover:shadow-xl hover:shadow-gold-500/20 hover:scale-[1.02]"
+            className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl gradient-gold text-gray-900 font-black text-lg transition-all hover:shadow-xl hover:shadow-purple-500/20 hover:scale-[1.02]"
           >
             <BsDownload className="text-xl" />
             تحميل البطاقة
@@ -148,7 +148,7 @@ export default function CardViewPage() {
             </button>
             <Link
               to="/editor"
-              className="flex items-center justify-center gap-2 p-3 rounded-xl bg-gold-500/10 border border-gold-500/20 hover:bg-gold-500/20 text-gold-400 font-bold text-sm transition-all"
+              className="flex items-center justify-center gap-2 p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 text-purple-400 font-bold text-sm transition-all"
             >
               <BsMoonStars />
               صمّم بطاقتك
@@ -159,13 +159,13 @@ export default function CardViewPage() {
         {/* Branding */}
         <div className="mt-10 text-center">
           <div className="flex items-center justify-center gap-3 mb-3">
-            <div className="w-8 h-px bg-gold-500/20"></div>
-            <span className="text-gold-400/30 text-xs">•</span>
-            <div className="w-8 h-px bg-gold-500/20"></div>
+            <div className="w-8 h-px bg-purple-500/20"></div>
+            <span className="text-purple-400/30 text-xs">•</span>
+            <div className="w-8 h-px bg-purple-500/20"></div>
           </div>
-          <Link to="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-gold-400 text-xs transition-colors">
+          <Link to="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-purple-400 text-xs transition-colors">
             <img src="/images/logo-suliman.png" alt="سَلِّم" className="w-5 h-5 object-contain opacity-50" onError={(e) => { e.target.style.display = 'none' }} />
-            صنع عبر <span className="text-gold-400/70 font-bold">سَلِّم</span> — تابع لمؤسسة سليمان
+            صنع عبر <span className="text-purple-400/70 font-bold">سَلِّم</span> — تابع لمؤسسة سليمان
           </Link>
         </div>
       </div>

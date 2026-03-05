@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import {
   Palette, Settings, BarChart3, Upload, Image,
   Check, Globe, Building2, FileText, Link2,
@@ -27,13 +27,13 @@ export default function DashboardPage() {
   const [tab, setTab] = useState('brand')
 
   return (
-    <div className="min-h-screen pt-24 pb-24">
-      <div className="max-w-6xl mx-auto px-5">
+    <div className="page-shell pb-24 px-4">
+      <div className="max-w-6xl mx-auto rounded-[2rem] bg-[#0F172A] border border-[#1E293B] p-5 sm:p-8 shadow-[0_24px_60px_rgba(15,23,42,0.25)]">
         {/* Header */}
         <div className="mb-8">
-          <span className="text-gold-500/40 text-[11px] font-bold tracking-[0.2em] uppercase">COMPANIES</span>
+          <span className="text-purple-500/40 text-[11px] font-bold tracking-[0.2em] uppercase">COMPANIES</span>
           <h1 className="text-3xl font-bold text-white/90 mt-1">لوحة الشركات</h1>
-          <p className="text-white/25 text-sm mt-2">إدارة هوية شركتك وربطها بمنصة سَلِّم</p>
+          <p className="text-white/55 text-sm mt-2">إدارة هوية شركتك وربطها بمنصة سَلِّم</p>
         </div>
 
         {/* Tab bar */}
@@ -42,8 +42,8 @@ export default function DashboardPage() {
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`flex items-center gap-2.5 px-5 py-3 rounded-xl text-[13px] font-medium transition-all whitespace-nowrap ${
                 tab === t.id
-                  ? 'bg-gold-500/10 text-gold-400 shadow-sm shadow-gold-500/5'
-                  : 'text-white/30 hover:text-white/50 hover:bg-white/[0.02]'
+                  ? 'bg-[#6A47ED]/15 text-[#C6F806] border border-[#6A47ED]/30 shadow-sm shadow-[#6A47ED]/20'
+                  : 'text-white/60 hover:text-white hover:bg-white/[0.03]'
               }`}>
               <t.icon className="w-4 h-4" strokeWidth={1.5} />
               {t.label}
@@ -64,8 +64,8 @@ function BrandPanel() {
   const ws = useWhiteLabelStore()
   const [b, setB] = useState(() => load(BRAND_KEY, {
     companyName: ws.companyName || '',
-    primaryColor: ws.primaryColor || '#b8963a',
-    secondaryColor: ws.secondaryColor || '#13151c',
+    primaryColor: ws.primaryColor || '#6A47ED',
+    secondaryColor: ws.secondaryColor || '#17012C',
     logo: ws.logo || '',
     website: '',
     description: '',
@@ -141,7 +141,7 @@ function BrandPanel() {
       <div className="mt-10 pt-6 border-t border-white/[0.04]">
         <button onClick={handleSave}
           className={`flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-bold transition-all ${
-            saved ? 'bg-emerald-500/10 text-emerald-400' : 'bg-gradient-to-l from-gold-600 to-gold-500 text-[#060709] hover:from-gold-500 hover:to-gold-400 shadow-sm shadow-gold-500/10'
+            saved ? 'bg-emerald-500/10 text-emerald-400' : 'bg-gradient-to-l from-purple-600 to-purple-500 text-[#17012C] hover:from-purple-500 hover:to-purple-400 shadow-sm shadow-purple-500/10'
           }`}>
           {saved ? <><Check className="w-4 h-4" /> تم الحفظ</> : 'حفظ الهوية'}
         </button>
@@ -173,8 +173,8 @@ function ConfigPanel() {
           <p className="text-white/30 text-sm leading-[1.9] mb-5">
             اربط منصة سَلِّم بموقع شركتك عبر API. أرسل بيانات البطاقة كـ JSON إلى نقطة الحفظ وستحصل على رابط مشاركة فريد.
           </p>
-          <div className="bg-[#060709] rounded-xl p-5 text-[12px] font-mono text-white/30 leading-[2] overflow-x-auto" dir="ltr">
-            <span className="text-gold-400/70">POST</span> <span className="text-white/20">/api/v1/cards</span><br/>
+          <div className="bg-[#17012C] rounded-xl p-5 text-[12px] font-mono text-white/30 leading-[2] overflow-x-auto" dir="ltr">
+            <span className="text-purple-400/70">POST</span> <span className="text-white/20">/api/v1/cards</span><br/>
             {'{'}<br/>
             {'  '}<span className="text-emerald-400/50">"senderName"</span>: <span className="text-amber-400/50">"اسم المرسل"</span>,<br/>
             {'  '}<span className="text-emerald-400/50">"recipientName"</span>: <span className="text-amber-400/50">"اسم المستلم"</span>,<br/>
@@ -202,7 +202,7 @@ function StatsPanel() {
 
   if (loading) return (
     <div className="flex items-center gap-3 text-white/20 text-sm py-16 justify-center">
-      <div className="w-4 h-4 border-2 border-gold-500/20 border-t-gold-400 rounded-full animate-spin" />
+      <div className="w-4 h-4 border-2 border-purple-500/20 border-t-purple-400 rounded-full animate-spin" />
       جارٍ التحميل...
     </div>
   )
@@ -239,7 +239,7 @@ function InputField({ icon: Icon, label, value, onChange, placeholder, dir }) {
       <div className="relative">
         {Icon && <Icon className="absolute right-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/10" strokeWidth={1.5} />}
         <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} dir={dir}
-          className={`w-full bg-white/[0.02] border border-white/[0.05] rounded-xl py-2.5 text-sm text-white/70 outline-none focus:border-gold-500/20 transition-colors placeholder-white/10 ${Icon ? 'px-11' : 'px-4'}`} />
+          className={`w-full bg-white/[0.02] border border-white/[0.05] rounded-xl py-2.5 text-sm text-white/70 outline-none focus:border-purple-500/20 transition-colors placeholder-white/10 ${Icon ? 'px-11' : 'px-4'}`} />
       </div>
     </div>
   )
@@ -261,7 +261,7 @@ function ColorInput({ label, value, onChange }) {
 function InfoBox({ icon: Icon, label, value }) {
   return (
     <div className="flex items-center gap-4 bg-white/[0.015] border border-white/[0.04] rounded-xl px-5 py-3.5">
-      <Icon className="w-4 h-4 text-gold-500/30 shrink-0" strokeWidth={1.5} />
+      <Icon className="w-4 h-4 text-purple-500/30 shrink-0" strokeWidth={1.5} />
       <div className="min-w-0">
         <p className="text-white/20 text-[10px] mb-0.5">{label}</p>
         <p className="text-white/40 text-xs font-mono truncate" dir="ltr">{value}</p>
