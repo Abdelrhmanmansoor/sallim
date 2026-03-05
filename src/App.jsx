@@ -32,7 +32,7 @@ export default function App() {
   ].includes(pathname)
   
   return (
-    <div className="flex flex-col min-h-screen w-full max-w-full bg-white text-[#0F172A] font-ibm overflow-x-hidden" dir="rtl">
+    <div className="flex flex-col min-h-screen w-full max-w-full bg-white text-[#0F172A] overflow-x-hidden" dir="rtl">
       {/* Accent particles background */}
       {showParticles && <EidParticles />}
       

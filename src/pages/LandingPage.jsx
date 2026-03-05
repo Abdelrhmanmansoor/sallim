@@ -255,7 +255,7 @@ function EidiyaCalculator() {
   const pct = step > 0 && step <= totalQ ? (step / totalQ) * 100 : step > totalQ ? 100 : 0
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-[#f8fafc]">
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="max-w-xl mx-auto">
           <div className="text-center mb-10">
@@ -400,7 +400,7 @@ function EidiyaLuckGenerator() {
   ]
 
   return (
-    <section className="py-20 bg-[#f8fafc]">
+    <section className="py-20 bg-white">
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="max-w-2xl mx-auto">
           {/* Heading */}
@@ -645,7 +645,7 @@ function QuickCardCreator() {
 
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           {/* Controls */}
-          <div className="flex-1 w-full space-y-6">
+          <div className="flex-1 min-w-0 space-y-6">
             <div>
               <label className="text-xs font-bold text-[#64748b] block mb-3">اختر التصميم</label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -815,13 +815,13 @@ export default function LandingPage() {
       <EidiyaLuckGenerator />
 
       {/* ── HOW IT WORKS ── */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-[#f8fafc]">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="text-center mb-12">
             <span className="section-label">الخطوات</span>
-            <h2 className="section-title">كيف تصمّم بطاقتك</h2>
+            <h2 className="section-title">كيف تصمّن بطاقتك</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-3">
             <StepCard num={1} icon={Layers}  title="اختر القالب"  desc="تصفّح القوالب الجاهزة أو ارفع تصميمك الخاص من لوحة التحكم" />
             <StepCard num={2} icon={Palette}  title="خصّص البطاقة" desc="اختر الخط والعبارة والألوان واكتب اسم المُرسل والمُستلم" />
             <StepCard num={3} icon={Send}     title="أرسل أو حمّل" desc="صدّر بصيغة PNG أو PDF أو أرسل مباشرة عبر واتساب" />
@@ -830,7 +830,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section className="py-20 bg-[#f8fafc]">
+      <section className="py-20 bg-white">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             <div>
@@ -860,7 +860,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-[#f8fafc]">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-10">
@@ -877,7 +877,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="py-20 bg-[#f8fafc]">
+      <section className="py-20 bg-white">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="max-w-xl mx-auto text-center">
             <img src="/images/logo.png" alt="سَلِّم" className="h-16 w-auto mx-auto mb-6 opacity-90" />
