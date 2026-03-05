@@ -740,25 +740,29 @@ function QuickCardCreator() {
           <div className="flex-1 min-w-0 space-y-8">
             <div>
               <label className="text-xs font-bold text-[#64748b] block mb-3">اختر التصميم</label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {/* Horizontal scrollable carousel */}
+              <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {quickDesigns.map(d => (
                   <button key={d.id} onClick={() => setSelectedId(d.id)}
-                    className={`group relative aspect-square rounded-xl overflow-hidden transition-all ${
-                      selectedId === d.id ? 'ring-2 ring-[#1d4ed8] shadow-md' : 'ring-1 ring-[#e2e8f0] hover:ring-[#93c5fd]'
+                    className={`group relative flex-none w-[120px] aspect-[3/4] rounded-2xl overflow-hidden snap-start transition-all duration-200 ${
+                      selectedId === d.id
+                        ? 'ring-2 ring-[#1d4ed8] shadow-lg scale-[1.03]'
+                        : 'ring-1 ring-[#e2e8f0] hover:ring-[#93c5fd] opacity-85 hover:opacity-100'
                     }`}>
                     <img src={d.image} alt={d.label} className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none' }} />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 pointer-events-none">
-                      <span className="text-white text-[13px] font-black drop-shadow-lg">{d.greeting}</span>
-                      <span className="text-white/70 text-[9px] mt-0.5">{d.sub}</span>
+                    {/* Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
+                    {/* Bottom label */}
+                    <div className="absolute bottom-0 inset-x-0 p-2.5">
+                      <span className="text-white text-[12px] font-black drop-shadow-sm block">{d.label}</span>
+                      <span className="text-white/65 text-[9px]">{d.greeting}</span>
                     </div>
+                    {/* Selected tick */}
                     {selectedId === d.id && (
-                      <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#1d4ed8] flex items-center justify-center">
+                      <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#1d4ed8] flex items-center justify-center shadow">
                         <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                       </div>
                     )}
-                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent px-2 pb-2 pt-4">
-                      <span className="text-[11px] text-white font-bold">{d.label}</span>
-                    </div>
                   </button>
                 ))}
               </div>
@@ -851,12 +855,12 @@ function QuickCardCreator() {
             )}
 
             {showAll && (
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+              <div className="flex gap-3 overflow-x-auto pb-2 snap-x scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {templates.slice(4).map(t => (
-                  <Link key={t.id} to="/editor" className="relative aspect-square rounded-xl overflow-hidden ring-1 ring-[#e2e8f0] hover:ring-[#93c5fd] transition-all">
+                  <Link key={t.id} to="/editor" className="relative flex-none w-[100px] aspect-[3/4] rounded-2xl overflow-hidden ring-1 ring-[#e2e8f0] hover:ring-[#93c5fd] transition-all snap-start">
                     <img src={t.image} alt={t.name} className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none' }} />
-                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent px-1.5 pb-1.5 pt-4">
-                      <span className="text-[9px] text-white">{t.name}</span>
+                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent px-2 pb-2 pt-4">
+                      <span className="text-[10px] text-white font-bold">{t.name}</span>
                     </div>
                   </Link>
                 ))}
@@ -914,8 +918,8 @@ export default function LandingPage() {
           }} />
         </div>
 
-        {/* Content — flex column on mobile to fill full screen height */}
-        <div className="container-main relative z-10 flex flex-col justify-between md:block min-h-[100svh] md:min-h-0 pt-28 pb-10 md:py-0">
+        {/* Content — pushed to bottom on mobile */}
+        <div className="container-main relative z-10 flex flex-col justify-end md:block min-h-[100svh] md:min-h-0 pt-20 pb-8 md:py-0">
 
           {/* Text block */}
           <div className="max-w-3xl mx-auto text-center md:mb-12">
@@ -923,48 +927,48 @@ export default function LandingPage() {
             {/* Luxury glass card wrapper — mobile only */}
             <div className="
               backdrop-blur-2xl
-              bg-white/[0.06]
-              border border-white/[0.14]
-              rounded-3xl px-6 py-8
-              shadow-[0_8px_48px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.09)]
+              bg-white/[0.05]
+              border border-white/[0.12]
+              rounded-2xl px-5 py-6
+              shadow-[0_4px_32px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.07)]
               md:bg-transparent md:border-0 md:shadow-none md:backdrop-blur-none md:rounded-none md:p-0
             ">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/15 md:bg-[#eff6ff] border border-white/25 md:border-[#dbeafe] px-4 py-2 text-[13px] font-semibold text-white md:text-[#1d4ed8] mb-5 md:mb-6">
-                <Sparkles className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-white/12 md:bg-[#eff6ff] border border-white/20 md:border-[#dbeafe] px-3 py-1.5 text-[11px] font-semibold text-white/90 md:text-[#1d4ed8] mb-3 md:mb-6">
+                <Sparkles className="w-3 h-3" />
                 تجربة تصميم احترافية
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black leading-[1.25] text-white md:text-[#0f172a] mb-4 md:mb-6">
+              <h1 className="text-3xl sm:text-5xl lg:text-[3.5rem] font-black leading-[1.2] text-white md:text-[#0f172a] mb-3 md:mb-6">
                 صمّم بطاقة عيد
                 <span className="block gradient-gold-text">بشكل فاخر خلال دقائق</span>
               </h1>
 
-              <p className="text-white/78 md:text-[#64748b] text-[15px] md:text-lg leading-relaxed max-w-xl mx-auto mb-7 md:mb-8">
+              <p className="text-white/70 md:text-[#64748b] text-[13px] md:text-lg leading-relaxed max-w-xl mx-auto mb-5 md:mb-8">
                 منصة عربية حديثة لتصميم بطاقات تهنئة العيد وإرسالها مباشرة عبر واتساب — بدون تسجيل أو تعقيد.
               </p>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <Link to="/editor" className="btn-gold !px-8 !py-3.5 w-full sm:w-auto justify-center">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 md:gap-3">
+                <Link to="/editor" className="btn-gold !px-7 !py-3 w-full sm:w-auto justify-center !text-sm">
                   ابدأ التصميم الآن
-                  <ArrowLeft className="w-4 h-4" />
+                  <ArrowLeft className="w-3.5 h-3.5" />
                 </Link>
-                <Link to="/send" className="btn-outline-gold !px-7 !py-3.5 w-full sm:w-auto justify-center">
+                <Link to="/send" className="btn-outline-gold !px-6 !py-3 w-full sm:w-auto justify-center !text-sm">
                   جرّب الإرسال الذكي
                 </Link>
               </div>
             </div>
           </div>
 
-          {/* Stats — pinned to bottom on mobile, normal flow on desktop */}
-          <div className="max-w-lg mx-auto w-full grid grid-cols-3 gap-4 md:gap-5 mt-8 md:mt-0">
+          {/* Stats — just below the card on mobile */}
+          <div className="max-w-lg mx-auto w-full grid grid-cols-3 gap-3 md:gap-5 mt-4 md:mt-0">
             {[
               { n: '+100', l: 'عبارة جاهزة' },
               { n: '20', l: 'قالب أنيق' },
               { n: '1080', l: 'دقة التصدير' },
             ].map((s, i) => (
-              <div key={i} className="rounded-xl border border-white/[0.18] md:border-[#e2e8f0] bg-white/[0.08] md:bg-[#f8fafc] backdrop-blur-xl md:backdrop-blur-none px-3 py-4 text-center shadow-[0_4px_24px_rgba(0,0,0,0.35)] md:shadow-none">
-                <div className="text-[#C6F806] md:text-[#1d4ed8] text-xl font-black tabular-nums">{s.n}</div>
-                <div className="text-white/62 md:text-[#64748b] text-xs mt-1.5">{s.l}</div>
+              <div key={i} className="rounded-xl border border-white/[0.14] md:border-[#e2e8f0] bg-white/[0.06] md:bg-[#f8fafc] backdrop-blur-xl md:backdrop-blur-none px-2 py-3 text-center">
+                <div className="text-[#C6F806] md:text-[#1d4ed8] text-lg md:text-xl font-black tabular-nums">{s.n}</div>
+                <div className="text-white/55 md:text-[#64748b] text-[10px] md:text-xs mt-1">{s.l}</div>
               </div>
             ))}
           </div>
