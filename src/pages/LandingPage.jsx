@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   ArrowLeft, Palette, Type, Send, Download,
   Building2, ChevronDown,
-  Layers, FileText, Shield, Users, Share2,
+  Layers, FileText, Shield, Users, Share2, Gift,
 } from 'lucide-react'
 
 /* ═══ Helpers ═══ */
@@ -236,6 +236,121 @@ function EidiyaCalculator() {
   )
 }
 
+/* ═══ Eidiya Luck Generator ═══ */
+function EidiyaLuckGenerator() {
+  const [name, setName] = useState('')
+  const [copied, setCopied] = useState(false)
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
+  const link = name.trim() ? `${baseUrl}/eidiya-luck?name=${encodeURIComponent(name.trim())}` : ''
+
+  const copyLink = () => {
+    if (!link) return
+    navigator.clipboard.writeText(link).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  const shareWa = () => {
+    if (!link) return
+    const text = `🎰 عيديتك بحظك! لفّ العداد وشوف كم عيديتك من ${name.trim()} 🌙\n${link}`
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
+  }
+
+  return (
+    <section className="py-28 px-4 relative w-full" style={{ backgroundColor: '#070810' }}>
+      <div className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C]/10 to-transparent" />
+
+      <div className="max-w-lg mx-auto relative z-10">
+        {/* Heading */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 bg-[#C9A84C]/[0.08] border border-[#C9A84C]/15 rounded-full px-5 py-2 mb-5">
+            <Gift className="w-4 h-4 text-[#C9A84C]" />
+            <span className="text-[#C9A84C] text-sm font-medium">جديد</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-black text-white/90 mb-3">
+            🎰 عيديتك بحظك!
+          </h2>
+          <p className="text-white/35 text-sm leading-[1.8] max-w-sm mx-auto">
+            أنشئ رابط عيدية — المستلم يلفّ العداد ويشوف حظه!
+          </p>
+        </div>
+
+        {/* Card */}
+        <div className="rounded-3xl p-8 sm:p-10 transition-all duration-500"
+          style={{
+            background: 'rgba(201,168,76,0.03)',
+            border: '1.5px solid rgba(201,168,76,0.12)',
+            boxShadow: '0 0 60px rgba(201,168,76,0.04)',
+          }}
+        >
+          {/* Name input */}
+          <div className="mb-6">
+            <label className="block text-white/40 text-sm font-bold mb-3">اسمك (المُعَيِّد)</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => { setName(e.target.value); setCopied(false) }}
+              placeholder="مثال: أبو فهد"
+              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white text-[15px] placeholder:text-white/15 outline-none transition-all duration-300 focus:border-[#C9A84C]/30 focus:bg-[#C9A84C]/[0.03] focus:shadow-[0_0_20px_rgba(201,168,76,0.06)]"
+            />
+          </div>
+
+          {/* Generated link preview */}
+          {name.trim() && (
+            <div className="mb-6 animate-fade-up">
+              <label className="block text-white/25 text-[11px] font-bold mb-2 uppercase tracking-wider">الرابط</label>
+              <div className="flex items-center gap-2 bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-3">
+                <span className="text-white/30 text-xs truncate flex-1 direction-ltr" dir="ltr">{link}</span>
+                <button
+                  onClick={copyLink}
+                  className={`shrink-0 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300 ${
+                    copied
+                      ? 'bg-green-500/15 text-green-400 border border-green-500/20'
+                      : 'bg-[#C9A84C]/10 text-[#C9A84C] border border-[#C9A84C]/15 hover:bg-[#C9A84C]/20'
+                  }`}
+                >
+                  {copied ? '✔ تم النسخ' : 'انسخ'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Action buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button
+              onClick={shareWa}
+              disabled={!name.trim()}
+              className={`btn-gold w-full justify-center ${
+                !name.trim() ? '!opacity-30 !cursor-not-allowed !transform-none !shadow-none' : ''
+              }`}
+            >
+              <Share2 className="w-4 h-4" />
+              أرسل عبر واتساب
+            </button>
+            <button
+              onClick={copyLink}
+              disabled={!name.trim()}
+              className={`btn-outline-gold w-full justify-center ${
+                !name.trim() ? '!opacity-30 !cursor-not-allowed !transform-none' : ''
+              }`}
+            >
+              {copied ? '✔ تم النسخ!' : 'انسخ الرابط'}
+            </button>
+          </div>
+
+          {/* How it works hint */}
+          <div className="mt-6 rounded-xl p-4 text-center" style={{ background: 'rgba(201,168,76,0.03)', border: '1px solid rgba(201,168,76,0.08)' }}>
+            <p className="text-white/30 text-xs leading-[1.9]">
+              🎮 اكتب اسمك → انسخ الرابط أو شاركه → المستلم يلفّ العداد ويشوف حظه!
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 /* ═══ FAQ ═══ */
 function FAQ({ q, a, isOpen, toggle }) {
   return (
@@ -359,6 +474,9 @@ export default function LandingPage() {
 
       {/* ─── EIDIYA CALCULATOR ─── */}
       <EidiyaCalculator />
+
+      {/* ─── EIDIYA LUCK GENERATOR ─── */}
+      <EidiyaLuckGenerator />
 
       {/* ─── HOW IT WORKS ─── */}
       <section className="py-28 px-4 relative bg-[#060709] w-full">

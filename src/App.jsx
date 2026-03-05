@@ -11,6 +11,7 @@ import PricingPage from './pages/PricingPage'
 import BusinessPage from './pages/BusinessPage'
 import CardViewPage from './pages/CardViewPage'
 import EidiyaPage from './pages/EidiyaPage'
+import EidiyaLuckPage from './pages/EidiyaLuckPage'
 import EidParticles from './components/effects/EidParticles'
 
 export default function App() {
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/business" element={<BusinessPage />} />
           <Route path="/card" element={<CardViewPage />} />
           <Route path="/eidiya" element={<EidiyaPage />} />
+          <Route path="/eidiya-luck" element={<EidiyaLuckPage />} />
         </Routes>
       </main>
       <Footer />

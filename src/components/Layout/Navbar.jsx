@@ -28,13 +28,16 @@ export default function Navbar() {
         : 'bg-transparent'
     }`}>
       <div className="max-w-6xl mx-auto px-5 h-[68px] flex items-center justify-between relative">
+        {/* Left side - empty on mobile for centering balance */}
+        <div className="w-10 md:hidden" />
+
         {/* Logo - centered on mobile, left on desktop */}
-        <Link to="/" className="flex items-center justify-center absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0">
+        <Link to="/" className="flex items-center justify-center absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 md:order-first">
           <span className="text-2xl font-bold gradient-gold-text whitespace-nowrap">سَلِّم</span>
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden md:flex items-center gap-1 md:order-2">
           {links.map(l => (
             <Link
               key={l.path}
@@ -51,7 +54,7 @@ export default function Navbar() {
         </div>
 
         {/* Desktop right */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-3 md:order-3">
           <Link
             to="/admin"
             className="px-4 py-2 rounded-lg text-[13px] text-white/30 hover:text-white/50 hover:bg-white/[0.02] transition-all"
@@ -66,10 +69,10 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Mobile toggle */}
+        {/* Mobile toggle - right side */}
         <button
           onClick={() => setOpen(!open)}
-          className="md:hidden w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center text-white/50 hover:text-white/70 transition-colors"
+          className="md:hidden w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center text-white/50 hover:text-white/70 transition-colors order-last"
         >
           {open ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
         </button>
