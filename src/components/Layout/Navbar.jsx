@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Sparkles } from 'lucide-react'
+import { Menu, X, ArrowLeft } from 'lucide-react'
 
 const links = [
   { path: '/', label: 'الرئيسية' },
   { path: '/editor', label: 'المحرر' },
   { path: '/texts', label: 'النصوص' },
-  { path: '/send', label: 'الإرسال' },
+  { path: '/eidiya', label: 'العيدية' },
 ]
 
 export default function Navbar() {
@@ -17,7 +17,7 @@ export default function Navbar() {
   useEffect(() => { setOpen(false) }, [pathname])
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
+    const onScroll = () => setScrolled(window.scrollY > 10)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
@@ -27,61 +27,75 @@ export default function Navbar() {
     return () => { document.body.style.overflow = '' }
   }, [open])
 
-  const isHero = pathname === '/' && !scrolled
+  const isHome = pathname === '/'
+  const showDark = isHome && !scrolled
 
   return (
     <>
-      <nav style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 100,
-        height: '72px',
-        display: 'flex',
-        alignItems: 'center',
-        transition: 'all 0.3s',
-        fontFamily: "'Tajawal', sans-serif",
-        background: isHero ? 'transparent' : 'rgba(255,255,255,0.97)',
-        backdropFilter: scrolled ? 'blur(20px)' : 'none',
-        borderBottom: scrolled ? '1px solid #f1f5f9' : '1px solid transparent',
-        boxShadow: scrolled ? '0 1px 8px rgba(0,0,0,0.04)' : 'none',
-      }}>
-        <div style={{
-          maxWidth: '1200px',
-          width: '100%',
-          margin: '0 auto',
-          padding: '0 24px',
+      <nav
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 100,
+          height: '64px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-
+          fontFamily: "'Tajawal', sans-serif",
+          background: scrolled ? 'rgba(255,255,255,0.98)' : (showDark ? 'transparent' : '#fff'),
+          backdropFilter: scrolled ? 'blur(12px)' : 'none',
+          borderBottom: scrolled ? '1px solid #f0f0f0' : 'none',
+          transition: 'all 200ms ease',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1200px',
+            width: '100%',
+            margin: '0 auto',
+            padding: '0 24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           {/* Logo */}
           <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/images/logo.png" alt="سَلِّم" style={{ height: '40px', width: 'auto' }} />
+            <img
+              src="/images/logo.png"
+              alt="سَلِّم"
+              style={{
+                height: '36px',
+                width: 'auto',
+                filter: showDark ? 'brightness(10)' : 'none',
+                transition: 'filter 200ms ease',
+              }}
+            />
           </Link>
 
-          {/* Desktop nav */}
-          <div className="hidden md:flex" style={{ alignItems: 'center', gap: '4px' }}>
-            {links.map(l => (
-              <Link key={l.path} to={l.path}
+          {/* Desktop Nav */}
+          <div
+            className="hidden md:flex"
+            style={{ alignItems: 'center', gap: '8px' }}
+          >
+            {links.map((l) => (
+              <Link
+                key={l.path}
+                to={l.path}
                 style={{
-                  padding: '8px 18px',
-                  borderRadius: '9999px',
-                  fontSize: '13px',
-                  fontWeight: 600,
+                  padding: '8px 16px',
+                  fontSize: '14px',
+                  fontWeight: pathname === l.path ? 600 : 500,
                   textDecoration: 'none',
-                  transition: 'all 0.2s',
                   color: pathname === l.path
-                    ? (isHero ? '#2dd4bf' : '#0f172a')
-                    : (isHero ? 'rgba(255,255,255,0.6)' : '#64748b'),
+                    ? (showDark ? '#fff' : '#171717')
+                    : (showDark ? 'rgba(255,255,255,0.7)' : '#737373'),
+                  borderRadius: '8px',
                   background: pathname === l.path
-                    ? (isHero ? 'rgba(45,212,191,0.1)' : '#f0fdfa')
+                    ? (showDark ? 'rgba(255,255,255,0.1)' : '#f5f5f5')
                     : 'transparent',
-                  border: pathname === l.path
-                    ? (isHero ? '1px solid rgba(45,212,191,0.2)' : '1px solid #99f6e4')
-                    : '1px solid transparent',
+                  transition: 'all 150ms ease',
                 }}
               >
                 {l.label}
@@ -91,78 +105,137 @@ export default function Navbar() {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex" style={{ alignItems: 'center', gap: '12px' }}>
-            <Link to="/editor" style={{
-              display: 'inline-flex', alignItems: 'center', gap: '8px',
-              padding: '10px 24px', borderRadius: '9999px',
-              background: 'linear-gradient(135deg, #2dd4bf, #06b6d4)',
-              color: '#020617', fontSize: '13px', fontWeight: 700, textDecoration: 'none',
-              transition: 'all 0.3s',
-            }}>
-              <Sparkles style={{ width: '14px', height: '14px' }} />
+            <Link
+              to="/editor"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '10px 20px',
+                fontSize: '14px',
+                fontWeight: 600,
+                color: showDark ? '#171717' : '#fff',
+                background: showDark ? '#fff' : '#171717',
+                borderRadius: '10px',
+                textDecoration: 'none',
+                transition: 'all 200ms ease',
+              }}
+            >
               ابدأ التصميم
+              <ArrowLeft style={{ width: '16px', height: '16px' }} />
             </Link>
           </div>
 
-          {/* Mobile toggle */}
+          {/* Mobile Toggle */}
           <button
             className="md:hidden"
-            onClick={() => setOpen(v => !v)}
-            aria-label={open ? 'إغلاق القائمة' : 'فتح القائمة'}
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? 'إغلاق' : 'القائمة'}
             style={{
-              width: '40px', height: '40px', borderRadius: '12px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              border: '1px solid ' + (isHero ? 'rgba(255,255,255,0.15)' : '#e2e8f0'),
-              background: isHero ? 'rgba(255,255,255,0.05)' : '#fafbfc',
-              color: isHero ? '#fff' : '#0f172a',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: showDark ? 'rgba(255,255,255,0.1)' : '#f5f5f5',
+              border: 'none',
+              borderRadius: '10px',
+              color: showDark ? '#fff' : '#171717',
               cursor: 'pointer',
+              transition: 'all 150ms ease',
             }}
           >
-            {open ? <X style={{ width: '16px', height: '16px' }} /> : <Menu style={{ width: '16px', height: '16px' }} />}
+            {open ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
       </nav>
 
-      {/* Mobile menu */}
+      {/* Mobile Menu */}
       {open && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 90 }} className="md:hidden">
-          <div onClick={() => setOpen(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(4px)' }} />
-          <div style={{
-            position: 'absolute', top: '72px', left: 0, right: 0,
-            background: '#ffffff', borderTop: '1px solid #f1f5f9',
-            padding: '20px', boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-            fontFamily: "'Tajawal', sans-serif",
-          }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {links.map(l => (
-                <Link key={l.path} to={l.path} onClick={() => setOpen(false)}
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 90 }}
+          className="md:hidden"
+        >
+          {/* Overlay */}
+          <div
+            onClick={() => setOpen(false)}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(0,0,0,0.4)',
+              backdropFilter: 'blur(4px)',
+            }}
+          />
+
+          {/* Menu Panel */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '64px',
+              left: 0,
+              right: 0,
+              background: '#fff',
+              padding: '16px',
+              borderTop: '1px solid #f0f0f0',
+              fontFamily: "'Tajawal', sans-serif",
+              animation: 'slideDown 200ms ease',
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {links.map((l) => (
+                <Link
+                  key={l.path}
+                  to={l.path}
+                  onClick={() => setOpen(false)}
                   style={{
-                    padding: '14px 16px', borderRadius: '14px', fontSize: '15px',
-                    fontWeight: 600, textDecoration: 'none', transition: 'all 0.2s',
-                    color: pathname === l.path ? '#0f172a' : '#64748b',
-                    background: pathname === l.path ? '#f0fdfa' : 'transparent',
-                    border: pathname === l.path ? '1px solid #99f6e4' : '1px solid transparent',
+                    padding: '14px 16px',
+                    fontSize: '15px',
+                    fontWeight: pathname === l.path ? 600 : 500,
+                    color: pathname === l.path ? '#171717' : '#525252',
+                    background: pathname === l.path ? '#f5f5f5' : 'transparent',
+                    borderRadius: '12px',
+                    textDecoration: 'none',
+                    transition: 'all 150ms ease',
                   }}
                 >
                   {l.label}
                 </Link>
               ))}
             </div>
-            <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #f1f5f9' }}>
-              <Link to="/editor" onClick={() => setOpen(false)}
+
+            <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #f0f0f0' }}>
+              <Link
+                to="/editor"
+                onClick={() => setOpen(false)}
                 style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                  padding: '14px', borderRadius: '14px', width: '100%',
-                  background: 'linear-gradient(135deg, #2dd4bf, #06b6d4)',
-                  color: '#020617', fontSize: '15px', fontWeight: 700, textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  width: '100%',
+                  padding: '14px',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  color: '#fff',
+                  background: '#171717',
+                  borderRadius: '12px',
+                  textDecoration: 'none',
                 }}
               >
-                <Sparkles style={{ width: '16px', height: '16px' }} />
                 ابدأ التصميم
+                <ArrowLeft size={16} />
               </Link>
             </div>
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes slideDown {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </>
   )
 }

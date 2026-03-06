@@ -1,0 +1,493 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   THMANYAH-INSPIRED DESIGN SYSTEM
+   Clean, Professional, Arabic-First UX
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* 1. FONTS - Tajawal (Clean Arabic Font like Thmanyah) */
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap');
+
+:root {
+  /* Typography */
+  --font-primary: 'Tajawal', -apple-system, BlinkMacSystemFont, sans-serif;
+  
+  /* Colors - Clean & Professional */
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #e5e5e5;
+  --color-gray-300: #d4d4d4;
+  --color-gray-400: #a3a3a3;
+  --color-gray-500: #737373;
+  --color-gray-600: #525252;
+  --color-gray-700: #404040;
+  --color-gray-800: #262626;
+  --color-gray-900: #171717;
+  
+  /* Primary - Teal Accent */
+  --color-primary: #0d9488;
+  --color-primary-light: #14b8a6;
+  --color-primary-dark: #0f766e;
+  --color-primary-bg: #f0fdfa;
+  
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+  
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.1);
+  --shadow-xl: 0 16px 48px rgba(0,0,0,0.12);
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+}
+
+/* 2. GLOBAL RESET */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-primary);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-gray-900);
+  background: var(--color-white);
+  direction: rtl;
+  text-align: right;
+}
+
+/* 3. TYPOGRAPHY */
+.th-h1 {
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--color-gray-900);
+}
+
+.th-h2 {
+  font-size: clamp(24px, 4vw, 40px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--color-gray-900);
+}
+
+.th-h3 {
+  font-size: clamp(18px, 3vw, 24px);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-gray-900);
+}
+
+.th-body {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--color-gray-600);
+}
+
+.th-body-sm {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--color-gray-500);
+}
+
+.th-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-gray-400);
+}
+
+/* 4. BUTTONS - Clean & Professional */
+.th-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  font-family: var(--font-primary);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  white-space: nowrap;
+}
+
+.th-btn-primary {
+  background: var(--color-gray-900);
+  color: var(--color-white);
+}
+
+.th-btn-primary:hover {
+  background: var(--color-black);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.th-btn-secondary {
+  background: var(--color-gray-100);
+  color: var(--color-gray-700);
+}
+
+.th-btn-secondary:hover {
+  background: var(--color-gray-200);
+}
+
+.th-btn-outline {
+  background: transparent;
+  color: var(--color-gray-700);
+  border: 1.5px solid var(--color-gray-200);
+}
+
+.th-btn-outline:hover {
+  border-color: var(--color-gray-300);
+  background: var(--color-gray-50);
+}
+
+.th-btn-accent {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.th-btn-accent:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+}
+
+.th-btn-lg {
+  padding: var(--space-4) var(--space-6);
+  font-size: 15px;
+}
+
+.th-btn-sm {
+  padding: var(--space-2) var(--space-4);
+  font-size: 13px;
+}
+
+/* 5. INPUTS */
+.th-input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-primary);
+  font-size: 15px;
+  color: var(--color-gray-900);
+  background: var(--color-white);
+  border: 1.5px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.th-input::placeholder {
+  color: var(--color-gray-400);
+}
+
+.th-input:hover {
+  border-color: var(--color-gray-300);
+}
+
+.th-input:focus {
+  border-color: var(--color-gray-900);
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+}
+
+/* 6. CARDS */
+.th-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-100);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-normal);
+}
+
+.th-card:hover {
+  border-color: var(--color-gray-200);
+  box-shadow: var(--shadow-md);
+}
+
+.th-card-interactive {
+  cursor: pointer;
+}
+
+.th-card-interactive:hover {
+  transform: translateY(-2px);
+}
+
+/* 7. TOOLTIPS - Quick appear/disappear */
+.th-tooltip-wrapper {
+  position: relative;
+}
+
+.th-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-gray-900);
+  color: var(--color-white);
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 150ms ease;
+  z-index: 50;
+}
+
+.th-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--color-gray-900);
+}
+
+.th-tooltip-wrapper:hover .th-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* 8. CONTAINER */
+.th-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.th-container-sm {
+  max-width: 800px;
+}
+
+.th-container-lg {
+  max-width: 1400px;
+}
+
+/* 9. SECTIONS */
+.th-section {
+  padding: var(--space-20) 0;
+}
+
+.th-section-sm {
+  padding: var(--space-12) 0;
+}
+
+/* 10. DIVIDERS */
+.th-divider {
+  height: 1px;
+  background: var(--color-gray-100);
+}
+
+/* 11. BADGES */
+.th-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  background: var(--color-gray-100);
+  color: var(--color-gray-600);
+}
+
+.th-badge-accent {
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+}
+
+/* 12. ANIMATIONS */
+@keyframes th-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes th-slide-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes th-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.th-animate-fade { animation: th-fade-in 300ms ease; }
+.th-animate-slide { animation: th-slide-up 400ms ease; }
+.th-animate-scale { animation: th-scale-in 300ms ease; }
+
+/* 13. EDITOR SPECIFIC */
+.th-editor-panel {
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-100);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.th-editor-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-gray-500);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex: 1;
+}
+
+.th-editor-tab:hover {
+  color: var(--color-gray-700);
+  background: var(--color-gray-50);
+}
+
+.th-editor-tab.active {
+  color: var(--color-gray-900);
+  background: var(--color-gray-100);
+}
+
+.th-editor-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-white);
+  border: 1.5px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.th-editor-option:hover {
+  border-color: var(--color-gray-300);
+  background: var(--color-gray-50);
+}
+
+.th-editor-option.selected {
+  border-color: var(--color-gray-900);
+  background: var(--color-gray-50);
+}
+
+/* 14. SCROLLBAR */
+.th-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.th-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.th-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: var(--radius-full);
+}
+
+.th-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-400);
+}
+
+/* 15. GRID */
+.th-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
+.th-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.th-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .th-grid-2, .th-grid-3, .th-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .th-grid-2, .th-grid-3, .th-grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 16. FLEX UTILITIES */
+.th-flex { display: flex; }
+.th-flex-col { flex-direction: column; }
+.th-items-center { align-items: center; }
+.th-justify-center { justify-content: center; }
+.th-justify-between { justify-content: space-between; }
+.th-gap-1 { gap: var(--space-1); }
+.th-gap-2 { gap: var(--space-2); }
+.th-gap-3 { gap: var(--space-3); }
+.th-gap-4 { gap: var(--space-4); }
+.th-gap-6 { gap: var(--space-6); }
+.th-gap-8 { gap: var(--space-8); }
+
+/* 17. HOVER STATES */
+.th-hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+.th-hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* 18. FOCUS STATES */
+.th-focus:focus-visible {
+  outline: 2px solid var(--color-gray-900);
+  outline-offset: 2px;
+}
