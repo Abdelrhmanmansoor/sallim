@@ -14,7 +14,6 @@ export const useEditorStore = create((set, get) => ({
   subTextColor: '#ffffff',
   senderColor: '#ffffff',
   recipientColor: '#ffffff',
-  logoImage: null,
   canvasWidth: 1080,
   canvasHeight: 1080,
 
@@ -24,8 +23,22 @@ export const useEditorStore = create((set, get) => ({
   senderPos: { x: 0.5, y: 0.85 },
   recipientPos: { x: 0.5, y: 0.75 },
 
+  // Calligraphy
+  selectedCalligraphy: null,
+  calligraphyPos: { x: 0.5, y: 0.25 },
+  calligraphyScale: 0.6,
+
+  // Personal photo
+  personalPhoto: null,
+  photoPos: { x: 0.5, y: 0.7 },
+  photoScale: 0.25,
+  photoShape: 'circle', // circle, rounded, square
+  photoBorder: true,
+  photoBorderColor: '#ffffff',
+  photoBorderWidth: 3,
+
   // Text effects
-  textShadow: true,
+  textShadow: false,
   textStroke: false,
   textStrokeColor: '#000000',
   textStrokeWidth: 1,
@@ -50,7 +63,6 @@ export const useEditorStore = create((set, get) => ({
   setSubTextColor: (color) => set({ subTextColor: color }),
   setSenderColor: (color) => set({ senderColor: color }),
   setRecipientColor: (color) => set({ recipientColor: color }),
-  setLogoImage: (img) => set({ logoImage: img }),
   setMainTextPos: (pos) => set({ mainTextPos: pos }),
   setSubTextPos: (pos) => set({ subTextPos: pos }),
   setSenderPos: (pos) => set({ senderPos: pos }),
@@ -63,15 +75,25 @@ export const useEditorStore = create((set, get) => ({
   setOverlayColor: (c) => set({ overlayColor: c }),
   setMainTextRotation: (r) => set({ mainTextRotation: r }),
   setSubTextRotation: (r) => set({ subTextRotation: r }),
+  setSelectedCalligraphy: (c) => set({ selectedCalligraphy: c }),
+  setCalligraphyPos: (pos) => set({ calligraphyPos: pos }),
+  setCalligraphyScale: (s) => set({ calligraphyScale: s }),
+  setPersonalPhoto: (p) => set({ personalPhoto: p }),
+  setPhotoPos: (pos) => set({ photoPos: pos }),
+  setPhotoScale: (s) => set({ photoScale: s }),
+  setPhotoShape: (s) => set({ photoShape: s }),
+  setPhotoBorder: (v) => set({ photoBorder: v }),
+  setPhotoBorderColor: (c) => set({ photoBorderColor: c }),
+  setPhotoBorderWidth: (w) => set({ photoBorderWidth: w }),
   setActiveElement: (el) => set({ activeElement: el }),
 
   // Send state
   sendMode: 'single',
   setSendMode: (mode) => set({ sendMode: mode }),
-  
+
   csvData: [],
   setCsvData: (data) => set({ csvData: data }),
-  
+
   sendInterval: 5,
   setSendInterval: (interval) => set({ sendInterval: interval }),
 }))
@@ -81,7 +103,7 @@ export const useAuthStore = create((set) => ({
   isAuthenticated: false,
   plan: 'free',
   dailyCount: 0,
-  
+
   setUser: (user) => set({ user, isAuthenticated: !!user }),
   setPlan: (plan) => set({ plan }),
   incrementDaily: () => set((state) => ({ dailyCount: state.dailyCount + 1 })),
@@ -98,7 +120,7 @@ export const useWhiteLabelStore = create((set) => ({
     hideBranding: false,
     apiKey: '',
   },
-  
+
   setConfig: (config) => set((state) => ({
     config: { ...state.config, ...config }
   })),

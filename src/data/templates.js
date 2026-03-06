@@ -7,23 +7,6 @@ export const templates = [
   { id: 1, name: 'قالب ١', image: '/templates/1.png', textColor: '#ffffff' },
   { id: 2, name: 'قالب ٢', image: '/templates/2.png', textColor: '#ffffff' },
   { id: 3, name: 'قالب ٣', image: '/templates/3.png', textColor: '#ffffff' },
-  { id: 4, name: 'قالب ٤', image: '/templates/4.png', textColor: '#ffffff' },
-  { id: 5, name: 'قالب ٥', image: '/templates/5.png', textColor: '#ffffff' },
-  { id: 6, name: 'قالب ٦', image: '/templates/6.png', textColor: '#ffffff' },
-  { id: 7, name: 'قالب ٧', image: '/templates/7.png', textColor: '#ffffff' },
-  { id: 8, name: 'قالب ٨', image: '/templates/8.png', textColor: '#ffffff' },
-  { id: 9, name: 'قالب ٩', image: '/templates/9.png', textColor: '#ffffff' },
-  { id: 10, name: 'قالب ١٠', image: '/templates/10.png', textColor: '#ffffff' },
-  { id: 11, name: 'قالب ١١', image: '/templates/11.png', textColor: '#ffffff' },
-  { id: 12, name: 'قالب ١٢', image: '/templates/12.png', textColor: '#ffffff' },
-  { id: 13, name: 'قالب ١٣', image: '/templates/13.png', textColor: '#ffffff' },
-  { id: 14, name: 'قالب ١٤', image: '/templates/14.png', textColor: '#ffffff' },
-  { id: 15, name: 'قالب ١٥', image: '/templates/15.png', textColor: '#ffffff' },
-  { id: 16, name: 'قالب ١٦', image: '/templates/16.png', textColor: '#ffffff' },
-  { id: 17, name: 'قالب ١٧', image: '/templates/17.png', textColor: '#ffffff' },
-  { id: 18, name: 'قالب ١٨', image: '/templates/18.png', textColor: '#ffffff' },
-  { id: 19, name: 'قالب ١٩', image: '/templates/19.png', textColor: '#ffffff' },
-  { id: 20, name: 'قالب ٢٠', image: '/templates/20.png', textColor: '#ffffff' },
 ]
 
 export const themes = [
