@@ -142,7 +142,7 @@ export default function EditorPage() {
 
   // Mode & State
   const [mode, setMode] = useState('ready')
-  const [readyDesign, setReadyDesign] = useState(null)
+  const [readyDesign, setReadyDesign] = useState(readyDesigns[0])
   const [readyName, setReadyName] = useState('')
   const [readySenderName, setReadySenderName] = useState('')
   const [readyFontSize, setReadyFontSize] = useState(60)
@@ -179,11 +179,13 @@ export default function EditorPage() {
   // Computed - Show different templates based on mode
   // Ready mode: templates from /templates/جاهزة/
   // Designer mode: templates from /templates/مصمم/ (exclusive) + custom uploads
-  // Batch mode: templates from /templates/جاهزة/ + custom uploads
-  const allTemplates = mode === 'designer' 
+  // Batch mode: ALL templates + custom uploads
+  const allTemplates = mode === 'designer'
     ? [...designerOnlyTemplates, ...customTemplates]
-    : [...templates, ...customTemplates]
-  
+    : mode === 'batch'
+      ? [...templates, ...designerOnlyTemplates, ...customTemplates]
+      : [...templates, ...customTemplates]
+
   const currentTemplate = allTemplates.find(t => t.id === store.selectedTemplate) || allTemplates[0]
   const currentFont = fonts.find(f => f.id === store.selectedFont) || fonts[1]
   const scale = stageSize.width / 1080
@@ -491,7 +493,7 @@ export default function EditorPage() {
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <a
-                href="https://wa.me/966500000000"
+                href="https://wa.me/201007835547"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -552,9 +554,9 @@ export default function EditorPage() {
             </div>
 
             {/* Manual Template Grid - User scrolls horizontally */}
-            <div style={{ 
-              display: 'flex', 
-              gap: 14, 
+            <div style={{
+              display: 'flex',
+              gap: 14,
               padding: '0 28px',
               overflowX: 'auto',
               scrollSnapType: 'x mandatory',
@@ -562,19 +564,19 @@ export default function EditorPage() {
               paddingBottom: 10
             }}>
               {templates.map((t) => (
-                <button 
-                  key={t.id} 
-                  onClick={() => { store.setTemplate(t.id); setReadyDesign(null) }} 
+                <button
+                  key={t.id}
+                  onClick={() => store.setTemplate(t.id)}
                   style={{
-                    position: 'relative', 
-                    width: 140, 
-                    minWidth: 140, 
-                    aspectRatio: '1', 
-                    borderRadius: 16, 
+                    position: 'relative',
+                    width: 140,
+                    minWidth: 140,
+                    aspectRatio: '1',
+                    borderRadius: 16,
                     overflow: 'hidden',
                     border: store.selectedTemplate === t.id ? '3px solid #000' : '2px solid #eee',
-                    cursor: 'pointer', 
-                    padding: 0, 
+                    cursor: 'pointer',
+                    padding: 0,
                     transition: 'all 300ms',
                     transform: store.selectedTemplate === t.id ? 'scale(1.05)' : 'scale(1)',
                     boxShadow: store.selectedTemplate === t.id ? '0 8px 24px rgba(0,0,0,0.15)' : '0 2px 8px rgba(0,0,0,0.06)',
@@ -590,14 +592,14 @@ export default function EditorPage() {
                 </button>
               ))}
             </div>
-            
+
             <p style={{ fontSize: 11, color: '#888', padding: '12px 28px 0', fontFamily: ds.font }}>
               اسحب يميناً ويساراً لاستعراض التصاميم
             </p>
           </div>
 
           {/* Step 2: Customize */}
-          {readyDesign && (
+          {store.selectedTemplate && (
             <div style={{ background: '#fff', borderRadius: 20, padding: 28, marginBottom: 20, boxShadow: ds.shadow.sm, animation: 'fadeUp 300ms ease' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800 }}>٢</div>
@@ -616,6 +618,7 @@ export default function EditorPage() {
                   }}
                   onFocus={(e) => e.target.style.borderColor = '#000'}
                   onBlur={(e) => e.target.style.borderColor = '#eee'}
+                  onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur() }}
                 />
               </div>
 
@@ -631,6 +634,7 @@ export default function EditorPage() {
                   }}
                   onFocus={(e) => e.target.style.borderColor = '#000'}
                   onBlur={(e) => e.target.style.borderColor = '#eee'}
+                  onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur() }}
                 />
               </div>
 
@@ -653,7 +657,7 @@ export default function EditorPage() {
 
               {/* Name Color */}
               <div style={{ marginBottom: 20 }}>
-                <ColorPicker value={readyNameColor || readyDesign.nameColor} onChange={setReadyNameColor} label="لون النص" />
+                <ColorPicker value={readyNameColor || currentTemplate?.textColor || '#ffffff'} onChange={setReadyNameColor} label="لون النص" />
               </div>
 
               {/* Logo Upload */}
@@ -768,7 +772,7 @@ export default function EditorPage() {
           )}
 
           {/* Step 3: Preview & Export */}
-          {readyDesign && (
+          {store.selectedTemplate && (
             <div style={{ background: '#fff', borderRadius: 20, padding: 28, boxShadow: ds.shadow.sm, animation: 'fadeUp 300ms ease' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800 }}>٣</div>
@@ -784,11 +788,11 @@ export default function EditorPage() {
                       {bgImage && bgLoaded && <KonvaImage image={bgImage} width={stageSize.width} height={stageSize.height} />}
                       {readyName && (
                         <Text text={readyName} x={0} y={stageSize.height * readyNameY} width={stageSize.width} align="center"
-                          fontFamily={currentFont.family} fontSize={readyFontSize * scale} fill={readyNameColor || readyDesign.nameColor} lineHeight={1.5} />
+                          fontFamily={currentFont.family} fontSize={readyFontSize * scale} fill={readyNameColor || currentTemplate?.textColor || '#ffffff'} lineHeight={1.5} />
                       )}
                       {readySenderName && (
                         <Text text={readySenderName} x={0} y={stageSize.height * readySenderY} width={stageSize.width} align="center"
-                          fontFamily={currentFont.family} fontSize={readySenderFontSize * scale} fill={readyNameColor || readyDesign.nameColor} opacity={0.85} lineHeight={1.5} />
+                          fontFamily={currentFont.family} fontSize={readySenderFontSize * scale} fill={readyNameColor || currentTemplate?.textColor || '#ffffff'} opacity={0.85} lineHeight={1.5} />
                       )}
                       {logoImg && logoLoaded && (
                         <KonvaImage image={logoImg} x={logoPos.x} y={logoPos.y} width={logoW} height={logoH} />
@@ -978,8 +982,144 @@ export default function EditorPage() {
       {mode === 'batch' && (
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px' }}>
 
+          {/* Step 1: Choose Design */}
+          <div style={{ background: '#fff', borderRadius: 20, padding: '28px 0', marginBottom: 20, boxShadow: ds.shadow.sm }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24, padding: '0 28px' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800 }}>١</div>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>اختر التصميم (جاهزة ومصمم)</h2>
+            </div>
+            <div style={{ display: 'flex', gap: 14, padding: '0 28px', overflowX: 'auto', scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', paddingBottom: 10 }}>
+              {allTemplates.filter(t => !t.image?.includes('تصميم لرفع صورة')).map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => store.setTemplate(t.id)}
+                  style={{
+                    position: 'relative', width: 140, minWidth: 140, aspectRatio: '9/16', borderRadius: 16, overflow: 'hidden',
+                    border: store.selectedTemplate === t.id ? '3px solid #000' : '2px solid #eee',
+                    cursor: 'pointer', padding: 0, transition: 'all 300ms',
+                    transform: store.selectedTemplate === t.id ? 'scale(1.05)' : 'scale(1)',
+                    boxShadow: store.selectedTemplate === t.id ? '0 8px 24px rgba(0,0,0,0.15)' : '0 2px 8px rgba(0,0,0,0.06)',
+                    flexShrink: 0, scrollSnapAlign: 'start', background: '#f8f9fa'
+                  }}
+                >
+                  <img src={t.image} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  {store.selectedTemplate === t.id && (
+                    <div style={{ position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: '50%', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700 }}>✓</div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Step 2: Customize */}
+          <div style={{ background: '#fff', borderRadius: 20, padding: 28, marginBottom: 20, boxShadow: ds.shadow.sm }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800 }}>٢</div>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>عدّل تفاصيل البطاقة</h2>
+            </div>
+
+            {/* Font */}
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 10 }}>الخط</label>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {fonts.map(f => (
+                  <button key={f.id} onClick={() => store.setFont(f.id)} style={{
+                    padding: '10px 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                    background: store.selectedFont === f.id ? '#000' : '#f5f5f5', color: store.selectedFont === f.id ? '#fff' : '#666',
+                    fontSize: 12, fontWeight: 600, fontFamily: f.family
+                  }}>
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Main Text Customization */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <label style={{ fontSize: 13, fontWeight: 700 }}>النص الرئيسي</label>
+                <span style={{ fontSize: 11, color: '#888', background: '#f5f5f5', padding: '4px 8px', borderRadius: 6 }}>{store.fontSize}px</span>
+              </div>
+              <textarea value={store.mainText} onChange={(e) => store.setMainText(e.target.value)} onFocus={() => store.setActiveElement('mainText')}
+                dir="rtl" rows={2} placeholder="عيد مبارك..."
+                style={{ width: '100%', padding: 14, fontSize: 14, fontFamily: ds.font, border: '2px solid #eee', borderRadius: 12, resize: 'none', outline: 'none', transition: 'border-color 200ms', background: '#fafafa' }}
+              />
+              <div style={{ display: 'flex', gap: 10, marginTop: 12, marginBottom: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontSize: 11, color: '#666' }}>إزاحة عمودية (نزولاً)</span>
+                    <span style={{ fontSize: 10, color: '#999' }}>{Math.round(store.mainTextPos.y * 100)}%</span>
+                  </div>
+                  <input type="range" min={0.05} max={0.95} step={0.01} value={store.mainTextPos.y} onChange={(e) => store.setMainTextPos({ ...store.mainTextPos, y: Number(e.target.value) })} style={{ width: '100%' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontSize: 11, color: '#666' }}>حجم الخط</span>
+                  </div>
+                  <input type="range" min={16} max={80} value={store.fontSize} onChange={(e) => store.setFontSize(Number(e.target.value))} style={{ width: '100%' }} />
+                </div>
+              </div>
+              <ColorPicker value={store.textColor} onChange={store.setTextColor} label="لون النص الرئيسي" />
+            </div>
+
+            {/* Sub Text Customization */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <label style={{ fontSize: 13, fontWeight: 700 }}>النص الفرعي</label>
+                <span style={{ fontSize: 11, color: '#888', background: '#f5f5f5', padding: '4px 8px', borderRadius: 6 }}>{store.subFontSize}px</span>
+              </div>
+              <textarea value={store.subText} onChange={(e) => store.setSubText(e.target.value)} onFocus={() => store.setActiveElement('subText')}
+                dir="rtl" rows={2} placeholder="كل عام وأنتم بخير"
+                style={{ width: '100%', padding: 14, fontSize: 14, fontFamily: ds.font, border: '2px solid #eee', borderRadius: 12, resize: 'none', outline: 'none', transition: 'border-color 200ms', background: '#fafafa' }}
+              />
+              <div style={{ display: 'flex', gap: 10, marginTop: 12, marginBottom: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontSize: 11, color: '#666' }}>إزاحة عمودية (نزولاً)</span>
+                    <span style={{ fontSize: 10, color: '#999' }}>{Math.round(store.subTextPos.y * 100)}%</span>
+                  </div>
+                  <input type="range" min={0.05} max={0.95} step={0.01} value={store.subTextPos.y} onChange={(e) => store.setSubTextPos({ ...store.subTextPos, y: Number(e.target.value) })} style={{ width: '100%' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontSize: 11, color: '#666' }}>حجم الخط</span>
+                  </div>
+                  <input type="range" min={10} max={60} value={store.subFontSize} onChange={(e) => store.setSubFontSize(Number(e.target.value))} style={{ width: '100%' }} />
+                </div>
+              </div>
+              <ColorPicker value={store.subTextColor} onChange={store.setSubTextColor} label="لون النص الفرعي" />
+            </div>
+
+            {/* Recipient Customization */}
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 8 }}>إعدادات ظهور الاسم</label>
+              <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontSize: 11, color: '#666' }}>إزاحة عمودية (نزولاً)</span>
+                    <span style={{ fontSize: 10, color: '#999' }}>{Math.round(store.recipientPos.y * 100)}%</span>
+                  </div>
+                  <input type="range" min={0.05} max={0.95} step={0.01} value={store.recipientPos.y} onChange={(e) => store.setRecipientPos({ ...store.recipientPos, y: Number(e.target.value) })} style={{ width: '100%' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontSize: 11, color: '#666' }}>حجم الخط</span>
+                    <span style={{ fontSize: 10, color: '#999' }}>{store.recipientFontSize}px</span>
+                  </div>
+                  <input type="range" min={20} max={100} value={store.recipientFontSize} onChange={(e) => store.setRecipientFontSize(Number(e.target.value))} style={{ width: '100%' }} />
+                </div>
+              </div>
+              <ColorPicker value={store.recipientColor} onChange={store.setRecipientColor} label="لون الاسم" />
+            </div>
+
+          </div>
+
           {/* Preview Canvas - On Top */}
           <div style={{ background: '#fff', borderRadius: 20, padding: 16, boxShadow: ds.shadow.sm, marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800 }}>٣</div>
+              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>معاينة حية للقالب</h2>
+            </div>
             <div ref={mode === 'batch' ? containerRef : undefined} style={{ maxWidth: 400, margin: '0 auto' }}>
               <div style={{ background: '#000', borderRadius: 14, padding: 8 }}>
                 <Stage ref={stageRef} width={stageSize.width} height={stageSize.height} style={{ borderRadius: 10, overflow: 'hidden' }}>
@@ -993,8 +1133,9 @@ export default function EditorPage() {
                         y={store.calligraphyPos.y * stageSize.height - calligraphyHeight / 2}
                         width={calligraphyWidth} height={calligraphyHeight} />
                     )}
-                    <DraggableText text={store.mainText} x={store.mainTextPos.x * stageSize.width - stageSize.width * 0.4} y={store.mainTextPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={store.fontSize * scale} fontFamily={currentFont.family} fill={store.textColor} align="center" lineHeight={1.6} padding={20 * scale} shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.6)" shadowBlur={10 * scale} />
-                    <DraggableText text={store.recipientName || 'الاسم هنا'} x={store.recipientPos.x * stageSize.width - stageSize.width * 0.4} y={store.recipientPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={store.recipientFontSize * scale} fontFamily={currentFont.family} fill={store.recipientColor} align="center" shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.5)" shadowBlur={6 * scale} />
+                    <DraggableText text={store.mainText} x={store.mainTextPos.x * stageSize.width - stageSize.width * 0.4} y={store.mainTextPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={store.fontSize * scale} fontFamily={currentFont.family} fill={store.textColor} align="center" lineHeight={1.6} padding={20 * scale} shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.6)" shadowBlur={10 * scale} strokeEnabled={store.textStroke} stroke={store.textStrokeColor} strokeWidth={store.textStrokeWidth * scale} />
+                    <DraggableText text={store.subText} x={store.subTextPos.x * stageSize.width - stageSize.width * 0.4} y={store.subTextPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={store.subFontSize * scale} fontFamily={currentFont.family} fill={store.subTextColor} align="center" lineHeight={1.5} padding={15 * scale} shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.5)" shadowBlur={8 * scale} strokeEnabled={store.textStroke} stroke={store.textStrokeColor} strokeWidth={store.textStrokeWidth * scale * 0.7} />
+                    <DraggableText text={store.recipientName || 'الاسم هنا'} x={store.recipientPos.x * stageSize.width - stageSize.width * 0.4} y={store.recipientPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={store.recipientFontSize * scale} fontFamily={currentFont.family} fill={store.recipientColor} align="center" shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.5)" shadowBlur={6 * scale} strokeEnabled={store.textStroke} stroke={store.textStrokeColor} strokeWidth={store.textStrokeWidth * scale * 0.5} />
                     {logoImg && logoLoaded && (
                       <KonvaImage image={logoImg} x={logoPos.x} y={logoPos.y} width={logoW} height={logoH} />
                     )}
@@ -1025,14 +1166,9 @@ export default function EditorPage() {
 
           {/* Names Input Section */}
           <div style={{ background: '#fff', borderRadius: 20, padding: 24, boxShadow: ds.shadow.sm, marginBottom: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 14, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <BsPeople size={20} />
-              </div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>تهنئة جماعية</h3>
-                <p style={{ margin: 0, fontSize: 12, color: '#888' }}>أدخل أسماء المهنئين</p>
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800 }}>٤</div>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>أدخل أسماء المهنئين للتهنئة الجماعية</h2>
             </div>
 
             {/* File Upload */}
