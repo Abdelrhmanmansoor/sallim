@@ -242,11 +242,8 @@ export default function LandingPage() {
       <section style={{ background: 'linear-gradient(135deg, #f0fdfa 0%, #e0f2fe 100%)', paddingTop: '100px', paddingBottom: '100px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
           <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <span style={{ display: 'inline-block', fontSize: '13px', fontWeight: 700, color: '#0d9488', letterSpacing: '3px', marginBottom: '16px' }}>الدعم والاستثمار</span>
-            <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 800, color: '#0f172a', marginBottom: '20px' }}>ادعم المشروع وساهم في التطوير</h2>
-            <p style={{ fontSize: '18px', color: '#64748b', maxWidth: '600px', margin: '0 auto', lineHeight: 1.7 }}>
-              كل مساهمة تساعد في تطوير منصة أفضل ونشر فرحة العيد ل المزيد من الناس 🎉
-            </p>
+            <span style={{ display: 'inline-block', fontSize: '13px', fontWeight: 700, color: '#0d9488', letterSpacing: '3px', marginBottom: '16px' }}>الباقات</span>
+            <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 800, color: '#0f172a', marginBottom: '20px' }}>اختر ما يناسبك</h2>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', marginBottom: '50px' }}>
@@ -294,22 +291,20 @@ export default function LandingPage() {
             onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1.05) translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,112,186,0.15)' }}
             >
               <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: '#0070ba', color: '#ffffff', padding: '6px 20px', borderRadius: '20px', fontSize: '12px', fontWeight: 700 }}>
-                الأكثر دعماً
+                مميز
               </div>
               <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'linear-gradient(135deg, #0070ba, #1546a0)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '12px auto 20px' }}>
                 <Heart style={{ width: '28px', height: '28px', color: '#ffffff' }} />
               </div>
-              <h3 style={{ fontSize: '24px', fontWeight: 700, color: '#0f172a', marginBottom: '12px' }}>ادعمنا</h3>
-              <div style={{ fontSize: '36px', fontWeight: 800, color: '#0070ba', marginBottom: '20px' }}>
-                <span style={{ fontSize: '20px', fontWeight: 500, color: '#64748b', verticalAlign: 'top' }}>من</span>
-                10
-                <span style={{ fontSize: '16px', fontWeight: 500, color: '#64748b' }}>ريال</span>
+              <h3 style={{ fontSize: '24px', fontWeight: 700, color: '#0f172a', marginBottom: '12px' }}>داعم</h3>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: '#0070ba', marginBottom: '20px' }}>
+                تطوعي
               </div>
               <ul style={{ textAlign: 'right', marginBottom: '24px', paddingLeft: '20px' }}>
                 <li style={{ marginBottom: '10px', color: '#64748b', fontSize: '14px' }}>✓ كل ما في الخطة المجانية</li>
-                <li style={{ marginBottom: '10px', color: '#64748b', fontSize: '14px' }}>✓ دعم المشروع المستقبلي</li>
-                <li style={{ marginBottom: '10px', color: '#64748b', fontSize: '14px' }}>✓ مشاركتك تصنع الفرق</li>
-                <li style={{ color: '#64748b', fontSize: '14px' }}>✓ شكراً لثقتك بنا ❤️</li>
+                <li style={{ marginBottom: '10px', color: '#64748b', fontSize: '14px' }}>✓ أولوية في الميزات الجديدة</li>
+                <li style={{ marginBottom: '10px', color: '#64748b', fontSize: '14px' }}>✓ اسمك في قائمة الداعمين</li>
+                <li style={{ color: '#64748b', fontSize: '14px' }}>✓ دعم فني مميز</li>
               </ul>
               <a
                 href="https://paypal.me/SOLIMANW"
@@ -363,11 +358,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div style={{ textAlign: 'center', padding: '24px', background: 'rgba(255,255,255,0.7)', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-            <p style={{ fontSize: '16px', color: '#64748b', margin: 0 }}>
-              💝 كل مساهمة تساعد في تطوير المنصة ونشر الفرحة
-            </p>
-          </div>
+
         </div>
       </section>
 
