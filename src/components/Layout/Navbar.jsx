@@ -3,10 +3,10 @@ import { Link, useLocation } from 'react-router-dom'
 import { Menu, X, Sparkles } from 'lucide-react'
 
 const links = [
-  { path: '/',        label: 'الرئيسية' },
-  { path: '/editor',  label: 'المحرر' },
-  { path: '/texts',   label: 'النصوص' },
-  { path: '/send',    label: 'الإرسال' },
+  { path: '/', label: 'الرئيسية' },
+  { path: '/editor', label: 'المحرر' },
+  { path: '/texts', label: 'النصوص' },
+  { path: '/send', label: 'الإرسال' },
   { path: '/pricing', label: 'الأسعار' },
 ]
 
@@ -15,9 +15,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const { pathname } = useLocation()
 
-  useEffect(() => {
-    setOpen(false)
-  }, [pathname])
+  useEffect(() => { setOpen(false) }, [pathname])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -27,117 +25,145 @@ export default function Navbar() {
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
-    return () => {
-      document.body.style.overflow = ''
-    }
+    return () => { document.body.style.overflow = '' }
   }, [open])
+
+  const isHero = pathname === '/' && !scrolled
 
   return (
     <>
-      <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-white/95 backdrop-blur-xl border-b border-[#e2e8f0] shadow-sm'
-          : 'bg-white/90 backdrop-blur-lg border-b border-transparent'
-      }`}>
-        <div className="container-main h-[72px] flex items-center justify-between relative">
+      <nav style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 100,
+        height: '72px',
+        display: 'flex',
+        alignItems: 'center',
+        transition: 'all 0.3s',
+        fontFamily: "'Tajawal', sans-serif",
+        background: isHero ? 'transparent' : 'rgba(255,255,255,0.97)',
+        backdropFilter: scrolled ? 'blur(20px)' : 'none',
+        borderBottom: scrolled ? '1px solid #f1f5f9' : '1px solid transparent',
+        boxShadow: scrolled ? '0 1px 8px rgba(0,0,0,0.04)' : 'none',
+      }}>
+        <div style={{
+          maxWidth: '1200px',
+          width: '100%',
+          margin: '0 auto',
+          padding: '0 24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
 
-          {/* Left side - empty on mobile for centering balance */}
-          <div className="w-10 md:hidden" />
-
-          {/* Logo - centered on mobile, left on desktop */}
-          <Link to="/" className="flex items-center justify-center absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 md:order-first">
-            <img src="/images/logo.png" alt="سَلِّم" className="h-10 sm:h-12 w-auto" />
+          {/* Logo */}
+          <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
+            <img src="/images/logo.png" alt="سَلِّم" style={{ height: '40px', width: 'auto' }} />
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-1 md:order-2">
+          <div className="hidden md:flex" style={{ display: 'none', alignItems: 'center', gap: '4px' }}>
             {links.map(l => (
-              <Link
-                key={l.path}
-                to={l.path}
-                className={`px-4 py-2 rounded-full text-[13px] font-semibold tracking-wide border transition-all duration-300 ${
-                  pathname === l.path
-                    ? 'text-[#0F172A] bg-[#eff6ff] border-[#dbeafe]'
-                    : 'text-[#475569] border-transparent hover:text-[#0F172A] hover:bg-[#f8fafc]'
-                }`}
+              <Link key={l.path} to={l.path}
+                style={{
+                  padding: '8px 18px',
+                  borderRadius: '9999px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  transition: 'all 0.2s',
+                  color: pathname === l.path
+                    ? (isHero ? '#2dd4bf' : '#0f172a')
+                    : (isHero ? 'rgba(255,255,255,0.6)' : '#64748b'),
+                  background: pathname === l.path
+                    ? (isHero ? 'rgba(45,212,191,0.1)' : '#f0fdfa')
+                    : 'transparent',
+                  border: pathname === l.path
+                    ? (isHero ? '1px solid rgba(45,212,191,0.2)' : '1px solid #99f6e4')
+                    : '1px solid transparent',
+                }}
               >
                 {l.label}
               </Link>
             ))}
           </div>
 
-          {/* Desktop right */}
-          <div className="hidden md:flex items-center gap-2.5 md:order-3">
-            <span className="hidden xl:inline-flex items-center gap-1.5 rounded-full border border-[#BFDBFE] bg-[#EFF6FF] px-3 py-1.5 text-[11px] font-bold text-[#1D4ED8]">
-              <Sparkles className="w-3.5 h-3.5 text-[#F59E0B]" />
-              تجربة فاخرة
-            </span>
-            <Link
-              to="/editor"
-              className="btn-gold !py-2.5 !px-6 !text-[13px] !rounded-full !gap-1.5"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
+          {/* Desktop CTA */}
+          <div className="hidden md:flex" style={{ display: 'none', alignItems: 'center', gap: '12px' }}>
+            <Link to="/editor" style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              padding: '10px 24px', borderRadius: '9999px',
+              background: 'linear-gradient(135deg, #2dd4bf, #06b6d4)',
+              color: '#020617', fontSize: '13px', fontWeight: 700, textDecoration: 'none',
+              transition: 'all 0.3s',
+            }}>
+              <Sparkles style={{ width: '14px', height: '14px' }} />
               ابدأ التصميم
             </Link>
           </div>
 
-          {/* Mobile toggle - right side */}
+          {/* Mobile toggle */}
           <button
+            className="md:hidden"
             onClick={() => setOpen(v => !v)}
             aria-label={open ? 'إغلاق القائمة' : 'فتح القائمة'}
-            aria-expanded={open}
-            aria-controls="mobile-main-menu"
-            className="md:hidden w-10 h-10 rounded-full bg-[#EFF6FF] border border-[#BFDBFE] flex items-center justify-center text-[#1D4ED8] hover:text-[#0F172A] transition-colors order-last"
+            style={{
+              width: '40px', height: '40px', borderRadius: '12px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              border: '1px solid ' + (isHero ? 'rgba(255,255,255,0.15)' : '#e2e8f0'),
+              background: isHero ? 'rgba(255,255,255,0.05)' : '#fafbfc',
+              color: isHero ? '#fff' : '#0f172a',
+              cursor: 'pointer',
+            }}
           >
-            {open ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            {open ? <X style={{ width: '16px', height: '16px' }} /> : <Menu style={{ width: '16px', height: '16px' }} />}
           </button>
         </div>
       </nav>
 
-      {/* Mobile menu as a dedicated layer to avoid overlap with page content */}
-      <div className={`fixed inset-0 z-40 md:hidden transition-opacity duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-        <button
-          aria-label="إغلاق القائمة"
-          onClick={() => setOpen(false)}
-          className="absolute inset-0 bg-[#0F172A]/18 backdrop-blur-[2px]"
-        />
-        <div
-          id="mobile-main-menu"
-          className={`absolute top-[72px] inset-x-0 bottom-0 bg-white/98 backdrop-blur-xl border-t border-[#e2e8f0] px-5 py-5 overflow-y-auto shadow-lg transition-transform duration-300 ${open ? 'translate-y-0' : '-translate-y-6'}`}
-        >
-          <div className="mb-4 rounded-xl border border-[#dbeafe] bg-[#eff6ff] px-4 py-3 text-center text-xs font-semibold text-[#1d4ed8]">
-            تنقل سريع وتجربة تصميم سلسة
-          </div>
-
-          <div className="space-y-2">
-            {links.map(l => (
-              <Link
-                key={l.path}
-                to={l.path}
-                onClick={() => setOpen(false)}
-                className={`block px-4 py-3.5 rounded-2xl text-sm font-semibold transition-colors ${
-                  pathname === l.path
-                    ? 'text-[#0f172a] bg-[#eff6ff] border border-[#dbeafe]'
-                    : 'text-[#475569] border border-transparent hover:text-[#0f172a] hover:bg-[#f8fafc]'
-                }`}
+      {/* Mobile menu */}
+      {open && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 90 }} className="md:hidden">
+          <div onClick={() => setOpen(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(4px)' }} />
+          <div style={{
+            position: 'absolute', top: '72px', left: 0, right: 0,
+            background: '#ffffff', borderTop: '1px solid #f1f5f9',
+            padding: '20px', boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+            fontFamily: "'Tajawal', sans-serif",
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {links.map(l => (
+                <Link key={l.path} to={l.path} onClick={() => setOpen(false)}
+                  style={{
+                    padding: '14px 16px', borderRadius: '14px', fontSize: '15px',
+                    fontWeight: 600, textDecoration: 'none', transition: 'all 0.2s',
+                    color: pathname === l.path ? '#0f172a' : '#64748b',
+                    background: pathname === l.path ? '#f0fdfa' : 'transparent',
+                    border: pathname === l.path ? '1px solid #99f6e4' : '1px solid transparent',
+                  }}
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+            <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #f1f5f9' }}>
+              <Link to="/editor" onClick={() => setOpen(false)}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                  padding: '14px', borderRadius: '14px', width: '100%',
+                  background: 'linear-gradient(135deg, #2dd4bf, #06b6d4)',
+                  color: '#020617', fontSize: '15px', fontWeight: 700, textDecoration: 'none',
+                }}
               >
-                {l.label}
+                <Sparkles style={{ width: '16px', height: '16px' }} />
+                ابدأ التصميم
               </Link>
-            ))}
-          </div>
-
-          <div className="pt-4 mt-4 border-t border-[#DBEAFE]">
-            <Link
-              to="/editor"
-              onClick={() => setOpen(false)}
-              className="btn-gold w-full !text-sm !py-3.5 !rounded-full"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              ابدأ التصميم
-            </Link>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </>
   )
 }

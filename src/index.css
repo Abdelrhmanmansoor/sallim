@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./design-system.css";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    GLOBAL RESET & BASE STYLES — Clean SaaS Design

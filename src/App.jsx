@@ -13,6 +13,8 @@ import BusinessPage from './pages/BusinessPage'
 import CardViewPage from './pages/CardViewPage'
 import EidiyaPage from './pages/EidiyaPage'
 import EidiyaLuckPage from './pages/EidiyaLuckPage'
+import PrivacyPage from './pages/PrivacyPage'
+import TermsPage from './pages/TermsPage'
 import EidParticles from './components/effects/EidParticles'
 
 export default function App() {
@@ -30,16 +32,13 @@ export default function App() {
     '/dashboard',
     '/business',
   ].includes(pathname)
-  
+
   return (
     <div className="flex flex-col min-h-screen w-full max-w-full bg-white text-[#0F172A] overflow-x-hidden" dir="rtl">
-      {/* Accent particles background */}
       {showParticles && <EidParticles />}
-      
-      {/* Fixed navbar */}
+
       {!isBusiness && <Navbar />}
-      
-      {/* Main content - grows to fill space */}
+
       <main className="flex-1 w-full relative z-10">
         <Routes>
           <Route path="/" element={<LandingPage />} />
@@ -53,13 +52,13 @@ export default function App() {
           <Route path="/card" element={<CardViewPage />} />
           <Route path="/eidiya" element={<EidiyaPage />} />
           <Route path="/eidiya-luck" element={<EidiyaLuckPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
         </Routes>
       </main>
-      
-      {/* Footer */}
+
       {!isBusiness && <Footer />}
-      
-      {/* WhatsApp floating button */}
+
       {!hideWhatsAppFloat && <WhatsAppFloat />}
     </div>
   )
