@@ -4,8 +4,9 @@ import { useEditorStore } from '../store'
 import { templates, fonts } from '../data/templates'
 import { greetingTexts } from '../data/texts'
 import { calligraphy, calligraphyCategories } from '../data/calligraphy'
-import { BsDownload, BsFilePdf, BsWhatsapp, BsLink45Deg, BsShareFill, BsCheck2, BsPencilFill, BsStars, BsSearch, BsPersonCircle, BsImage, BsChatLeftText, BsSliders, BsPlusLg, BsX, BsArrowLeft, BsInfoCircle } from 'react-icons/bs'
+import { BsDownload, BsFilePdf, BsWhatsapp, BsLink45Deg, BsShareFill, BsCheck2, BsPencilFill, BsStars, BsSearch, BsPersonCircle, BsImage, BsChatLeftText, BsSliders, BsPlusLg, BsX, BsArrowLeft, BsInfoCircle, BsBuilding, BsPeople, BsFileEarmarkText, BsCloudDownload } from 'react-icons/bs'
 import { HiPhotograph, HiOutlineColorSwatch } from 'react-icons/hi'
+import JSZip from 'jszip'
 import toast, { Toaster } from 'react-hot-toast'
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -161,10 +162,25 @@ export default function EditorPage() {
   const [bgImage, bgLoaded] = useImage(mode === 'ready' && readyDesign ? readyDesign.template : currentTemplate?.image)
   const [calligraphyImg, calligraphyLoaded] = useImage(store.selectedCalligraphy)
   const [personalPhotoImg, personalPhotoLoaded] = useImage(store.personalPhoto)
+  const [logoImg, logoLoaded] = useImage(store.companyLogo)
 
   const calligraphyWidth = stageSize.width * store.calligraphyScale
   const calligraphyHeight = calligraphyImg ? (calligraphyImg.height / calligraphyImg.width) * calligraphyWidth : 0
   const photoW = stageSize.width * store.photoScale
+  const logoW = stageSize.width * store.logoScale
+  const logoH = logoImg ? (logoImg.height / logoImg.width) * logoW : logoW
+
+  // Get logo position coordinates
+  const getLogoPosition = () => {
+    const padding = stageSize.width * 0.03
+    switch (store.logoPosition) {
+      case 'top-right': return { x: stageSize.width - logoW - padding, y: padding }
+      case 'top-left': return { x: padding, y: padding }
+      case 'bottom-right': return { x: stageSize.width - logoW - padding, y: stageSize.height - logoH - padding }
+      case 'bottom-left': default: return { x: padding, y: stageSize.height - logoH - padding }
+    }
+  }
+  const logoPos = getLogoPosition()
 
   // Calligraphy filtering
   const allFilteredCalligraphy = calligraphy.filter(c => c.category === calligraphyCat)
@@ -344,6 +360,7 @@ export default function EditorPage() {
     { id: 'backgrounds', label: 'الخلفية', icon: <BsImage size={20} />, tip: 'اختر خلفية للبطاقة' },
     { id: 'calligraphy', label: 'المخطوطات', icon: <BsStars size={20} />, tip: 'أضف مخطوطة عيدية' },
     { id: 'photo', label: 'صورة', icon: <BsPersonCircle size={20} />, tip: 'أضف صورتك الشخصية' },
+    { id: 'logo', label: 'الشعار', icon: <BsBuilding size={20} />, tip: 'شعار شركتك' },
     { id: 'text', label: 'النصوص', icon: <BsChatLeftText size={20} />, tip: 'تعديل نصوص البطاقة' },
     { id: 'style', label: 'التنسيق', icon: <HiOutlineColorSwatch size={20} />, tip: 'الخط والألوان والتأثيرات' },
   ]
@@ -352,52 +369,79 @@ export default function EditorPage() {
      RENDER
   ═══════════════════════════════════════════════════════════════════ */
   return (
-    <div style={{ fontFamily: ds.font, background: '#f5f5f5', minHeight: '100vh', paddingBottom: 40 }}>
+    <div style={{ fontFamily: ds.font, background: '#f5f5f5', minHeight: '100vh', paddingTop: 0 }}>
       <Toaster position="top-center" toastOptions={{ 
         style: { background: '#1a1a1a', color: '#fff', borderRadius: 12, fontFamily: ds.font, fontSize: 14, padding: '12px 20px' }
       }} />
 
       {/* ═══ Header ═══ */}
       <div style={{
-        background: '#fff', borderBottom: '1px solid #eee', position: 'sticky', top: 64, zIndex: 40,
-        padding: '0 20px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+        background: '#fff', borderBottom: '1px solid #eee',
+        padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12
       }}>
-        <h1 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: '#000' }}>محرر البطاقات</h1>
+        <h1 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: '#000' }}>محرر البطاقات</h1>
         
-        {/* Mode Switcher */}
-        <div style={{ display: 'flex', background: '#f5f5f5', borderRadius: 12, padding: 4 }}>
-          <Tooltip text="تصاميم جاهزة">
-            <button onClick={() => setMode('ready')} style={{
-              display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 10,
-              border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: ds.font,
-              background: mode === 'ready' ? '#000' : 'transparent',
-              color: mode === 'ready' ? '#fff' : '#666',
-              transition: 'all 200ms'
-            }}>
-              <BsStars /> جاهز
-            </button>
-          </Tooltip>
-          <Tooltip text="صمم بنفسك">
-            <button onClick={() => setMode('designer')} style={{
-              display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 10,
-              border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: ds.font,
-              background: mode === 'designer' ? '#000' : 'transparent',
-              color: mode === 'designer' ? '#fff' : '#666',
-              transition: 'all 200ms'
-            }}>
-              <BsPencilFill /> صمّم
-            </button>
-          </Tooltip>
+        {/* Mode Switcher - Prominent */}
+        <div style={{ display: 'flex', background: '#f0f0f0', borderRadius: 14, padding: 4, gap: 4 }}>
+          <button onClick={() => setMode('ready')} style={{
+            display: 'flex', alignItems: 'center', gap: 8, padding: '12px 24px', borderRadius: 12,
+            border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: ds.font,
+            background: mode === 'ready' ? '#000' : 'transparent',
+            color: mode === 'ready' ? '#fff' : '#555',
+            transition: 'all 200ms'
+          }}>
+            <BsStars size={16} /> جاهز
+          </button>
+          <button onClick={() => setMode('designer')} style={{
+            display: 'flex', alignItems: 'center', gap: 8, padding: '12px 24px', borderRadius: 12,
+            border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: ds.font,
+            background: mode === 'designer' ? '#000' : 'transparent',
+            color: mode === 'designer' ? '#fff' : '#555',
+            transition: 'all 200ms'
+          }}>
+            <BsPencilFill size={14} /> صمّم
+          </button>
+          <button onClick={() => setMode('batch')} style={{
+            display: 'flex', alignItems: 'center', gap: 8, padding: '12px 24px', borderRadius: 12,
+            border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: ds.font,
+            background: mode === 'batch' ? '#000' : 'transparent',
+            color: mode === 'batch' ? '#fff' : '#555',
+            transition: 'all 200ms'
+          }}>
+            <BsPeople size={16} /> جماعي
+          </button>
         </div>
+      </div>
 
-        <div style={{ width: 100 }} />
+      {/* ═══ Luxury Animated Marquee Banner ═══ */}
+      <div style={{
+        background: '#2d2d2d',
+        padding: '12px 0', overflow: 'hidden', width: '100%'
+      }}>
+        <div style={{
+          display: 'flex', width: 'max-content', animation: 'marquee 20s linear infinite'
+        }}>
+          {[0, 1].map((idx) => (
+            <div key={idx} style={{ display: 'flex', gap: 50, alignItems: 'center', paddingRight: 50 }}>
+              <span style={{ color: '#d4af37', fontSize: 13, fontWeight: 600, fontFamily: ds.font }}>✨ صمّم بطاقات عيد احترافية</span>
+              <span style={{ color: '#555', fontSize: 8 }}>●</span>
+              <span style={{ color: '#fff', fontSize: 13, fontWeight: 500, fontFamily: ds.font }}>أكثر من 100+ تصميم</span>
+              <span style={{ color: '#555', fontSize: 8 }}>●</span>
+              <span style={{ color: '#d4af37', fontSize: 13, fontWeight: 600, fontFamily: ds.font }}>مجاني 100%</span>
+              <span style={{ color: '#555', fontSize: 8 }}>●</span>
+              <span style={{ color: '#fff', fontSize: 13, fontWeight: 500, fontFamily: ds.font }}>تهنئة جماعية</span>
+              <span style={{ color: '#555', fontSize: 8 }}>●</span>
+              <span style={{ color: '#d4af37', fontSize: 13, fontWeight: 600, fontFamily: ds.font }}>جودة 4K</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════
          READY MODE - Simple 3-Step Flow
       ═══════════════════════════════════════════════════════════════════ */}
       {mode === 'ready' && (
-        <div style={{ maxWidth: 600, margin: '0 auto', padding: '40px 20px' }}>
+        <div style={{ maxWidth: 600, margin: '0 auto', padding: '20px 20px 40px' }}>
           
           {/* Step 1: Choose Design */}
           <div style={{ background: '#fff', borderRadius: 20, padding: 28, marginBottom: 20, boxShadow: ds.shadow.sm }}>
@@ -508,7 +552,7 @@ export default function EditorPage() {
          DESIGNER MODE - Advanced Editor
       ═══════════════════════════════════════════════════════════════════ */}
       {mode === 'designer' && (
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '24px 16px' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '16px 16px 40px' }}>
           <div className="designer-grid" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             
             {/* ═══ Left: Canvas & Actions ═══ */}
@@ -552,6 +596,10 @@ export default function EditorPage() {
                       <DraggableText text={store.subText} x={store.subTextPos.x * stageSize.width - stageSize.width * 0.4} y={store.subTextPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={store.subFontSize * scale} fontFamily={currentFont.family} fill={store.subTextColor} align="center" lineHeight={1.5} padding={15 * scale} rotation={store.subTextRotation} shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.5)" shadowBlur={8 * scale} strokeEnabled={store.textStroke} stroke={store.textStrokeColor} strokeWidth={store.textStrokeWidth * scale * 0.7} onDragEnd={handleDrag(store.setSubTextPos)} onClick={handleElementClick('subText')} />
                       <DraggableText text={store.recipientName} x={store.recipientPos.x * stageSize.width - stageSize.width * 0.4} y={store.recipientPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={22 * scale} fontFamily={currentFont.family} fill={store.recipientColor} align="center" shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.5)" shadowBlur={6 * scale} strokeEnabled={store.textStroke} stroke={store.textStrokeColor} strokeWidth={store.textStrokeWidth * scale * 0.5} onDragEnd={handleDrag(store.setRecipientPos)} onClick={handleElementClick('recipientName')} />
                       <DraggableText text={store.senderName} x={store.senderPos.x * stageSize.width - stageSize.width * 0.4} y={store.senderPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={18 * scale} fontFamily={currentFont.family} fill={store.senderColor} align="center" opacity={0.85} shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.4)" shadowBlur={5 * scale} strokeEnabled={store.textStroke} stroke={store.textStrokeColor} strokeWidth={store.textStrokeWidth * scale * 0.4} onDragEnd={handleDrag(store.setSenderPos)} onClick={handleElementClick('senderName')} />
+                                            {/* Company Logo */}
+                                            {logoImg && logoLoaded && (
+                                              <KonvaImage image={logoImg} x={logoPos.x} y={logoPos.y} width={logoW} height={logoH} />
+                                            )}
                     </Layer>
                   </Stage>
                 </div>
@@ -639,10 +687,265 @@ export default function EditorPage() {
         </div>
       )}
 
-      {/* Animations & Responsive */}
+      {/* ═══════════════════════════════════════════════════════════════════
+         BATCH MODE - Mass Greeting Cards
+      ═══════════════════════════════════════════════════════════════════ */}
+      {mode === 'batch' && (
+        <div style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px' }}>
+          
+          {/* Preview Canvas - On Top */}
+          <div style={{ background: '#fff', borderRadius: 20, padding: 16, boxShadow: ds.shadow.sm, marginBottom: 20 }}>
+            <div ref={mode === 'batch' ? containerRef : undefined} style={{ maxWidth: 400, margin: '0 auto' }}>
+              <div style={{ background: '#000', borderRadius: 14, padding: 8 }}>
+                <Stage ref={stageRef} width={stageSize.width} height={stageSize.height} style={{ borderRadius: 10, overflow: 'hidden' }}>
+                  <Layer>
+                    <Rect width={stageSize.width} height={stageSize.height} fill="#17012C" />
+                    {bgImage && bgLoaded && <KonvaImage image={bgImage} width={stageSize.width} height={stageSize.height} />}
+                    {store.overlayOpacity > 0 && <Rect width={stageSize.width} height={stageSize.height} fill={store.overlayColor} opacity={store.overlayOpacity} />}
+                    {calligraphyImg && calligraphyLoaded && (
+                      <KonvaImage image={calligraphyImg}
+                        x={store.calligraphyPos.x * stageSize.width - calligraphyWidth / 2}
+                        y={store.calligraphyPos.y * stageSize.height - calligraphyHeight / 2}
+                        width={calligraphyWidth} height={calligraphyHeight} />
+                    )}
+                    <DraggableText text={store.mainText} x={store.mainTextPos.x * stageSize.width - stageSize.width * 0.4} y={store.mainTextPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={store.fontSize * scale} fontFamily={currentFont.family} fill={store.textColor} align="center" lineHeight={1.6} padding={20 * scale} shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.6)" shadowBlur={10 * scale} />
+                    <DraggableText text={store.recipientName || 'الاسم هنا'} x={store.recipientPos.x * stageSize.width - stageSize.width * 0.4} y={store.recipientPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={22 * scale} fontFamily={currentFont.family} fill={store.recipientColor} align="center" shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.5)" shadowBlur={6 * scale} />
+                    {logoImg && logoLoaded && (
+                      <KonvaImage image={logoImg} x={logoPos.x} y={logoPos.y} width={logoW} height={logoH} />
+                    )}
+                  </Layer>
+                </Stage>
+              </div>
+            </div>
+          </div>
+
+          {/* Progress Circle - When Generating */}
+          {store.batchGenerating && (
+            <div style={{ background: '#fff', borderRadius: 20, padding: 24, boxShadow: ds.shadow.sm, marginBottom: 20, textAlign: 'center' }}>
+              <div style={{ position: 'relative', width: 100, height: 100, margin: '0 auto 12px' }}>
+                <svg width="100" height="100" style={{ transform: 'rotate(-90deg)' }}>
+                  <circle cx="50" cy="50" r="44" fill="none" stroke="#f0f0f0" strokeWidth="10" />
+                  <circle cx="50" cy="50" r="44" fill="none" stroke="#000" strokeWidth="10"
+                    strokeDasharray={276.5} strokeDashoffset={276.5 * (1 - store.batchProgress / 100)}
+                    strokeLinecap="round" style={{ transition: 'stroke-dashoffset 300ms ease' }} />
+                </svg>
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: 20, fontWeight: 800 }}>
+                  {store.batchProgress}%
+                </div>
+              </div>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>جاري إنشاء: {store.batchNames[store.batchCurrentIndex]}</p>
+              <p style={{ margin: '4px 0 0', fontSize: 12, color: '#888' }}>{store.batchCurrentIndex + 1} / {store.batchNames.length}</p>
+            </div>
+          )}
+
+          {/* Names Input Section */}
+          <div style={{ background: '#fff', borderRadius: 20, padding: 24, boxShadow: ds.shadow.sm, marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 14, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <BsPeople size={20} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>تهنئة جماعية</h3>
+                <p style={{ margin: 0, fontSize: 12, color: '#888' }}>أدخل أسماء المهنئين</p>
+              </div>
+            </div>
+
+            {/* File Upload */}
+            <label style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%',
+              padding: '16px', background: '#f8f8f8', border: '2px dashed #ddd', borderRadius: 14,
+              cursor: 'pointer', marginBottom: 16, fontFamily: ds.font
+            }}>
+              <input type="file" accept=".txt,.csv" style={{ display: 'none' }} onChange={(e) => {
+                const file = e.target.files[0]
+                if (!file) return
+                const reader = new FileReader()
+                reader.onload = (ev) => {
+                  const text = ev.target.result
+                  const names = text.split(/[\n,;]+/).map(n => n.trim()).filter(n => n.length > 0)
+                  store.setBatchNames(names)
+                  toast.success(`تم تحميل ${names.length} اسم`)
+                }
+                reader.readAsText(file)
+                e.target.value = ''
+              }} />
+              <BsFileEarmarkText size={18} />
+              <span style={{ fontSize: 13, fontWeight: 600 }}>رفع ملف (.txt, .csv)</span>
+            </label>
+
+            {/* Text Input */}
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 8 }}>أو اكتب الأسماء (اسم في كل سطر)</label>
+              <textarea
+                dir="rtl"
+                rows={5}
+                placeholder="محمد العلي&#10;فاطمة السعيد&#10;أحمد الخالد..."
+                value={store.batchNames.join('\n')}
+                onChange={(e) => {
+                  const names = e.target.value.split('\n').map(n => n.trim()).filter(n => n.length > 0)
+                  store.setBatchNames(names)
+                }}
+                style={{
+                  width: '100%', padding: 14, fontSize: 14, fontFamily: ds.font, border: '2px solid #eee',
+                  borderRadius: 12, resize: 'none', outline: 'none', background: '#fafafa', lineHeight: 1.8
+                }}
+              />
+            </div>
+
+            {/* Names Count */}
+            {store.batchNames.length > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 12, background: '#f0fdf4', borderRadius: 12, marginBottom: 16 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#166534' }}>{store.batchNames.length} اسم جاهز</span>
+                <button onClick={() => store.resetBatch()} style={{
+                  padding: '6px 12px', borderRadius: 8, border: 'none', background: '#fee2e2', color: '#dc2626',
+                  fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: ds.font
+                }}>
+                  مسح
+                </button>
+              </div>
+            )}
+
+            {/* Generate Button */}
+            <button
+              onClick={async () => {
+                if (store.batchNames.length === 0) {
+                  toast.error('أدخل أسماء أولاً')
+                  return
+                }
+                store.setBatchGenerating(true)
+                store.setGeneratedCards([])
+                
+                for (let i = 0; i < store.batchNames.length; i++) {
+                  store.setBatchCurrentIndex(i)
+                  store.setBatchProgress(Math.round(((i + 1) / store.batchNames.length) * 100))
+                  store.setRecipientName(store.batchNames[i])
+                  await new Promise(resolve => setTimeout(resolve, 300))
+                  if (stageRef.current) {
+                    const dataUrl = stageRef.current.toDataURL({ pixelRatio: 3 })
+                    store.addGeneratedCard({ name: store.batchNames[i], dataUrl })
+                  }
+                }
+                
+                store.setBatchGenerating(false)
+                toast.success(`تم إنشاء ${store.batchNames.length} بطاقة!`)
+              }}
+              disabled={store.batchGenerating || store.batchNames.length === 0}
+              style={{
+                width: '100%', padding: '16px', borderRadius: 14, border: 'none',
+                background: store.batchNames.length > 0 ? '#000' : '#ddd',
+                color: '#fff', fontSize: 15, fontWeight: 700, cursor: store.batchNames.length > 0 ? 'pointer' : 'not-allowed',
+                fontFamily: ds.font, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10
+              }}
+            >
+              {store.batchGenerating ? (
+                <>
+                  <div style={{ width: 20, height: 20, border: '3px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                  جاري الإنشاء... {store.batchProgress}%
+                </>
+              ) : (
+                <><BsStars size={18} /> إنشاء البطاقات</>
+              )}
+            </button>
+          </div>
+
+          {/* Generated Cards */}
+          {store.generatedCards.length > 0 && !store.batchGenerating && (
+            <div style={{ background: '#fff', borderRadius: 20, padding: 24, boxShadow: ds.shadow.sm }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <h4 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>البطاقات الجاهزة ({store.generatedCards.length})</h4>
+                <button
+                  onClick={async () => {
+                    const zip = new JSZip()
+                    store.generatedCards.forEach((card) => {
+                      const base64 = card.dataUrl.split(',')[1]
+                      zip.file(`بطاقة-${card.name}.png`, base64, { base64: true })
+                    })
+                    const content = await zip.generateAsync({ type: 'blob' })
+                    const link = document.createElement('a')
+                    link.href = URL.createObjectURL(content)
+                    link.download = `بطاقات-العيد-${store.generatedCards.length}.zip`
+                    link.click()
+                    toast.success('تم تحميل الملف!')
+                  }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px',
+                    background: '#000', color: '#fff', border: 'none', borderRadius: 10,
+                    fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: ds.font
+                  }}
+                >
+                  <BsCloudDownload size={16} /> تحميل ZIP
+                </button>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, maxHeight: 250, overflowY: 'auto' }}>
+                {store.generatedCards.map((card, i) => (
+                  <div key={i} style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', border: '2px solid #eee' }}>
+                    <img src={card.dataUrl} alt={card.name} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover' }} />
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.8))', padding: '12px 6px 6px', textAlign: 'center' }}>
+                      <span style={{ color: '#fff', fontSize: 9, fontWeight: 600 }}>{card.name}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ═══ Attribution Footer ═══ */}
+      <div style={{
+        background: '#fff', borderTop: '1px solid #eee',
+        padding: '50px 20px', textAlign: 'center'
+      }}>
+        <div style={{ maxWidth: 480, margin: '0 auto' }}>
+          {/* Designer Credit Card */}
+          <div style={{
+            background: '#fafafa', borderRadius: 16, padding: '28px 32px',
+            marginBottom: 24, border: '1px solid #eee'
+          }}>
+            <p style={{ margin: '0 0 16px', fontSize: 13, color: '#888', fontFamily: ds.font }}>
+              تم تصميم وتطوير هذا المشروع بواسطة
+            </p>
+            <a
+              href="https://x.com/am_designing"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10, padding: '10px 20px',
+                background: '#000', color: '#fff', borderRadius: 10, textDecoration: 'none',
+                fontSize: 14, fontWeight: 600, fontFamily: ds.font
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+              @am_designing
+            </a>
+          </div>
+
+          {/* Collaboration */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 12, color: '#999', fontFamily: ds.font }}>هل ترغب بالتعاون معنا؟</span>
+            <a
+              href="https://x.com/am_designing"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontSize: 12, color: '#000', fontWeight: 600, fontFamily: ds.font,
+                textDecoration: 'underline', textUnderlineOffset: 3
+              }}
+            >
+              تواصل معنا →
+            </a>
+          </div>
+        </div>
+      </div>
+      
+            {/* Animations & Responsive */}
       <style>{`
         @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes tooltipIn { from { opacity: 0; transform: translateX(-50%) translateY(4px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
         input[type="range"] { -webkit-appearance: none; height: 6px; border-radius: 6px; background: #eee; cursor: pointer; width: 100%; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #000; cursor: pointer; }
         
@@ -664,7 +967,7 @@ export default function EditorPage() {
           }
           .tool-tabs {
             display: grid !important;
-            grid-template-columns: repeat(5, 1fr) !important;
+            grid-template-columns: repeat(6, 1fr) !important;
             overflow: visible !important;
           }
         }
@@ -679,6 +982,13 @@ export default function EditorPage() {
           }
           .tools-section {
             order: 2;
+          }
+        }
+        
+        /* Batch mode mobile */
+        @media (max-width: 768px) {
+          .batch-grid {
+            grid-template-columns: 1fr !important;
           }
         }
       `}</style>
@@ -903,6 +1213,94 @@ export default function EditorPage() {
               fontSize: 14, fontWeight: 600, fontFamily: ds.font
             }}>
               إزالة الصورة
+            </button>
+          </div>
+        )}
+      </div>
+    )
+
+    // ─── LOGO PANEL ───
+    if (activePanel === 'logo') return (
+      <div style={{ animation: 'fadeUp 200ms ease' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+          <div style={{ width: 44, height: 44, borderRadius: 14, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <BsBuilding size={20} />
+          </div>
+          <div>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>شعار الشركة</h3>
+            <p style={{ margin: 0, fontSize: 12, color: '#888' }}>أضف شعارك على البطاقة</p>
+          </div>
+        </div>
+
+        {/* Upload Logo */}
+        <label style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%',
+          padding: '20px', background: '#f8f8f8', border: '2px dashed #ddd', borderRadius: 14,
+          cursor: 'pointer', marginBottom: 20, transition: 'all 200ms', fontFamily: ds.font
+        }}>
+          <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
+            const file = e.target.files[0]
+            if (!file) return
+            const reader = new FileReader()
+            reader.onload = (ev) => {
+              store.setCompanyLogo(ev.target.result)
+              toast.success('تم إضافة الشعار')
+            }
+            reader.readAsDataURL(file)
+            e.target.value = ''
+          }} />
+          <BsBuilding size={20} />
+          <span style={{ fontSize: 14, fontWeight: 600 }}>{store.companyLogo ? 'تغيير الشعار' : 'رفع الشعار'}</span>
+        </label>
+
+        {/* Logo Controls */}
+        {store.companyLogo && (
+          <div style={{ animation: 'fadeUp 200ms ease' }}>
+            {/* Preview */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+              <div style={{ width: 80, height: 80, overflow: 'hidden', border: '2px solid #eee', borderRadius: 12, background: '#f8f8f8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <img src={store.companyLogo} alt="شعار" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+              </div>
+            </div>
+
+            {/* Position Selector */}
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 10 }}>موقع الشعار</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                {[
+                  { id: 'top-right', label: 'أعلى يمين' },
+                  { id: 'top-left', label: 'أعلى يسار' },
+                  { id: 'bottom-right', label: 'أسفل يمين' },
+                  { id: 'bottom-left', label: 'أسفل يسار' },
+                ].map(pos => (
+                  <button key={pos.id} onClick={() => store.setLogoPosition(pos.id)} style={{
+                    padding: '12px', borderRadius: 12, border: 'none', cursor: 'pointer', fontFamily: ds.font,
+                    background: store.logoPosition === pos.id ? '#000' : '#f5f5f5',
+                    color: store.logoPosition === pos.id ? '#fff' : '#666',
+                    fontSize: 13, fontWeight: 600, transition: 'all 200ms'
+                  }}>
+                    {pos.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Size */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <span style={{ fontSize: 13, fontWeight: 600 }}>الحجم</span>
+                <span style={{ fontSize: 12, color: '#888', background: '#f5f5f5', padding: '4px 10px', borderRadius: 8 }}>{Math.round(store.logoScale * 100)}%</span>
+              </div>
+              <input type="range" min={0.05} max={0.3} step={0.01} value={store.logoScale} onChange={(e) => store.setLogoScale(Number(e.target.value))} style={{ width: '100%' }} />
+            </div>
+
+            {/* Remove Button */}
+            <button onClick={() => store.setCompanyLogo(null)} style={{
+              width: '100%', padding: '14px', borderRadius: 14,
+              border: 'none', background: '#fee2e2', color: '#dc2626', cursor: 'pointer',
+              fontSize: 14, fontWeight: 600, fontFamily: ds.font
+            }}>
+              إزالة الشعار
             </button>
           </div>
         )}

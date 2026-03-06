@@ -1,6 +1,6 @@
 ﻿import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Palette, Download, Smartphone, Type, Layers, Shield, ChevronDown, Heart } from 'lucide-react'
+import { ArrowLeft, Palette, Download, Smartphone, Type, Layers, Shield, ChevronDown, Heart, DollarSign } from 'lucide-react'
 
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState(null)
@@ -42,9 +42,9 @@ export default function LandingPage() {
       desc: 'ادعم تطوير المنصة',
       features: ['كل الميزات المجانية', 'أولوية في الميزات الجديدة', 'اسمك في قائمة الداعمين'],
       cta: 'ادعم المشروع',
-      href: 'https://paypal.me/SOLIMANW',
+      href: '/donate',
       highlight: true,
-      external: true,
+      external: false,
     },
     {
       name: 'للشركات',
@@ -156,22 +156,25 @@ export default function LandingPage() {
               <ArrowLeft size={18} />
             </Link>
             <a
-              href="#features"
+              href="https://paypal.me/SOLIMANW"
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
                 padding: '14px 28px',
-                background: 'rgba(255,255,255,0.1)',
+                background: 'linear-gradient(135deg, #0070ba, #003087)',
                 color: '#fff',
                 fontSize: '15px',
-                fontWeight: 500,
+                fontWeight: 600,
                 borderRadius: '12px',
                 textDecoration: 'none',
                 transition: 'all 200ms ease',
               }}
             >
-              اكتشف المميزات
+              <DollarSign size={18} />
+              ادعم المشروع
             </a>
           </div>
 

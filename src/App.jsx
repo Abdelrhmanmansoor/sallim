@@ -10,6 +10,8 @@ import DashboardPage from './pages/DashboardPage'
 import CardViewPage from './pages/CardViewPage'
 import EidiyaPage from './pages/EidiyaPage'
 import EidiyaLuckPage from './pages/EidiyaLuckPage'
+import EidiyaGamePage from './pages/EidiyaGamePage'
+import DonatePage from './pages/DonatePage'
 import PrivacyPage from './pages/PrivacyPage'
 import TermsPage from './pages/TermsPage'
 import EidParticles from './components/effects/EidParticles'
@@ -23,6 +25,8 @@ export default function App() {
     '/send',
     '/eidiya',
     '/eidiya-luck',
+    '/eidiya-game',
+    '/donate',
     '/card',
     '/dashboard',
   ].includes(pathname)
@@ -46,6 +50,8 @@ export default function App() {
           <Route path="/card" element={<CardViewPage />} />
           <Route path="/eidiya" element={<EidiyaPage />} />
           <Route path="/eidiya-luck" element={<EidiyaLuckPage />} />
+          <Route path="/eidiya-game" element={<EidiyaGamePage />} />
+          <Route path="/donate" element={<DonatePage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />

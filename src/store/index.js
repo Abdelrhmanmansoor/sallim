@@ -37,6 +37,18 @@ export const useEditorStore = create((set, get) => ({
   photoBorderColor: '#ffffff',
   photoBorderWidth: 3,
 
+  // Company Logo
+  companyLogo: null,
+  logoPosition: 'bottom-left', // top-right, top-left, bottom-right, bottom-left
+  logoScale: 0.12,
+
+  // Batch Names
+  batchNames: [],
+  batchGenerating: false,
+  batchProgress: 0,
+  batchCurrentIndex: 0,
+  generatedCards: [],
+
   // Text effects
   textShadow: false,
   textStroke: false,
@@ -86,6 +98,20 @@ export const useEditorStore = create((set, get) => ({
   setPhotoBorderColor: (c) => set({ photoBorderColor: c }),
   setPhotoBorderWidth: (w) => set({ photoBorderWidth: w }),
   setActiveElement: (el) => set({ activeElement: el }),
+
+  // Logo actions
+  setCompanyLogo: (logo) => set({ companyLogo: logo }),
+  setLogoPosition: (pos) => set({ logoPosition: pos }),
+  setLogoScale: (s) => set({ logoScale: s }),
+
+  // Batch actions
+  setBatchNames: (names) => set({ batchNames: names }),
+  setBatchGenerating: (v) => set({ batchGenerating: v }),
+  setBatchProgress: (p) => set({ batchProgress: p }),
+  setBatchCurrentIndex: (i) => set({ batchCurrentIndex: i }),
+  setGeneratedCards: (cards) => set({ generatedCards: cards }),
+  addGeneratedCard: (card) => set((state) => ({ generatedCards: [...state.generatedCards, card] })),
+  resetBatch: () => set({ batchNames: [], batchGenerating: false, batchProgress: 0, batchCurrentIndex: 0, generatedCards: [] }),
 
   // Send state
   sendMode: 'single',
