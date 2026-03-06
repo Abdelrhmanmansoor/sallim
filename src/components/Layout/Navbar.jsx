@@ -7,7 +7,6 @@ const links = [
   { path: '/editor', label: 'المحرر' },
   { path: '/texts', label: 'النصوص' },
   { path: '/send', label: 'الإرسال' },
-  { path: '/pricing', label: 'الأسعار' },
 ]
 
 export default function Navbar() {
@@ -64,7 +63,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex" style={{ display: 'none', alignItems: 'center', gap: '4px' }}>
+          <div className="hidden md:flex" style={{ alignItems: 'center', gap: '4px' }}>
             {links.map(l => (
               <Link key={l.path} to={l.path}
                 style={{
@@ -91,7 +90,7 @@ export default function Navbar() {
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex" style={{ display: 'none', alignItems: 'center', gap: '12px' }}>
+          <div className="hidden md:flex" style={{ alignItems: 'center', gap: '12px' }}>
             <Link to="/editor" style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',
               padding: '10px 24px', borderRadius: '9999px',

@@ -8,7 +8,7 @@ export default function WhatsAppFloat() {
   const [isDesktop, setIsDesktop] = useState(false)
   
   const phoneNumber = '201007835547'
-  const message = 'مرحباً، أنا مهتم بشراء سكريبت سَلِّم للشركات 🎉'
+  const message = 'مرحباً، عندي استفسار عن منصة سَلِّم 🎉'
 
   useEffect(() => {
     const savedDismissed = window.localStorage.getItem(DISMISS_KEY) === '1'
@@ -73,9 +73,9 @@ export default function WhatsAppFloat() {
 
           {/* Message content */}
           <div>
-            <p className="text-gray-800 text-sm font-bold mb-1">عرض خاص للشركات</p>
+            <p className="text-gray-800 text-sm font-bold mb-1">تحتاج مساعدة؟</p>
             <p className="text-gray-600 text-xs leading-relaxed">
-              احصل على سكريبت سَلِّم كامل لشركتك بخصم 70%
+              تواصل معنا عبر واتساب لأي استفسار أو اقتراح
             </p>
             <button
               onClick={handleWhatsAppClick}

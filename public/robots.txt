@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sallim.vercel.app/sitemap.xml

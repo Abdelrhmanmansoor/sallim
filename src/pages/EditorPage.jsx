@@ -278,6 +278,29 @@ export default function EditorPage() {
     return () => window.removeEventListener('keydown', onKey)
   }, [store.activeElement, stageSize.width])
 
+  /* ── Pinch-to-zoom: resize active text on mobile ── */
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el || mode !== 'designer') return
+    let lastDist = 0
+    const getDist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY)
+    const onTS = (e) => { if (e.touches.length === 2) lastDist = getDist(e.touches) }
+    const onTM = (e) => {
+      if (e.touches.length !== 2) return
+      e.preventDefault()
+      const d = getDist(e.touches), delta = d - lastDist
+      if (Math.abs(delta) < 3) return
+      const step = delta > 0 ? 2 : -2
+      const s = useEditorStore.getState()
+      if (s.activeElement === 'subText') s.setSubFontSize(Math.max(10, Math.min(52, s.subFontSize + step)))
+      else s.setFontSize(Math.max(16, Math.min(80, s.fontSize + step)))
+      lastDist = d
+    }
+    el.addEventListener('touchstart', onTS, { passive: true })
+    el.addEventListener('touchmove', onTM, { passive: false })
+    return () => { el.removeEventListener('touchstart', onTS); el.removeEventListener('touchmove', onTM) }
+  }, [mode])
+
   const handleTemplateUpload = (e) => {
     const files = Array.from(e.target.files)
     files.forEach(file => {
@@ -345,26 +368,7 @@ export default function EditorPage() {
               <BsPencilFill className="text-sm" /> أنت المصمم
             </button>
           </div>
-          {mode === 'designer' && (
-            <div className="hidden sm:flex items-center gap-2">
-              <button onClick={handleExportPNG} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 shadow-sm transition-all">
-                <BsDownload /> تحميل PNG
-              </button>
-              <button onClick={handleShareWhatsApp} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#25D366]/10 text-[#128C7E] text-xs font-medium hover:bg-[#25D366]/20 transition-all">
-                <BsWhatsapp />
-              </button>
-              <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-gray-200 text-gray-500 text-xs font-medium hover:bg-gray-50 transition-all">
-                <BsFilePdf />
-              </button>
-              <button onClick={handleCopyImage} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-gray-200 text-gray-500 text-xs font-medium hover:bg-gray-50 transition-all">
-                {copied ? <BsCheck2 className="text-emerald-500" /> : <BsLink45Deg />}
-              </button>
-              <button onClick={handleShareNative} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-gray-200 text-gray-500 text-xs font-medium hover:bg-gray-50 transition-all">
-                <BsShareFill />
-              </button>
-            </div>
-          )}
-          {mode === 'ready' && <div className="w-1" />}
+          <div className="w-1" />
         </div>
       </div>
 
@@ -451,33 +455,13 @@ export default function EditorPage() {
 
       {/* ═══════════════ DESIGNER MODE ═══════════════ */}
       {mode === 'designer' && (
-        <div className="flex flex-col xl:flex-row" style={{ minHeight: 'calc(100vh - 128px)' }}>
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-6">
+          <div className="xl:flex xl:gap-8 xl:items-start">
 
-          {/* ── TOOL SIDEBAR (desktop) ── */}
-          <div className="hidden xl:flex flex-col w-16 bg-white border-l border-gray-100 shrink-0 items-center py-4 gap-1">
-            {toolItems.map(t => (
-              <button key={t.id} onClick={() => setActivePanel(activePanel === t.id ? activePanel : t.id)}
-                className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all text-[10px] font-bold ${activePanel === t.id
-                  ? 'bg-blue-50 text-blue-600' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'}`}
-                title={t.label}
-              >
-                <span className="text-lg">{t.icon}</span>
-                <span className="leading-none">{t.label}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* ── PANEL (desktop: side column / mobile: below canvas) ── */}
-          <div className="hidden xl:block w-[340px] bg-white border-l border-gray-100 shrink-0 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 128px)' }}>
-            <div className="p-5 space-y-5">
-              {renderPanel()}
-            </div>
-          </div>
-
-          {/* ── CANVAS AREA ── */}
-          <div className="flex-1 flex flex-col items-center justify-start xl:justify-center px-4 py-6 xl:py-8 min-w-0">
-            <div ref={mode === 'designer' ? containerRef : undefined} className="w-full max-w-[500px]">
-              <div className="bg-white rounded-xl p-2 sm:p-2.5 shadow-lg ring-1 ring-black/[0.04]">
+          {/* ── CANVAS + ACTIONS ── */}
+          <div className="xl:flex-1 xl:sticky xl:top-24 space-y-4 mb-6 xl:mb-0">
+            <div ref={mode === 'designer' ? containerRef : undefined} className="w-full max-w-[520px] mx-auto" style={{ touchAction: 'none' }}>
+              <div className="bg-white rounded-2xl p-2.5 shadow-lg ring-1 ring-black/[0.04]">
                 <Stage ref={stageRef} width={stageSize.width} height={stageSize.height} className="rounded-lg overflow-hidden mx-auto cursor-grab active:cursor-grabbing">
                   <Layer>
                     <Rect width={stageSize.width} height={stageSize.height} fill="#17012C" />
@@ -526,36 +510,44 @@ export default function EditorPage() {
               </div>
             </div>
 
-            {/* Mobile action buttons */}
-            <div className="flex sm:hidden gap-2 justify-center flex-wrap mt-4 w-full max-w-[500px]">
-              <button onClick={handleExportPNG} className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 shadow-sm transition-all">
-                <BsDownload /> تحميل PNG
+            {/* Action buttons */}
+            <div className="max-w-[520px] mx-auto grid grid-cols-2 gap-3">
+              <button onClick={handleExportPNG} className="flex items-center justify-center gap-2.5 py-4 rounded-2xl bg-blue-600 text-white font-bold text-sm shadow-lg shadow-blue-500/25 hover:bg-blue-700 active:scale-[0.98] transition-all">
+                <BsDownload className="text-lg" /> تحميل البطاقة
               </button>
-              <button onClick={handleShareWhatsApp} className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#25D366]/10 text-[#128C7E] text-xs font-medium transition-all">
-                <BsWhatsapp />
+              <button onClick={handleShareWhatsApp} className="flex items-center justify-center gap-2.5 py-4 rounded-2xl bg-[#25D366] text-white font-bold text-sm shadow-lg shadow-green-500/25 hover:bg-[#1da851] active:scale-[0.98] transition-all">
+                <BsWhatsapp className="text-lg" /> مشاركة واتساب
               </button>
-              <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-500 text-xs font-medium transition-all">
-                <BsFilePdf />
+            </div>
+            <div className="max-w-[520px] mx-auto flex gap-2 justify-center">
+              <button onClick={handleExportPDF} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 shadow-sm transition-all">
+                <BsFilePdf /> PDF
               </button>
-              <button onClick={handleCopyImage} className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-500 text-xs font-medium transition-all">
-                {copied ? <BsCheck2 className="text-emerald-500" /> : <BsLink45Deg />}
+              <button onClick={handleCopyImage} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 shadow-sm transition-all">
+                {copied ? <BsCheck2 className="text-emerald-500" /> : <BsLink45Deg />} {copied ? 'تم!' : 'نسخ'}
+              </button>
+              <button onClick={handleShareNative} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 shadow-sm transition-all">
+                <BsShareFill /> مشاركة
               </button>
             </div>
           </div>
 
-          {/* ── MOBILE: Tool tabs + Panel below canvas ── */}
-          <div className="xl:hidden px-4 pb-8 space-y-3">
-            <div className="flex gap-1.5 overflow-x-auto custom-scrollbar py-1">
+          {/* ── TOOLS + PANEL ── */}
+          <div className="xl:w-[400px] xl:shrink-0 space-y-4">
+            <div className="grid grid-cols-5 gap-2">
               {toolItems.map(t => (
                 <button key={t.id} onClick={() => setActivePanel(t.id)}
-                  className={`shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${activePanel === t.id
-                    ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-gray-400 border border-gray-200 hover:text-gray-600'}`}
+                  className={`flex flex-col items-center justify-center gap-1.5 py-3.5 rounded-2xl transition-all ${activePanel === t.id
+                    ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'}`}
                 >
-                  <span className="text-sm">{t.icon}</span> {t.label}
+                  <span className="text-xl">{t.icon}</span>
+                  <span className="text-[11px] font-bold leading-none">{t.label}</span>
                 </button>
               ))}
             </div>
             {renderPanel()}
+          </div>
+
           </div>
         </div>
       )}
@@ -574,7 +566,7 @@ export default function EditorPage() {
   /* ═══ Panel content renderer ═══ */
   function renderPanel() {
     if (activePanel === 'backgrounds') return (
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4 animate-fadeIn xl:border-0 xl:p-0 xl:rounded-none xl:shadow-none">
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4 animate-fadeIn">
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 rounded-xl p-4 border border-blue-100/60">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-sm">
@@ -609,7 +601,7 @@ export default function EditorPage() {
     )
 
     if (activePanel === 'calligraphy') return (
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4 animate-fadeIn xl:border-0 xl:p-0 xl:rounded-none">
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4 animate-fadeIn">
         <div className="flex gap-1.5">
           {calligraphyCategories.map(cat => (
             <button key={cat.id} onClick={() => { setCalligraphyCat(cat.id); setCalligraphyLimit(30) }}
@@ -663,7 +655,7 @@ export default function EditorPage() {
     )
 
     if (activePanel === 'photo') return (
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4 animate-fadeIn xl:border-0 xl:p-0 xl:rounded-none">
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4 animate-fadeIn">
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 rounded-xl p-4 border border-blue-100/60">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-sm">
@@ -741,7 +733,7 @@ export default function EditorPage() {
     )
 
     if (activePanel === 'text') return (
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4 animate-fadeIn xl:border-0 xl:p-0 xl:rounded-none">
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4 animate-fadeIn">
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-gray-700">النص الرئيسي</label>
@@ -800,7 +792,7 @@ export default function EditorPage() {
     )
 
     if (activePanel === 'style') return (
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-5 animate-fadeIn xl:border-0 xl:p-0 xl:rounded-none">
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-5 animate-fadeIn">
         <div className="space-y-2">
           <label className="text-xs font-bold text-gray-700">الخط</label>
           <div className="flex gap-1.5 overflow-x-auto pb-1 custom-scrollbar">

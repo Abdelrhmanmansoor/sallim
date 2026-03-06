@@ -4,13 +4,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/card/:path*", "destination": "/index.html" },
-    { "source": "/editor/:path*", "destination": "/index.html" },
-    { "source": "/send/:path*", "destination": "/index.html" },
-    { "source": "/pricing/:path*", "destination": "/index.html" },
-    { "source": "/texts/:path*", "destination": "/index.html" },
-    { "source": "/dashboard/:path*", "destination": "/index.html" },
-    { "source": "/eidiya/:path*", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
     {
