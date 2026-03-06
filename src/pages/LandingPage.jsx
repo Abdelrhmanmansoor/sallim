@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+﻿import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowLeft, Palette, Type, Send, Download,
@@ -652,18 +652,18 @@ function EidiyaLuckGenerator() {
   return (
     <section className="section-spacing bg-white">
       <div className="container-main">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           {/* Heading */}
           <div className="text-center mb-12">
             <span className="section-label"><Sparkles className="w-3.5 h-3.5" /> ميزة جديدة</span>
             <h2 className="section-title mt-3 mb-4">عيدية مفاجأة 🎁</h2>
-            <p className="text-[#64748b] text-[15px] leading-relaxed max-w-lg mx-auto">
+            <p className="text-[#64748b] text-[15px] leading-relaxed max-w-xl mx-auto">
               أنشئ رابط عيدية مفاجأة وأرسله لأصدقائك — المستلم يختار فانوسه ويكشف مبلغه مع دعاء جميل
             </p>
           </div>
 
           {/* Features */}
-          <div className="grid grid-cols-2 gap-5 mb-12">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
             {luckFeatures.map((f, i) => (
               <div key={i} className="rounded-xl border border-[#e2e8f0] bg-white p-5 text-center hover:border-[#bfdbfe] hover:shadow-sm transition-all">
                 <div className="w-10 h-10 mx-auto mb-3 rounded-lg bg-[#eff6ff] border border-[#dbeafe] flex items-center justify-center">
@@ -739,36 +739,39 @@ function EidiyaLuckGenerator() {
    ═══════════════════════════════════════════════════════════════════════════ */
 function FAQ({ q, a, isOpen, toggle, index }) {
   return (
-    <div className={`faq-item-luxury ${isOpen ? 'open' : ''}`}>
-      <button onClick={toggle} className="w-full flex items-center justify-between p-5 text-right group">
-        <div className="flex items-center gap-4">
-          <span className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-sm font-bold transition-all duration-300 ${
-            isOpen 
-              ? 'bg-gradient-to-br from-[#d4af37] to-[#f4e4a6] text-[#1e1b4b]' 
-              : 'bg-[#fef9e7] text-[#92400e] border border-[#d4af37]/30'
-          }`}>
-            {String(index + 1).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d])}
-          </span>
-          <span className={`text-[15px] font-semibold transition-colors ${isOpen ? 'text-[#92400e]' : 'text-[#0f172a]'}`}>{q}</span>
-        </div>
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
-          isOpen 
-            ? 'bg-gradient-to-br from-[#d4af37] to-[#f4e4a6] rotate-180' 
-            : 'bg-[#fef9e7] border border-[#d4af37]/30'
+    <div className={`rounded-2xl border overflow-hidden transition-all duration-300 ${
+      isOpen
+        ? 'border-[#d4af37]/50 shadow-[0_4px_20px_rgba(212,175,55,0.10)] bg-gradient-to-br from-[#fef9e7] to-[#fffdf5]'
+        : 'border-[#e2e8f0] bg-white hover:border-[#d4af37]/30 hover:shadow-sm'
+    }`}>
+      <button onClick={toggle} className="w-full flex items-center gap-4 px-6 py-5 text-right">
+        <span className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-sm font-black transition-all duration-300 ${
+          isOpen
+            ? 'bg-[#d4af37] text-white shadow-sm'
+            : 'bg-[#fef3c7] text-[#92400e]'
         }`}>
-          <ChevronDown className={`w-4 h-4 transition-colors ${isOpen ? 'text-[#1e1b4b]' : 'text-[#92400e]'}`} />
-        </div>
+          {String(index + 1).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d])}
+        </span>
+        <span className={`flex-1 text-base font-bold text-right transition-colors leading-snug ${
+          isOpen ? 'text-[#92400e]' : 'text-[#0f172a]'
+        }`}>{q}</span>
+        <span className={`w-8 h-8 rounded-full border flex items-center justify-center shrink-0 text-lg font-bold leading-none transition-all duration-300 ${
+          isOpen
+            ? 'border-[#d4af37] text-[#d4af37] rotate-45'
+            : 'border-[#e2e8f0] text-[#94a3b8]'
+        }`}>+</span>
       </button>
       <div className={`grid transition-all duration-300 ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="overflow-hidden">
-          <div className="px-5 pb-5 pr-[4.5rem]">
-            <p className="text-[#64748b] text-sm leading-relaxed">{a}</p>
+          <div className="px-6 pb-5 pr-[4.75rem] border-t border-[#d4af37]/15">
+            <p className="text-[#64748b] text-[14px] leading-[1.9] pt-4">{a}</p>
           </div>
         </div>
       </div>
     </div>
   )
 }
+
 
 const faqs = [
   { q: 'هل المنصة مجانية؟', a: 'نعم، يمكنك تصميم وتحميل البطاقات مجاناً بالكامل بدون تسجيل أو بيانات شخصية.' },
@@ -1289,7 +1292,7 @@ export default function LandingPage() {
       {/* ── FAQ ── */}
       <section className="section-spacing bg-gradient-to-b from-[#fef9e7]/50 to-[#f8fafc]">
         <div className="container-main">
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-3xl mx-auto">
             {/* Luxury Header */}
             <div className="text-center mb-12">
               <span className="official-badge">
@@ -1304,13 +1307,11 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* FAQ Items with Luxury Border Container */}
-            <div className="luxury-card !p-0 overflow-hidden">
-              <div className="divide-y divide-[#d4af37]/10">
-                {faqs.map((f, i) => (
-                  <FAQ key={i} q={f.q} a={f.a} isOpen={openFaq === i} toggle={() => setOpenFaq(openFaq === i ? null : i)} index={i} />
-                ))}
-              </div>
+            {/* FAQ Items */}
+            <div className="space-y-3">
+              {faqs.map((f, i) => (
+                <FAQ key={i} q={f.q} a={f.a} isOpen={openFaq === i} toggle={() => setOpenFaq(openFaq === i ? null : i)} index={i} />
+              ))}
             </div>
 
             {/* Bottom decoration */}
