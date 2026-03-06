@@ -238,32 +238,136 @@ export default function LandingPage() {
       </section>
 
 
-      {/* ═══════════ SUPPORT ═══════════ */}
-      <section style={{ background: '#f8fafc', paddingTop: '80px', paddingBottom: '80px' }}>
-        <div style={{ maxWidth: '520px', margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
-          <p style={{ fontSize: '17px', color: '#475569', lineHeight: 1.9, marginBottom: '28px', fontWeight: 500 }}>
-            صمّمنا هالموقع عشان تنشر فرحة العيد بسهولة 🎉
-            <br />
-            إذا أعجبك المشروع تقدر تدعمه ☕
-          </p>
-          <a
-            href="https://paypal.me/SOLIMANW"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: '10px',
-              padding: '16px 40px', borderRadius: '16px',
-              background: 'linear-gradient(135deg, #0070ba, #1546a0)',
-              color: '#ffffff', fontSize: '16px', fontWeight: 700,
-              textDecoration: 'none',
-              boxShadow: '0 8px 28px rgba(0,112,186,0.25)',
-              transition: 'all 0.3s',
+      {/* ═══════════ PAYMENT/PRICING ═══════════ */}
+      <section style={{ background: 'linear-gradient(135deg, #f0fdfa 0%, #e0f2fe 100%)', paddingTop: '100px', paddingBottom: '100px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+            <span style={{ display: 'inline-block', fontSize: '13px', fontWeight: 700, color: '#0d9488', letterSpacing: '3px', marginBottom: '16px' }}>الدعم والاستثمار</span>
+            <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 800, color: '#0f172a', marginBottom: '20px' }}>ادعم المشروع وساهم في التطوير</h2>
+            <p style={{ fontSize: '18px', color: '#64748b', maxWidth: '600px', margin: '0 auto', lineHeight: 1.7 }}>
+              كل مساهمة تساعد في تطوير منصة أفضل ونشر فرحة العيد ل المزيد من الناس 🎉
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', marginBottom: '50px' }}>
+            {/* Free Option */}
+            <div style={{ 
+              background: '#ffffff', borderRadius: '20px', padding: '32px', 
+              border: '2px solid #e2e8f0', textAlign: 'center',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+              transition: 'all 0.3s'
             }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 36px rgba(0,112,186,0.35)' }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(0,112,186,0.25)' }}
-          >
-            ادعم المشروع ❤️
-          </a>
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-8px)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,0,0,0.08)'; e.currentTarget.style.borderColor = '#bae6fd' }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.05)'; e.currentTarget.style.borderColor = '#e2e8f0' }}
+            >
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'linear-gradient(135deg, #f0fdfa, #dcfce7)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                <svg style={{ width: '28px', height: '28px', color: '#22c55e' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 style={{ fontSize: '24px', fontWeight: 700, color: '#0f172a', marginBottom: '12px' }}>مجاني</h3>
+              <div style={{ fontSize: '36px', fontWeight: 800, color: '#22c55e', marginBottom: '20px' }}>0<span style={{ fontSize: '16px', fontWeight: 500, color: '#64748b' }}>ريال</span></div>
+              <ul style={{ textAlign: 'right', marginBottom: '24px', paddingLeft: '20px' }}>
+                <li style={{ marginBottom: '10px', color: '#64748b', fontSize: '14px' }}>✓ تصميم بطاقات غير محدود</li>
+                <li style={{ marginBottom: '10px', color: '#64748b', fontSize: '14px' }}>✓ تصدير عالي الجودة</li>
+                <li style={{ marginBottom: '10px', color: '#64748b', fontSize: '14px' }}>✓ مشاركة فورية</li>
+                <li style={{ color: '#64748b', fontSize: '14px' }}>✓ دعم فني أساسي</li>
+              </ul>
+              <Link to="/editor" style={{
+                display: 'block', width: '100%', padding: '14px', borderRadius: '12px',
+                background: '#22c55e', color: '#ffffff', fontSize: '16px', fontWeight: 600,
+                textDecoration: 'none', textAlign: 'center'
+              }}>
+                ابدأ مجاناً
+              </Link>
+            </div>
+
+            {/* Donation Option */}
+            <div style={{ 
+              background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)', borderRadius: '20px', padding: '32px', 
+              border: '2px solid #0070ba', textAlign: 'center', position: 'relative',
+              boxShadow: '0 8px 32px rgba(0,112,186,0.15)',
+              transform: 'scale(1.05)',
+              transition: 'all 0.3s'
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08) translateY(-8px)'; e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,112,186,0.25)' }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1.05) translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,112,186,0.15)' }}
+            >
+              <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: '#0070ba', color: '#ffffff', padding: '6px 20px', borderRadius: '20px', fontSize: '12px', fontWeight: 700 }}>
+                الأكثر دعماً
+              </div>
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'linear-gradient(135deg, #0070ba, #1546a0)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '12px auto 20px' }}>
+                <Heart style={{ width: '28px', height: '28px', color: '#ffffff' }} />
+              </div>
+              <h3 style={{ fontSize: '24px', fontWeight: 700, color: '#0f172a', marginBottom: '12px' }}>ادعمنا</h3>
+              <div style={{ fontSize: '36px', fontWeight: 800, color: '#0070ba', marginBottom: '20px' }}>
+                <span style={{ fontSize: '20px', fontWeight: 500, color: '#64748b', verticalAlign: 'top' }}>من</span>
+                10
+                <span style={{ fontSize: '16px', fontWeight: 500, color: '#64748b' }}>ريال</span>
+              </div>
+              <ul style={{ textAlign: 'right', marginBottom: '24px', paddingLeft: '20px' }}>
+                <li style={{ marginBottom: '10px', color: '#64748b', fontSize: '14px' }}>✓ كل ما في الخطة المجانية</li>
+                <li style={{ marginBottom: '10px', color: '#64748b', fontSize: '14px' }}>✓ دعم المشروع المستقبلي</li>
+                <li style={{ marginBottom: '10px', color: '#64748b', fontSize: '14px' }}>✓ مشاركتك تصنع الفرق</li>
+                <li style={{ color: '#64748b', fontSize: '14px' }}>✓ شكراً لثقتك بنا ❤️</li>
+              </ul>
+              <a
+                href="https://paypal.me/SOLIMANW"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'block', width: '100%', padding: '14px', borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #0070ba, #1546a0)', color: '#ffffff', fontSize: '16px', fontWeight: 600,
+                  textDecoration: 'none', textAlign: 'center',
+                  boxShadow: '0 4px 16px rgba(0,112,186,0.25)'
+                }}
+              >
+                ادعم المشروع
+              </a>
+            </div>
+
+            {/* Business Option */}
+            <div style={{ 
+              background: '#ffffff', borderRadius: '20px', padding: '32px', 
+              border: '2px solid #e2e8f0', textAlign: 'center',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+              transition: 'all 0.3s'
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-8px)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,0,0,0.08)'; e.currentTarget.style.borderColor = '#c7d2fe' }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.05)'; e.currentTarget.style.borderColor = '#e2e8f0' }}
+            >
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'linear-gradient(135deg, #eef2ff, #ede9fe)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                <svg style={{ width: '28px', height: '28px', color: '#818cf8' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <h3 style={{ fontSize: '24px', fontWeight: 700, color: '#0f172a', marginBottom: '12px' }}>للشركات</h3>
+              <div style={{ fontSize: '36px', fontWeight: 800, color: '#818cf8', marginBottom: '20px' }}>
+                <span style={{ fontSize: '20px', fontWeight: 500, color: '#64748b', verticalAlign: 'top' }}>اتصل بـ</span>
+                <br />
+                <span style={{ fontSize: '20px', fontWeight: 500, color: '#64748b' }}>المبيعات</span>
+              </div>
+              <ul style={{ textAlign: 'right', marginBottom: '24px', paddingLeft: '20px' }}>
+                <li style={{ marginBottom: '10px', color: '#64748b', fontSize: '14px' }}>✓ حلول مخصصة للشركات</li>
+                <li style={{ marginBottom: '10px', color: '#64748b', fontSize: '14px' }}>✓ علامات مائية مزالة</li>
+                <li style={{ marginBottom: '10px', color: '#64748b', fontSize: '14px' }}>✓ دعم فني متميز</li>
+                <li style={{ color: '#64748b', fontSize: '14px' }}>✓ تكامل API</li>
+              </ul>
+              <a href="mailto:sales@solimanw.com" style={{
+                display: 'block', width: '100%', padding: '14px', borderRadius: '12px',
+                background: '#818cf8', color: '#ffffff', fontSize: '16px', fontWeight: 600,
+                textDecoration: 'none', textAlign: 'center'
+              }}>
+                اتصل بنا
+              </a>
+            </div>
+          </div>
+
+          <div style={{ textAlign: 'center', padding: '24px', background: 'rgba(255,255,255,0.7)', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+            <p style={{ fontSize: '16px', color: '#64748b', margin: 0 }}>
+              💝 كل مساهمة تساعد في تطوير المنصة ونشر الفرحة
+            </p>
+          </div>
         </div>
       </section>
 

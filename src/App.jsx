@@ -27,6 +27,9 @@ export default function App() {
     '/dashboard',
   ].includes(pathname)
 
+  // Define isBusiness - assuming it's false for the free version
+  const isBusiness = false
+
   return (
     <div className="flex flex-col min-h-screen w-full max-w-full bg-white text-[#0F172A] overflow-x-hidden" dir="rtl">
       {showParticles && <EidParticles />}
