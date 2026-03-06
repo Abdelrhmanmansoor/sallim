@@ -3,10 +3,42 @@
 // ضع الصور في public/templates/ وعدّل المسارات هنا
 // أو ارفعها من لوحة التحكم (Dashboard > إدارة القوالب)
 
+// ═══════════════════════════════════════════════════════════════
+// القوالب الأساسية - تظهر في "جاهز" و "جماعي"
+// المسار: public/templates/جاهزة/
+// ═══════════════════════════════════════════════════════════════
 export const templates = [
-  { id: 1, name: 'قالب ١', image: '/templates/1.png', textColor: '#ffffff' },
-  { id: 2, name: 'قالب ٢', image: '/templates/2.png', textColor: '#ffffff' },
-  { id: 3, name: 'قالب ٣', image: '/templates/3.png', textColor: '#ffffff' },
+  { id: 1, name: 'تصميم ١', image: '/templates/جاهزة/3.png', textColor: '#ffffff' },
+  { id: 2, name: 'تصميم ٢', image: '/templates/جاهزة/5.png', textColor: '#ffffff' },
+  { id: 3, name: 'تصميم ٣', image: '/templates/جاهزة/6.png', textColor: '#ffffff' },
+  { id: 4, name: 'تصميم ٤', image: '/templates/جاهزة/7.png', textColor: '#ffffff' },
+  { id: 5, name: 'تصميم ٥', image: '/templates/جاهزة/8.png', textColor: '#ffffff' },
+  { id: 6, name: 'تصميم ٦', image: '/templates/جاهزة/9.png', textColor: '#ffffff' },
+  { id: 7, name: 'تصميم ٧', image: '/templates/جاهزة/Artboard 1.png', textColor: '#ffffff' },
+  { id: 8, name: 'تصميم ٨', image: '/templates/جاهزة/Artboard 2.png', textColor: '#ffffff' },
+  { id: 9, name: 'تصميم ٩', image: '/templates/جاهزة/Artboard 4.png', textColor: '#ffffff' },
+]
+
+// ═══════════════════════════════════════════════════════════════
+// قوالب حصرية - تظهر فقط في "صمّم"
+// المسار: public/templates/مصمم/
+// ═══════════════════════════════════════════════════════════════
+export const designerOnlyTemplates = [
+  { id: 101, name: 'تصميم حصري ١', image: '/templates/مصمم/14.png', textColor: '#ffffff', exclusive: true },
+  { id: 102, name: 'تصميم حصري ٢', image: '/templates/مصمم/15.png', textColor: '#ffffff', exclusive: true },
+  { id: 103, name: 'تصميم حصري ٣', image: '/templates/مصمم/16.png', textColor: '#ffffff', exclusive: true },
+  { id: 104, name: 'تصميم حصري ٤', image: '/templates/مصمم/17.png', textColor: '#ffffff', exclusive: true },
+  { id: 105, name: 'تصميم حصري ٥', image: '/templates/مصمم/18.png', textColor: '#ffffff', exclusive: true },
+  { id: 106, name: 'تصميم حصري ٦', image: '/templates/مصمم/19.png', textColor: '#ffffff', exclusive: true },
+  { id: 107, name: 'تصميم حصري ٧', image: '/templates/مصمم/Artboard 1.png', textColor: '#ffffff', exclusive: true },
+  { id: 108, name: 'تصميم حصري ٨', image: '/templates/مصمم/Artboard 2.png', textColor: '#ffffff', exclusive: true },
+  { id: 109, name: 'تصميم حصري ٩', image: '/templates/مصمم/Artboard 3.png', textColor: '#ffffff', exclusive: true },
+  { id: 110, name: 'تصميم حصري ١٠', image: '/templates/مصمم/Artboard 4.png', textColor: '#ffffff', exclusive: true },
+  { id: 111, name: 'تصميم حصري ١١', image: '/templates/مصمم/Artboard 5.png', textColor: '#ffffff', exclusive: true },
+  { id: 112, name: 'تصميم حصري ١٢', image: '/templates/مصمم/Artboard 6.png', textColor: '#ffffff', exclusive: true },
+  { id: 113, name: 'تصميم حصري ١٣', image: '/templates/مصمم/Artboard 7.png', textColor: '#ffffff', exclusive: true },
+  { id: 114, name: 'تصميم حصري ١٤', image: '/templates/مصمم/Artboard 12.png', textColor: '#ffffff', exclusive: true },
+  { id: 115, name: 'تصميم لرفع صورة', image: '/templates/مصمم/تصميم لرفع صورة.png', textColor: '#ffffff', exclusive: true },
 ]
 
 export const themes = [
@@ -67,6 +99,7 @@ export const themes = [
 ]
 
 export const fonts = [
+  { id: 'handicrafts', name: 'TheYearofHandicrafts', family: "'TheYearofHandicrafts', serif", label: 'عام الحرف' },
   { id: 'amiri', name: 'Amiri', family: "'Amiri', serif", label: 'أميري' },
   { id: 'cairo', name: 'Cairo', family: "'Cairo', sans-serif", label: 'القاهرة' },
   { id: 'tajawal', name: 'Tajawal', family: "'Tajawal', sans-serif", label: 'تجوّل' },

@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Stage, Layer, Rect, Text, Image as KonvaImage, Group, Circle } from 'react-konva'
 import { useEditorStore } from '../store'
-import { templates, fonts } from '../data/templates'
+import { templates, fonts, designerOnlyTemplates } from '../data/templates'
 import { greetingTexts } from '../data/texts'
 import { calligraphy, calligraphyCategories } from '../data/calligraphy'
 import { BsDownload, BsFilePdf, BsWhatsapp, BsLink45Deg, BsShareFill, BsCheck2, BsPencilFill, BsStars, BsSearch, BsPersonCircle, BsImage, BsChatLeftText, BsSliders, BsPlusLg, BsX, BsArrowLeft, BsInfoCircle, BsBuilding, BsPeople, BsFileEarmarkText, BsCloudDownload } from 'react-icons/bs'
@@ -119,9 +120,15 @@ function ColorPicker({ value, onChange, label }) {
 
 /* ═══ Ready Designs ═══ */
 const readyDesigns = [
-  { id: 'r1', name: 'عيد فطر سعيد', template: '/templates/1.png', nameColor: '#ffffff' },
-  { id: 'r2', name: 'عيد مبارك', template: '/templates/2.png', nameColor: '#333333' },
-  { id: 'r3', name: 'كل عام وأنتم بخير', template: '/templates/3.png', nameColor: '#ffffff' },
+  { id: 'r1', name: 'تصميم ١', template: '/templates/جاهزة/3.png', nameColor: '#ffffff' },
+  { id: 'r2', name: 'تصميم ٢', template: '/templates/جاهزة/5.png', nameColor: '#ffffff' },
+  { id: 'r3', name: 'تصميم ٣', template: '/templates/جاهزة/6.png', nameColor: '#ffffff' },
+  { id: 'r4', name: 'تصميم ٤', template: '/templates/جاهزة/7.png', nameColor: '#ffffff' },
+  { id: 'r5', name: 'تصميم ٥', template: '/templates/جاهزة/8.png', nameColor: '#ffffff' },
+  { id: 'r6', name: 'تصميم ٦', template: '/templates/جاهزة/9.png', nameColor: '#ffffff' },
+  { id: 'r7', name: 'تصميم ٧', template: '/templates/جاهزة/Artboard 1.png', nameColor: '#ffffff' },
+  { id: 'r8', name: 'تصميم ٨', template: '/templates/جاهزة/Artboard 2.png', nameColor: '#ffffff' },
+  { id: 'r9', name: 'تصميم ٩', template: '/templates/جاهزة/Artboard 4.png', nameColor: '#ffffff' },
 ]
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -131,11 +138,18 @@ export default function EditorPage() {
   const store = useEditorStore()
   const stageRef = useRef(null)
   const containerRef = useRef(null)
+  const [searchParams] = useSearchParams()
 
   // Mode & State
-  const [mode, setMode] = useState('designer')
+  const [mode, setMode] = useState('ready')
   const [readyDesign, setReadyDesign] = useState(null)
   const [readyName, setReadyName] = useState('')
+  const [readySenderName, setReadySenderName] = useState('')
+  const [readyFontSize, setReadyFontSize] = useState(60)
+  const [readyNameY, setReadyNameY] = useState(0.65)
+  const [readyNameColor, setReadyNameColor] = useState(null)
+  const [readySenderY, setReadySenderY] = useState(0.75)
+  const [readySenderFontSize, setReadySenderFontSize] = useState(40)
   const [activePanel, setActivePanel] = useState('backgrounds')
   const [stageSize, setStageSize] = useState({ width: 540, height: 540 })
   const [searchText, setSearchText] = useState('')
@@ -143,6 +157,16 @@ export default function EditorPage() {
   const [calligraphyLimit, setCalligraphyLimit] = useState(30)
   const [customTemplates, setCustomTemplates] = useState([])
   const [copied, setCopied] = useState(false)
+
+  // Handle URL template parameter - select template from landing page
+  useEffect(() => {
+    const templateId = searchParams.get('template')
+    if (templateId) {
+      const id = parseInt(templateId)
+      store.setTemplate(id)
+      setMode('ready')
+    }
+  }, [searchParams])
 
   // Load custom templates
   useEffect(() => {
@@ -152,14 +176,20 @@ export default function EditorPage() {
     } catch { }
   }, [])
 
-  // Computed
-  const allTemplates = [...templates, ...customTemplates]
+  // Computed - Show different templates based on mode
+  // Ready mode: templates from /templates/جاهزة/
+  // Designer mode: templates from /templates/مصمم/ (exclusive) + custom uploads
+  // Batch mode: templates from /templates/جاهزة/ + custom uploads
+  const allTemplates = mode === 'designer' 
+    ? [...designerOnlyTemplates, ...customTemplates]
+    : [...templates, ...customTemplates]
+  
   const currentTemplate = allTemplates.find(t => t.id === store.selectedTemplate) || allTemplates[0]
   const currentFont = fonts.find(f => f.id === store.selectedFont) || fonts[1]
   const scale = stageSize.width / 1080
 
-  // Images
-  const [bgImage, bgLoaded] = useImage(mode === 'ready' && readyDesign ? readyDesign.template : currentTemplate?.image)
+  // Images - use currentTemplate when no readyDesign is selected
+  const [bgImage, bgLoaded] = useImage(currentTemplate?.image)
   const [calligraphyImg, calligraphyLoaded] = useImage(store.selectedCalligraphy)
   const [personalPhotoImg, personalPhotoLoaded] = useImage(store.personalPhoto)
   const [logoImg, logoLoaded] = useImage(store.companyLogo)
@@ -192,14 +222,39 @@ export default function EditorPage() {
     function handleResize() {
       if (containerRef.current) {
         const w = containerRef.current.offsetWidth
-        const size = Math.min(w, 520)
-        setStageSize({ width: size, height: size })
+        const baseWidth = Math.min(w, 520)
+
+        if (mode === 'ready') {
+          // Maintain natural aspect ratio of the loaded image
+          if (bgImage) {
+            const ratio = bgImage.height / bgImage.width
+            setStageSize({ width: baseWidth, height: baseWidth * ratio })
+          } else {
+            // Default vertical ratio
+            setStageSize({ width: baseWidth, height: baseWidth * 1.333 })
+          }
+        } else {
+          // Designer mode is a square
+          setStageSize({ width: baseWidth, height: baseWidth })
+        }
       }
     }
+
+    // Call once and on resize
     handleResize()
+
+    // Also re-run when the image loads
+    const img = bgImage
+    if (img) {
+      img.addEventListener('load', handleResize)
+    }
+
     window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      if (img) img.removeEventListener('load', handleResize)
+    }
+  }, [mode, bgImage])
 
   // Disable pull-to-refresh on mobile
   useEffect(() => {
@@ -370,7 +425,7 @@ export default function EditorPage() {
   ═══════════════════════════════════════════════════════════════════ */
   return (
     <div style={{ fontFamily: ds.font, background: '#f5f5f5', minHeight: '100vh', paddingTop: 0 }}>
-      <Toaster position="top-center" toastOptions={{ 
+      <Toaster position="top-center" toastOptions={{
         style: { background: '#1a1a1a', color: '#fff', borderRadius: 12, fontFamily: ds.font, fontSize: 14, padding: '12px 20px' }
       }} />
 
@@ -380,7 +435,7 @@ export default function EditorPage() {
         padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12
       }}>
         <h1 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: '#000' }}>محرر البطاقات</h1>
-        
+
         {/* Mode Switcher - Prominent */}
         <div style={{ display: 'flex', background: '#f0f0f0', borderRadius: 14, padding: 4, gap: 4 }}>
           <button onClick={() => setMode('ready')} style={{
@@ -411,30 +466,76 @@ export default function EditorPage() {
             <BsPeople size={16} /> جماعي
           </button>
         </div>
-      </div>
 
-      {/* ═══ Luxury Animated Marquee Banner ═══ */}
-      <div style={{
-        background: '#2d2d2d',
-        padding: '12px 0', overflow: 'hidden', width: '100%'
-      }}>
-        <div style={{
-          display: 'flex', width: 'max-content', animation: 'marquee 20s linear infinite'
-        }}>
-          {[0, 1].map((idx) => (
-            <div key={idx} style={{ display: 'flex', gap: 50, alignItems: 'center', paddingRight: 50 }}>
-              <span style={{ color: '#d4af37', fontSize: 13, fontWeight: 600, fontFamily: ds.font }}>✨ صمّم بطاقات عيد احترافية</span>
-              <span style={{ color: '#555', fontSize: 8 }}>●</span>
-              <span style={{ color: '#fff', fontSize: 13, fontWeight: 500, fontFamily: ds.font }}>أكثر من 100+ تصميم</span>
-              <span style={{ color: '#555', fontSize: 8 }}>●</span>
-              <span style={{ color: '#d4af37', fontSize: 13, fontWeight: 600, fontFamily: ds.font }}>مجاني 100%</span>
-              <span style={{ color: '#555', fontSize: 8 }}>●</span>
-              <span style={{ color: '#fff', fontSize: 13, fontWeight: 500, fontFamily: ds.font }}>تهنئة جماعية</span>
-              <span style={{ color: '#555', fontSize: 8 }}>●</span>
-              <span style={{ color: '#d4af37', fontSize: 13, fontWeight: 600, fontFamily: ds.font }}>جودة 4K</span>
+        {/* Business Notification - Subtle */}
+        {mode === 'designer' && (
+          <div style={{
+            background: 'linear-gradient(135deg, #fef3c7, #fde68a)',
+            border: '1px solid #fbbf24',
+            borderRadius: 12,
+            padding: '12px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            maxWidth: 500,
+            boxShadow: '0 2px 8px rgba(251, 191, 36, 0.2)'
+          }}>
+            <BsBuilding size={18} color="#b45309" />
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#92400e', margin: '0 0 4px 0', fontFamily: ds.font }}>
+                للشركات والراغبين في تصميم خاص؟
+              </p>
+              <p style={{ fontSize: 11, color: '#b45309', margin: 0, fontFamily: ds.font }}>
+                تواصل معنا لتصميم مخصص يناسب هويتك
+              </p>
             </div>
-          ))}
-        </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <a
+                href="https://wa.me/966500000000"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  padding: '6px 10px',
+                  background: '#25D366',
+                  color: '#fff',
+                  borderRadius: 8,
+                  textDecoration: 'none',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  fontFamily: ds.font
+                }}
+              >
+                <BsWhatsapp size={14} /> واتساب
+              </a>
+              <a
+                href="https://x.com/am_designing"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  padding: '6px 10px',
+                  background: '#000',
+                  color: '#fff',
+                  borderRadius: 8,
+                  textDecoration: 'none',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  fontFamily: ds.font
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+                تويتر
+              </a>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════
@@ -442,50 +543,227 @@ export default function EditorPage() {
       ═══════════════════════════════════════════════════════════════════ */}
       {mode === 'ready' && (
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '20px 20px 40px' }}>
-          
-          {/* Step 1: Choose Design */}
-          <div style={{ background: '#fff', borderRadius: 20, padding: 28, marginBottom: 20, boxShadow: ds.shadow.sm }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24 }}>
+
+          {/* Step 1: Choose Design — Manual Selector */}
+          <div style={{ background: '#fff', borderRadius: 20, padding: '28px 0', marginBottom: 20, boxShadow: ds.shadow.sm }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24, padding: '0 28px' }}>
               <div style={{ width: 40, height: 40, borderRadius: 12, background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800 }}>١</div>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>اختر التصميم</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
-              {readyDesigns.map(d => (
-                <button key={d.id} onClick={() => { setReadyDesign(d); store.setTemplate(null) }} style={{
-                  position: 'relative', aspectRatio: '1', borderRadius: 16, overflow: 'hidden',
-                  border: readyDesign?.id === d.id ? '3px solid #000' : '2px solid #eee',
-                  cursor: 'pointer', padding: 0, transition: 'all 200ms',
-                  transform: readyDesign?.id === d.id ? 'scale(1.02)' : 'scale(1)'
-                }}>
-                  <img src={d.template} alt={d.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.7))', padding: '24px 10px 10px', textAlign: 'center' }}>
-                    <span style={{ color: '#fff', fontSize: 12, fontWeight: 600 }}>{d.name}</span>
-                  </div>
-                  {readyDesign?.id === d.id && (
-                    <div style={{ position: 'absolute', top: 10, left: 10, width: 28, height: 28, borderRadius: '50%', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>✓</div>
+
+            {/* Manual Template Grid - User scrolls horizontally */}
+            <div style={{ 
+              display: 'flex', 
+              gap: 14, 
+              padding: '0 28px',
+              overflowX: 'auto',
+              scrollSnapType: 'x mandatory',
+              WebkitOverflowScrolling: 'touch',
+              paddingBottom: 10
+            }}>
+              {templates.map((t) => (
+                <button 
+                  key={t.id} 
+                  onClick={() => { store.setTemplate(t.id); setReadyDesign(null) }} 
+                  style={{
+                    position: 'relative', 
+                    width: 140, 
+                    minWidth: 140, 
+                    aspectRatio: '1', 
+                    borderRadius: 16, 
+                    overflow: 'hidden',
+                    border: store.selectedTemplate === t.id ? '3px solid #000' : '2px solid #eee',
+                    cursor: 'pointer', 
+                    padding: 0, 
+                    transition: 'all 300ms',
+                    transform: store.selectedTemplate === t.id ? 'scale(1.05)' : 'scale(1)',
+                    boxShadow: store.selectedTemplate === t.id ? '0 8px 24px rgba(0,0,0,0.15)' : '0 2px 8px rgba(0,0,0,0.06)',
+                    flexShrink: 0,
+                    scrollSnapAlign: 'start',
+                    background: '#f8f9fa'
+                  }}
+                >
+                  <img src={t.image} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  {store.selectedTemplate === t.id && (
+                    <div style={{ position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: '50%', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700 }}>✓</div>
                   )}
                 </button>
               ))}
             </div>
+            
+            <p style={{ fontSize: 11, color: '#888', padding: '12px 28px 0', fontFamily: ds.font }}>
+              اسحب يميناً ويساراً لاستعراض التصاميم
+            </p>
           </div>
 
-          {/* Step 2: Enter Name */}
+          {/* Step 2: Customize */}
           {readyDesign && (
             <div style={{ background: '#fff', borderRadius: 20, padding: 28, marginBottom: 20, boxShadow: ds.shadow.sm, animation: 'fadeUp 300ms ease' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800 }}>٢</div>
-                <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>اكتب اسمك</h2>
+                <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>خصّص البطاقة</h2>
               </div>
-              <input type="text" value={readyName} onChange={(e) => setReadyName(e.target.value)}
-                placeholder="مثال: محمد العلي" dir="rtl"
-                style={{
-                  width: '100%', padding: '18px 24px', fontSize: 18, fontWeight: 600, fontFamily: ds.font,
-                  border: '2px solid #eee', borderRadius: 14, textAlign: 'center', outline: 'none',
-                  transition: 'border-color 200ms', background: '#fafafa'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#000'}
-                onBlur={(e) => e.target.style.borderColor = '#eee'}
-              />
+
+              {/* Recipient Name */}
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 8 }}>اسم المُستلِم</label>
+                <input type="text" value={readyName} onChange={(e) => setReadyName(e.target.value)}
+                  placeholder="مثال: أم فهد" dir="rtl"
+                  style={{
+                    width: '100%', padding: '16px 24px', fontSize: 16, fontWeight: 600, fontFamily: ds.font,
+                    border: '2px solid #eee', borderRadius: 14, textAlign: 'center', outline: 'none',
+                    transition: 'border-color 200ms', background: '#fafafa'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#000'}
+                  onBlur={(e) => e.target.style.borderColor = '#eee'}
+                />
+              </div>
+
+              {/* Sender Name */}
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 8 }}>اسم المُرسِل</label>
+                <input type="text" value={readySenderName} onChange={(e) => setReadySenderName(e.target.value)}
+                  placeholder="مثال: محمد العلي" dir="rtl"
+                  style={{
+                    width: '100%', padding: '16px 24px', fontSize: 16, fontWeight: 600, fontFamily: ds.font,
+                    border: '2px solid #eee', borderRadius: 14, textAlign: 'center', outline: 'none',
+                    transition: 'border-color 200ms', background: '#fafafa'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#000'}
+                  onBlur={(e) => e.target.style.borderColor = '#eee'}
+                />
+              </div>
+
+              {/* Font Selection */}
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 10 }}>الخط</label>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {fonts.map(f => (
+                    <button key={f.id} onClick={() => store.setFont(f.id)} style={{
+                      padding: '10px 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                      background: store.selectedFont === f.id ? '#000' : '#f5f5f5',
+                      color: store.selectedFont === f.id ? '#fff' : '#666',
+                      fontSize: 12, fontWeight: 600, fontFamily: f.family, transition: 'all 200ms'
+                    }}>
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Name Color */}
+              <div style={{ marginBottom: 20 }}>
+                <ColorPicker value={readyNameColor || readyDesign.nameColor} onChange={setReadyNameColor} label="لون النص" />
+              </div>
+
+              {/* Logo Upload */}
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 10 }}>الشعار</label>
+                {store.companyLogo ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 48, height: 48, borderRadius: 10, border: '2px solid #eee', background: '#f8f8f8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                      <img src={store.companyLogo} alt="شعار" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                    </div>
+                    <button onClick={() => store.setCompanyLogo(null)} style={{
+                      padding: '8px 14px', borderRadius: 10, border: 'none', background: '#fee2e2', color: '#dc2626',
+                      fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: ds.font
+                    }}>
+                      إزالة
+                    </button>
+                  </div>
+                ) : (
+                  <label style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    padding: '14px', background: '#f8f8f8', border: '2px dashed #ddd', borderRadius: 12,
+                    cursor: 'pointer', fontFamily: ds.font
+                  }}>
+                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
+                      const file = e.target.files[0]
+                      if (!file) return
+                      const reader = new FileReader()
+                      reader.onload = (ev) => { store.setCompanyLogo(ev.target.result); toast.success('تم إضافة الشعار') }
+                      reader.readAsDataURL(file)
+                      e.target.value = ''
+                    }} />
+                    <BsBuilding size={16} />
+                    <span style={{ fontSize: 13, fontWeight: 600 }}>رفع شعار</span>
+                  </label>
+                )}
+              </div>
+
+              {/* --- Advanced Controls (collapsible style) --- */}
+              <div style={{ borderTop: '1px solid #eee', paddingTop: 20 }}>
+                <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 14, color: '#666' }}>تحكم متقدم</label>
+
+                {/* Recipient Font Size */}
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600 }}>حجم خط المُستلِم</span>
+                    <span style={{ fontSize: 11, color: '#888', background: '#f5f5f5', padding: '3px 8px', borderRadius: 6 }}>{readyFontSize}px</span>
+                  </div>
+                  <input type="range" min={14} max={100} value={readyFontSize} onChange={(e) => setReadyFontSize(Number(e.target.value))} style={{ width: '100%' }} />
+                </div>
+
+                {/* Recipient Position */}
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600 }}>موضع المُستلِم</span>
+                    <span style={{ fontSize: 11, color: '#888', background: '#f5f5f5', padding: '3px 8px', borderRadius: 6 }}>{Math.round(readyNameY * 100)}%</span>
+                  </div>
+                  <input type="range" min={0.05} max={0.95} step={0.01} value={readyNameY} onChange={(e) => setReadyNameY(Number(e.target.value))} style={{ width: '100%' }} />
+                </div>
+
+                {/* Sender Font Size */}
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600 }}>حجم خط المُرسِل</span>
+                    <span style={{ fontSize: 11, color: '#888', background: '#f5f5f5', padding: '3px 8px', borderRadius: 6 }}>{readySenderFontSize}px</span>
+                  </div>
+                  <input type="range" min={14} max={80} value={readySenderFontSize} onChange={(e) => setReadySenderFontSize(Number(e.target.value))} style={{ width: '100%' }} />
+                </div>
+
+                {/* Sender Position */}
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600 }}>موضع المُرسِل</span>
+                    <span style={{ fontSize: 11, color: '#888', background: '#f5f5f5', padding: '3px 8px', borderRadius: 6 }}>{Math.round(readySenderY * 100)}%</span>
+                  </div>
+                  <input type="range" min={0.05} max={0.95} step={0.01} value={readySenderY} onChange={(e) => setReadySenderY(Number(e.target.value))} style={{ width: '100%' }} />
+                </div>
+
+                {/* Logo Size & Position */}
+                {store.companyLogo && (
+                  <>
+                    <div style={{ marginBottom: 16 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                        <span style={{ fontSize: 12, fontWeight: 600 }}>حجم الشعار</span>
+                        <span style={{ fontSize: 11, color: '#888', background: '#f5f5f5', padding: '3px 8px', borderRadius: 6 }}>{Math.round(store.logoScale * 100)}%</span>
+                      </div>
+                      <input type="range" min={0.05} max={0.3} step={0.01} value={store.logoScale} onChange={(e) => store.setLogoScale(Number(e.target.value))} style={{ width: '100%' }} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 8 }}>موقع الشعار</label>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                        {[
+                          { id: 'top-right', label: 'أعلى يمين' },
+                          { id: 'top-left', label: 'أعلى يسار' },
+                          { id: 'bottom-right', label: 'أسفل يمين' },
+                          { id: 'bottom-left', label: 'أسفل يسار' },
+                        ].map(pos => (
+                          <button key={pos.id} onClick={() => store.setLogoPosition(pos.id)} style={{
+                            padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: ds.font,
+                            background: store.logoPosition === pos.id ? '#000' : '#f5f5f5',
+                            color: store.logoPosition === pos.id ? '#fff' : '#666',
+                            fontSize: 12, fontWeight: 600, transition: 'all 200ms'
+                          }}>
+                            {pos.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           )}
 
@@ -496,7 +774,7 @@ export default function EditorPage() {
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800 }}>٣</div>
                 <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>حمّل أو شارك</h2>
               </div>
-              
+
               {/* Canvas Preview */}
               <div ref={mode === 'ready' ? containerRef : undefined} style={{ maxWidth: 400, margin: '0 auto 24px' }}>
                 <div style={{ background: '#000', borderRadius: 16, padding: 8 }}>
@@ -505,8 +783,15 @@ export default function EditorPage() {
                       <Rect width={stageSize.width} height={stageSize.height} fill="#17012C" />
                       {bgImage && bgLoaded && <KonvaImage image={bgImage} width={stageSize.width} height={stageSize.height} />}
                       {readyName && (
-                        <Text text={readyName} x={0} y={stageSize.height * 0.82} width={stageSize.width} align="center"
-                          fontFamily="'Cairo', sans-serif" fontSize={24 * scale} fill={readyDesign.nameColor} lineHeight={1.5} />
+                        <Text text={readyName} x={0} y={stageSize.height * readyNameY} width={stageSize.width} align="center"
+                          fontFamily={currentFont.family} fontSize={readyFontSize * scale} fill={readyNameColor || readyDesign.nameColor} lineHeight={1.5} />
+                      )}
+                      {readySenderName && (
+                        <Text text={readySenderName} x={0} y={stageSize.height * readySenderY} width={stageSize.width} align="center"
+                          fontFamily={currentFont.family} fontSize={readySenderFontSize * scale} fill={readyNameColor || readyDesign.nameColor} opacity={0.85} lineHeight={1.5} />
+                      )}
+                      {logoImg && logoLoaded && (
+                        <KonvaImage image={logoImg} x={logoPos.x} y={logoPos.y} width={logoW} height={logoH} />
                       )}
                     </Layer>
                   </Stage>
@@ -554,10 +839,10 @@ export default function EditorPage() {
       {mode === 'designer' && (
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '16px 16px 40px' }}>
           <div className="designer-grid" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            
+
             {/* ═══ Left: Canvas & Actions ═══ */}
             <div className="canvas-section">
-              
+
               {/* Canvas */}
               <div ref={mode === 'designer' ? containerRef : undefined} style={{ maxWidth: 520, margin: '0 auto' }}>
                 <div style={{ background: '#fff', borderRadius: 20, padding: 10, boxShadow: ds.shadow.lg }}>
@@ -594,12 +879,12 @@ export default function EditorPage() {
                       )}
                       <DraggableText text={store.mainText} x={store.mainTextPos.x * stageSize.width - stageSize.width * 0.4} y={store.mainTextPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={store.fontSize * scale} fontFamily={currentFont.family} fill={store.textColor} align="center" lineHeight={1.6} padding={20 * scale} rotation={store.mainTextRotation} shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.6)" shadowBlur={10 * scale} strokeEnabled={store.textStroke} stroke={store.textStrokeColor} strokeWidth={store.textStrokeWidth * scale} onDragEnd={handleDrag(store.setMainTextPos)} onClick={handleElementClick('mainText')} />
                       <DraggableText text={store.subText} x={store.subTextPos.x * stageSize.width - stageSize.width * 0.4} y={store.subTextPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={store.subFontSize * scale} fontFamily={currentFont.family} fill={store.subTextColor} align="center" lineHeight={1.5} padding={15 * scale} rotation={store.subTextRotation} shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.5)" shadowBlur={8 * scale} strokeEnabled={store.textStroke} stroke={store.textStrokeColor} strokeWidth={store.textStrokeWidth * scale * 0.7} onDragEnd={handleDrag(store.setSubTextPos)} onClick={handleElementClick('subText')} />
-                      <DraggableText text={store.recipientName} x={store.recipientPos.x * stageSize.width - stageSize.width * 0.4} y={store.recipientPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={22 * scale} fontFamily={currentFont.family} fill={store.recipientColor} align="center" shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.5)" shadowBlur={6 * scale} strokeEnabled={store.textStroke} stroke={store.textStrokeColor} strokeWidth={store.textStrokeWidth * scale * 0.5} onDragEnd={handleDrag(store.setRecipientPos)} onClick={handleElementClick('recipientName')} />
-                      <DraggableText text={store.senderName} x={store.senderPos.x * stageSize.width - stageSize.width * 0.4} y={store.senderPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={18 * scale} fontFamily={currentFont.family} fill={store.senderColor} align="center" opacity={0.85} shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.4)" shadowBlur={5 * scale} strokeEnabled={store.textStroke} stroke={store.textStrokeColor} strokeWidth={store.textStrokeWidth * scale * 0.4} onDragEnd={handleDrag(store.setSenderPos)} onClick={handleElementClick('senderName')} />
-                                            {/* Company Logo */}
-                                            {logoImg && logoLoaded && (
-                                              <KonvaImage image={logoImg} x={logoPos.x} y={logoPos.y} width={logoW} height={logoH} />
-                                            )}
+                      <DraggableText text={store.recipientName} x={store.recipientPos.x * stageSize.width - stageSize.width * 0.4} y={store.recipientPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={store.recipientFontSize * scale} fontFamily={currentFont.family} fill={store.recipientColor} align="center" shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.5)" shadowBlur={6 * scale} strokeEnabled={store.textStroke} stroke={store.textStrokeColor} strokeWidth={store.textStrokeWidth * scale * 0.5} onDragEnd={handleDrag(store.setRecipientPos)} onClick={handleElementClick('recipientName')} />
+                      <DraggableText text={store.senderName} x={store.senderPos.x * stageSize.width - stageSize.width * 0.4} y={store.senderPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={store.senderFontSize * scale} fontFamily={currentFont.family} fill={store.senderColor} align="center" opacity={0.85} shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.4)" shadowBlur={5 * scale} strokeEnabled={store.textStroke} stroke={store.textStrokeColor} strokeWidth={store.textStrokeWidth * scale * 0.4} onDragEnd={handleDrag(store.setSenderPos)} onClick={handleElementClick('senderName')} />
+                      {/* Company Logo */}
+                      {logoImg && logoLoaded && (
+                        <KonvaImage image={logoImg} x={logoPos.x} y={logoPos.y} width={logoW} height={logoH} />
+                      )}
                     </Layer>
                   </Stage>
                 </div>
@@ -692,7 +977,7 @@ export default function EditorPage() {
       ═══════════════════════════════════════════════════════════════════ */}
       {mode === 'batch' && (
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px' }}>
-          
+
           {/* Preview Canvas - On Top */}
           <div style={{ background: '#fff', borderRadius: 20, padding: 16, boxShadow: ds.shadow.sm, marginBottom: 20 }}>
             <div ref={mode === 'batch' ? containerRef : undefined} style={{ maxWidth: 400, margin: '0 auto' }}>
@@ -709,7 +994,7 @@ export default function EditorPage() {
                         width={calligraphyWidth} height={calligraphyHeight} />
                     )}
                     <DraggableText text={store.mainText} x={store.mainTextPos.x * stageSize.width - stageSize.width * 0.4} y={store.mainTextPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={store.fontSize * scale} fontFamily={currentFont.family} fill={store.textColor} align="center" lineHeight={1.6} padding={20 * scale} shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.6)" shadowBlur={10 * scale} />
-                    <DraggableText text={store.recipientName || 'الاسم هنا'} x={store.recipientPos.x * stageSize.width - stageSize.width * 0.4} y={store.recipientPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={22 * scale} fontFamily={currentFont.family} fill={store.recipientColor} align="center" shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.5)" shadowBlur={6 * scale} />
+                    <DraggableText text={store.recipientName || 'الاسم هنا'} x={store.recipientPos.x * stageSize.width - stageSize.width * 0.4} y={store.recipientPos.y * stageSize.height} width={stageSize.width * 0.8} fontSize={store.recipientFontSize * scale} fontFamily={currentFont.family} fill={store.recipientColor} align="center" shadowEnabled={store.textShadow} shadowColor="rgba(0,0,0,0.5)" shadowBlur={6 * scale} />
                     {logoImg && logoLoaded && (
                       <KonvaImage image={logoImg} x={logoPos.x} y={logoPos.y} width={logoW} height={logoH} />
                     )}
@@ -775,21 +1060,23 @@ export default function EditorPage() {
 
             {/* Text Input */}
             <div style={{ marginBottom: 16 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 8 }}>أو اكتب الأسماء (اسم في كل سطر)</label>
+              <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 8 }}>أو اكتب الأسماء (افصل بينها بسطر جديد أو فاصلة أو منقوطة)</label>
               <textarea
                 dir="rtl"
-                rows={5}
-                placeholder="محمد العلي&#10;فاطمة السعيد&#10;أحمد الخالد..."
+                rows={8}
+                placeholder="محمد العلي&#10;فاطمة السعيد&#10;أحمد الخالد&#10;&#10;أو: خالد، سعد، فهد، نورة..."
                 value={store.batchNames.join('\n')}
                 onChange={(e) => {
-                  const names = e.target.value.split('\n').map(n => n.trim()).filter(n => n.length > 0)
+                  const names = e.target.value.split(/[\n,;,]/).map(n => n.trim()).filter(n => n.length > 0)
                   store.setBatchNames(names)
                 }}
                 style={{
                   width: '100%', padding: 14, fontSize: 14, fontFamily: ds.font, border: '2px solid #eee',
-                  borderRadius: 12, resize: 'none', outline: 'none', background: '#fafafa', lineHeight: 1.8
+                  borderRadius: 12, resize: 'vertical', outline: 'none', background: '#fafafa', lineHeight: 1.8,
+                  minHeight: '200px', maxHeight: '500px'
                 }}
               />
+              <p style={{ fontSize: 11, color: '#888', marginTop: 6 }}>يدعم عدد كبير من الأسماء - يمكنك سحب حافة الصندوق لتكبيره</p>
             </div>
 
             {/* Names Count */}
@@ -814,7 +1101,7 @@ export default function EditorPage() {
                 }
                 store.setBatchGenerating(true)
                 store.setGeneratedCards([])
-                
+
                 for (let i = 0; i < store.batchNames.length; i++) {
                   store.setBatchCurrentIndex(i)
                   store.setBatchProgress(Math.round(((i + 1) / store.batchNames.length) * 100))
@@ -825,7 +1112,7 @@ export default function EditorPage() {
                     store.addGeneratedCard({ name: store.batchNames[i], dataUrl })
                   }
                 }
-                
+
                 store.setBatchGenerating(false)
                 toast.success(`تم إنشاء ${store.batchNames.length} بطاقة!`)
               }}
@@ -916,7 +1203,7 @@ export default function EditorPage() {
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
               </svg>
               @am_designing
             </a>
@@ -939,8 +1226,8 @@ export default function EditorPage() {
           </div>
         </div>
       </div>
-      
-            {/* Animations & Responsive */}
+
+      {/* Animations & Responsive */}
       <style>{`
         @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes tooltipIn { from { opacity: 0; transform: translateX(-50%) translateY(4px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
@@ -1032,6 +1319,21 @@ export default function EditorPage() {
               cursor: 'pointer', transition: 'all 200ms'
             }}>
               <img src={t.image} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.closest('button').style.display = 'none' }} />
+              {t.exclusive && (
+                <div style={{
+                  position: 'absolute', top: 6, left: 6,
+                  background: 'linear-gradient(135deg, #d4af37, #f5d67b)',
+                  color: '#000',
+                  padding: '4px 8px',
+                  borderRadius: 6,
+                  fontSize: 9,
+                  fontWeight: 700,
+                  fontFamily: ds.font,
+                  boxShadow: '0 2px 8px rgba(212, 175, 55, 0.4)'
+                }}>
+                  ⭐ حصري
+                </div>
+              )}
               {t.isCustom && (
                 <button onClick={(ev) => { ev.stopPropagation(); handleDeleteCustomTemplate(t.id) }} style={{
                   position: 'absolute', top: 6, left: 6, width: 24, height: 24, borderRadius: '50%',
@@ -1353,9 +1655,12 @@ export default function EditorPage() {
         </div>
 
         {/* Names */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
-          <div>
-            <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 8 }}>المُستلِم</label>
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <label style={{ fontSize: 13, fontWeight: 700 }}>المُستلِم</label>
+              <span style={{ fontSize: 11, color: '#888', background: '#f5f5f5', padding: '4px 8px', borderRadius: 6 }}>{store.recipientFontSize}px</span>
+            </div>
             <input type="text" value={store.recipientName} onChange={(e) => store.setRecipientName(e.target.value)}
               dir="rtl" placeholder="أم فهد"
               style={{
@@ -1363,9 +1668,13 @@ export default function EditorPage() {
                 borderRadius: 10, outline: 'none', background: '#fafafa'
               }}
             />
+            <input type="range" min={10} max={52} value={store.recipientFontSize} onChange={(e) => store.setRecipientFontSize(Number(e.target.value))} style={{ width: '100%', marginTop: 8 }} />
           </div>
           <div>
-            <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 8 }}>المُرسِل</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <label style={{ fontSize: 13, fontWeight: 700 }}>المُرسِل</label>
+              <span style={{ fontSize: 11, color: '#888', background: '#f5f5f5', padding: '4px 8px', borderRadius: 6 }}>{store.senderFontSize}px</span>
+            </div>
             <input type="text" value={store.senderName} onChange={(e) => store.setSenderName(e.target.value)}
               dir="rtl" placeholder="اسمك"
               style={{
@@ -1373,6 +1682,7 @@ export default function EditorPage() {
                 borderRadius: 10, outline: 'none', background: '#fafafa'
               }}
             />
+            <input type="range" min={10} max={52} value={store.senderFontSize} onChange={(e) => store.setSenderFontSize(Number(e.target.value))} style={{ width: '100%', marginTop: 8 }} />
           </div>
         </div>
 
@@ -1455,7 +1765,7 @@ export default function EditorPage() {
         {/* Effects */}
         <div style={{ borderTop: '1px solid #eee', paddingTop: 20 }}>
           <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 14 }}>التأثيرات</label>
-          
+
           {/* Shadow Toggle */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 14, background: '#f8f8f8', borderRadius: 12, marginBottom: 10 }}>
             <span style={{ fontSize: 13, fontWeight: 600 }}>ظل النص</span>

@@ -60,144 +60,154 @@ export default function LandingPage() {
 
   return (
     <div style={{ fontFamily: "'Tajawal', sans-serif" }}>
-      
+
       {/* HERO */}
       <section
         style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'relative',
-          overflow: 'hidden',
+          background: '#fff',
+          padding: '16px',
         }}
       >
-        {/* Background */}
         <div
           style={{
-            position: 'absolute',
-            inset: 0,
+            minHeight: 'calc(100vh - 32px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            overflow: 'hidden',
+            borderRadius: '24px',
             background: 'linear-gradient(135deg, #171717 0%, #262626 100%)',
           }}
-        />
-        
-        {/* Content */}
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 1,
-            maxWidth: '800px',
-            margin: '0 auto',
-            padding: '120px 24px',
-            textAlign: 'center',
-          }}
         >
+          {/* Content */}
           <div
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '8px 16px',
-              background: 'rgba(255,255,255,0.1)',
-              borderRadius: '100px',
-              marginBottom: '32px',
+              position: 'relative',
+              zIndex: 1,
+              maxWidth: '800px',
+              margin: '0 auto',
+              padding: '120px 24px',
+              textAlign: 'center',
             }}
           >
-            <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)' }}>
-              منصة تصميم بطاقات العيد
-            </span>
-          </div>
-
-          <h1
-            style={{
-              fontSize: 'clamp(36px, 6vw, 64px)',
-              fontWeight: 700,
-              color: '#fff',
-              lineHeight: 1.1,
-              marginBottom: '24px',
-              letterSpacing: '-0.02em',
-            }}
-          >
-            صمّم بطاقتك
-            <br />
-            <span style={{ color: '#a3a3a3' }}>بأناقة واحترافية</span>
-          </h1>
-
-          <p
-            style={{
-              fontSize: '18px',
-              color: 'rgba(255,255,255,0.5)',
-              maxWidth: '480px',
-              margin: '0 auto 40px',
-              lineHeight: 1.7,
-            }}
-          >
-            اختر من قوالب فاخرة، خصّصها، وشاركها في ثوانٍ
-          </p>
-
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            <Link
-              to="/editor"
+            <div
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '14px 28px',
-                background: '#fff',
-                color: '#171717',
-                fontSize: '15px',
-                fontWeight: 600,
-                borderRadius: '12px',
-                textDecoration: 'none',
-                transition: 'all 200ms ease',
+                padding: '8px 16px',
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '100px',
+                marginBottom: '32px',
+                border: '1px solid rgba(255,255,255,0.05)',
               }}
             >
-              ابدأ التصميم
-              <ArrowLeft size={18} />
-            </Link>
-            <a
-              href="https://paypal.me/SOLIMANW"
-              target="_blank"
-              rel="noopener noreferrer"
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#C6F806', boxShadow: '0 0 10px rgba(198,248,6,0.5)', animation: 'pulse 2s infinite' }} />
+              <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>
+                نسخة تجريبية — جارٍ إضافة قوالب جديدة باستمرار
+              </span>
+            </div>
+
+            <style>{`
+              @keyframes pulse {
+                0% { transform: scale(0.95); opacity: 0.8; }
+                50% { transform: scale(1.1); opacity: 1; }
+                100% { transform: scale(0.95); opacity: 0.8; }
+              }
+            `}</style>
+
+            <h1
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '14px 28px',
-                background: 'linear-gradient(135deg, #0070ba, #003087)',
+                fontSize: 'clamp(36px, 6vw, 64px)',
+                fontWeight: 700,
                 color: '#fff',
-                fontSize: '15px',
-                fontWeight: 600,
-                borderRadius: '12px',
-                textDecoration: 'none',
-                transition: 'all 200ms ease',
+                lineHeight: 1.1,
+                marginBottom: '24px',
+                letterSpacing: '-0.02em',
               }}
             >
-              <DollarSign size={18} />
-              ادعم المشروع
-            </a>
-          </div>
+              صمّم بطاقتك
+              <br />
+              <span style={{ color: '#a3a3a3' }}>بأناقة واحترافية</span>
+            </h1>
 
-          {/* Stats */}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '48px',
-              marginTop: '80px',
-              flexWrap: 'wrap',
-            }}
-          >
-            {[
-              { value: '+٥٠,٠٠٠', label: 'بطاقة' },
-              { value: '+٢٠', label: 'قالب' },
-              { value: '٨', label: 'خطوط' },
-            ].map((s, i) => (
-              <div key={i} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '32px', fontWeight: 700, color: '#fff' }}>{s.value}</div>
-                <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', marginTop: '4px' }}>{s.label}</div>
-              </div>
-            ))}
+            <p
+              style={{
+                fontSize: '18px',
+                color: 'rgba(255,255,255,0.5)',
+                maxWidth: '480px',
+                margin: '0 auto 40px',
+                lineHeight: 1.7,
+              }}
+            >
+              اختر من قوالب فاخرة، خصّصها، وشاركها في ثوانٍ
+            </p>
+
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+              <Link
+                to="/editor"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '14px 28px',
+                  background: '#fff',
+                  color: '#171717',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  borderRadius: '12px',
+                  textDecoration: 'none',
+                  transition: 'all 200ms ease',
+                }}
+              >
+                ابدأ التصميم
+                <ArrowLeft size={18} />
+              </Link>
+              <a
+                href="https://paypal.me/SOLIMANW"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '14px 28px',
+                  background: 'linear-gradient(135deg, #0070ba, #003087)',
+                  color: '#fff',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  borderRadius: '12px',
+                  textDecoration: 'none',
+                  transition: 'all 200ms ease',
+                }}
+              >
+                <DollarSign size={18} />
+                ادعم المشروع
+              </a>
+            </div>
+
+            {/* Stats */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '48px',
+                marginTop: '80px',
+                flexWrap: 'wrap',
+              }}
+            >
+              {[
+                { value: '+٥٠,٠٠٠', label: 'بطاقة' },
+                { value: '+٢٠', label: 'قالب' },
+                { value: '٨', label: 'خطوط' },
+              ].map((s, i) => (
+                <div key={i} style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '32px', fontWeight: 700, color: '#fff' }}>{s.value}</div>
+                  <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', marginTop: '4px' }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -302,10 +312,17 @@ export default function LandingPage() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px', marginBottom: '40px' }}>
-            {[1, 2, 3].map((i) => (
+            {[
+              { id: 1, image: '/templates/جاهزة/3.png', name: 'تصميم ١' },
+              { id: 2, image: '/templates/جاهزة/5.png', name: 'تصميم ٢' },
+              { id: 3, image: '/templates/جاهزة/6.png', name: 'تصميم ٣' },
+              { id: 4, image: '/templates/جاهزة/7.png', name: 'تصميم ٤' },
+              { id: 5, image: '/templates/جاهزة/8.png', name: 'تصميم ٥' },
+              { id: 6, image: '/templates/جاهزة/9.png', name: 'تصميم ٦' },
+            ].map((template) => (
               <Link
-                to="/editor"
-                key={i}
+                to={`/editor?template=${template.id}`}
+                key={template.id}
                 style={{
                   display: 'block',
                   aspectRatio: '1',
@@ -313,6 +330,7 @@ export default function LandingPage() {
                   overflow: 'hidden',
                   background: '#f5f5f5',
                   transition: 'all 200ms ease',
+                  position: 'relative'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-4px)'
@@ -324,11 +342,25 @@ export default function LandingPage() {
                 }}
               >
                 <img
-                  src={`/templates/${i}.png`}
-                  alt={`قالب ${i}`}
+                  src={template.image}
+                  alt={template.name}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   onError={(e) => (e.target.style.display = 'none')}
                 />
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  padding: '12px',
+                  background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+                  color: '#fff',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  textAlign: 'center'
+                }}>
+                  {template.name}
+                </div>
               </Link>
             ))}
           </div>
@@ -341,8 +373,8 @@ export default function LandingPage() {
                 alignItems: 'center',
                 gap: '8px',
                 padding: '12px 24px',
-                background: '#f5f5f5',
-                color: '#171717',
+                background: '#171717',
+                color: '#fff',
                 fontSize: '14px',
                 fontWeight: 600,
                 borderRadius: '10px',
