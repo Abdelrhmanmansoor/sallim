@@ -508,11 +508,11 @@ export default function EditorPage() {
          DESIGNER MODE - Advanced Editor
       ═══════════════════════════════════════════════════════════════════ */}
       {mode === 'designer' && (
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '24px 20px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '420px 1fr', gap: 28, alignItems: 'start', direction: 'rtl' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '24px 16px' }}>
+          <div className="designer-grid" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             
             {/* ═══ Left: Canvas & Actions ═══ */}
-            <div style={{ position: 'sticky', top: 140 }}>
+            <div className="canvas-section">
               
               {/* Canvas */}
               <div ref={mode === 'designer' ? containerRef : undefined} style={{ maxWidth: 520, margin: '0 auto' }}>
@@ -610,18 +610,18 @@ export default function EditorPage() {
             </div>
 
             {/* ═══ Right: Tools Panel ═══ */}
-            <div>
+            <div className="tools-section">
               {/* Tool Tabs */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginBottom: 16, direction: 'rtl' }}>
+              <div className="tool-tabs" style={{ display: 'flex', gap: 6, marginBottom: 16, overflowX: 'auto', paddingBottom: 4, direction: 'rtl' }}>
                 {toolItems.map(t => (
                   <Tooltip key={t.id} text={t.tip}>
                     <button onClick={() => setActivePanel(t.id)} style={{
                       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
-                      padding: '14px 8px', borderRadius: 14, border: 'none', cursor: 'pointer', fontFamily: ds.font,
+                      padding: '12px 16px', borderRadius: 14, border: 'none', cursor: 'pointer', fontFamily: ds.font,
                       background: activePanel === t.id ? '#000' : '#fff',
                       color: activePanel === t.id ? '#fff' : '#666',
                       boxShadow: activePanel === t.id ? ds.shadow.md : 'none',
-                      transition: 'all 200ms', width: '100%'
+                      transition: 'all 200ms', minWidth: 70, flexShrink: 0
                     }}>
                       {t.icon}
                       <span style={{ fontSize: 11, fontWeight: 700 }}>{t.label}</span>
@@ -639,14 +639,47 @@ export default function EditorPage() {
         </div>
       )}
 
-      {/* Animations */}
+      {/* Animations & Responsive */}
       <style>{`
         @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes tooltipIn { from { opacity: 0; transform: translateX(-50%) translateY(4px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-        input[type="range"] { -webkit-appearance: none; height: 6px; border-radius: 6px; background: #eee; cursor: pointer; }
+        input[type="range"] { -webkit-appearance: none; height: 6px; border-radius: 6px; background: #eee; cursor: pointer; width: 100%; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #000; cursor: pointer; }
-        @media (max-width: 1024px) {
-          .designer-grid { grid-template-columns: 1fr !important; }
+        
+        .tool-tabs::-webkit-scrollbar { height: 4px; }
+        .tool-tabs::-webkit-scrollbar-track { background: transparent; }
+        .tool-tabs::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+        
+        /* Desktop Layout */
+        @media (min-width: 1024px) {
+          .designer-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 420px !important;
+            gap: 28px !important;
+            direction: rtl;
+          }
+          .canvas-section {
+            position: sticky;
+            top: 140px;
+          }
+          .tool-tabs {
+            display: grid !important;
+            grid-template-columns: repeat(5, 1fr) !important;
+            overflow: visible !important;
+          }
+        }
+        
+        /* Mobile Layout */
+        @media (max-width: 1023px) {
+          .designer-grid {
+            flex-direction: column !important;
+          }
+          .canvas-section {
+            order: 1;
+          }
+          .tools-section {
+            order: 2;
+          }
         }
       `}</style>
     </div>
