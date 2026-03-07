@@ -20,6 +20,12 @@ import CompanyDashboardPage from './pages/CompanyDashboardPage'
 import BlogPage from './pages/BlogPage'
 import BlogPostPage from './pages/BlogPostPage'
 import PrivacyPage from './pages/PrivacyPage'
+import PublicDiwaniyaPage from './pages/PublicDiwaniyaPage'
+import CreateDiwaniyaPage from './pages/CreateDiwaniyaPage'
+import DiwaniyaDashboardPage from './pages/DiwaniyaDashboardPage'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
+import ProfilePage from './pages/ProfilePage'
 
 export default function App() {
   const location = useLocation()
@@ -37,6 +43,7 @@ export default function App() {
     '/company-activation',
     '/company-login',
     '/company/dashboard',
+    '/diwaniya',
   ].includes(pathname)
 
   // Define isBusiness - assuming it's false for the free version
@@ -67,6 +74,12 @@ export default function App() {
           <Route path="/company/dashboard" element={<CompanyDashboardPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
+          <Route path="/eid/:username" element={<PublicDiwaniyaPage />} />
+          <Route path="/create-diwaniya" element={<CreateDiwaniyaPage />} />
+          <Route path="/dashboard/diwaniya" element={<DiwaniyaDashboardPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

@@ -42,18 +42,18 @@ export default function BlogPostPage() {
 
     if (loading) {
         return (
-            <div className="pt-32 pb-20 min-h-screen flex flex-col items-center justify-center">
-                <Loader2 className="w-10 h-10 text-[#3b82f6] animate-spin mb-4" />
-                <p className="text-white/50">جاري تحميل المقال...</p>
+            <div className="pt-32 pb-20 min-h-screen flex flex-col items-center justify-center bg-[#f8fafc]">
+                <Loader2 className="w-10 h-10 text-[#2563eb] animate-spin mb-4" />
+                <p className="text-[#64748b]">جاري تحميل المقال...</p>
             </div>
         )
     }
 
     if (error || !post) {
         return (
-            <div className="pt-32 pb-20 min-h-screen flex flex-col items-center justify-center text-center px-4">
-                <h2 className="text-2xl font-bold mb-4">عذراً! المقال غير موجود</h2>
-                <p className="text-white/40 mb-8">{error}</p>
+            <div className="pt-32 pb-20 min-h-screen flex flex-col items-center justify-center text-center px-4 bg-[#f8fafc]">
+                <h2 className="text-2xl font-bold mb-4 text-[#0f172a]">عذراً! المقال غير موجود</h2>
+                <p className="text-[#64748b] mb-8">{error}</p>
                 <button onClick={() => navigate('/blog')} className="btn-primary">
                     <ArrowRight className="w-4 h-4 ml-2" /> العودة للمدونة
                 </button>
@@ -62,25 +62,25 @@ export default function BlogPostPage() {
     }
 
     return (
-        <div className="pt-28 pb-20 min-h-screen relative">
+        <div className="pt-28 pb-20 min-h-screen relative bg-[#f8fafc]">
             {/* Background decorations */}
             <div className="fixed inset-0 pointer-events-none -z-10">
-                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#3b82f6]/5 rounded-full blur-[100px] mix-blend-screen" />
+                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#2563eb]/5 rounded-full blur-[100px] mix-blend-multiply" />
             </div>
 
             <div className="max-w-4xl mx-auto px-4 relative z-10">
-                <Link to="/blog" className="inline-flex items-center text-white/50 hover:text-white mb-8 transition-colors text-sm font-medium">
+                <Link to="/blog" className="inline-flex items-center text-[#64748b] hover:text-[#0f172a] mb-8 transition-colors text-sm font-medium">
                     <ArrowRight className="w-4 h-4 ml-2" /> العودة للقائمة
                 </Link>
 
                 {/* Article Header */}
                 <header className="mb-10 text-center">
-                    <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[#3b82f6] text-xs font-bold mb-6">
+                    <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-[#1e293b]/5 border border-[#1e293b]/10 text-[#2563eb] text-xs font-bold mb-6">
                         {post.category}
                     </div>
-                    <h1 className="text-3xl md:text-5xl font-bold mb-8 leading-tight">{post.title}</h1>
+                    <h1 className="text-3xl md:text-5xl font-bold mb-8 leading-tight text-[#0f172a]">{post.title}</h1>
 
-                    <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-white/50">
+                    <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-[#64748b]">
                         <div className="flex items-center gap-2">
                             <User className="w-4 h-4" />
                             <span>{post.author}</span>
@@ -104,20 +104,20 @@ export default function BlogPostPage() {
                 )}
 
                 {/* Article Content */}
-                <article className="prose prose-invert prose-blue max-w-none prose-lg">
-                    <div className="whitespace-pre-wrap leading-relaxed text-white/80 font-normal">
+                <article className="prose prose-blue max-w-none prose-lg">
+                    <div className="whitespace-pre-wrap leading-relaxed text-[#0f172a] font-normal">
                         {post.content}
                     </div>
                 </article>
 
                 {/* Footer actions */}
-                <div className="mt-16 pt-8 border-t border-white/10 flex items-center justify-between">
+                <div className="mt-16 pt-8 border-t border-[#e2e8f0] flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <button onClick={handleShare} className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-colors text-white/70">
+                        <button onClick={handleShare} className="w-10 h-10 rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] border border-[#cbd5e1] flex items-center justify-center transition-colors text-[#64748b]">
                             <Share2 className="w-4 h-4" />
                         </button>
                     </div>
-                    <div className="text-white/40 text-sm">
+                    <div className="text-[#64748b] text-sm">
                         تم النشر في: {formatDate(post.createdAt)}
                     </div>
                 </div>

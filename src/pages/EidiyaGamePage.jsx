@@ -1,15 +1,14 @@
-import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { BsWhatsapp, BsTwitterX, BsArrowLeft, BsStars, BsCoin, BsShare, BsLightning, BsHeart, BsEmojiLaughing, BsTrophy, BsClock, BsFire } from 'react-icons/bs'
+import { useState } from 'react'
+import { BsWhatsapp, BsTwitterX, BsArrowLeft, BsStars, BsCoin, BsClock, BsLightning } from 'react-icons/bs'
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//   MEGA QUESTION BANK - 100+ Saudi Eid Situations
+//   MEGA QUESTION BANK - 85+ Saudi Eid Situations
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const megaQuestionBank = {
   
   // ═══════════════════════════════════════════
-  // CATEGORY 1: صباح العيد (10 questions)
+  // CATEGORY 1: صباح العيد (8 questions)
   // ═══════════════════════════════════════════
   morning: {
     title: "صباح العيد",
@@ -33,17 +32,7 @@ const megaQuestionBank = {
           { text: "قلت أذكار الصباح", points: 30, trait: "spiritual" },
           { text: "فتحت الجوال أشوف الرسايل", points: 15, trait: "connected" },
           { text: "رحت الحمام على طول", points: 20, trait: "practical" },
-          { text: "رجعت نمت 5 دقايق (صارت ساعة) 😂", points: 5, trait: "lazy" },
-        ]
-      },
-      {
-        q: "كم أخذت وقت تتجهز؟",
-        emoji: "🪞",
-        options: [
-          { text: "ساعة كاملة - لازم أطلع perfect", points: 20, trait: "perfectionist" },
-          { text: "نص ساعة تقريباً", points: 25, trait: "balanced" },
-          { text: "ربع ساعة بالكثير", points: 20, trait: "efficient" },
-          { text: "5 دقايق وطلعت 😎", points: 10, trait: "careless" },
+          { text: "رجعت نمت 5 دقايق 😂", points: 5, trait: "lazy" },
         ]
       },
       {
@@ -97,16 +86,6 @@ const megaQuestionBank = {
         ]
       },
       {
-        q: "كيف كان مزاجك الصبح؟",
-        emoji: "😊",
-        options: [
-          { text: "سعيد ومتحمس!", points: 30, trait: "positive" },
-          { text: "عادي، يوم زي أي يوم", points: 15, trait: "neutral" },
-          { text: "مريت بس عشان العيديات 💰", points: 20, trait: "honest" },
-          { text: "زهقان وأبي أرجع أنام", points: 5, trait: "grumpy" },
-        ]
-      },
-      {
         q: "هل ساعدت أمك في تجهيزات العيد؟",
         emoji: "🏠",
         options: [
@@ -120,7 +99,7 @@ const megaQuestionBank = {
   },
 
   // ═══════════════════════════════════════════
-  // CATEGORY 2: الزيارات العائلية (15 questions)
+  // CATEGORY 2: الزيارات العائلية (12 questions)
   // ═══════════════════════════════════════════
   family: {
     title: "الزيارات والأقارب",
@@ -247,41 +226,11 @@ const megaQuestionBank = {
           { text: "صورت الموقف 📱😂", points: 0, trait: "immature" },
         ]
       },
-      {
-        q: "قريبك يتفاخر بإنجازاته، وش حسيت؟",
-        emoji: "🏆",
-        options: [
-          { text: "فرحت له من قلبي", points: 30, trait: "supportive" },
-          { text: "قلت ماشاء الله", points: 25, trait: "polite" },
-          { text: "حسيت بشوية غيرة", points: 15, trait: "honest" },
-          { text: "قلت 'إي إي طيب' وغيرت الموضوع", points: 10, trait: "jealous" },
-        ]
-      },
-      {
-        q: "عمتك جابت لك هدية ما تحبها، وش سويت؟",
-        emoji: "🎁",
-        options: [
-          { text: "شكرتها بحرارة", points: 30, trait: "grateful" },
-          { text: "قلت شكراً وابتسمت", points: 25, trait: "polite" },
-          { text: "سألتها وش هي بصراحة", points: 10, trait: "direct" },
-          { text: "وجهي فضحني 😅", points: 15, trait: "expressive" },
-        ]
-      },
-      {
-        q: "أحد طلب منك توصيلة وأنت تعبان، وش سويت؟",
-        emoji: "🚗",
-        options: [
-          { text: "وصلته بكل سرور", points: 30, trait: "generous" },
-          { text: "وصلته بس تضايقت شوي", points: 20, trait: "helpful" },
-          { text: "اعتذرت منه", points: 15, trait: "honest" },
-          { text: "قلت سيارتي خربانة 😂", points: 5, trait: "liar" },
-        ]
-      },
     ]
   },
 
   // ═══════════════════════════════════════════
-  // CATEGORY 3: العيديات (12 questions)
+  // CATEGORY 3: العيديات (10 questions)
   // ═══════════════════════════════════════════
   eidiya: {
     title: "العيديات والفلوس",
@@ -369,16 +318,6 @@ const megaQuestionBank = {
         ]
       },
       {
-        q: "شفت أحد يتباهى بعيدياته، وش قلت؟",
-        emoji: "📱",
-        options: [
-          { text: "ماشاء الله تبارك الله", points: 30, trait: "positive" },
-          { text: "ما عليّ منه", points: 20, trait: "unbothered" },
-          { text: "حسيت بغيرة شوي", points: 15, trait: "honest" },
-          { text: "سويت له بلوك 💀", points: 5, trait: "petty" },
-        ]
-      },
-      {
         q: "وش خطتك للعيديات؟",
         emoji: "📋",
         options: [
@@ -398,21 +337,11 @@ const megaQuestionBank = {
           { text: "ولا واحد، أبي أقعد في البيت 😴", points: 5, trait: "antisocial" },
         ]
       },
-      {
-        q: "أحد عطاك عيدية بتحويل بنكي، وش رأيك؟",
-        emoji: "📲",
-        options: [
-          { text: "حلو! أسهل وأنظف", points: 25, trait: "modern" },
-          { text: "عادي، المهم العيدية", points: 20, trait: "practical" },
-          { text: "أفضل الكاش صراحة", points: 15, trait: "traditional" },
-          { text: "ما وصلني التحويل أصلاً 😂", points: 5, trait: "unlucky" },
-        ]
-      },
     ]
   },
 
   // ═══════════════════════════════════════════
-  // CATEGORY 4: الأكل والحلويات (10 questions)
+  // CATEGORY 4: الأكل والحلويات (8 questions)
   // ═══════════════════════════════════════════
   food: {
     title: "الأكل والحلويات",
@@ -470,16 +399,6 @@ const megaQuestionBank = {
         ]
       },
       {
-        q: "جربت أكلة جديدة يوم العيد؟",
-        emoji: "🆕",
-        options: [
-          { text: "إي! وكانت لذيذة", points: 30, trait: "adventurous" },
-          { text: "جربت بس ما عجبتني", points: 20, trait: "honest" },
-          { text: "لا، أكلت اللي أعرفه", points: 15, trait: "traditional" },
-          { text: "أخاف أجرب شي جديد", points: 10, trait: "cautious" },
-        ]
-      },
-      {
         q: "أكلت لين تعبت؟",
         emoji: "🤢",
         options: [
@@ -509,21 +428,11 @@ const megaQuestionBank = {
           { text: "هم اللي أصروا علي", points: 25, trait: "loved" },
         ]
       },
-      {
-        q: "كم وجبة أكلت يوم العيد الأول؟",
-        emoji: "🍔",
-        options: [
-          { text: "3 وجبات عادية", points: 25, trait: "normal" },
-          { text: "4-5 وجبات", points: 20, trait: "hungry" },
-          { text: "فوق 5 وجبات! 😱", points: 10, trait: "extreme" },
-          { text: "وجبة أو وجبتين بس", points: 20, trait: "light" },
-        ]
-      },
     ]
   },
 
   // ═══════════════════════════════════════════
-  // CATEGORY 5: السوشيال ميديا (10 questions)
+  // CATEGORY 5: السوشيال ميديا (8 questions)
   // ═══════════════════════════════════════════
   social_media: {
     title: "السوشيال ميديا",
@@ -591,16 +500,6 @@ const megaQuestionBank = {
         ]
       },
       {
-        q: "شاركت صور عيدياتك في السوشيال؟",
-        emoji: "💸",
-        options: [
-          { text: "لا، خصوصية", points: 30, trait: "private" },
-          { text: "بس في الستوري المقرب", points: 20, trait: "selective" },
-          { text: "إي، ليش لا؟", points: 15, trait: "open" },
-          { text: "ما عندي عيديات أشاركها 😂", points: 10, trait: "honest" },
-        ]
-      },
-      {
         q: "رديت على كل التهاني اللي وصلتك؟",
         emoji: "✉️",
         options: [
@@ -608,16 +507,6 @@ const megaQuestionBank = {
           { text: "أغلبهم", points: 25, trait: "good" },
           { text: "المهمين بس", points: 15, trait: "selective" },
           { text: "نسيت أرد 😅", points: 5, trait: "forgetful" },
-        ]
-      },
-      {
-        q: "شفت ستوريات العيد، وش كان إحساسك؟",
-        emoji: "👀",
-        options: [
-          { text: "فرحت للناس", points: 30, trait: "positive" },
-          { text: "عادي، ما أهتم", points: 20, trait: "unbothered" },
-          { text: "حسيت إن عيدي أحلى 😎", points: 15, trait: "competitive" },
-          { text: "حسيت بالـ FOMO 😔", points: 10, trait: "comparison" },
         ]
       },
       {
@@ -634,43 +523,13 @@ const megaQuestionBank = {
   },
 
   // ═══════════════════════════════════════════
-  // CATEGORY 6: المواقف المحرجة (10 questions)
+  // CATEGORY 6: المواقف المحرجة (8 questions)
   // ═══════════════════════════════════════════
   awkward: {
     title: "المواقف المحرجة",
     emoji: "😳",
     color: "#ef4444",
     questions: [
-      {
-        q: "نسيت تجيب هدية لأحد وهو جاب لك، وش سويت؟",
-        emoji: "😰",
-        options: [
-          { text: "اعتذرت ووعدته أجيب له", points: 30, trait: "honest" },
-          { text: "قلت هديتك بتوصل بعدين", points: 20, trait: "creative" },
-          { text: "تظاهرت إن شي ما صار", points: 15, trait: "avoidant" },
-          { text: "هربت من الموقف 😂", points: 5, trait: "coward" },
-        ]
-      },
-      {
-        q: "طفل كسر شي غالي في بيتكم، وش سويت؟",
-        emoji: "💔",
-        options: [
-          { text: "قلت عادي وما سوينا موضوع", points: 30, trait: "gracious" },
-          { text: "زعلت بس ما بينت", points: 20, trait: "controlled" },
-          { text: "قلت لأمه بطريقة لطيفة", points: 15, trait: "direct" },
-          { text: "طلبت من أهله يعوضون 😬", points: 5, trait: "materialistic" },
-        ]
-      },
-      {
-        q: "أحد مدح شكلك وأنت شايف نفسك مو أوكي، وش قلت؟",
-        emoji: "🪞",
-        options: [
-          { text: "شكرته وابتسمت", points: 30, trait: "gracious" },
-          { text: "قلت 'أنت أحلى'", points: 25, trait: "kind" },
-          { text: "قلت 'لا والله؟!' باستغراب", points: 20, trait: "humble" },
-          { text: "قلت 'كذاب!' 😂", points: 15, trait: "selfcritical" },
-        ]
-      },
       {
         q: "أكلت شي وطلع مو لذيذ قدام اللي سواه، وش سويت؟",
         emoji: "🤮",
@@ -739,6 +598,16 @@ const megaQuestionBank = {
           { text: "اعتذرت بهدوء", points: 25, trait: "considerate" },
           { text: "ضحكت على نفسي", points: 20, trait: "lighthearted" },
           { text: "تجاهلت الموضوع", points: 15, trait: "casual" },
+        ]
+      },
+      {
+        q: "شفت أحد يتفاخر بإنجازاته، وش حسيت؟",
+        emoji: "🏆",
+        options: [
+          { text: "فرحت له من قلبي", points: 30, trait: "supportive" },
+          { text: "قلت ماشاء الله", points: 25, trait: "polite" },
+          { text: "حسيت بشوية غيرة", points: 15, trait: "honest" },
+          { text: "قلت 'إي إي طيب' وغيرت الموضوع", points: 10, trait: "jealous" },
         ]
       },
     ]
@@ -813,16 +682,6 @@ const megaQuestionBank = {
         ]
       },
       {
-        q: "كيف تعاملت مع الخدم/العمال يوم العيد؟",
-        emoji: "🤝",
-        options: [
-          { text: "عيدت عليهم وعطيتهم عيدية", points: 30, trait: "kind" },
-          { text: "عيدت عليهم بس", points: 25, trait: "respectful" },
-          { text: "تعامل عادي", points: 15, trait: "neutral" },
-          { text: "ما فكرت فيهم 😔", points: 5, trait: "neglectful" },
-        ]
-      },
-      {
         q: "دعيت لأحد من قلبك يوم العيد؟",
         emoji: "🤲",
         options: [
@@ -832,11 +691,21 @@ const megaQuestionBank = {
           { text: "نسيت الدعاء 😔", points: 5, trait: "forgetful" },
         ]
       },
+      {
+        q: "كيف كنت مع الخادمات والخدم يوم العيد؟",
+        emoji: "🤝",
+        options: [
+          { text: "محترم ولطيف جداً", points: 30, trait: "kind" },
+          { text: "معاملتهم جيد", points: 25, trait: "respectful" },
+          { text: "تعامل عادي", points: 15, trait: "neutral" },
+          { text: "ما فكرت فيهم 😔", points: 5, trait: "neglectful" },
+        ]
+      },
     ]
   },
 
   // ═══════════════════════════════════════════
-  // CATEGORY 8: مواقف خاصة (10 questions)
+  // CATEGORY 8: مواقف خاصة (8 questions)
   // ═══════════════════════════════════════════
   special: {
     title: "مواقف خاصة",
@@ -914,16 +783,6 @@ const megaQuestionBank = {
         ]
       },
       {
-        q: "لو تختار، تبي عيديات أكثر أو وقت أكثر مع الأهل؟",
-        emoji: "⚖️",
-        options: [
-          { text: "الوقت مع الأهل أهم", points: 30, trait: "family" },
-          { text: "التوازن بين الاثنين", points: 25, trait: "balanced" },
-          { text: "صراحة العيديات 💰", points: 15, trait: "honest" },
-          { text: "ولا واحد، أبي راحة 😴", points: 5, trait: "tired" },
-        ]
-      },
-      {
         q: "وش الدرس اللي تعلمته هالعيد؟",
         emoji: "📚",
         options: [
@@ -931,16 +790,6 @@ const megaQuestionBank = {
           { text: "الصحة أهم من كل شي", points: 25, trait: "aware" },
           { text: "لازم أكون أكثر اجتماعية", points: 20, trait: "learning" },
           { text: "ما تعلمت شي جديد 😅", points: 10, trait: "static" },
-        ]
-      },
-      {
-        q: "هل العيد هذا كان أحسن من السنة اللي قبلها؟",
-        emoji: "📈",
-        options: [
-          { text: "إي! أحسن بكثير", points: 30, trait: "improving" },
-          { text: "نفس الشي تقريباً", points: 20, trait: "stable" },
-          { text: "أقل شوي صراحة", points: 15, trait: "honest" },
-          { text: "ما أقارن، كل عيد له طعمه", points: 25, trait: "present" },
         ]
       },
     ]
@@ -992,7 +841,6 @@ const getQuestionsByMode = (mode) => {
   const allQuestions = []
   const categories = Object.keys(megaQuestionBank)
   
-  // Determine questions per category based on mode
   const questionsPerCategory = Math.ceil(mode.questions / categories.length)
   
   categories.forEach(cat => {
@@ -1010,7 +858,6 @@ const getQuestionsByMode = (mode) => {
     })
   })
   
-  // Shuffle and limit to exact number
   return allQuestions.sort(() => Math.random() - 0.5).slice(0, mode.questions)
 }
 
@@ -1142,7 +989,7 @@ const getResult = (score, maxScore, traits) => {
 }
 
 export default function EidiyaGamePage() {
-  const [phase, setPhase] = useState('mode') // mode | intro | playing | result | claim
+  const [phase, setPhase] = useState('mode') // mode | playing | result | claim
   const [selectedMode, setSelectedMode] = useState(null)
   const [questions, setQuestions] = useState([])
   const [currentQ, setCurrentQ] = useState(0)
@@ -1197,101 +1044,52 @@ export default function EidiyaGamePage() {
   const currentQuestion = questions[currentQ]
 
   return (
-    <div dir="rtl" style={{
-      fontFamily: "'Tajawal', sans-serif",
-      background: 'linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%)',
-      minHeight: '100vh',
-      color: '#fff',
-      position: 'relative',
-      overflow: 'hidden'
-    }}>
-      {/* Confetti */}
-      {showConfetti && (
-        <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 100 }}>
-          {[...Array(60)].map((_, i) => (
-            <div key={i} style={{
-              position: 'absolute',
-              left: `${Math.random() * 100}%`,
-              top: '-5%',
-              fontSize: `${14 + Math.random() * 20}px`,
-              animation: `confettiFall ${2 + Math.random() * 3}s linear forwards`,
-              animationDelay: `${Math.random() * 2}s`
-            }}>
-              {['🎉', '✨', '💰', '🌟', '💵', '🎊', '👑', '⭐', '🏆'][i % 9]}
-            </div>
-          ))}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
+      <div className="max-w-2xl mx-auto">
+        
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-800 mb-3" style={{ fontFamily: 'Tajawal, sans-serif' }}>
+            🎁 لعبة العيدية
+          </h1>
+          <p className="text-gray-600 text-lg">
+            اكتشف شخصيتك العيدية واستحق عيديتك!
+          </p>
         </div>
-      )}
-
-      {/* Category Intro Overlay */}
-      {categoryIntro && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          zIndex: 80, animation: 'fadeIn 200ms ease'
-        }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 70, marginBottom: 12 }}>{categoryIntro.categoryEmoji}</div>
-            <h2 style={{ fontSize: 26, fontWeight: 900, color: categoryIntro.categoryColor }}>{categoryIntro.category}</h2>
-          </div>
-        </div>
-      )}
-
-      {/* Back Button */}
-      <Link to="/" style={{
-        position: 'absolute', top: 20, right: 20, zIndex: 50,
-        display: 'flex', alignItems: 'center', gap: 8,
-        color: '#666', fontSize: 14, textDecoration: 'none'
-      }}>
-        <BsArrowLeft /> الرئيسية
-      </Link>
-
-      <div style={{ maxWidth: 520, margin: '0 auto', padding: '60px 20px 40px' }}>
 
         {/* ═══ MODE SELECTION ═══ */}
         {phase === 'mode' && (
-          <div style={{ animation: 'fadeIn 500ms ease' }}>
-            <div style={{ textAlign: 'center', marginBottom: 30 }}>
-              <div style={{ fontSize: 70, marginBottom: 16, animation: 'bounce 2s infinite' }}>🎁</div>
-              <h1 style={{ fontSize: 30, fontWeight: 900, marginBottom: 8, background: 'linear-gradient(135deg, #d4af37, #f5d67b)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                اختبار العيدية الضخم
-              </h1>
-              <p style={{ fontSize: 15, color: '#888' }}>اختر مستوى التحدي!</p>
-              <p style={{ fontSize: 12, color: '#555', marginTop: 8 }}>85+ سؤال • 8 فئات مختلفة</p>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {gameModes.map((mode) => (
-                <button
-                  key={mode.id}
-                  onClick={() => startGame(mode)}
-                  style={{
-                    padding: '20px 24px', borderRadius: 16, border: `2px solid ${mode.color}40`,
-                    background: '#1f1f1f', cursor: 'pointer', fontFamily: 'inherit',
-                    display: 'flex', alignItems: 'center', gap: 16, textAlign: 'right',
-                    transition: 'all 200ms'
-                  }}
+          <div className="space-y-4">
+            {gameModes.map((mode) => (
+              <button
+                key={mode.id}
+                onClick={() => startGame(mode)}
+                className="w-full bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 text-right flex items-center gap-4 border-2 hover:border-opacity-100 border-transparent hover:border-gray-300"
+                style={{ borderColor: mode.color + '20' }}
+              >
+                <div 
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
+                  style={{ backgroundColor: mode.color + '15' }}
                 >
-                  <div style={{
-                    width: 50, height: 50, borderRadius: 14, background: `${mode.color}20`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26
-                  }}>
-                    {mode.emoji}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: mode.color }}>{mode.name}</h3>
-                    <p style={{ margin: '4px 0 0', fontSize: 13, color: '#888' }}>{mode.description}</p>
-                  </div>
-                  <div style={{ textAlign: 'left' }}>
-                    <span style={{ fontSize: 12, color: '#666', display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <BsClock size={12} /> {mode.time}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            <p style={{ fontSize: 11, color: '#444', textAlign: 'center', marginTop: 24 }}>
+                  {mode.emoji}
+                </div>
+                <div className="flex-1">
+                  <h3 
+                    className="text-xl font-bold mb-1"
+                    style={{ color: mode.color, fontFamily: 'Tajawal, sans-serif' }}
+                  >
+                    {mode.name}
+                  </h3>
+                  <p className="text-gray-500 text-sm">{mode.description}</p>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-400">
+                  <BsClock size={16} />
+                  <span>{mode.time}</span>
+                </div>
+              </button>
+            ))}
+            
+            <p className="text-center text-gray-400 text-sm mt-6">
               كل مرة تلعب، الأسئلة تتغير عشوائياً! 🎲
             </p>
           </div>
@@ -1299,59 +1097,67 @@ export default function EidiyaGamePage() {
 
         {/* ═══ PLAYING PHASE ═══ */}
         {phase === 'playing' && currentQuestion && (
-          <div style={{ animation: 'fadeIn 300ms ease' }}>
-            {/* Progress */}
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span style={{ fontSize: 11, color: '#888' }}>
+          <div className="space-y-6">
+            {/* Progress Bar */}
+            <div>
+              <div className="flex justify-between mb-2">
+                <span className="text-sm text-gray-500">
                   {selectedMode?.emoji} {selectedMode?.name} • السؤال {currentQ + 1}/{questions.length}
                 </span>
-                <span style={{ fontSize: 11, color: '#d4af37', fontWeight: 700 }}>{Math.round(progress)}%</span>
+                <span className="text-sm font-bold" style={{ color: selectedMode?.color }}>
+                  {Math.round(progress)}%
+                </span>
               </div>
-              <div style={{ height: 6, background: '#333', borderRadius: 10, overflow: 'hidden' }}>
-                <div style={{
-                  height: '100%', background: `linear-gradient(90deg, ${selectedMode?.color || '#d4af37'}, #f5d67b)`,
-                  width: `${progress}%`, transition: 'width 400ms ease', borderRadius: 10
-                }} />
+              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div 
+                  className="h-full rounded-full transition-all duration-400"
+                  style={{ 
+                    width: `${progress}%`,
+                    background: `linear-gradient(90deg, ${selectedMode?.color || '#d4af37'}, #f5d67b)`
+                  }}
+                />
               </div>
             </div>
 
             {/* Category Badge */}
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
-              <span style={{
-                padding: '5px 12px', background: `${currentQuestion.categoryColor}15`, borderRadius: 16,
-                fontSize: 11, color: currentQuestion.categoryColor, fontWeight: 600,
-                border: `1px solid ${currentQuestion.categoryColor}30`
-              }}>
+            <div className="flex justify-center">
+              <span 
+                className="px-4 py-2 rounded-full text-sm font-semibold"
+                style={{ 
+                  backgroundColor: currentQuestion.categoryColor + '15',
+                  color: currentQuestion.categoryColor,
+                  border: `1px solid ${currentQuestion.categoryColor}30`
+                }}
+              >
                 {currentQuestion.categoryEmoji} {currentQuestion.category}
               </span>
             </div>
 
             {/* Question Card */}
-            <div style={{
-              background: '#1f1f1f', borderRadius: 20, padding: 24,
-              border: '1px solid #333', marginBottom: 20
-            }}>
-              <div style={{ fontSize: 44, textAlign: 'center', marginBottom: 14 }}>
+            <div className="bg-white rounded-3xl shadow-lg p-8">
+              <div className="text-6xl text-center mb-6">
                 {currentQuestion.emoji}
               </div>
-              <h2 style={{ fontSize: 18, fontWeight: 700, textAlign: 'center', lineHeight: 1.7, marginBottom: 20 }}>
+              <h2 
+                className="text-xl font-bold text-center mb-8 leading-relaxed"
+                style={{ fontFamily: 'Tajawal, sans-serif' }}
+              >
                 {currentQuestion.q}
               </h2>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div className="space-y-3">
                 {currentQuestion.options.map((opt, idx) => (
                   <button
                     key={idx}
                     onClick={() => !selectedOption && handleAnswer(opt.points, opt.trait)}
                     disabled={selectedOption !== null}
+                    className={`w-full p-4 rounded-xl font-semibold transition-all duration-200 text-right ${
+                      selectedOption === opt.points 
+                        ? 'text-black shadow-lg' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
                     style={{
-                      padding: '14px 18px', borderRadius: 12, border: 'none',
-                      background: selectedOption === opt.points ? selectedMode?.color || '#d4af37' : '#2d2d2d',
-                      color: selectedOption === opt.points ? '#000' : '#fff',
-                      fontSize: 14, fontWeight: 600, cursor: selectedOption ? 'default' : 'pointer',
-                      fontFamily: 'inherit', textAlign: 'right',
-                      transition: 'all 200ms',
+                      backgroundColor: selectedOption === opt.points ? selectedMode?.color : '',
                       opacity: selectedOption !== null && selectedOption !== opt.points ? 0.4 : 1
                     }}
                   >
@@ -1364,11 +1170,8 @@ export default function EidiyaGamePage() {
             {showNext && (
               <button
                 onClick={nextQuestion}
-                style={{
-                  width: '100%', padding: '14px', borderRadius: 12, border: 'none',
-                  background: '#fff', color: '#000', fontSize: 15, fontWeight: 700,
-                  cursor: 'pointer', fontFamily: 'inherit', animation: 'fadeIn 300ms ease'
-                }}
+                className="w-full py-4 rounded-xl font-bold bg-gray-800 text-white hover:bg-gray-900 transition-colors"
+                style={{ fontFamily: 'Tajawal, sans-serif' }}
               >
                 {currentQ < questions.length - 1 ? 'التالي ←' : 'النتيجة! 🎉'}
               </button>
@@ -1378,82 +1181,96 @@ export default function EidiyaGamePage() {
 
         {/* ═══ RESULT PHASE ═══ */}
         {phase === 'result' && result && (
-          <div style={{ textAlign: 'center', animation: 'scaleIn 400ms ease' }}>
+          <div className="text-center space-y-6">
             {/* Tier Badge */}
-            <div style={{
-              width: 80, height: 80, borderRadius: '50%', margin: '0 auto 16px',
-              background: result.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 36, fontWeight: 900, color: '#000', boxShadow: `0 8px 30px ${result.color}40`
-            }}>
+            <div 
+              className="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center text-5xl font-black text-white shadow-xl"
+              style={{ background: result.gradient }}
+            >
               {result.tier}
             </div>
 
-            <div style={{ fontSize: 50, marginBottom: 12 }}>{result.emoji}</div>
-            <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10, color: result.color, lineHeight: 1.5 }}>
+            <div className="text-6xl mb-4">{result.emoji}</div>
+            <h1 
+              className="text-3xl font-bold mb-3"
+              style={{ color: result.color, fontFamily: 'Tajawal, sans-serif' }}
+            >
               {result.title}
             </h1>
-            <p style={{ fontSize: 14, color: '#888', marginBottom: 16 }}>{result.message}</p>
+            <p className="text-gray-600 text-lg mb-6">{result.message}</p>
 
             {/* Stats Row */}
-            <div style={{
-              display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 20,
-              padding: '14px', background: '#1a1a1a', borderRadius: 12
-            }}>
+            <div className="flex justify-center gap-8 mb-6 p-4 bg-white rounded-xl shadow">
               <div>
-                <p style={{ fontSize: 22, fontWeight: 800, color: result.color }}>{score}</p>
-                <p style={{ fontSize: 10, color: '#666' }}>نقاطك</p>
+                <p className="text-3xl font-bold" style={{ color: result.color }}>{score}</p>
+                <p className="text-xs text-gray-500">نقاطك</p>
               </div>
-              <div style={{ width: 1, background: '#333' }} />
+              <div className="w-px bg-gray-200"></div>
               <div>
-                <p style={{ fontSize: 22, fontWeight: 800, color: '#888' }}>{maxScore}</p>
-                <p style={{ fontSize: 10, color: '#666' }}>الأقصى</p>
+                <p className="text-3xl font-bold text-gray-400">{maxScore}</p>
+                <p className="text-xs text-gray-500">الأقصى</p>
               </div>
-              <div style={{ width: 1, background: '#333' }} />
+              <div className="w-px bg-gray-200"></div>
               <div>
-                <p style={{ fontSize: 22, fontWeight: 800, color: result.color }}>{Math.round((score/maxScore)*100)}%</p>
-                <p style={{ fontSize: 10, color: '#666' }}>النسبة</p>
+                <p className="text-3xl font-bold" style={{ color: result.color }}>{Math.round((score/maxScore)*100)}%</p>
+                <p className="text-xs text-gray-500">النسبة</p>
               </div>
             </div>
 
             {/* Amount */}
-            <div style={{
-              background: '#1f1f1f', borderRadius: 20, padding: 28, marginBottom: 16,
-              border: `2px solid ${result.color}30`
-            }}>
-              <p style={{ fontSize: 13, color: '#888', marginBottom: 6 }}>عيديتك المستحقة:</p>
-              <div style={{
-                fontSize: 52, fontWeight: 900, marginBottom: 6,
-                background: result.gradient, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
-              }}>
+            <div 
+              className="bg-white rounded-3xl p-8 shadow-lg mb-6 border-2"
+              style={{ borderColor: result.color + '30' }}
+            >
+              <p className="text-gray-500 mb-2">عيديتك المستحقة:</p>
+              <div 
+                className="text-6xl font-black mb-2"
+                style={{ 
+                  background: result.gradient,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontFamily: 'Tajawal, sans-serif'
+                }}
+              >
                 {result.amount}
               </div>
-              <p style={{ fontSize: 16, color: '#888' }}>ريال سعودي</p>
+              <p className="text-gray-600 text-xl">ريال سعودي</p>
             </div>
 
             {/* Personality */}
-            <div style={{
-              background: '#1a1a1a', borderRadius: 14, padding: 16, marginBottom: 20,
-              border: '1px solid #333'
-            }}>
-              <p style={{ fontSize: 11, color: '#666', marginBottom: 6 }}>شخصيتك العيدية:</p>
-              <p style={{ fontSize: 14, color: '#fff', fontWeight: 600 }}>{result.personality}</p>
-              <p style={{ fontSize: 11, color: result.color, marginTop: 10 }}>💡 {result.tip}</p>
+            <div className="bg-white rounded-2xl p-6 shadow border border-gray-200">
+              <p className="text-sm text-gray-500 mb-2">شخصيتك العيدية:</p>
+              <p 
+                className="text-lg font-semibold text-gray-800 mb-4"
+                style={{ fontFamily: 'Tajawal, sans-serif' }}
+              >
+                {result.personality}
+              </p>
+              <p 
+                className="text-sm"
+                style={{ color: result.color }}
+              >
+                💡 {result.tip}
+              </p>
             </div>
 
             {/* Buttons */}
-            <button onClick={() => setPhase('claim')} style={{
-              width: '100%', padding: '16px', borderRadius: 14, border: 'none',
-              background: result.gradient, color: '#000', fontSize: 15, fontWeight: 800,
-              cursor: 'pointer', fontFamily: 'inherit', marginBottom: 10
-            }}>
-              <BsCoin style={{ marginLeft: 8 }} /> طالب بعيديتك!
+            <button 
+              onClick={() => setPhase('claim')}
+              className="w-full py-4 rounded-xl font-black text-white hover:shadow-lg transition-shadow"
+              style={{ background: result.gradient, fontFamily: 'Tajawal, sans-serif' }}
+            >
+              <span className="flex items-center justify-center gap-2">
+                <BsCoin size={20} />
+                طالب بعيديتك!
+              </span>
             </button>
 
-            <button onClick={() => { setPhase('mode'); setShowConfetti(false) }} style={{
-              width: '100%', padding: '14px', borderRadius: 12, border: '1px solid #333',
-              background: 'transparent', color: '#888', fontSize: 14, fontWeight: 600,
-              cursor: 'pointer', fontFamily: 'inherit'
-            }}>
+            <button 
+              onClick={() => { setPhase('mode'); setShowConfetti(false) }}
+              className="w-full py-3 rounded-xl font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              style={{ fontFamily: 'Tajawal, sans-serif' }}
+            >
               العب مرة ثانية
             </button>
           </div>
@@ -1461,21 +1278,30 @@ export default function EidiyaGamePage() {
 
         {/* ═══ CLAIM PHASE ═══ */}
         {phase === 'claim' && result && (
-          <div style={{ animation: 'fadeIn 300ms ease' }}>
-            <div style={{ textAlign: 'center', marginBottom: 24 }}>
-              <div style={{ fontSize: 50, marginBottom: 10 }}>💰</div>
-              <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 6 }}>طالب بعيديتك!</h2>
-              <p style={{ fontSize: 13, color: '#888' }}>ممن تريد المطالبة بـ {result.amount} ريال؟</p>
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <div className="text-7xl mb-4">💰</div>
+              <h2 
+                className="text-2xl font-bold mb-2"
+                style={{ fontFamily: 'Tajawal, sans-serif' }}
+              >
+                طالب بعيديتك!
+              </h2>
+              <p className="text-gray-600">
+                ممن تريد المطالبة بـ {result.amount} ريال؟
+              </p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 16 }}>
+            <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 mb-6">
               {['أبوي', 'أمي', 'جدي', 'جدتي', 'خالي', 'خالتي', 'عمي', 'عمتي', 'أخوي', 'أختي', 'زوجي', 'صديقي'].map((name) => (
-                <button key={name} onClick={() => setClaimFrom(name)} style={{
-                  padding: '12px 8px', borderRadius: 10, border: 'none',
-                  background: claimFrom === name ? result.color : '#2d2d2d',
-                  color: claimFrom === name ? '#000' : '#fff',
-                  fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit'
-                }}>
+                <button
+                  key={name}
+                  onClick={() => setClaimFrom(name)}
+                  className={`p-3 rounded-lg font-semibold transition-colors ${
+                    claimFrom === name ? 'text-black' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                  style={{ backgroundColor: claimFrom === name ? result.color : '' }}
+                >
                   {name}
                 </button>
               ))}
@@ -1486,62 +1312,93 @@ export default function EidiyaGamePage() {
               placeholder="أو اكتب اسم..."
               value={claimFrom}
               onChange={(e) => setClaimFrom(e.target.value)}
-              style={{
-                width: '100%', padding: '14px', borderRadius: 12, border: '2px solid #333',
-                background: '#1f1f1f', color: '#fff', fontSize: 14, fontFamily: 'inherit',
-                outline: 'none', textAlign: 'right', marginBottom: 16
-              }}
+              className="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-gray-400 outline-none text-right mb-6"
+              style={{ fontFamily: 'Tajawal, sans-serif' }}
             />
 
             {claimFrom && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <button onClick={() => {
-                  const text = encodeURIComponent(`يا ${claimFrom}! 🎁\n\nسويت اختبار العيدية وطلعت:\n${result.title}\n\nمستواي: ${result.tier}\nأستاهل: ${result.amount} ريال! 💰\n\nوش رايك تعطيني عيديتي؟ 😂\n\nجرب: ${window.location.href}`)
-                  window.open(`https://wa.me/?text=${text}`, '_blank')
-                }} style={{
-                  width: '100%', padding: '14px', borderRadius: 12, border: 'none',
-                  background: '#25D366', color: '#fff', fontSize: 14, fontWeight: 700,
-                  cursor: 'pointer', fontFamily: 'inherit'
-                }}>
-                  <BsWhatsapp style={{ marginLeft: 8 }} /> واتساب
+              <div className="space-y-3">
+                <button 
+                  onClick={() => {
+                    const text = encodeURIComponent(`يا ${claimFrom}! 🎁\n\nسويت اختبار العيدية وطلعت:\n${result.title}\n\nمستواي: ${result.tier}\nأستاهل: ${result.amount} ريال! 💰\n\nوش رايك تعطيني عيديتي؟ 😂\n\nجرب: ${window.location.href}`)
+                    window.open(`https://wa.me/?text=${text}`, '_blank')
+                  }} 
+                  className="w-full py-4 rounded-xl font-bold bg-green-500 text-white hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
+                >
+                  <BsWhatsapp size={20} />
+                  واتساب
                 </button>
 
-                <button onClick={() => {
-                  const text = encodeURIComponent(`سويت اختبار العيدية! 🎁\n\nمستواي: ${result.tier} ${result.emoji}\nأستاهل: ${result.amount} ريال!\n\nجرب:`)
-                  window.open(`https://twitter.com/intent/tweet?text=${text}&url=${window.location.href}`, '_blank')
-                }} style={{
-                  width: '100%', padding: '14px', borderRadius: 12, border: '1px solid #333',
-                  background: '#000', color: '#fff', fontSize: 14, fontWeight: 700,
-                  cursor: 'pointer', fontFamily: 'inherit'
-                }}>
-                  <BsTwitterX style={{ marginLeft: 8 }} /> شارك في X
+                <button 
+                  onClick={() => {
+                    const text = encodeURIComponent(`سويت اختبار العيدية! 🎁\n\nمستواي: ${result.tier} ${result.emoji}\nأستاهل: ${result.amount} ريال!\n\nجرب:`)
+                    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${window.location.href}`, '_blank')
+                  }} 
+                  className="w-full py-4 rounded-xl font-bold bg-black text-white hover:bg-gray-900 transition-colors flex items-center justify-center gap-2"
+                >
+                  <BsTwitterX size={20} />
+                  شارك في X
                 </button>
               </div>
             )}
 
-            <button onClick={() => setPhase('result')} style={{
-              width: '100%', padding: '12px', borderRadius: 10, border: 'none',
-              background: '#2d2d2d', color: '#888', fontSize: 13, fontWeight: 600,
-              cursor: 'pointer', fontFamily: 'inherit', marginTop: 16
-            }}>
+            <button 
+              onClick={() => setPhase('result')}
+              className="w-full py-3 rounded-xl font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              style={{ fontFamily: 'Tajawal, sans-serif' }}
+            >
               ← رجوع
             </button>
           </div>
         )}
-
-        {/* Footer */}
-        <div style={{ textAlign: 'center', marginTop: 32, paddingTop: 16, borderTop: '1px solid #222' }}>
-          <Link to="/" style={{ fontSize: 11, color: '#444', textDecoration: 'none' }}>
-            صنع بـ ❤️ بواسطة <span style={{ color: '#d4af37' }}>@am_designing</span>
-          </Link>
-        </div>
+        
       </div>
+      
+      {/* Confetti Effect */}
+      {showConfetti && (
+        <div className="fixed inset-0 pointer-events-none z-50">
+          {[...Array(40)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute animate-fall"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: '-5%',
+                fontSize: `${16 + Math.random() * 20}px`,
+                animationDelay: `${Math.random() * 2}s`,
+                animationDuration: `${2 + Math.random() * 2}s`
+              }}
+            >
+              {['🎉', '✨', '💰', '🌟', '💵', '🎊', '👑', '⭐', '🏆'][i % 9]}
+            </div>
+          ))}
+        </div>
+      )}
 
-      <style>{`
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        @keyframes confettiFall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+      {/* Category Intro Overlay */}
+      {categoryIntro && (
+        <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-40 animate-fade">
+          <div className="text-center">
+            <div className="text-8xl mb-4">{categoryIntro.categoryEmoji}</div>
+            <h2 
+              className="text-3xl font-black"
+              style={{ color: categoryIntro.categoryColor, fontFamily: 'Tajawal, sans-serif' }}
+            >
+              {categoryIntro.category}
+            </h2>
+          </div>
+        </div>
+      )}
+
+      <style jsx>{`
+        @keyframes fall {
+          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        @keyframes fade {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
       `}</style>
     </div>
   )

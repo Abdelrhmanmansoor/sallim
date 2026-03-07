@@ -333,4 +333,240 @@ export async function updateAdminTicketStatus(adminKey, ticketId, status) {
   })
 }
 
+// ═════════════════════════════════════════════
+// DIWAN AL-EID (Interactive Greetings)
+// ═════════════════════════════════════════════
+
+/**
+ * Public: Create a new Diwan page
+ */
+export async function createDiwan(data) {
+  return apiRequest('/diwan', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Public: Get a Diwan page by username
+ */
+export async function getDiwan(username) {
+  return apiRequest(`/diwan/${username}`)
+}
+
+/**
+ * Public: Add a greeting to a specific Diwan
+ */
+export async function addDiwanGreeting(username, data) {
+  return apiRequest(`/diwan/${username}/greet`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Public: Like a specific greeting inside a Diwan
+ */
+export async function likeDiwanGreeting(username, greetId) {
+  return apiRequest(`/diwan/${username}/greet/${greetId}/like`, {
+    method: 'POST'
+  })
+}
+
+// ═════════════════════════════════════════════
+// DIWANIYAT AL-EID (Anonymous Greetings)
+// ═════════════════════════════════════════════
+
+/**
+ * Public: Create a new Diwaniya page
+ */
+export async function createDiwaniya(data) {
+  return apiRequest('/diwaniya', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Public: Get a Diwaniya page by username (public view)
+ */
+export async function getDiwaniya(username) {
+  return apiRequest(`/diwaniya/${username}`)
+}
+
+/**
+ * Public: Get all greetings for owner (including private)
+ */
+export async function getDiwaniyaManage(username) {
+  return apiRequest(`/diwaniya/${username}/manage`)
+}
+
+/**
+ * Public: Add a greeting to a specific Diwaniya
+ */
+export async function addDiwaniyaGreeting(username, data) {
+  return apiRequest(`/diwaniya/${username}/greet`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Public: Like a specific greeting inside a Diwaniya
+ */
+export async function likeDiwaniyaGreeting(username, greetId) {
+  return apiRequest(`/diwaniya/${username}/greet/${greetId}/like`, {
+    method: 'POST'
+  })
+}
+
+/**
+ * Owner: Update greeting visibility
+ */
+export async function updateDiwaniyaGreetingVisibility(username, greetId, visibility) {
+  return apiRequest(`/diwaniya/${username}/greet/${greetId}/visibility`, {
+    method: 'PUT',
+    body: JSON.stringify({ visibility })
+  })
+}
+
+/**
+ * Owner: Delete a greeting
+ */
+export async function deleteDiwaniyaGreeting(username, greetId) {
+  return apiRequest(`/diwaniya/${username}/greet/${greetId}`, {
+    method: 'DELETE'
+  })
+}
+
+// ═════════════════════════════════════════════
+// EIDIYA GAME (Diwaniya Quiz Game)
+// ═════════════════════════════════════════════
+
+/**
+ * Public: Get Eidiya Game status and questions
+ */
+export async function getEidiyaGame(username) {
+  return apiRequest(`/diwaniya/${username}/game`)
+}
+
+/**
+ * Public: Check if player can play (with sessionId)
+ */
+export async function getEidiyaGameStatus(username, sessionId) {
+  return apiRequest(`/diwaniya/${username}/game/status?sessionId=${sessionId}`)
+}
+
+/**
+ * Public: Submit an answer to a question
+ */
+export async function submitEidiyaGameAnswer(username, data) {
+  return apiRequest(`/diwaniya/${username}/game/answer`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Owner: Update Eidiya Game questions and settings
+ */
+export async function updateEidiyaGame(username, data) {
+  return apiRequest(`/diwaniya/${username}/game`, {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Owner: Get game statistics
+ */
+export async function getEidiyaGameStats(username) {
+  return apiRequest(`/diwaniya/${username}/game/stats`)
+}
+
+// ═════════════════════════════════════════════
+// AUTHENTICATION (Login, Register, Profile)
+// ═════════════════════════════════════════════
+
+/**
+ * Public: Register a new user
+ */
+export async function registerUser(data) {
+  return apiRequest('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Public: Login existing user
+ */
+export async function loginUser(data) {
+  return apiRequest('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Auth: Get user profile (requires token)
+ */
+export async function getUserProfile() {
+  const token = localStorage.getItem('token')
+  return apiRequest('/auth/profile', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+}
+
+/**
+ * Auth: Claim an existing diwaniya (requires token)
+ */
+export async function claimDiwaniya(diwaniyaId) {
+  const token = localStorage.getItem('token')
+  return apiRequest('/auth/claim-diwaniya', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ diwaniyaId })
+  })
+}
+
+/**
+ * Auth: Update user profile (requires token)
+ */
+export async function updateUserProfile(data) {
+  const token = localStorage.getItem('token')
+  return apiRequest('/auth/profile', {
+    method: 'PUT',
+    headers: { 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Auth: Upload avatar image (requires token)
+ * Uses FormData for multipart upload
+ */
+export async function uploadAvatar(file) {
+  const token = localStorage.getItem('token')
+  const url = `${API_BASE}/api/v1/upload/avatar`
+  
+  const formData = new FormData()
+  formData.append('avatar', file)
+  
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },
+    body: formData
+  })
+  
+  const data = await res.json()
+  if (!res.ok) {
+    throw new Error(data.error || 'حدث خطأ أثناء رفع الصورة')
+  }
+  
+  return data
+}
+
 export default API_BASE
