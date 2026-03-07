@@ -61,7 +61,7 @@ const allowedOrigins = [
   'http://localhost:5175',
 ].filter(Boolean)
 
-app.use(cors({
+const corsOptions = {
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
@@ -81,10 +81,12 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Admin-Key'],
-}))
+};
+
+app.use(cors(corsOptions))
 
 // Handle preflight requests explicitly
-app.options('*', cors())
+app.options('*', cors(corsOptions))
 
 // Rate limiting: 100 requests per 15 minutes per IP
 const limiter = rateLimit({
