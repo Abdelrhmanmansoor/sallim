@@ -6,7 +6,9 @@ import {
   ArrowLeft, Sparkles, ChevronRight
 } from 'lucide-react'
 import { useWhiteLabelStore } from '../store'
-import { getPublicStats, getAdminTickets, adminReplyToTicket, updateAdminTicketStatus } from '../utils/api'
+import { getPublicStats, getAdminTickets, adminReplyToTicket, updateAdminTicketStatus, getAdminCards, getAdminCompanies, inviteCompany, updateCompanyAsAdmin, getAdminTemplates, addAdminTemplate, updateAdminTemplate, deleteAdminTemplate, getAdminBlogPosts, addAdminBlogPost, updateAdminBlogPost, deleteAdminBlogPost } from '../utils/api'
+import toast from 'react-hot-toast'
+import { Loader2, Trash2 } from 'lucide-react'
 const BRAND_KEY = 'sallim_company_brand'
 
 function load(key, fb = {}) {
@@ -294,7 +296,7 @@ function StatsPanel() {
 }
 
 /* ─────────── Admin Panel ─── */
-import { getAdminCards } from '../utils/api'
+
 function AdminPanel() {
   const [key, setKey] = useState('')
   const [cards, setCards] = useState([])
@@ -438,8 +440,7 @@ function AdminPanel() {
 }
 
 /* ─────────── Admin Companies Panel ─── */
-import { getAdminCompanies, inviteCompany, updateCompanyAsAdmin } from '../utils/api'
-import toast from 'react-hot-toast'
+
 
 function AdminCompaniesPanel() {
   const [key, setKey] = useState('')
@@ -686,8 +687,7 @@ function AdminCompaniesPanel() {
 }
 
 /* ─────────── Admin Templates Panel ─── */
-import { getAdminTemplates, addAdminTemplate, updateAdminTemplate, deleteAdminTemplate } from '../utils/api'
-import { Loader2, Trash2 } from 'lucide-react'
+
 
 function AdminTemplatesPanel() {
   const [key, setKey] = useState('')
@@ -964,7 +964,7 @@ function AdminTemplatesPanel() {
 }
 
 /* ─────────── Admin Blog Panel ─── */
-import { getAdminBlogPosts, addAdminBlogPost, updateAdminBlogPost, deleteAdminBlogPost } from '../utils/api'
+
 
 function AdminBlogPanel() {
   const [key, setKey] = useState('')
