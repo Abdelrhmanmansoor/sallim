@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, ArrowLeft } from 'lucide-react'
+import { Menu, X, ArrowLeft, Building2 } from 'lucide-react'
+import { useCompany } from '../../context/CompanyContext'
 
 const links = [
   { path: '/', label: 'الرئيسية' },
   { path: '/editor', label: 'المحرر' },
   { path: '/texts', label: 'النصوص' },
   { path: '/eidiya', label: 'العيدية' },
+  { path: '/blog', label: 'المدونة' },
 ]
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const { pathname } = useLocation()
+  const { isAuthenticated, company } = useCompany()
 
   useEffect(() => { setOpen(false) }, [pathname])
 
@@ -103,8 +106,27 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Desktop CTA */}
-          <div className="hidden md:flex" style={{ alignItems: 'center', gap: '12px' }}>
+          {isAuthenticated && company ? (
+            <Link
+              to="/company/dashboard"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '10px 20px',
+                fontSize: '14px',
+                fontWeight: 600,
+                color: showDark ? '#fff' : '#2563eb',
+                background: showDark ? 'rgba(255,255,255,0.1)' : '#ebf5ff',
+                borderRadius: '10px',
+                textDecoration: 'none',
+                transition: 'all 200ms ease',
+              }}
+            >
+              <Building2 style={{ width: '16px', height: '16px' }} />
+              مساحة {company.name}
+            </Link>
+          ) : (
             <Link
               to="/editor"
               style={{
@@ -124,111 +146,31 @@ export default function Navbar() {
               ابدأ التصميم
               <ArrowLeft style={{ width: '16px', height: '16px' }} />
             </Link>
-          </div>
-
-          {/* Mobile Toggle */}
-          <button
-            className="md:hidden"
-            onClick={() => setOpen((v) => !v)}
-            aria-label={open ? 'إغلاق' : 'القائمة'}
-            style={{
-              width: '40px',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: showDark ? 'rgba(255,255,255,0.1)' : '#f5f5f5',
-              border: 'none',
-              borderRadius: '10px',
-              color: showDark ? '#fff' : '#171717',
-              cursor: 'pointer',
-              transition: 'all 150ms ease',
-            }}
-          >
-            {open ? <X size={18} /> : <Menu size={18} />}
-          </button>
+          )}
         </div>
-      </nav>
 
-      {/* Mobile Menu */}
-      {open && (
-        <div
-          style={{ position: 'fixed', inset: 0, zIndex: 90 }}
+        {/* Mobile Toggle */}
+        <button
           className="md:hidden"
+          onClick={() => setOpen((v) => !v)}
+          aria-label={open ? 'إغلاق' : 'القائمة'}
+          style={{
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: showDark ? 'rgba(255,255,255,0.1)' : '#f5f5f5',
+            border: 'none',
+            borderRadius: '10px',
+            color: showDark ? '#fff' : '#171717',
+            cursor: 'pointer',
+            transition: 'all 150ms ease',
+          }}
         >
-          {/* Overlay */}
-          <div
-            onClick={() => setOpen(false)}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'rgba(0,0,0,0.4)',
-              backdropFilter: 'blur(4px)',
-            }}
-          />
-
-          {/* Menu Panel */}
-          <div
-            style={{
-              position: 'absolute',
-              top: '64px',
-              left: 0,
-              right: 0,
-              background: '#fff',
-              padding: '16px',
-              borderTop: '1px solid #f0f0f0',
-              fontFamily: "'Tajawal', sans-serif",
-              animation: 'slideDown 200ms ease',
-            }}
-          >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              {links.map((l) => (
-                <Link
-                  key={l.path}
-                  to={l.path}
-                  onClick={() => setOpen(false)}
-                  style={{
-                    padding: '14px 16px',
-                    fontSize: '15px',
-                    fontWeight: pathname === l.path ? 600 : 500,
-                    color: pathname === l.path ? '#171717' : '#525252',
-                    background: pathname === l.path ? '#f5f5f5' : 'transparent',
-                    borderRadius: '12px',
-                    textDecoration: 'none',
-                    transition: 'all 150ms ease',
-                  }}
-                >
-                  {l.label}
-                </Link>
-              ))}
-            </div>
-
-            <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #f0f0f0' }}>
-              <Link
-                to="/editor"
-                onClick={() => setOpen(false)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  width: '100%',
-                  padding: '14px',
-                  fontSize: '15px',
-                  fontWeight: 600,
-                  color: '#fff',
-                  background: '#171717',
-                  borderRadius: '12px',
-                  textDecoration: 'none',
-                }}
-              >
-                ابدأ التصميم
-                <ArrowLeft size={16} />
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
+          {open ? <X size={18} /> : <Menu size={18} />}
+        </button>
+      </nav>
 
       <style>{`
         @keyframes slideDown {

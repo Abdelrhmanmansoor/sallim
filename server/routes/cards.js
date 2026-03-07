@@ -57,8 +57,8 @@ router.get('/:shareId', async (req, res) => {
 
     // Increment view count (non-blocking)
     card.viewCount += 1
-    card.save().catch(() => {})
-    Stats.incrementToday('cardViews').catch(() => {})
+    card.save().catch(() => { })
+    Stats.incrementToday('cardViews').catch(() => { })
 
     res.json({
       success: true,
@@ -100,6 +100,28 @@ router.get('/public/stats', async (req, res) => {
     })
   } catch (error) {
     res.status(500).json({ success: false, error: 'حدث خطأ' })
+  }
+})
+
+// ═══ Admin: Get all cards ═══
+router.get('/admin/all', async (req, res) => {
+  try {
+    const adminKey = req.headers['x-admin-key']
+    if (!adminKey || adminKey !== process.env.ADMIN_SECRET_KEY) {
+      return res.status(401).json({ success: false, error: 'غير مصرح لك بالوصول' })
+    }
+
+    const cards = await Card.find({ status: 'active' })
+      .sort({ createdAt: -1 })
+      .limit(100) // Show latest 100 cards for safety
+
+    res.json({
+      success: true,
+      data: cards
+    })
+  } catch (error) {
+    console.error('Admin fetch error:', error)
+    res.status(500).json({ success: false, error: 'حدث خطأ في النظام' })
   }
 })
 

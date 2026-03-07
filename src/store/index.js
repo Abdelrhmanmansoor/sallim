@@ -166,3 +166,8 @@ export const useWhiteLabelStore = create((set) => ({
     }
   }),
 }))
+
+export const useCompanyStore = create((set) => ({
+  company: null,
+  setCompany: (company) => set({ company }),
+}))

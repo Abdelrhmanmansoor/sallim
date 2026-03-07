@@ -12,9 +12,14 @@ import EidiyaPage from './pages/EidiyaPage'
 import EidiyaLuckPage from './pages/EidiyaLuckPage'
 import EidiyaGamePage from './pages/EidiyaGamePage'
 import DonatePage from './pages/DonatePage'
-import PrivacyPage from './pages/PrivacyPage'
 import TermsPage from './pages/TermsPage'
 import EidParticles from './components/effects/EidParticles'
+import CompanyActivationPage from './pages/CompanyActivationPage'
+import CompanyLoginPage from './pages/CompanyLoginPage'
+import CompanyDashboardPage from './pages/CompanyDashboardPage'
+import BlogPage from './pages/BlogPage'
+import BlogPostPage from './pages/BlogPostPage'
+import PrivacyPage from './pages/PrivacyPage'
 
 export default function App() {
   const location = useLocation()
@@ -29,6 +34,9 @@ export default function App() {
     '/donate',
     '/card',
     '/dashboard',
+    '/company-activation',
+    '/company-login',
+    '/company/dashboard',
   ].includes(pathname)
 
   // Define isBusiness - assuming it's false for the free version
@@ -54,6 +62,11 @@ export default function App() {
           <Route path="/donate" element={<DonatePage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
+          <Route path="/company-activation" element={<CompanyActivationPage />} />
+          <Route path="/company-login" element={<CompanyLoginPage />} />
+          <Route path="/company/dashboard" element={<CompanyDashboardPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

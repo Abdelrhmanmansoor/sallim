@@ -7,6 +7,17 @@ import mongoSanitize from 'express-mongo-sanitize'
 import connectDB from './config/db.js'
 import cardRoutes from './routes/cards.js'
 import statsRoutes from './routes/stats.js'
+import adminRoutes from './routes/admin.js'
+import companyRoutes from './routes/company.js'
+import templateRoutes from './routes/templates.js'
+import blogRoutes from './routes/blog.js'
+import ticketRoutes from './routes/tickets.js'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+// For ES modules __dirname
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 // ═══════════════════════════════════════════
 // سَلِّم Sallim — Production Backend
@@ -64,11 +75,14 @@ const createLimiter = rateLimit({
 })
 
 // Body parsing with size limit
-app.use(express.json({ limit: '1mb' }))
-app.use(express.urlencoded({ extended: false }))
+app.use(express.json({ limit: '5mb' }))
+app.use(express.urlencoded({ extended: false, limit: '5mb' }))
 
 // Sanitize MongoDB queries (prevent NoSQL injection)
 app.use(mongoSanitize())
+
+// Serve Uploads folder as Static Files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 // Trust proxy (for Render / reverse proxies)
 app.set('trust proxy', 1)
@@ -85,6 +99,11 @@ app.get('/api/health', (req, res) => {
 // ─── API Routes ───
 app.use('/api/v1/cards', createLimiter, cardRoutes)
 app.use('/api/v1/stats', statsRoutes)
+app.use('/api/v1/admin', adminRoutes)
+app.use('/api/v1/company', companyRoutes)
+app.use('/api/v1/templates', templateRoutes)
+app.use('/api/v1/blog', blogRoutes)
+app.use('/api/v1/tickets', ticketRoutes)
 
 // ─── 404 Handler ───
 app.use('/api/*', (req, res) => {

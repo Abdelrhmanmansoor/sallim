@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Stage, Layer, Rect, Text, Image as KonvaImage, Group, Circle } from 'react-konva'
-import { useEditorStore } from '../store'
-import { templates, fonts, designerOnlyTemplates } from '../data/templates'
+import { useEditorStore, useCompanyStore } from '../store'
+import { templates as staticTemplates, fonts, designerOnlyTemplates as staticDesignerTemplates } from '../data/templates'
 import { greetingTexts } from '../data/texts'
+import { getTemplates } from '../utils/api'
+import { useCompany } from '../context/CompanyContext'
 import { calligraphy, calligraphyCategories } from '../data/calligraphy'
 import { BsDownload, BsFilePdf, BsWhatsapp, BsLink45Deg, BsShareFill, BsCheck2, BsPencilFill, BsStars, BsSearch, BsPersonCircle, BsImage, BsChatLeftText, BsSliders, BsPlusLg, BsX, BsArrowLeft, BsInfoCircle, BsBuilding, BsPeople, BsFileEarmarkText, BsCloudDownload } from 'react-icons/bs'
 import { HiPhotograph, HiOutlineColorSwatch } from 'react-icons/hi'
@@ -136,9 +138,16 @@ const readyDesigns = [
 ═══════════════════════════════════════════════════════════════════ */
 export default function EditorPage() {
   const store = useEditorStore()
+  const { company, isAuthenticated } = useCompany()
   const stageRef = useRef(null)
   const containerRef = useRef(null)
   const [searchParams] = useSearchParams()
+
+  // API Templates State
+  const [fetchedTemplates, setFetchedTemplates] = useState([])
+  const [dbReadyTemplates, setDbReadyTemplates] = useState([])
+  const [dbDesignerTemplates, setDbDesignerTemplates] = useState([])
+  const [isLoadingTemplates, setIsLoadingTemplates] = useState(true)
 
   // Mode & State
   const [mode, setMode] = useState('ready')
@@ -176,15 +185,62 @@ export default function EditorPage() {
     } catch { }
   }, [])
 
-  // Computed - Show different templates based on mode
-  // Ready mode: templates from /templates/جاهزة/
-  // Designer mode: templates from /templates/مصمم/ (exclusive) + custom uploads
-  // Batch mode: ALL templates + custom uploads
+  // Fetch templates from API
+  useEffect(() => {
+    async function loadTemplates() {
+      try {
+        setIsLoadingTemplates(true)
+        const res = await getTemplates()
+        if (res.success && res.data) {
+
+          // Filter templates based on company access
+          const accessibleTemplates = res.data.filter(t => {
+            if (t.type === 'public') return true
+
+            // If it's premium or exclusive, company must be logged in and active
+            if (!isAuthenticated || !company || company.status !== 'active') return false
+
+            if (t.type === 'premium') return true // All active companies get premium
+
+            if (t.type === 'exclusive') {
+              // Must have the specific feature flag
+              return company.features && company.features.includes(t.requiredFeature)
+            }
+            return false
+          })
+
+          setFetchedTemplates(accessibleTemplates)
+
+          // Map to editor format
+          const mappedReady = accessibleTemplates
+            .filter(t => t.type === 'public' || t.type === 'premium')
+            .map(t => ({ id: t._id, name: t.name, image: t.imageUrl, textColor: '#ffffff' }))
+
+          const mappedDesigner = accessibleTemplates
+            .filter(t => t.type === 'exclusive')
+            .map(t => ({ id: t._id, name: t.name, image: t.imageUrl, textColor: '#ffffff', exclusive: true }))
+
+          setDbReadyTemplates(mappedReady)
+          setDbDesignerTemplates(mappedDesigner)
+        }
+      } catch (error) {
+        console.error('Failed to fetch templates:', error)
+      } finally {
+        setIsLoadingTemplates(false)
+      }
+    }
+    loadTemplates()
+  }, [isAuthenticated, company])
+
+  // Computed - Combine API templates with static fallbacks + custom uploads
+  const finalReadyTemplates = dbReadyTemplates.length > 0 ? dbReadyTemplates : staticTemplates
+  const finalDesignerTemplates = dbDesignerTemplates.length > 0 ? dbDesignerTemplates : staticDesignerTemplates
+
   const allTemplates = mode === 'designer'
-    ? [...designerOnlyTemplates, ...customTemplates]
+    ? [...finalDesignerTemplates, ...customTemplates]
     : mode === 'batch'
-      ? [...templates, ...designerOnlyTemplates, ...customTemplates]
-      : [...templates, ...customTemplates]
+      ? [...finalReadyTemplates, ...finalDesignerTemplates, ...customTemplates]
+      : [...finalReadyTemplates, ...customTemplates]
 
   const currentTemplate = allTemplates.find(t => t.id === store.selectedTemplate) || allTemplates[0]
   const currentFont = fonts.find(f => f.id === store.selectedFont) || fonts[1]
@@ -470,74 +526,62 @@ export default function EditorPage() {
         </div>
 
         {/* Business Notification - Subtle */}
-        {mode === 'designer' && (
-          <div style={{
-            background: 'linear-gradient(135deg, #fef3c7, #fde68a)',
-            border: '1px solid #fbbf24',
-            borderRadius: 12,
-            padding: '12px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            maxWidth: 500,
-            boxShadow: '0 2px 8px rgba(251, 191, 36, 0.2)'
-          }}>
-            <BsBuilding size={18} color="#b45309" />
-            <div style={{ flex: 1 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: '#92400e', margin: '0 0 4px 0', fontFamily: ds.font }}>
-                للشركات والراغبين في تصميم خاص؟
-              </p>
-              <p style={{ fontSize: 11, color: '#b45309', margin: 0, fontFamily: ds.font }}>
-                تواصل معنا لتصميم مخصص يناسب هويتك
-              </p>
-            </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <a
-                href="https://wa.me/201007835547"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  padding: '6px 10px',
-                  background: '#25D366',
-                  color: '#fff',
-                  borderRadius: 8,
-                  textDecoration: 'none',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  fontFamily: ds.font
-                }}
-              >
-                <BsWhatsapp size={14} /> واتساب
-              </a>
-              <a
-                href="https://x.com/am_designing"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  padding: '6px 10px',
-                  background: '#000',
-                  color: '#fff',
-                  borderRadius: 8,
-                  textDecoration: 'none',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  fontFamily: ds.font
-                }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-                تويتر
-              </a>
-            </div>
+        <div style={{
+          background: 'linear-gradient(135deg, #fef3c7, #fde68a)',
+          border: '1px solid #fbbf24',
+          borderRadius: 12,
+          padding: '12px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          maxWidth: 500,
+          boxShadow: '0 2px 8px rgba(251, 191, 36, 0.2)',
+          marginTop: 10
+        }}>
+          <BsBuilding size={18} color="#b45309" />
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#92400e', margin: '0 0 4px 0', fontFamily: ds.font }}>
+              {(isAuthenticated && company?.status === 'active') ? 'إنشاء تصميم مؤسسي مخصص' : 'للشركات والراغبين في تصميم خاص؟'}
+            </p>
+            <p style={{ fontSize: 11, color: '#b45309', margin: 0, fontFamily: ds.font }}>
+              {(isAuthenticated && company?.status === 'active') ? 'اطلب تصميم بطاقة خاص وحصري بهويتك عبر نظام التذاكر' : 'تواصل معنا لتصميم مخصص يناسب هويتك'}
+            </p>
           </div>
-        )}
+          <div style={{ display: 'flex', gap: 8 }}>
+            {(isAuthenticated && company?.status === 'active') ? (
+              <a
+                href="/company/dashboard"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  padding: '8px 14px',
+                  background: '#b45309',
+                  color: '#fff',
+                  borderRadius: 8,
+                  textDecoration: 'none',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  fontFamily: ds.font,
+                  boxShadow: '0 2px 4px rgba(180, 83, 9, 0.3)'
+                }}
+              >
+                طلب تصميم
+              </a>
+            ) : (
+              <>
+                <a href="https://wa.me/201007835547" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', background: '#25D366', color: '#fff', borderRadius: 8, textDecoration: 'none', fontSize: 11, fontWeight: 600, fontFamily: ds.font }}>
+                  <BsWhatsapp size={14} /> واتساب
+                </a>
+                <a href="https://x.com/am_designing" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', background: '#000', color: '#fff', borderRadius: 8, textDecoration: 'none', fontSize: 11, fontWeight: 600, fontFamily: ds.font }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg> تويتر
+                </a>
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════
@@ -553,7 +597,6 @@ export default function EditorPage() {
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>اختر التصميم</h2>
             </div>
 
-            {/* Manual Template Grid - User scrolls horizontally */}
             <div style={{
               display: 'flex',
               gap: 14,
@@ -563,34 +606,40 @@ export default function EditorPage() {
               WebkitOverflowScrolling: 'touch',
               paddingBottom: 10
             }}>
-              {templates.map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => store.setTemplate(t.id)}
-                  style={{
-                    position: 'relative',
-                    width: 140,
-                    minWidth: 140,
-                    aspectRatio: '1',
-                    borderRadius: 16,
-                    overflow: 'hidden',
-                    border: store.selectedTemplate === t.id ? '3px solid #000' : '2px solid #eee',
-                    cursor: 'pointer',
-                    padding: 0,
-                    transition: 'all 300ms',
-                    transform: store.selectedTemplate === t.id ? 'scale(1.05)' : 'scale(1)',
-                    boxShadow: store.selectedTemplate === t.id ? '0 8px 24px rgba(0,0,0,0.15)' : '0 2px 8px rgba(0,0,0,0.06)',
-                    flexShrink: 0,
-                    scrollSnapAlign: 'start',
-                    background: '#f8f9fa'
-                  }}
-                >
-                  <img src={t.image} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  {store.selectedTemplate === t.id && (
-                    <div style={{ position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: '50%', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700 }}>✓</div>
-                  )}
-                </button>
-              ))}
+              {isLoadingTemplates ? (
+                <div style={{ padding: '20px 0', width: '100%', textAlign: 'center', color: '#888', fontSize: 14 }}>جاري تحميل القوالب...</div>
+              ) : finalReadyTemplates.length === 0 ? (
+                <div style={{ padding: '20px 0', width: '100%', textAlign: 'center', color: '#888', fontSize: 14 }}>لا توجد قوالب متاحة حالياً.</div>
+              ) : (
+                finalReadyTemplates.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => store.setTemplate(t.id)}
+                    style={{
+                      position: 'relative',
+                      width: 140,
+                      minWidth: 140,
+                      aspectRatio: '1',
+                      borderRadius: 16,
+                      overflow: 'hidden',
+                      border: store.selectedTemplate === t.id ? '3px solid #000' : '2px solid #eee',
+                      cursor: 'pointer',
+                      padding: 0,
+                      transition: 'all 300ms',
+                      transform: store.selectedTemplate === t.id ? 'scale(1.05)' : 'scale(1)',
+                      boxShadow: store.selectedTemplate === t.id ? '0 8px 24px rgba(0,0,0,0.15)' : '0 2px 8px rgba(0,0,0,0.06)',
+                      flexShrink: 0,
+                      scrollSnapAlign: 'start',
+                      background: '#f8f9fa'
+                    }}
+                  >
+                    <img src={t.image} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    {store.selectedTemplate === t.id && (
+                      <div style={{ position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: '50%', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700 }}>✓</div>
+                    )}
+                  </button>
+                ))
+              )}
             </div>
 
             <p style={{ fontSize: 11, color: '#888', padding: '12px 28px 0', fontFamily: ds.font }}>
@@ -989,25 +1038,31 @@ export default function EditorPage() {
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>اختر التصميم (جاهزة ومصمم)</h2>
             </div>
             <div style={{ display: 'flex', gap: 14, padding: '0 28px', overflowX: 'auto', scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', paddingBottom: 10 }}>
-              {allTemplates.filter(t => !t.image?.includes('تصميم لرفع صورة')).map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => store.setTemplate(t.id)}
-                  style={{
-                    position: 'relative', width: 140, minWidth: 140, aspectRatio: '9/16', borderRadius: 16, overflow: 'hidden',
-                    border: store.selectedTemplate === t.id ? '3px solid #000' : '2px solid #eee',
-                    cursor: 'pointer', padding: 0, transition: 'all 300ms',
-                    transform: store.selectedTemplate === t.id ? 'scale(1.05)' : 'scale(1)',
-                    boxShadow: store.selectedTemplate === t.id ? '0 8px 24px rgba(0,0,0,0.15)' : '0 2px 8px rgba(0,0,0,0.06)',
-                    flexShrink: 0, scrollSnapAlign: 'start', background: '#f8f9fa'
-                  }}
-                >
-                  <img src={t.image} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                  {store.selectedTemplate === t.id && (
-                    <div style={{ position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: '50%', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700 }}>✓</div>
-                  )}
-                </button>
-              ))}
+              {isLoadingTemplates ? (
+                <div style={{ padding: '20px 0', width: '100%', textAlign: 'center', color: '#888', fontSize: 14 }}>جاري تحميل القوالب...</div>
+              ) : allTemplates.length === 0 ? (
+                <div style={{ padding: '20px 0', width: '100%', textAlign: 'center', color: '#888', fontSize: 14 }}>لا توجد قوالب متاحة حالياً.</div>
+              ) : (
+                allTemplates.filter(t => !t.image?.includes('تصميم لرفع صورة')).map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => store.setTemplate(t.id)}
+                    style={{
+                      position: 'relative', width: 140, minWidth: 140, aspectRatio: '9/16', borderRadius: 16, overflow: 'hidden',
+                      border: store.selectedTemplate === t.id ? '3px solid #000' : '2px solid #eee',
+                      cursor: 'pointer', padding: 0, transition: 'all 300ms',
+                      transform: store.selectedTemplate === t.id ? 'scale(1.05)' : 'scale(1)',
+                      boxShadow: store.selectedTemplate === t.id ? '0 8px 24px rgba(0,0,0,0.15)' : '0 2px 8px rgba(0,0,0,0.06)',
+                      flexShrink: 0, scrollSnapAlign: 'start', background: '#f8f9fa'
+                    }}
+                  >
+                    <img src={t.image} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    {store.selectedTemplate === t.id && (
+                      <div style={{ position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: '50%', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700 }}>✓</div>
+                    )}
+                  </button>
+                ))
+              )}
             </div>
           </div>
 

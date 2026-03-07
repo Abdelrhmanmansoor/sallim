@@ -4,12 +4,10 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* 1. FONTS - Tajawal (Clean Arabic Font like Thmanyah) */
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap');
-
 :root {
   /* Typography */
   --font-primary: 'Tajawal', -apple-system, BlinkMacSystemFont, sans-serif;
-  
+
   /* Colors - Clean & Professional */
   --color-black: #000000;
   --color-white: #ffffff;
@@ -23,13 +21,13 @@
   --color-gray-700: #404040;
   --color-gray-800: #262626;
   --color-gray-900: #171717;
-  
+
   /* Primary - Teal Accent */
   --color-primary: #0d9488;
   --color-primary-light: #14b8a6;
   --color-primary-dark: #0f766e;
   --color-primary-bg: #f0fdfa;
-  
+
   /* Spacing */
   --space-1: 4px;
   --space-2: 8px;
@@ -42,21 +40,21 @@
   --space-12: 48px;
   --space-16: 64px;
   --space-20: 80px;
-  
+
   /* Border Radius */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
   --radius-xl: 20px;
   --radius-full: 9999px;
-  
+
   /* Shadows */
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-sm: 0 2px 4px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.1);
-  --shadow-xl: 0 16px 48px rgba(0,0,0,0.12);
-  
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12);
+
   /* Transitions */
   --transition-fast: 150ms ease;
   --transition-normal: 200ms ease;
@@ -64,7 +62,9 @@
 }
 
 /* 2. GLOBAL RESET */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -226,7 +226,7 @@ body {
 
 .th-input:focus {
   border-color: var(--color-gray-900);
-  box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
 }
 
 /* 6. CARDS */
@@ -340,23 +340,50 @@ body {
 
 /* 12. ANIMATIONS */
 @keyframes th-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes th-slide-up {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes th-scale-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-.th-animate-fade { animation: th-fade-in 300ms ease; }
-.th-animate-slide { animation: th-slide-up 400ms ease; }
-.th-animate-scale { animation: th-scale-in 300ms ease; }
+.th-animate-fade {
+  animation: th-fade-in 300ms ease;
+}
+
+.th-animate-slide {
+  animation: th-slide-up 400ms ease;
+}
+
+.th-animate-scale {
+  animation: th-scale-in 300ms ease;
+}
 
 /* 13. EDITOR SPECIFIC */
 .th-editor-panel {
@@ -453,29 +480,67 @@ body {
 }
 
 @media (max-width: 768px) {
-  .th-grid-2, .th-grid-3, .th-grid-4 {
+
+  .th-grid-2,
+  .th-grid-3,
+  .th-grid-4 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 480px) {
-  .th-grid-2, .th-grid-3, .th-grid-4 {
+
+  .th-grid-2,
+  .th-grid-3,
+  .th-grid-4 {
     grid-template-columns: 1fr;
   }
 }
 
 /* 16. FLEX UTILITIES */
-.th-flex { display: flex; }
-.th-flex-col { flex-direction: column; }
-.th-items-center { align-items: center; }
-.th-justify-center { justify-content: center; }
-.th-justify-between { justify-content: space-between; }
-.th-gap-1 { gap: var(--space-1); }
-.th-gap-2 { gap: var(--space-2); }
-.th-gap-3 { gap: var(--space-3); }
-.th-gap-4 { gap: var(--space-4); }
-.th-gap-6 { gap: var(--space-6); }
-.th-gap-8 { gap: var(--space-8); }
+.th-flex {
+  display: flex;
+}
+
+.th-flex-col {
+  flex-direction: column;
+}
+
+.th-items-center {
+  align-items: center;
+}
+
+.th-justify-center {
+  justify-content: center;
+}
+
+.th-justify-between {
+  justify-content: space-between;
+}
+
+.th-gap-1 {
+  gap: var(--space-1);
+}
+
+.th-gap-2 {
+  gap: var(--space-2);
+}
+
+.th-gap-3 {
+  gap: var(--space-3);
+}
+
+.th-gap-4 {
+  gap: var(--space-4);
+}
+
+.th-gap-6 {
+  gap: var(--space-6);
+}
+
+.th-gap-8 {
+  gap: var(--space-8);
+}
 
 /* 17. HOVER STATES */
 .th-hover-lift:hover {

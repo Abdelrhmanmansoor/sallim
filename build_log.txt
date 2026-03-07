@@ -1,0 +1,24 @@
+
+> eidgreet-pro@1.0.0 build
+> vite build
+
+[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+[33msrc/pages/EditorPage.jsx (4:25): "useCompanyStore" is not exported by "src/store/index.js", imported by "src/pages/EditorPage.jsx".[39m
+[32m✓[39m 2120 modules transformed.
+rendering chunks...
+[33m[plugin vite:reporter] 
+(!) C:/Users/abdel/Desktop/تهنئة العيد/node_modules/jspdf/dist/jspdf.es.min.js is dynamically imported by C:/Users/abdel/Desktop/تهنئة العيد/src/pages/EditorPage.jsx but also statically imported by C:/Users/abdel/Desktop/تهنئة العيد/src/utils/export.js, dynamic import will not move module into another chunk.
+[39m
+computing gzip size...
+[2mdist/[22m[32mindex.html                    [39m[1m[2m    4.19 kB[22m[1m[22m[2m │ gzip:   1.63 kB[22m
+[2mdist/[22m[35massets/index-tHEQGTeE.css     [39m[1m[2m  117.81 kB[22m[1m[22m[2m │ gzip:  19.50 kB[22m
+[2mdist/[22m[36massets/purify.es-Bzr520pe.js  [39m[1m[2m   22.45 kB[22m[1m[22m[2m │ gzip:   8.63 kB[22m
+[2mdist/[22m[36massets/index.es-DRAwUKEy.js   [39m[1m[2m  158.58 kB[22m[1m[22m[2m │ gzip:  52.93 kB[22m
+[2mdist/[22m[36massets/index-BOJf8I_u.js      [39m[1m[33m1,819.93 kB[39m[22m[2m │ gzip: 487.41 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 7.36s[39m
