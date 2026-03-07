@@ -43,7 +43,8 @@ export default function CreateDiwaniyaPage() {
             const res = await createDiwaniya(formData);
             if (res.success) {
                 // If user is logged in, claim this diwaniya
-                if (user && user.token) {
+                const token = localStorage.getItem('token');
+                if (token) {
                     try {
                         await claimDiwaniya(res.data._id);
                     } catch (claimError) {

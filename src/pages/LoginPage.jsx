@@ -20,6 +20,7 @@ export default function LoginPage() {
                 // Save token and user data
                 localStorage.setItem('token', res.data.token);
                 localStorage.setItem('user', JSON.stringify(res.data.user));
+                window.dispatchEvent(new Event('user-update'));
 
                 // Redirect to dashboard
                 navigate('/dashboard/diwaniya');

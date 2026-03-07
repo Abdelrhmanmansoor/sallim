@@ -18,10 +18,22 @@ export default function Navbar() {
 
   useEffect(() => {
     // Check if user is logged in
-    const userData = localStorage.getItem('user')
-    if (userData) {
-      setUser(JSON.parse(userData))
-    }
+    const loadUser = () => {
+      const userData = localStorage.getItem('user');
+      setUser(userData ? JSON.parse(userData) : null);
+    };
+
+    // Initial load
+    loadUser();
+
+    // Listen to storage events (for multi-tab sync) and a custom event (for same-tab sync)
+    window.addEventListener('storage', loadUser);
+    window.addEventListener('user-update', loadUser);
+
+    return () => {
+      window.removeEventListener('storage', loadUser);
+      window.removeEventListener('user-update', loadUser);
+    };
   }, [])
 
   const handleLogout = () => {
