@@ -50,6 +50,9 @@ app.use(helmet({
 // CORS: Only allow our frontend
 const allowedOrigins = [
   process.env.CLIENT_URL,
+  'https://sallim.org',
+  'https://sallim.com',
+  'https://sallim-gamma.vercel.app',
   'http://localhost:5173',
   'http://localhost:4173',
   'http://localhost:3000',
@@ -60,9 +63,17 @@ const allowedOrigins = [
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, curl, etc.)
-    if (!origin || allowedOrigins.some(o => origin.startsWith(o))) {
+    if (!origin) return callback(null, true);
+
+    const isAllowed = allowedOrigins.some(o =>
+      origin === o || origin.startsWith(o) ||
+      (o.includes('sallim') && origin.includes('sallim'))
+    );
+
+    if (isAllowed) {
       callback(null, true)
     } else {
+      console.warn(`CORS blocked for origin: ${origin}`);
       callback(new Error('Not allowed by CORS'))
     }
   },
