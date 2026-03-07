@@ -20,12 +20,12 @@ export default function LoginPage() {
                 // Save token and user data
                 localStorage.setItem('token', res.data.token);
                 localStorage.setItem('user', JSON.stringify(res.data.user));
-                
+
                 // Redirect to dashboard
                 navigate('/dashboard/diwaniya');
             }
         } catch (err) {
-            setError(err.response?.data?.error || 'حدث خطأ أثناء تسجيل الدخول');
+            setError(err.message || 'حدث خطأ أثناء تسجيل الدخول');
         } finally {
             setLoading(false);
         }

@@ -20,12 +20,13 @@ export default function RegisterPage() {
                 // Save token and user data
                 localStorage.setItem('token', res.data.token);
                 localStorage.setItem('user', JSON.stringify(res.data.user));
-                
+
                 // Redirect to create diwaniya
                 navigate('/create-diwaniya');
             }
         } catch (err) {
-            setError(err.response?.data?.error || 'حدث خطأ أثناء التسجيل');
+            // apiRequest throws an Error object with the backend message
+            setError(err.message || 'حدث خطأ أثناء التسجيل');
         } finally {
             setLoading(false);
         }
