@@ -34,10 +34,14 @@ export default function PublicDiwaniyaPage() {
                     res.data.greetings = res.data.greetings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 }
                 setDiwaniya(res.data);
-                
-                // Check if game is enabled
-                const gameRes = await getEidiyaGame(username);
-                setGameEnabled(gameRes.data && gameRes.data.enabled);
+
+                // Fetch game status separately so it doesn't break the page if 404
+                try {
+                    const gameRes = await getEidiyaGame(username);
+                    setGameEnabled(gameRes.data && gameRes.data.enabled);
+                } catch (gameErr) {
+                    setGameEnabled(false);
+                }
             } catch (err) {
                 setError(true);
             } finally {
@@ -158,7 +162,7 @@ export default function PublicDiwaniyaPage() {
 
     return (
         <div style={{ fontFamily: "'Tajawal', sans-serif" }}>
-            
+
             {/* HERO */}
             <section style={{ background: '#171717', padding: '100px 24px', textAlign: 'center' }}>
                 <div style={{ maxWidth: '800px', margin: '0 auto' }}>
@@ -250,7 +254,7 @@ export default function PublicDiwaniyaPage() {
                     <p style={{ fontSize: '16px', color: '#737373', textAlign: 'center', marginBottom: '40px' }}>شارك فرحة العيد مع {diwaniya.ownerName}</p>
 
                     <form onSubmit={handleGreetingSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                        
+
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', background: '#fff', borderRadius: '12px' }}>
                             <span style={{ fontSize: '15px', fontWeight: 600, color: '#171717' }}>إرسال كمجهول</span>
                             <label style={{ position: 'relative', cursor: 'pointer' }}>
@@ -448,7 +452,7 @@ export default function PublicDiwaniyaPage() {
                                             <Heart size={16} style={{ fill: g.likes > 0 ? '#ef4444' : 'none' }} />
                                             {g.likes > 0 ? g.likes : 'أعجبني'}
                                         </button>
-                                        
+
                                         <button
                                             onClick={() => {
                                                 alert('ميزة تحميل الصورة قادمة قريباً!');
