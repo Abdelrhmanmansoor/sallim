@@ -68,7 +68,7 @@ app.use(cors({
 
     const isAllowed = allowedOrigins.some(o =>
       origin === o || origin.startsWith(o) ||
-      (o.includes('sallim') && origin.includes('sallim'))
+      (origin.includes('sallim') || origin.includes('localhost'))
     );
 
     if (isAllowed) {
