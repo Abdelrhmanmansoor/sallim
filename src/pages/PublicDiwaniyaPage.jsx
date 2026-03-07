@@ -93,7 +93,7 @@ export default function PublicDiwaniyaPage() {
                 }, 4000);
             }
         } catch (err) {
-            alert('حدث خطأ أثناء الإرسال');
+            alert(err.message || 'حدث خطأ أثناء الإرسال');
             setSubmitStatus('error');
         }
     };
