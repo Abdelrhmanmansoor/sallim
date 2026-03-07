@@ -52,6 +52,7 @@ const allowedOrigins = [
   process.env.CLIENT_URL,
   'https://sallim.org',
   'https://sallim.com',
+  'https://www.sallim.co',
   'https://sallim-gamma.vercel.app',
   'http://localhost:5173',
   'http://localhost:4173',
