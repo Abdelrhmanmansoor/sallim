@@ -1,8 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { getDiwaniya, getDiwaniyaManage, updateDiwaniyaGreetingVisibility, deleteDiwaniyaGreeting, updateDiwaniyaSettings } from '../utils/api';
-import { ArrowLeft, Copy, Eye, EyeOff, Trash2, MessageCircle, Loader2, Plus, Users, BookOpen, HandCoins, Settings, ChevronLeft, Calendar, Gamepad2, Gift } from 'lucide-react';
-import { getFamilyData, createFamilyStory, joinFamily, apiRequest } from '../utils/api';
+import { getFamilyData, createFamilyStory, joinFamily, apiRequest, getEidiyaRequests, updateEidiyaRequestStatus, deleteFamilyStory, deleteFamilyMember } from '../utils/api';
 
 export default function DiwaniyaDashboardPage() {
     const navigate = useNavigate();
@@ -13,8 +9,10 @@ export default function DiwaniyaDashboardPage() {
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('greetings'); // greetings | family | stories | requests | settings
     const [familyData, setFamilyData] = useState(null);
+    const [eidiyaRequests, setEidiyaRequests] = useState([]);
     const [availableGames, setAvailableGames] = useState([]);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [newStory, setNewStory] = useState({ title: '', story: '', type: 'memory' });
 
     useEffect(() => {
         // First try to load from localStorage for quick render
@@ -88,6 +86,31 @@ export default function DiwaniyaDashboardPage() {
                 .catch(err => console.error('Error fetching fresh user profile:', err));
         });
     }, []);
+
+    useEffect(() => {
+        if (!diwaniya?.username || !diwaniya.isFamilyMode) return;
+
+        const fetchFamilyData = async () => {
+            try {
+                const res = await getFamilyData(diwaniya.username);
+                if (res.success) setFamilyData(res.data);
+            } catch (err) {
+                console.error('Error fetching family data:', err);
+            }
+        };
+
+        const fetchRequests = async () => {
+            try {
+                const res = await getEidiyaRequests(diwaniya.username);
+                if (res.success) setEidiyaRequests(res.data);
+            } catch (err) {
+                console.error('Error fetching requests:', err);
+            }
+        };
+
+        if (activeTab === 'family' || activeTab === 'stories') fetchFamilyData();
+        if (activeTab === 'requests') fetchRequests();
+    }, [diwaniya?.username, activeTab, diwaniya?.isFamilyMode]);
 
     const handleCopyLink = () => {
         const url = `${window.location.origin}/eid/${diwaniya?.username}`;
@@ -166,6 +189,71 @@ export default function DiwaniyaDashboardPage() {
             alert('حدث خطأ أثناء تحديث حالة اللعبة');
         } finally {
             setIsUpdating(false);
+        }
+    };
+
+    const handlePostStory = async (e) => {
+        e.preventDefault();
+        if (!newStory.title || !newStory.story) return;
+
+        setIsUpdating(true);
+        try {
+            const res = await createFamilyStory(diwaniya.username, newStory);
+            if (res.success) {
+                setFamilyData(prev => ({
+                    ...prev,
+                    familyStories: [res.data, ...(prev.familyStories || [])]
+                }));
+                setNewStory({ title: '', story: '', type: 'memory' });
+                alert('تم نشر الخبر بنجاح');
+            }
+        } catch (err) {
+            alert('حدث خطأ أثناء النشر');
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    const handleDeleteStory = async (storyId) => {
+        if (!confirm('هل أنت متأكد من حذف هذا الخبر؟')) return;
+        try {
+            const res = await deleteFamilyStory(diwaniya.username, storyId);
+            if (res.success) {
+                setFamilyData(prev => ({
+                    ...prev,
+                    familyStories: prev.familyStories.filter(s => s._id !== storyId)
+                }));
+            }
+        } catch (err) {
+            alert('حدث خطأ أثناء الحذف');
+        }
+    };
+
+    const handleDeleteMember = async (memberId) => {
+        if (!confirm('هل أنت متأكد من حذف هذا الفرد من العائلة؟')) return;
+        try {
+            const res = await deleteFamilyMember(diwaniya.username, memberId);
+            if (res.success) {
+                setFamilyData(prev => ({
+                    ...prev,
+                    familyMembers: prev.familyMembers.filter(m => m._id !== memberId)
+                }));
+            }
+        } catch (err) {
+            alert('حدث خطأ أثناء الحذف');
+        }
+    };
+
+    const handleRequestStatus = async (requestId, status) => {
+        try {
+            const res = await updateEidiyaRequestStatus(diwaniya.username, requestId, status);
+            if (res.success) {
+                setEidiyaRequests(prev => prev.map(r =>
+                    r._id === requestId ? { ...r, status } : r
+                ));
+            }
+        } catch (err) {
+            alert('حدث خطأ أثناء تحديث الحالة');
         }
     };
 
@@ -398,12 +486,169 @@ export default function DiwaniyaDashboardPage() {
                     </div>
                 )}
 
-                {/* FAMILY TAB Content would go here */}
+                {/* FAMILY TAB Content */}
                 {activeTab === 'family' && (
-                    <div style={{ textAlign: 'center', padding: '60px' }}>
-                        <Users size={48} style={{ color: '#94a3b8', marginBottom: '16px' }} />
-                        <h3>أفراد العائلة قادم قريباً</h3>
-                        <p>هنا يمكنك إدارة أفراد عائلتك في الديوانية</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                        <div style={{ background: '#fff', padding: '32px', borderRadius: '24px', border: '1px solid #e2e8f0' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                                <h3 style={{ fontSize: '20px', fontWeight: 700 }}>أفراد العائلة ({familyData?.familyMembers?.length || 0})</h3>
+                                <div style={{ padding: '8px 16px', background: '#f8fafc', borderRadius: '10px', fontSize: '13px', color: '#64748b' }}>
+                                    يمكن لأفراد العائلة الانضمام عبر صفحة الديوانية العامة
+                                </div>
+                            </div>
+
+                            {familyData?.familyMembers?.length > 0 ? (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+                                    {familyData.familyMembers.map(member => (
+                                        <div key={member._id} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                                            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#171717', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '18px', fontWeight: 700 }}>
+                                                {member.avatar ? <img src={member.avatar} style={{ width: '100%', height: '100%', borderRadius: '12px', objectFit: 'cover' }} /> : member.name.charAt(0)}
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ fontWeight: 700, fontSize: '15px' }}>{member.name}</div>
+                                                <div style={{ fontSize: '12px', color: '#64748b' }}>{member.relation}</div>
+                                            </div>
+                                            <button onClick={() => handleDeleteMember(member._id)} style={{ padding: '8px', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}>
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>لا يوجد أفراد منضمون بعد</div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* STORIES TAB Content */}
+                {activeTab === 'stories' && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '32px' }}>
+                        {/* Post New Story */}
+                        <div style={{ background: '#fff', padding: '32px', borderRadius: '24px', border: '1px solid #e2e8f0', height: 'fit-content' }}>
+                            <h3 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '24px' }}>نشر خبر أو ذكرى عائلية</h3>
+                            <form onSubmit={handlePostStory} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                <input
+                                    required
+                                    type="text"
+                                    placeholder="عنوان الخبر (مثلاً: تجهيزات العيد)"
+                                    value={newStory.title}
+                                    onChange={e => setNewStory({ ...newStory, title: e.target.value })}
+                                    style={{ padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '15px', outline: 'none' }}
+                                />
+                                <div style={{ display: 'flex', gap: '12px' }}>
+                                    {['memory', 'update'].map(type => (
+                                        <button
+                                            key={type}
+                                            type="button"
+                                            onClick={() => setNewStory({ ...newStory, type })}
+                                            style={{
+                                                flex: 1,
+                                                padding: '10px',
+                                                borderRadius: '10px',
+                                                border: '1px solid #e2e8f0',
+                                                background: newStory.type === type ? '#171717' : '#fff',
+                                                color: newStory.type === type ? '#fff' : '#64748b',
+                                                fontSize: '13px',
+                                                fontWeight: 600,
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            {type === 'memory' ? 'ذكرى عائلية' : 'تحديث العيد'}
+                                        </button>
+                                    ))}
+                                </div>
+                                <textarea
+                                    required
+                                    placeholder="اكتب تفاصيل القصة هنا..."
+                                    value={newStory.story}
+                                    onChange={e => setNewStory({ ...newStory, story: e.target.value })}
+                                    rows={4}
+                                    style={{ padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '15px', outline: 'none', resize: 'none' }}
+                                ></textarea>
+                                <button
+                                    type="submit"
+                                    disabled={isUpdating}
+                                    style={{ padding: '14px', background: '#171717', color: '#fff', borderRadius: '12px', fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 200ms ease' }}
+                                >
+                                    {isUpdating ? 'جاري النشر...' : 'نشر الخبر ✨'}
+                                </button>
+                            </form>
+                        </div>
+
+                        {/* Stories List */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <h3 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '8px' }}>الأخبار المنشورة</h3>
+                            {familyData?.familyStories?.length > 0 ? (
+                                familyData.familyStories.map(story => (
+                                    <div key={story._id} style={{ background: '#fff', padding: '24px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                                            <span style={{ fontSize: '12px', fontWeight: 700, color: '#0ea5e9' }}>{story.type === 'update' ? 'تحديث' : 'ذكرى'}</span>
+                                            <button onClick={() => handleDeleteStory(story._id)} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}><Trash2 size={16} /></button>
+                                        </div>
+                                        <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>{story.title}</h4>
+                                        <p style={{ fontSize: '14px', color: '#525252', lineHeight: 1.6 }}>{story.story}</p>
+                                        <div style={{ marginTop: '12px', fontSize: '11px', color: '#94a3b8' }}>تم النشر في {formatDate(story.createdAt)}</div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div style={{ textAlign: 'center', padding: '40px', background: '#fff', borderRadius: '20px', color: '#94a3b8', border: '1px dashed #e2e8f0' }}>لم تنشر أي أخبار بعد</div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* REQUESTS TAB Content */}
+                {activeTab === 'requests' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <h3 style={{ fontSize: '20px', fontWeight: 700 }}>طلبات العيدية ({eidiyaRequests.length})</h3>
+                            <div style={{ padding: '8px 16px', background: '#fff7ed', borderRadius: '10px', fontSize: '13px', color: '#ea580c', fontWeight: 600 }}>
+                                إجمالي المبالغ المطلوبة: {eidiyaRequests.reduce((sum, r) => sum + (r.amount || 0), 0)} ريال
+                            </div>
+                        </div>
+
+                        {eidiyaRequests.length > 0 ? (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+                                {eidiyaRequests.map(request => (
+                                    <div key={request._id} style={{ background: '#fff', padding: '24px', borderRadius: '24px', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                                            <div>
+                                                <div style={{ fontWeight: 800, fontSize: '18px' }}>{request.requesterName}</div>
+                                                <div style={{ fontSize: '12px', color: '#94a3b8' }}>{formatDate(request.createdAt)}</div>
+                                            </div>
+                                            <div style={{ padding: '8px 16px', background: '#171717', color: '#fff', borderRadius: '10px', fontWeight: 800, fontSize: '16px' }}>
+                                                {request.amount} ريال
+                                            </div>
+                                        </div>
+
+                                        {request.message && (
+                                            <div style={{ padding: '12px', background: '#f8fafc', borderRadius: '12px', fontSize: '14px', color: '#475569', marginBottom: '20px', borderRight: '3px solid #e2e8f0' }}>
+                                                "{request.message}"
+                                            </div>
+                                        )}
+
+                                        <div style={{ display: 'flex', gap: '10px' }}>
+                                            {request.status === 'pending' ? (
+                                                <>
+                                                    <button onClick={() => handleRequestStatus(request._id, 'approved')} style={{ flex: 1, padding: '10px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer' }}>موافق ✅</button>
+                                                    <button onClick={() => handleRequestStatus(request._id, 'rejected')} style={{ flex: 1, padding: '10px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer' }}>رفض ❌</button>
+                                                </>
+                                            ) : (
+                                                <div style={{ flex: 1, textAlign: 'center', padding: '10px', background: request.status === 'approved' ? '#dcfce7' : '#fee2e2', color: request.status === 'approved' ? '#166534' : '#991b1b', borderRadius: '10px', fontWeight: 700, fontSize: '14px' }}>
+                                                    {request.status === 'approved' ? 'تمت الموافقة ✅' : 'تم الرفض ❌'}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div style={{ textAlign: 'center', padding: '80px 40px', background: '#fff', borderRadius: '24px', border: '1px solid #e2e8f0', color: '#94a3b8' }}>
+                                <HandCoins size={48} style={{ marginBottom: '16px', opacity: 0.3 }} />
+                                <p>لا توجد طلبات عيدية حتى الآن</p>
+                            </div>
+                        )}
                     </div>
                 )}
 

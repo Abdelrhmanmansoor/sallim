@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { BsWhatsapp, BsTwitterX, BsArrowLeft, BsLightning, BsCoin, BsTrophy } from 'react-icons/bs'
-import { getStandaloneGame, submitStandaloneGameAnswer, finishStandaloneGame } from '../utils/api'
+import { getStandaloneGame, submitStandaloneGameAnswer, finishStandaloneGame, getDiwaniyaGame, submitDiwaniyaGameAnswer } from '../utils/api'
 import { useNavigate } from 'react-router-dom'
 
 const moneyImages = [
@@ -109,7 +109,7 @@ function MoneyRain({ active }) {
 //   MAIN GAME COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export default function EidiyaGame({ gameId }) {
+export default function EidiyaGame({ gameId, username }) {
   const navigate = useNavigate();
 
   // Game State
@@ -149,9 +149,20 @@ export default function EidiyaGame({ gameId }) {
     async function fetchGame() {
       try {
         setLoading(true)
-        const res = await getStandaloneGame(gameId)
+        const res = username
+          ? await getDiwaniyaGame(username)
+          : await getStandaloneGame(gameId)
+
         if (res.success) {
-          setGameData(res.data)
+          // Normalize data if needed (standalone uses different field names than diwaniya routes sometimes)
+          const data = res.data;
+          if (username) {
+            // Diwaniya route returns { enabled, questions, totalQuestions }
+            // Standalone returns { title, ownerName, questions, settings: { currency } }
+            // Let's adapt if needed.
+            // Based on server/routes/diwaniya.js: questions map to { question, answers, rewardAmount }
+          }
+          setGameData(data)
         }
       } catch (err) {
         setError(err.message || 'حدث خطأ أثناء جلب اللعبة.')
@@ -159,8 +170,8 @@ export default function EidiyaGame({ gameId }) {
         setLoading(false)
       }
     }
-    fetchGame()
-  }, [gameId])
+    if (gameId || username) fetchGame()
+  }, [gameId, username])
 
   const startPledge = (e) => {
     e.preventDefault()
@@ -173,15 +184,21 @@ export default function EidiyaGame({ gameId }) {
     setSelectedAnswer(answerIndex)
 
     try {
-      const res = await submitStandaloneGameAnswer(gameId, {
-        questionIndex: currentQ,
-        answerIndex
-      })
+      const res = username
+        ? await submitDiwaniyaGameAnswer(username, {
+          questionIndex: currentQ,
+          answerIndex,
+          sessionId: 'public-user-' + Math.random().toString(36).substr(2, 9) // In real app, use persistent sessionId
+        })
+        : await submitStandaloneGameAnswer(gameId, {
+          questionIndex: currentQ,
+          answerIndex
+        })
 
       if (res.success) {
-        const { isCorrect, rewardAmount, correctAnswerIndex } = res.data
+        const { isCorrect, rewardAmount, correctAnswerIndex, correctAnswer } = res.data
         setShowFeedback(true)
-        setCorrectIndex(correctAnswerIndex)
+        setCorrectIndex(correctIndex !== undefined ? correctAnswerIndex : (isCorrect ? answerIndex : -1)) // Fallback if index not returned
 
         if (isCorrect) {
           setScore(prev => prev + 1)
@@ -208,26 +225,28 @@ export default function EidiyaGame({ gameId }) {
     } else {
       // Finish Game
       setPhase('result')
-      setSubmittingResult(true)
-      try {
-        await finishStandaloneGame(gameId, {
-          playerName,
-          score,
-          totalEarned
-        })
+      if (!username) {
+        setSubmittingResult(true)
+        try {
+          await finishStandaloneGame(gameId, {
+            playerName,
+            score,
+            totalEarned
+          })
 
-        // Save player data to localStorage for leaderboard display
-        const playerKey = `game_${gameId}_player`;
-        localStorage.setItem(playerKey, JSON.stringify({
-          playerName,
-          score,
-          totalEarned,
-          timestamp: Date.now()
-        }));
-      } catch (err) {
-        console.error('Failed to submit score:', err)
-      } finally {
-        setSubmittingResult(false)
+          // Save player data to localStorage for leaderboard display
+          const playerKey = `game_${gameId}_player`;
+          localStorage.setItem(playerKey, JSON.stringify({
+            playerName,
+            score,
+            totalEarned,
+            timestamp: Date.now()
+          }));
+        } catch (err) {
+          console.error('Failed to submit score:', err)
+        } finally {
+          setSubmittingResult(false)
+        }
       }
     }
   }
@@ -278,10 +297,10 @@ export default function EidiyaGame({ gameId }) {
             <span style={{ fontSize: '48px' }}>🎁</span>
           </div>
           <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#171717', marginBottom: '8px' }}>
-            {gameData.title}
+            {gameData.title || 'تحدي العيدية'}
           </h1>
           <p style={{ fontSize: '18px', color: '#737373', marginBottom: '32px' }}>
-            تحدي العيدية مُقدم من <strong style={{ color: '#171717' }}>{gameData.ownerName}</strong>
+            تحدي العيدية {gameData.ownerName ? <span>مُقدم من <strong style={{ color: '#171717' }}>{gameData.ownerName}</strong></span> : 'بانتظارك'}
           </p>
 
           <form onSubmit={startPledge} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -350,7 +369,7 @@ export default function EidiyaGame({ gameId }) {
               قيمة السؤال: {currentQuestionItem.rewardAmount} {currency}
             </div>
             <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#171717', lineHeight: 1.6 }}>
-              {currentQuestionItem.questionText}
+              {currentQuestionItem.questionText || currentQuestionItem.question}
             </h2>
           </div>
 

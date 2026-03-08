@@ -473,9 +473,9 @@ export default function PublicDiwaniyaPage() {
                                 <p style={{ color: '#737373', marginTop: '8px' }}>لحظاتنا الجميلة وتحديثات العيد</p>
                             </div>
 
-                            {familyData.stories && familyData.stories.length > 0 ? (
+                            {familyData.familyStories && familyData.familyStories.length > 0 ? (
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
-                                    {familyData.stories.map((story) => (
+                                    {familyData.familyStories.map((story) => (
                                         <div key={story._id} style={{ background: '#fafafa', borderRadius: '20px', overflow: 'hidden', border: '1px solid #e5e5e5' }}>
                                             {story.image && (
                                                 <img src={story.image} alt="" style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
@@ -486,7 +486,7 @@ export default function PublicDiwaniyaPage() {
                                                     <span style={{ fontSize: '12px', color: '#a3a3a3' }}>• {formatDate(story.createdAt)}</span>
                                                 </div>
                                                 <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#171717', marginBottom: '12px' }}>{story.title}</h3>
-                                                <p style={{ fontSize: '15px', color: '#525252', lineHeight: 1.6 }}>{story.content}</p>
+                                                <p style={{ fontSize: '15px', color: '#525252', lineHeight: 1.6 }}>{story.story || story.content}</p>
                                             </div>
                                         </div>
                                     ))}
@@ -501,11 +501,11 @@ export default function PublicDiwaniyaPage() {
                             {/* Family Members */}
                             <div id="family-members" style={{ marginTop: '80px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
-                                    <h3 style={{ fontSize: '24px', fontWeight: 700 }}>أفراد العائلة ({familyData.members?.length || 0})</h3>
+                                    <h3 style={{ fontSize: '24px', fontWeight: 700 }}>أفراد العائلة ({familyData.familyMembers?.length || 0})</h3>
                                     <Users size={24} color="#a3a3a3" />
                                 </div>
                                 <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', padding: '10px 0', scrollbarWidth: 'none' }}>
-                                    {familyData.members?.map(member => (
+                                    {familyData.familyMembers?.map(member => (
                                         <div key={member._id} style={{ flexShrink: 0, textAlign: 'center', width: '80px' }}>
                                             <div style={{ width: '64px', height: '64px', borderRadius: '20px', background: '#171717', margin: '0 auto 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '20px', fontWeight: 700 }}>
                                                 {member.avatar ? <img src={member.avatar} style={{ width: '100%', height: '100%', borderRadius: '20px', objectFit: 'cover' }} /> : member.name.charAt(0)}
@@ -715,8 +715,8 @@ export default function PublicDiwaniyaPage() {
                             <X size={24} />
                         </button>
                         <div style={{ padding: '40px 24px' }}>
-                            {diwaniya.activeGame ? (
-                                <EidiyaGame gameId={diwaniya.activeGame} />
+                            {diwaniya.eidiyaGame?.enabled ? (
+                                <EidiyaGame username={username} />
                             ) : (
                                 <div style={{ textAlign: 'center', padding: '80px 40px' }}>
                                     <div style={{ fontSize: '64px', marginBottom: '24px' }}>🎲</div>

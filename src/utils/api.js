@@ -488,14 +488,31 @@ export async function recordDiwaniyaView(username) {
  * Get family data for a Diwaniya
  */
 export async function getFamilyData(username) {
-  return apiRequest(`/diwaniya/${username}/family`)
+  return apiRequest(`/diwaniya/${username}/family-data`)
 }
 
 /**
- * Submit an Eidiya request
+ * Get all Eidiya requests (for owner)
+ */
+export async function getEidiyaRequests(username) {
+  return apiRequest(`/diwaniya/${username}/eidiya-requests`)
+}
+
+/**
+ * Update Eidiya request status
+ */
+export async function updateEidiyaRequestStatus(username, requestId, status) {
+  return apiRequest(`/diwaniya/${username}/eidiya-request/${requestId}`, {
+    method: 'PUT',
+    body: JSON.stringify({ status })
+  })
+}
+
+/**
+ * Submit an Eidiya request (public)
  */
 export async function createEidiyaRequest(username, data) {
-  return apiRequest(`/diwaniya/${username}/family/eidiya-request`, {
+  return apiRequest(`/diwaniya/${username}/eidiya-request`, {
     method: 'POST',
     body: JSON.stringify(data)
   })
@@ -505,9 +522,18 @@ export async function createEidiyaRequest(username, data) {
  * Add a family story/update
  */
 export async function createFamilyStory(username, data) {
-  return apiRequest(`/diwaniya/${username}/family/story`, {
+  return apiRequest(`/diwaniya/${username}/family-story`, {
     method: 'POST',
     body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Delete a family story
+ */
+export async function deleteFamilyStory(username, storyId) {
+  return apiRequest(`/diwaniya/${username}/family-story/${storyId}`, {
+    method: 'DELETE'
   })
 }
 
@@ -515,9 +541,18 @@ export async function createFamilyStory(username, data) {
  * Join family as a member
  */
 export async function joinFamily(username, data) {
-  return apiRequest(`/diwaniya/${username}/family/member`, {
+  return apiRequest(`/diwaniya/${username}/family-member`, {
     method: 'POST',
     body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Delete a family member
+ */
+export async function deleteFamilyMember(username, memberId) {
+  return apiRequest(`/diwaniya/${username}/family-member/${memberId}`, {
+    method: 'DELETE'
   })
 }
 
@@ -557,6 +592,27 @@ export async function submitStandaloneGameAnswer(gameId, data) {
  */
 export async function finishStandaloneGame(gameId, data) {
   return apiRequest(`/games/${gameId}/finish`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+}
+
+// ═════════════════════════════════════════════
+// DIWANIYA GAME (Quiz inside Diwaniya)
+// ═════════════════════════════════════════════
+
+/**
+ * Get Eidiya Game data for a diwaniya
+ */
+export async function getDiwaniyaGame(username) {
+  return apiRequest(`/diwaniya/${username}/game`)
+}
+
+/**
+ * Submit an answer to a diwaniya game question
+ */
+export async function submitDiwaniyaGameAnswer(username, data) {
+  return apiRequest(`/diwaniya/${username}/game/answer`, {
     method: 'POST',
     body: JSON.stringify(data)
   })
