@@ -1,12 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createStandaloneGame } from '../utils/api';
-import { Gift, Plus, Trash2, ArrowRight, Loader2, Sparkles, Trophy, Shuffle, Wand2 } from 'lucide-react';
+import { Gift, Plus, Trash2, ArrowRight, Loader2, Sparkles, Trophy, Shuffle, Wand2, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { eidiyaQuestions, getRandomQuestions } from '../data/eidiyaQuestions';
 
 export default function CreateGamePage() {
     const navigate = useNavigate();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        const userData = localStorage.getItem('user');
+        if (token && userData) {
+            setIsLoggedIn(true);
+            setUser(JSON.parse(userData));
+        }
+    }, []);
     const [status, setStatus] = useState('idle'); // idle, loading, success
     const [gameUrl, setGameUrl] = useState('');
 
@@ -160,6 +172,101 @@ export default function CreateGamePage() {
 
             {/* Form */}
             <main style={{ maxWidth: '700px', margin: '-40px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
+                {/* Warning for non-logged users */}
+                {!isLoggedIn && (
+                    <div style={{
+                        background: '#fee2e2',
+                        border: '2px solid #fecaca',
+                        borderRadius: '16px',
+                        padding: '24px',
+                        marginBottom: '24px',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '16px'
+                    }}>
+                        <div style={{
+                            width: '48px',
+                            height: '48px',
+                            background: '#fef2f2',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                        }}>
+                            <AlertCircle size={24} color="#dc2626" />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <h3 style={{
+                                fontSize: '18px',
+                                fontWeight: 700,
+                                color: '#991b1b',
+                                marginBottom: '8px'
+                            }}>
+                                ⚠️ تنبيه هام
+                            </h3>
+                            <p style={{
+                                fontSize: '15px',
+                                color: '#7f1d1d',
+                                lineHeight: 1.6,
+                                marginBottom: '16px'
+                            }}>
+                                لتفعيل اللعبة ومتابعة النتائج ولوحة الصدارة، يجب عليك إنشاء حساب وتسجيل الدخول أولاً.
+                            </p>
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/login')}
+                                    style={{
+                                        padding: '10px 20px',
+                                        background: '#dc2626',
+                                        color: '#fff',
+                                        border: 'none',
+                                        borderRadius: '8px',
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                        transition: 'all 200ms ease'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.background = '#b91c1c'
+                                        e.currentTarget.style.transform = 'translateY(-2px)'
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.background = '#dc2626'
+                                        e.currentTarget.style.transform = 'translateY(0)'
+                                    }}
+                                >
+                                    تسجيل الدخول
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/register')}
+                                    style={{
+                                        padding: '10px 20px',
+                                        background: '#fff',
+                                        color: '#dc2626',
+                                        border: '2px solid #dc2626',
+                                        borderRadius: '8px',
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                        transition: 'all 200ms ease'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-2px)'
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)'
+                                    }}
+                                >
+                                    إنشاء حساب جديد
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
                     {/* Basic Info */}
