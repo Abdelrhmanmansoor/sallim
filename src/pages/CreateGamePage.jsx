@@ -90,6 +90,10 @@ export default function CreateGamePage() {
         // Validations
         if (!ownerName.trim()) return toast.error('يرجى إدخال اسم المُنشئ');
 
+        if (questions.length === 0) {
+            return toast.error('يجب إضافة سؤال واحد على الأقل للعبة');
+        }
+
         for (let i = 0; i < questions.length; i++) {
             const q = questions[i];
             if (!q.questionText.trim()) return toast.error(`يرجى كتابة نص السؤال رقم ${i + 1}`);
