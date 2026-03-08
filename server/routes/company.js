@@ -2,14 +2,38 @@ import { Router } from 'express'
 import jwt from 'jsonwebtoken'
 import Company from '../models/Company.js'
 import { upload } from '../config/upload.js'
+import fs from 'fs'
+import path from 'path'
 
 const router = Router()
 
 // Initialize JWT secret
 const JWT_SECRET = process.env.JWT_SECRET || 'sallim_super_secret_corporate_key'
 
+// Helper function to get mock database
+const getMockCompanies = () => {
+    const dbPath = path.join(process.cwd(), 'server', 'mock-companies.json')
+    console.log('🔍 Looking for mock DB at:', dbPath)
+    console.log('📁 File exists:', fs.existsSync(dbPath))
+    
+    if (fs.existsSync(dbPath)) {
+        const data = fs.readFileSync(dbPath, 'utf-8')
+        const companies = JSON.parse(data)
+        console.log('📊 Loaded', companies.length, 'companies from mock DB')
+        return companies
+    }
+    console.log('⚠️ Mock DB not found')
+    return []
+}
+
+// Helper function to save mock database
+const saveMockCompanies = (companies) => {
+    const dbPath = path.join(process.cwd(), 'server', 'mock-companies.json')
+    fs.writeFileSync(dbPath, JSON.stringify(companies, null, 2))
+}
+
 // ═══ Activate Company Account ═══
-// Handles the link that the user clicks from their email
+// Handles the activation link that the user clicks from their email
 router.post('/activate', async (req, res) => {
     try {
         const { email, code, password } = req.body
@@ -22,8 +46,54 @@ router.post('/activate', async (req, res) => {
             return res.status(400).json({ success: false, error: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' })
         }
 
-        // Find company by email and code
-        // We need to explicitly select the hidden fields
+        // Try mock database first
+        const mockCompanies = getMockCompanies()
+        const mockCompany = mockCompanies.find(c => 
+            c.email.toLowerCase() === email.toLowerCase() && c.activationCode === code
+        )
+
+        if (mockCompany) {
+            // Check expiration
+            if (new Date() > new Date(mockCompany.activationExpires)) {
+                return res.status(400).json({ success: false, error: 'كود التفعيل هذا منتهي الصلاحية. يرجى طلب كود جديد.' })
+            }
+
+            // Activate account in mock database
+            mockCompany.status = 'active'
+            mockCompany.password = password // In real app, this would be hashed
+            mockCompany.activationCode = undefined
+            mockCompany.activationExpires = undefined
+
+            // Update mock database
+            const updatedCompanies = mockCompanies.map(c => 
+                c._id === mockCompany._id ? mockCompany : c
+            )
+            saveMockCompanies(updatedCompanies)
+
+            // Generate JWT token
+            const token = jwt.sign(
+                { id: mockCompany._id, role: mockCompany.role },
+                JWT_SECRET,
+                { expiresIn: '30d' }
+            )
+
+            return res.json({
+                success: true,
+                message: 'تم تفعيل الحساب بنجاح',
+                data: {
+                    token,
+                    company: {
+                        id: mockCompany._id,
+                        name: mockCompany.name,
+                        email: mockCompany.email,
+                        logoUrl: mockCompany.logoUrl,
+                        features: mockCompany.features
+                    }
+                }
+            })
+        }
+
+        // If not found in mock database, try MongoDB
         const company = await Company.findOne({
             email: email.toLowerCase(),
             activationCode: code
@@ -42,7 +112,7 @@ router.post('/activate', async (req, res) => {
             return res.status(400).json({ success: false, error: 'كود التفعيل هذا منتهي الصلاحية. يرجى طلب كود جديد.' })
         }
 
-        // Activate the account
+        // Activate account
         company.status = 'active'
         company.password = password
         company.activationCode = undefined // clear it

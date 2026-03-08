@@ -1,0 +1,17 @@
+[
+  {
+    "_id": "mock-company-id-1772930352608",
+    "name": "شركة تجريبية للاختبار",
+    "email": "company@example.com",
+    "password": "hashed_password_placeholder",
+    "activationCode": "GQ9G93",
+    "activationExpires": "2026-04-07T00:39:12.608Z",
+    "status": "pending",
+    "role": "company",
+    "companyType": "enterprise",
+    "features": [
+      "all"
+    ],
+    "createdAt": "2026-03-08T00:39:12.611Z"
+  }
+]

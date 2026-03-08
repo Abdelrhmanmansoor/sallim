@@ -36,11 +36,11 @@ export default function DiwaniyaDashboardPage() {
     const handleToggleVisibility = async (greetId) => {
         const greeting = greetings.find(g => g._id === greetId);
         const newVisibility = greeting.visibility === 'public' ? 'private' : 'public';
-        
+
         try {
             const res = await updateDiwaniyaGreetingVisibility('dashboard', greetId, newVisibility);
             if (res.success) {
-                setGreetings(prev => prev.map(g => 
+                setGreetings(prev => prev.map(g =>
                     g._id === greetId ? { ...g, visibility: newVisibility } : g
                 ));
             }
@@ -109,7 +109,7 @@ export default function DiwaniyaDashboardPage() {
 
     return (
         <div style={{ fontFamily: "'Tajawal', sans-serif" }}>
-            
+
             {/* HERO */}
             <section style={{ background: '#171717', padding: '80px 24px' }}>
                 <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
@@ -209,6 +209,24 @@ export default function DiwaniyaDashboardPage() {
                                     <MessageCircle size={16} />
                                     واتساب
                                 </button>
+                                <Link
+                                    to={`/eidiya-game?diwaniya=${diwaniya.username}`}
+                                    style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        padding: '10px 20px',
+                                        background: '#f59e0b',
+                                        color: '#fff',
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        borderRadius: '10px',
+                                        textDecoration: 'none',
+                                        transition: 'all 200ms ease',
+                                    }}
+                                >
+                                    لعبة العيدية
+                                </Link>
                             </div>
                         </div>
                         <div style={{ fontSize: '15px', color: '#171717', fontWeight: 600, wordBreak: 'break-all', padding: '12px', background: '#fafafa', borderRadius: '8px', textAlign: 'center' }}>

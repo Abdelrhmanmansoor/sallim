@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate, Link } from 'react-router-dom'
-import { Building2, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Building2, ArrowLeft, CheckCircle2, AlertCircle, Key } from 'lucide-react'
 import { useCompany } from '../context/CompanyContext'
 
 export default function CompanyActivationPage() {
@@ -15,7 +15,7 @@ export default function CompanyActivationPage() {
         confirmPassword: ''
     })
 
-    const [status, setStatus] = useState('idle') // idle, loading, success, error
+    const [status, setStatus] = useState('idle')
     const [errorMsg, setErrorMsg] = useState('')
 
     // If already logged in, redirect to dashboard
@@ -45,7 +45,6 @@ export default function CompanyActivationPage() {
 
         if (result.success) {
             setStatus('success')
-            // Auto redirect after 3 seconds
             setTimeout(() => navigate('/company/dashboard'), 3000)
         } else {
             setStatus('error')
@@ -54,110 +53,432 @@ export default function CompanyActivationPage() {
     }
 
     return (
-        <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 relative overflow-hidden">
-
-            {/* Decorative background */}
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#2563eb]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#d4a843]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
-
-            <div className="max-w-md w-full relative z-10">
-                <div className="text-center mb-8">
-                    <Link to="/" className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white shadow-xl shadow-[#2563eb]/10 mb-6">
-                        <Building2 className="w-8 h-8 text-[#2563eb]" />
-                    </Link>
-                    <h2 className="text-3xl font-extrabold text-slate-900 mb-2">تفعيل حساب الشركة</h2>
-                    <p className="text-slate-500 text-sm max-w-sm mx-auto">
-                        أهلاً بك في سَلِّم للمؤسسات. أدخل كود التفعيل المرسل إلى بريدك الإلكتروني لإعداد حسابك.
-                    </p>
-                </div>
-
-                <div className="bg-white py-8 px-6 shadow-2xl shadow-slate-200/50 rounded-3xl border border-slate-100">
-
-                    {status === 'success' ? (
-                        <div className="text-center py-4">
-                            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <CheckCircle2 className="w-8 h-8" />
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-2">تم التفعيل بنجاح!</h3>
-                            <p className="text-slate-500 mb-6">جاري تحويلك إلى لوحة التحكم...</p>
-                        </div>
-                    ) : (
-                        <form className="space-y-6" onSubmit={handleActivate}>
-                            {errorMsg && (
-                                <div className="bg-red-50 text-red-600 p-4 justify-center rounded-xl text-sm flex items-center gap-2 font-medium">
-                                    <AlertCircle className="w-5 h-5 shrink-0" />
-                                    {errorMsg}
-                                </div>
-                            )}
-
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                    البريد الإلكتروني للشركة
-                                </label>
-                                <input
-                                    type="email"
-                                    required
-                                    readOnly={!!searchParams.get('email')}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all"
-                                    value={formData.email}
-                                    onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                    كود التفعيل (أرسلناه للبريد)
-                                </label>
-                                <input
-                                    type="text"
-                                    required
-                                    dir="ltr"
-                                    placeholder="مثال: A7B9F1"
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-center tracking-widest font-mono text-lg font-bold uppercase"
-                                    value={formData.code}
-                                    onChange={e => setFormData(p => ({ ...p, code: e.target.value.toUpperCase() }))}
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                    كلمة المرور الجديدة
-                                </label>
-                                <input
-                                    type="password"
-                                    required
-                                    placeholder="••••••••"
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-left dir-ltr"
-                                    value={formData.password}
-                                    onChange={e => setFormData(p => ({ ...p, password: e.target.value }))}
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                    تأكيد كلمة المرور
-                                </label>
-                                <input
-                                    type="password"
-                                    required
-                                    placeholder="••••••••"
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-left dir-ltr"
-                                    value={formData.confirmPassword}
-                                    onChange={e => setFormData(p => ({ ...p, confirmPassword: e.target.value }))}
-                                />
-                            </div>
-
+        <div style={{ fontFamily: "'Tajawal', sans-serif" }}>
+            {/* HERO - Same style as LandingPage */}
+            <section
+                style={{
+                    background: '#171717',
+                    padding: 0,
+                }}
+            >
+                <div
+                    style={{
+                        minHeight: '100vh',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        background: 'linear-gradient(135deg, #171717 0%, #262626 100%)',
+                    }}
+                >
+                    {/* Content */}
+                    <div
+                        style={{
+                            position: 'relative',
+                            zIndex: 1,
+                            maxWidth: '480px',
+                            margin: '0 auto',
+                            padding: '120px 24px',
+                            textAlign: 'center',
+                        }}
+                    >
+                        {/* Back Button */}
+                        <div style={{ textAlign: 'right', marginBottom: '32px' }}>
                             <button
-                                type="submit"
-                                disabled={status === 'loading'}
-                                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg shadow-[#2563eb]/20 text-sm font-bold text-white bg-[#2563eb] hover:bg-[#1d4ed8] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2563eb] transition-all disabled:opacity-70"
+                                onClick={() => navigate('/')}
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    padding: '8px 16px',
+                                    background: 'rgba(255,255,255,0.05)',
+                                    color: '#fff',
+                                    fontSize: '13px',
+                                    fontWeight: 600,
+                                    borderRadius: '10px',
+                                    border: '1px solid rgba(255,255,255,0.05)',
+                                    cursor: 'pointer',
+                                    transition: 'all 200ms ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'rgba(255,255,255,0.1)'
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+                                }}
                             >
-                                {status === 'loading' ? 'جاري التفعيل...' : 'تفعيل الدخول'}
+                                <ArrowLeft size={16} />
+                                العودة للرئيسية
                             </button>
-                        </form>
-                    )}
+                        </div>
+
+                        {/* Icon */}
+                        <div
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '80px',
+                                height: '80px',
+                                background: 'rgba(255,255,255,0.05)',
+                                borderRadius: '20px',
+                                marginBottom: '32px',
+                                border: '1px solid rgba(255,255,255,0.05)',
+                            }}
+                        >
+                            <Key size={36} color="#fff" />
+                        </div>
+
+                        {/* Title */}
+                        <h1
+                            style={{
+                                fontSize: 'clamp(32px, 5vw, 48px)',
+                                fontWeight: 700,
+                                color: '#fff',
+                                lineHeight: 1.2,
+                                marginBottom: '12px',
+                                letterSpacing: '-0.02em',
+                            }}
+                        >
+                            تفعيل حساب الشركة
+                        </h1>
+
+                        {/* Subtitle */}
+                        <p
+                            style={{
+                                fontSize: '16px',
+                                color: 'rgba(255,255,255,0.5)',
+                                marginBottom: '48px',
+                                lineHeight: 1.6,
+                            }}
+                        >
+                            أدخل كود التفعيل المرسل إلى بريدك الإلكتروني لإعداد حسابك
+                        </p>
+
+                        {/* Form Card */}
+                        <div
+                            style={{
+                                padding: '32px',
+                                background: '#262626',
+                                borderRadius: '20px',
+                                border: '1px solid ' + (status === 'error' ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.05)'),
+                                textAlign: 'right',
+                            }}
+                        >
+                            {status === 'success' ? (
+                                <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                                    <div
+                                        style={{
+                                            width: '64px',
+                                            height: '64px',
+                                            background: 'rgba(34,197,94,0.1)',
+                                            borderRadius: '50%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            margin: '0 auto 24px',
+                                        }}
+                                    >
+                                        <CheckCircle2 size={32} color="#22c55e" />
+                                    </div>
+                                    <h3
+                                        style={{
+                                            fontSize: '24px',
+                                            fontWeight: 700,
+                                            color: '#fff',
+                                            marginBottom: '8px',
+                                        }}
+                                    >
+                                        تم التفعيل بنجاح!
+                                    </h3>
+                                    <p
+                                        style={{
+                                            fontSize: '14px',
+                                            color: 'rgba(255,255,255,0.5)',
+                                        }}
+                                    >
+                                        جاري تحويلك إلى لوحة التحكم...
+                                    </p>
+                                </div>
+                            ) : (
+                                <form onSubmit={handleActivate}>
+                                    {/* Error Message */}
+                                    {errorMsg && (
+                                        <div
+                                            style={{
+                                                padding: '16px 20px',
+                                                background: 'rgba(239,68,68,0.1)',
+                                                borderRadius: '12px',
+                                                marginBottom: '24px',
+                                                border: '1px solid rgba(239,68,68,0.2)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '12px',
+                                            }}
+                                        >
+                                            <AlertCircle size={18} color="#fca5a5" />
+                                            <p
+                                                style={{
+                                                    fontSize: '14px',
+                                                    color: '#fca5a5',
+                                                    margin: 0,
+                                                    lineHeight: 1.6,
+                                                }}
+                                            >
+                                                {errorMsg}
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* Email */}
+                                    <div style={{ marginBottom: '20px' }}>
+                                        <label
+                                            style={{
+                                                display: 'block',
+                                                fontSize: '13px',
+                                                fontWeight: 600,
+                                                color: '#a3a3a3',
+                                                marginBottom: '8px',
+                                            }}
+                                        >
+                                            البريد الإلكتروني للشركة
+                                        </label>
+                                        <input
+                                            type="email"
+                                            required
+                                            readOnly={!!searchParams.get('email')}
+                                            value={formData.email}
+                                            onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
+                                            dir="ltr"
+                                            style={{
+                                                width: '100%',
+                                                padding: '14px 16px',
+                                                background: '#171717',
+                                                border: '1px solid rgba(255,255,255,0.1)',
+                                                borderRadius: '12px',
+                                                color: '#fff',
+                                                fontSize: '14px',
+                                                outline: 'none',
+                                                transition: 'all 200ms ease',
+                                                opacity: searchParams.get('email') ? 0.5 : 1,
+                                            }}
+                                            onFocus={(e) => {
+                                                if (!searchParams.get('email')) {
+                                                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'
+                                                }
+                                            }}
+                                            onBlur={(e) => {
+                                                if (!searchParams.get('email')) {
+                                                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+                                                }
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Code */}
+                                    <div style={{ marginBottom: '20px' }}>
+                                        <label
+                                            style={{
+                                                display: 'block',
+                                                fontSize: '13px',
+                                                fontWeight: 600,
+                                                color: '#a3a3a3',
+                                                marginBottom: '8px',
+                                            }}
+                                        >
+                                            كود التفعيل
+                                        </label>
+                                        <input
+                                            type="text"
+                                            required
+                                            dir="ltr"
+                                            placeholder="مثال: A7B9F1"
+                                            value={formData.code}
+                                            onChange={e => setFormData(p => ({ ...p, code: e.target.value.toUpperCase() }))}
+                                            style={{
+                                                width: '100%',
+                                                padding: '14px 16px',
+                                                background: '#171717',
+                                                border: '1px solid rgba(255,255,255,0.1)',
+                                                borderRadius: '12px',
+                                                color: '#fff',
+                                                fontSize: '18px',
+                                                outline: 'none',
+                                                transition: 'all 200ms ease',
+                                                textAlign: 'center',
+                                                letterSpacing: '0.2em',
+                                                fontFamily: 'monospace',
+                                                fontWeight: 700,
+                                                textTransform: 'uppercase',
+                                            }}
+                                            onFocus={(e) => {
+                                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'
+                                            }}
+                                            onBlur={(e) => {
+                                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Password */}
+                                    <div style={{ marginBottom: '20px' }}>
+                                        <label
+                                            style={{
+                                                display: 'block',
+                                                fontSize: '13px',
+                                                fontWeight: 600,
+                                                color: '#a3a3a3',
+                                                marginBottom: '8px',
+                                            }}
+                                        >
+                                            كلمة المرور الجديدة
+                                        </label>
+                                        <input
+                                            type="password"
+                                            required
+                                            placeholder="•••••••"
+                                            value={formData.password}
+                                            onChange={e => setFormData(p => ({ ...p, password: e.target.value }))}
+                                            dir="ltr"
+                                            style={{
+                                                width: '100%',
+                                                padding: '14px 16px',
+                                                background: '#171717',
+                                                border: '1px solid rgba(255,255,255,0.1)',
+                                                borderRadius: '12px',
+                                                color: '#fff',
+                                                fontSize: '14px',
+                                                outline: 'none',
+                                                transition: 'all 200ms ease',
+                                            }}
+                                            onFocus={(e) => {
+                                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'
+                                            }}
+                                            onBlur={(e) => {
+                                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Confirm Password */}
+                                    <div style={{ marginBottom: '24px' }}>
+                                        <label
+                                            style={{
+                                                display: 'block',
+                                                fontSize: '13px',
+                                                fontWeight: 600,
+                                                color: '#a3a3a3',
+                                                marginBottom: '8px',
+                                            }}
+                                        >
+                                            تأكيد كلمة المرور
+                                        </label>
+                                        <input
+                                            type="password"
+                                            required
+                                            placeholder="•••••••"
+                                            value={formData.confirmPassword}
+                                            onChange={e => setFormData(p => ({ ...p, confirmPassword: e.target.value }))}
+                                            dir="ltr"
+                                            style={{
+                                                width: '100%',
+                                                padding: '14px 16px',
+                                                background: '#171717',
+                                                border: '1px solid rgba(255,255,255,0.1)',
+                                                borderRadius: '12px',
+                                                color: '#fff',
+                                                fontSize: '14px',
+                                                outline: 'none',
+                                                transition: 'all 200ms ease',
+                                            }}
+                                            onFocus={(e) => {
+                                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'
+                                            }}
+                                            onBlur={(e) => {
+                                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Submit Button */}
+                                    <button
+                                        type="submit"
+                                        disabled={status === 'loading'}
+                                        style={{
+                                            width: '100%',
+                                            padding: '14px 28px',
+                                            background: '#fff',
+                                            color: '#171717',
+                                            fontSize: '15px',
+                                            fontWeight: 600,
+                                            borderRadius: '12px',
+                                            border: 'none',
+                                            cursor: status === 'loading' ? 'not-allowed' : 'pointer',
+                                            transition: 'all 200ms ease',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            if (status !== 'loading') {
+                                                e.currentTarget.style.transform = 'translateY(-2px)'
+                                            }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            if (status !== 'loading') {
+                                                e.currentTarget.style.transform = 'translateY(0)'
+                                            }
+                                        }}
+                                    >
+                                        {status === 'loading' ? (
+                                            <>
+                                                <div style={{
+                                                    width: '16px',
+                                                    height: '16px',
+                                                    border: '2px solid rgba(23,23,23,0.1)',
+                                                    borderTopColor: '#171717',
+                                                    borderRadius: '50%',
+                                                    animation: 'spin 0.8s linear infinite',
+                                                    margin: '0 auto',
+                                                }} />
+                                                <style>{`
+                                                    @keyframes spin {
+                                                        to { transform: rotate(360deg); }
+                                                    }
+                                                `}</style>
+                                            </>
+                                        ) : (
+                                            'تفعيل الدخول'
+                                        )}
+                                    </button>
+                                </form>
+                            )}
+                        </div>
+
+                        {/* Help Text */}
+                        <div style={{ marginTop: '32px' }}>
+                            <p
+                                style={{
+                                    fontSize: '13px',
+                                    color: 'rgba(255,255,255,0.4)',
+                                    marginBottom: '8px',
+                                }}
+                            >
+                                تحتاج مساعدة؟ تواصل مع فريق الدعم
+                            </p>
+                            <a
+                                href="mailto:support@sallim.co"
+                                style={{
+                                    fontSize: '14px',
+                                    color: '#fff',
+                                    textDecoration: 'none',
+                                    fontWeight: 500,
+                                }}
+                            >
+                                support@sallim.co
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </section>
         </div>
     )
 }

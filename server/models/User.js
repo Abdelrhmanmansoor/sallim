@@ -41,38 +41,35 @@ const userSchema = new mongoose.Schema({
 });
 
 // Hash password before saving (only if password is modified and not already hashed)
-userSchema.pre('save', function(next) {
+userSchema.pre('save', async function (next) {
     const user = this;
-    
+
     // Only hash password if it's actually modified
     if (!user.isModified('password')) {
         return next();
     }
-    
+
     // Skip hashing if password is already a bcrypt hash
     if (user.password && (user.password.startsWith('$2a$') || user.password.startsWith('$2b$') || user.password.startsWith('$2y$'))) {
         return next();
     }
-    
-    // Hash the password
-    bcrypt.genSalt(10, (err, salt) => {
-        if (err) {
-            console.error('Error generating salt:', err);
-            return next(err);
+
+    try {
+        if (!user.password) {
+            return next();
         }
-        bcrypt.hash(user.password, salt, (err, hash) => {
-            if (err) {
-                console.error('Error hashing password:', err);
-                return next(err);
-            }
-            user.password = hash;
-            next();
-        });
-    });
+        // Hash password using async/await
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+        next();
+    } catch (error) {
+        console.error('Error hashing password:', error);
+        next(error);
+    }
 });
 
 // Method to compare password
-userSchema.methods.comparePassword = async function(candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword) {
     try {
         return await bcrypt.compare(candidatePassword, this.password);
     } catch (error) {
@@ -81,7 +78,7 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 };
 
 // Remove password from JSON output
-userSchema.methods.toJSON = function() {
+userSchema.methods.toJSON = function () {
     const user = this.toObject();
     delete user.password;
     return user;

@@ -26,6 +26,8 @@ import DiwaniyaDashboardPage from './pages/DiwaniyaDashboardPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import ProfilePage from './pages/ProfilePage'
+import CompaniesPage from './pages/CompaniesPage'
+import AdminDashboardPage from './pages/AdminDashboardPage'
 
 export default function App() {
   const location = useLocation()
@@ -44,6 +46,10 @@ export default function App() {
     '/company-login',
     '/company/dashboard',
     '/diwaniya',
+    '/admin/dashboard',
+    '/admin/companies',
+    '/admin/invite-codes',
+    '/companies',
   ].includes(pathname)
 
   // Define isBusiness - assuming it's false for the free version
@@ -80,6 +86,8 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/companies" element={<CompaniesPage />} />
+          <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

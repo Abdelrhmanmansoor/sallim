@@ -7,6 +7,7 @@ const links = [
   { path: '/editor', label: 'المحرر' },
   { path: '/texts', label: 'النصوص' },
   { path: '/eidiya', label: 'العيدية' },
+  { path: '/companies', label: 'الشركات' },
 ]
 
 export default function Navbar() {

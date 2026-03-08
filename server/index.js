@@ -23,6 +23,11 @@ import diwanRoutes from './routes/diwan.js'
 import diwaniyaRoutes from './routes/diwaniya.js'
 import authRoutes from './routes/auth.js'
 import diwaniyaFamilyRoutes from './routes/diwaniya-family.js'
+import walletRoutes from './routes/wallet.js'
+import adminInviteCodesRoutes from './routes/admin-invite-codes.js'
+import adminCompaniesRoutes from './routes/admin-companies.js'
+import campaignsRoutes from './routes/campaigns.js'
+import teamRoutes from './routes/team.js'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -59,6 +64,8 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5174',
   'http://localhost:5175',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:4173',
 ].filter(Boolean)
 
 const corsOptions = {
@@ -153,25 +160,32 @@ const upload = multer({
 })
 
 // ─── Image Upload Endpoint ───
-app.post('/api/v1/upload/avatar', upload.single('avatar'), (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ success: false, error: 'No file uploaded' })
+app.post('/api/v1/upload/avatar', (req, res) => {
+  upload.single('avatar')(req, res, function (err) {
+    if (err) {
+      console.error('Multer/Cloudinary error:', err);
+      return res.status(500).json({ success: false, error: err.message || 'Upload failed due to server configuration.' });
     }
 
-    // Cloudinary stores the URL in req.file.path
-    res.json({
-      success: true,
-      data: {
-        url: req.file.path, // Cloudinary URL
-        publicId: req.file.filename, // Cloudinary public ID
-        filename: req.file.originalname
+    try {
+      if (!req.file) {
+        return res.status(400).json({ success: false, error: 'لم يتم رفع أي صورة' });
       }
-    })
-  } catch (error) {
-    console.error('Upload error:', error)
-    res.status(500).json({ success: false, error: 'Upload failed' })
-  }
+
+      // Cloudinary stores the URL in req.file.path
+      res.json({
+        success: true,
+        data: {
+          url: req.file.path, // Cloudinary URL
+          publicId: req.file.filename, // Cloudinary public ID
+          filename: req.file.originalname
+        }
+      });
+    } catch (error) {
+      console.error('Upload error:', error);
+      res.status(500).json({ success: false, error: 'Upload failed' });
+    }
+  });
 })
 
 // ─── Health Check ───
@@ -187,7 +201,12 @@ app.get('/api/health', (req, res) => {
 app.use('/api/v1/cards', createLimiter, cardRoutes)
 app.use('/api/v1/stats', statsRoutes)
 app.use('/api/v1/admin', adminRoutes)
+app.use('/api/v1/admin/invite-codes', adminInviteCodesRoutes)
+app.use('/api/v1/admin/companies', adminCompaniesRoutes)
 app.use('/api/v1/company', companyRoutes)
+app.use('/api/v1/company/wallet', walletRoutes)
+app.use('/api/v1/company/campaigns', campaignsRoutes)
+app.use('/api/v1/company/team', teamRoutes)
 app.use('/api/v1/templates', templateRoutes)
 app.use('/api/v1/blog', blogRoutes)
 app.use('/api/v1/tickets', ticketRoutes)

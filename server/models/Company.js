@@ -42,6 +42,135 @@ const companySchema = new mongoose.Schema({
     role: {
         type: String,
         default: 'company', // admin, company
+    },
+    
+    // Enterprise: Branding
+    brandColors: {
+        primary: {
+            type: String,
+            default: '#2563eb'
+        },
+        secondary: {
+            type: String,
+            default: '#1e40af'
+        },
+        accent: {
+            type: String,
+            default: '#f59e0b'
+        }
+    },
+    brandFonts: {
+        heading: {
+            type: String,
+            default: 'Cairo'
+        },
+        body: {
+            type: String,
+            default: 'Cairo'
+        }
+    },
+    contactInfo: {
+        phone: String,
+        address: String,
+        website: String,
+        socialMedia: {
+            twitter: String,
+            linkedin: String,
+            instagram: String
+        }
+    },
+    
+    // Enterprise: Wallet reference
+    wallet: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Wallet'
+    },
+    
+    // Enterprise: Advanced features
+    customTemplates: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Template'
+    }],
+    teamMembers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'CompanyTeam'
+    }],
+    
+    // Enterprise: Settings
+    settings: {
+        defaultTemplate: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Template'
+        },
+        autoSaveDrafts: {
+            type: Boolean,
+            default: true
+        },
+        allowBulkCreation: {
+            type: Boolean,
+            default: true
+        },
+        requireApprovalForCampaigns: {
+            type: Boolean,
+            default: false
+        }
+    },
+    
+    // Enterprise: Subscription info
+    subscription: {
+        plan: {
+            type: String,
+            enum: ['basic', 'pro', 'enterprise'],
+            default: 'basic'
+        },
+        startDate: Date,
+        renewalDate: Date,
+        isActive: {
+            type: Boolean,
+            default: true
+        },
+        limits: {
+            cardsPerMonth: {
+                type: Number,
+                default: 100
+            },
+            teamMembers: {
+                type: Number,
+                default: 3
+            },
+            campaignsPerMonth: {
+                type: Number,
+                default: 5
+            }
+        }
+    },
+    
+    // Enterprise: Usage tracking
+    usage: {
+        cardsThisMonth: {
+            type: Number,
+            default: 0
+        },
+        campaignsThisMonth: {
+            type: Number,
+            default: 0
+        },
+        lastReset: {
+            type: Date,
+            default: Date.now
+        }
+    },
+    
+    // Enterprise: Onboarding status
+    onboardingCompleted: {
+        type: Boolean,
+        default: false
+    },
+    
+    // Metadata
+    metadata: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
     }
 }, {
     timestamps: true,
