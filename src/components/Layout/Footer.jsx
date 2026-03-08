@@ -6,6 +6,10 @@ const footerLinks = {
     { to: '/texts', label: 'بنك النصوص' },
     { to: '/eidiya', label: 'العيدية' },
   ],
+  games: [
+    { to: '/eidiya-game', label: 'لعبة العيدية' },
+    { to: '/eidiya-luck', label: 'حظ العيدية' },
+  ],
   resources: [
     { to: '/', label: 'الرئيسية' },
     { to: '/about', label: 'عن المنصة' },
@@ -78,6 +82,38 @@ export default function Footer() {
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {footerLinks.platform.map((l) => (
+                <Link
+                  key={l.to}
+                  to={l.to}
+                  style={{
+                    fontSize: '14px',
+                    color: '#525252',
+                    textDecoration: 'none',
+                    transition: 'color 150ms ease',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#171717')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#525252')}
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Games Links */}
+          <div>
+            <h4
+              style={{
+                fontSize: '13px',
+                fontWeight: 600,
+                color: '#171717',
+                marginBottom: '16px',
+              }}
+            >
+              ألعاب العيدية
+            </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {footerLinks.games.map((l) => (
                 <Link
                   key={l.to}
                   to={l.to}
