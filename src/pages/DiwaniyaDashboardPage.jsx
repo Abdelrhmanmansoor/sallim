@@ -5,26 +5,44 @@ import { ArrowLeft, Copy, Eye, EyeOff, Trash2, MessageCircle, Loader2 } from 'lu
 
 export default function DiwaniyaDashboardPage() {
     const navigate = useNavigate();
+    const [diwaniyas, setDiwaniyas] = useState([]);
     const [diwaniya, setDiwaniya] = useState(null);
     const [greetings, setGreetings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        async function fetchData() {
-            try {
-                const res = await getDiwaniyaManage('dashboard');
-                if (res.success) {
-                    setDiwaniya(res.data.diwaniya);
-                    setGreetings(res.data.greetings);
-                }
-            } catch (err) {
-                setError(true);
-            } finally {
+        // Get user from localStorage
+        const userData = localStorage.getItem('user');
+        if (userData) {
+            const user = JSON.parse(userData);
+            // user.diwaniyas is an array of diwaniya objects with username field
+            if (user.diwaniyas && user.diwaniyas.length > 0) {
+                setDiwaniyas(user.diwaniyas);
+                setDiwaniya(user.diwaniyas[0]);
+                
+                // Fetch the first diwaniya details
+                const username = user.diwaniyas[0].username;
+                getDiwaniyaManage(username)
+                    .then(res => {
+                        if (res.success) {
+                            setDiwaniya(res.data);
+                            setGreetings(res.data.greetings || []);
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error fetching diwaniya:', err);
+                        setError(true);
+                    })
+                    .finally(() => {
+                        setLoading(false);
+                    });
+            } else {
                 setLoading(false);
             }
+        } else {
+            setLoading(false);
         }
-        fetchData();
     }, []);
 
     const handleCopyLink = () => {
@@ -34,11 +52,16 @@ export default function DiwaniyaDashboardPage() {
     };
 
     const handleToggleVisibility = async (greetId) => {
+        if (!diwaniya?.username) {
+            alert('لا يمكن تحديث الرؤية');
+            return;
+        }
+
         const greeting = greetings.find(g => g._id === greetId);
         const newVisibility = greeting.visibility === 'public' ? 'private' : 'public';
 
         try {
-            const res = await updateDiwaniyaGreetingVisibility('dashboard', greetId, newVisibility);
+            const res = await updateDiwaniyaGreetingVisibility(diwaniya.username, greetId, newVisibility);
             if (res.success) {
                 setGreetings(prev => prev.map(g =>
                     g._id === greetId ? { ...g, visibility: newVisibility } : g
@@ -52,8 +75,13 @@ export default function DiwaniyaDashboardPage() {
     const handleDelete = async (greetId) => {
         if (!confirm('هل أنت متأكد من حذف هذه التهنئة؟')) return;
 
+        if (!diwaniya?.username) {
+            alert('لا يمكن حذف التهنئة');
+            return;
+        }
+
         try {
-            const res = await deleteDiwaniyaGreeting('dashboard', greetId);
+            const res = await deleteDiwaniyaGreeting(diwaniya.username, greetId);
             if (res.success) {
                 setGreetings(prev => prev.filter(g => g._id !== greetId));
             }

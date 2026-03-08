@@ -16,6 +16,7 @@ const footerLinks = {
     { to: '/terms', label: 'الشروط' },
     { to: '/delivery', label: 'التوصيل' },
     { to: '/refund', label: 'الاسترداد' },
+    { to: '/contact', label: 'اتصل بنا' },
   ],
 }
 
