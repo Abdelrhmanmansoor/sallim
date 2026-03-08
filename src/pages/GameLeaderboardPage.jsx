@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getStandaloneGameLeaderboard, getStandaloneGame } from '../utils/api';
-import { Trophy, Medal, ArrowLeft, Loader2, Share2, Sparkles } from 'lucide-react';
+import { Trophy, Medal, ArrowLeft, Loader2, Share2, Sparkles, User, Crown } from 'lucide-react';
 
 export default function GameLeaderboardPage() {
     const { gameId } = useParams();
     const navigate = useNavigate();
     const [leaderboard, setLeaderboard] = useState([]);
     const [gameData, setGameData] = useState(null);
+    const [currentPlayer, setCurrentPlayer] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -22,6 +23,14 @@ export default function GameLeaderboardPage() {
 
                 if (leaderboardRes.success) setLeaderboard(leaderboardRes.data);
                 if (gameRes.success) setGameData(gameRes.data);
+
+                // Get current player from localStorage
+                const playerKey = `game_${gameId}_player`;
+                const playerData = localStorage.getItem(playerKey);
+                if (playerData) {
+                    const player = JSON.parse(playerData);
+                    setCurrentPlayer(player);
+                }
             } catch (err) {
                 console.error(err);
                 setError('حدث خطأ أثناء تحميل الترتيب');
@@ -31,6 +40,10 @@ export default function GameLeaderboardPage() {
         }
         fetchLeaderboard();
     }, [gameId]);
+
+    // Find current player's rank
+    const currentPlayerRank = currentPlayer ? leaderboard.findIndex(p => p.playerName === currentPlayer.playerName) : -1;
+    const currentPlayerData = currentPlayerRank >= 0 ? leaderboard[currentPlayerRank] : null;
 
     const handleShare = () => {
         const text = encodeURIComponent(`🏆 ترتيب أبطال تحدي العيدية من ${gameData?.ownerName || 'سَلِّم'}!\nشوف الترتيب وشارك الآن:\n${window.location.href}`);
@@ -90,8 +103,96 @@ export default function GameLeaderboardPage() {
                 </div>
             </header>
 
+            {/* Current Player Card - Shows prominently if player exists */}
+            {currentPlayerData && currentPlayerRank >= 0 && (
+                <div style={{
+                    background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)',
+                    borderRadius: '24px',
+                    padding: '24px',
+                    marginBottom: '20px',
+                    color: '#fff',
+                    boxShadow: '0 10px 30px rgba(255, 140, 0, 0.3)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}>
+                    <div style={{
+                        position: 'absolute',
+                        top: '-20px',
+                        right: '-20px',
+                        width: '100px',
+                        height: '100px',
+                        background: 'rgba(255,255,255,0.1)',
+                        borderRadius: '50%'
+                    }} />
+                    <div style={{
+                        position: 'absolute',
+                        bottom: '-30px',
+                        left: '-20px',
+                        width: '80px',
+                        height: '80px',
+                        background: 'rgba(255,255,255,0.1)',
+                        borderRadius: '50%'
+                    }} />
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                            <div style={{
+                                width: '60px',
+                                height: '60px',
+                                background: 'rgba(255,255,255,0.2)',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}>
+                                <User size={30} />
+                            </div>
+                            <div>
+                                <div style={{ fontSize: '13px', opacity: 0.9, marginBottom: '4px', fontWeight: 600 }}>
+                                    🎮 مستواك الحالي
+                                </div>
+                                <div style={{ fontSize: '22px', fontWeight: 800 }}>
+                                    {currentPlayerData.playerName}
+                                </div>
+                            </div>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '48px', fontWeight: 900, lineHeight: 1 }}>
+                                #{currentPlayerRank + 1}
+                            </div>
+                            <div style={{ fontSize: '14px', fontWeight: 600, opacity: 0.9 }}>
+                                ترتيبك
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{
+                        marginTop: '20px',
+                        padding: '16px',
+                        background: 'rgba(255,255,255,0.15)',
+                        borderRadius: '16px',
+                        backdropFilter: 'blur(10px)',
+                        position: 'relative',
+                        zIndex: 1
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span style={{ fontSize: '24px' }}>💰</span>
+                                <span style={{ fontSize: '16px', fontWeight: 600 }}>عيديتك المستحقة:</span>
+                            </div>
+                            <div style={{ textAlign: 'left' }}>
+                                <div style={{ fontSize: '32px', fontWeight: 900, lineHeight: 1 }}>
+                                    {currentPlayerData.totalEarned}
+                                </div>
+                                <div style={{ fontSize: '14px', fontWeight: 600 }}>{currency}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Leaderboard List */}
-            <main style={{ maxWidth: '600px', margin: '-40px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
+            <main style={{ maxWidth: '600px', margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 10 }}>
                 {leaderboard.length === 0 ? (
                     <div style={{ background: '#fff', borderRadius: '24px', padding: '48px 24px', textAlign: 'center', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
                         <div style={{ fontSize: '48px', marginBottom: '16px' }}>😴</div>

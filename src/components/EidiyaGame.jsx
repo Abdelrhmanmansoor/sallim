@@ -215,6 +215,15 @@ export default function EidiyaGame({ gameId }) {
           score,
           totalEarned
         })
+
+        // Save player data to localStorage for leaderboard display
+        const playerKey = `game_${gameId}_player`;
+        localStorage.setItem(playerKey, JSON.stringify({
+          playerName,
+          score,
+          totalEarned,
+          timestamp: Date.now()
+        }));
       } catch (err) {
         console.error('Failed to submit score:', err)
       } finally {
