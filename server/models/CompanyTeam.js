@@ -107,32 +107,31 @@ companyTeamSchema.index({ company: 1, status: 1 })
 companyTeamSchema.index({ email: 1 })
 
 // Hash password before saving
-companyTeamSchema.pre('save', async function(next) {
-  if (!this.isModified('password') || !this.password) return next()
+companyTeamSchema.pre('save', async function () {
+  if (!this.isModified('password') || !this.password) return
 
   try {
     const bcrypt = await import('bcrypt')
     const salt = await bcrypt.genSalt(10)
     this.password = await bcrypt.hash(this.password, salt)
-    next()
   } catch (error) {
-    next(error)
+    throw error
   }
 })
 
 // Method to compare password
-companyTeamSchema.methods.comparePassword = async function(candidatePassword) {
+companyTeamSchema.methods.comparePassword = async function (candidatePassword) {
   const bcrypt = await import('bcrypt')
   return await bcrypt.compare(candidatePassword, this.password)
 }
 
 // Method to check if team member has specific permission
-companyTeamSchema.methods.hasPermission = function(permission) {
+companyTeamSchema.methods.hasPermission = function (permission) {
   return this.permissions[permission] === true
 }
 
 // Generate invite token
-companyTeamSchema.methods.generateInviteToken = function() {
+companyTeamSchema.methods.generateInviteToken = function () {
   const crypto = require('crypto')
   this.inviteToken = crypto.randomBytes(32).toString('hex')
   this.invitedAt = new Date()

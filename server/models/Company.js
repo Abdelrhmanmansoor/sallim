@@ -43,7 +43,7 @@ const companySchema = new mongoose.Schema({
         type: String,
         default: 'company', // admin, company
     },
-    
+
     // Enterprise: Branding
     brandColors: {
         primary: {
@@ -79,13 +79,13 @@ const companySchema = new mongoose.Schema({
             instagram: String
         }
     },
-    
+
     // Enterprise: Wallet reference
     wallet: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Wallet'
     },
-    
+
     // Enterprise: Advanced features
     customTemplates: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -95,7 +95,7 @@ const companySchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'CompanyTeam'
     }],
-    
+
     // Enterprise: Settings
     settings: {
         defaultTemplate: {
@@ -115,7 +115,7 @@ const companySchema = new mongoose.Schema({
             default: false
         }
     },
-    
+
     // Enterprise: Subscription info
     subscription: {
         plan: {
@@ -144,7 +144,7 @@ const companySchema = new mongoose.Schema({
             }
         }
     },
-    
+
     // Enterprise: Usage tracking
     usage: {
         cardsThisMonth: {
@@ -160,13 +160,13 @@ const companySchema = new mongoose.Schema({
             default: Date.now
         }
     },
-    
+
     // Enterprise: Onboarding status
     onboardingCompleted: {
         type: Boolean,
         default: false
     },
-    
+
     // Metadata
     metadata: {
         type: mongoose.Schema.Types.Mixed,
@@ -177,15 +177,14 @@ const companySchema = new mongoose.Schema({
 })
 
 // Hash password before saving if modified
-companySchema.pre('save', async function (next) {
-    if (!this.isModified('password') || !this.password) return next()
+companySchema.pre('save', async function () {
+    if (!this.isModified('password') || !this.password) return
 
     try {
         const salt = await bcrypt.genSalt(10)
         this.password = await bcrypt.hash(this.password, salt)
-        next()
     } catch (error) {
-        next(error)
+        throw error
     }
 })
 
