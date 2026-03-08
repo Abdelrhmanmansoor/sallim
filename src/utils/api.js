@@ -645,4 +645,20 @@ export async function uploadAvatar(file) {
   return data
 }
 
+/**
+ * Track platform statistics (visits, downloads, etc)
+ */
+export async function trackStat(field) {
+  try {
+    return await apiRequest('/stats/increment', {
+      method: 'POST',
+      body: JSON.stringify({ field }),
+    })
+  } catch (error) {
+    // Silent fail for analytics
+    console.warn('Analytics tracking failed:', error)
+    return { success: false }
+  }
+}
+
 export default API_BASE

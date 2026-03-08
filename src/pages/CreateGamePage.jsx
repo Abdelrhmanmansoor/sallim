@@ -9,6 +9,8 @@ export default function CreateGamePage() {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [user, setUser] = useState(null);
+    const [isMobile, setIsMobile] = useState(false);
+    const [isSmallMobile, setIsSmallMobile] = useState(false);
 
     useEffect(() => {
         // Check if user is logged in
@@ -18,6 +20,17 @@ export default function CreateGamePage() {
             setIsLoggedIn(true);
             setUser(JSON.parse(userData));
         }
+    }, []);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 640);
+            setIsSmallMobile(window.innerWidth < 480);
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
     }, []);
     const [status, setStatus] = useState('idle'); // idle, loading, success
     const [gameUrl, setGameUrl] = useState('');
@@ -152,43 +165,43 @@ export default function CreateGamePage() {
     return (
         <div style={{ fontFamily: "'Tajawal', sans-serif", background: '#fafafa', minHeight: '100vh', paddingBottom: '100px' }}>
             {/* Header */}
-            <header style={{ background: '#171717', padding: '60px 24px', textAlign: 'center', position: 'relative' }}>
+            <header style={{ background: '#171717', padding: 'clamp(40px, 8vw, 60px) 24px', textAlign: 'center', position: 'relative' }}>
                 <button
                     onClick={() => navigate('/')}
-                    style={{ position: 'absolute', top: '24px', right: '24px', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.1)', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '12px', cursor: 'pointer', fontWeight: 600, transition: 'all 200ms ease' }}
+                    style={{ position: 'absolute', top: 'clamp(16px, 3vw, 24px)', right: 'clamp(16px, 3vw, 24px)', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.1)', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: '12px', cursor: 'pointer', fontWeight: 600, transition: 'all 200ms ease', fontSize: '14px' }}
                     onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
                     onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
                 >
-                    <ArrowRight size={18} /> رجوع
+                    <ArrowRight size={16} /> رجوع
                 </button>
-                <div style={{ display: 'inline-flex', padding: '12px', borderRadius: '20px', background: 'rgba(255,255,255,0.1)', marginBottom: '24px' }}>
-                    <Trophy size={32} color="#FFD700" />
+                <div style={{ display: 'inline-flex', padding: '10px', borderRadius: '20px', background: 'rgba(255,255,255,0.1)', marginBottom: '20px' }}>
+                    <Trophy size={28} color="#FFD700" />
                 </div>
-                <h1 style={{ fontSize: 'clamp(32px, 6vw, 48px)', fontWeight: 800, color: '#fff', marginBottom: '16px', lineHeight: 1.2 }}>
+                <h1 style={{ fontSize: 'clamp(24px, 6vw, 48px)', fontWeight: 800, color: '#fff', marginBottom: '12px', lineHeight: 1.2 }}>
                     أطلق تحدي العيدية
                 </h1>
-                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '18px', maxWidth: '600px', margin: '0 auto', lineHeight: 1.6 }}>
+                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(14px, 3vw, 18px)', maxWidth: '600px', margin: '0 auto', lineHeight: 1.5 }}>
                     أنشئ أسئلتك الخاصة، حدد لكل سؤال جوائزه، ودع عائلتك تتنافس على صدارة الترتيب!
                 </p>
             </header>
 
             {/* Form */}
-            <main style={{ maxWidth: '800px', margin: '-60px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
+            <main style={{ maxWidth: '800px', margin: '-40px auto 0', padding: '0 clamp(16px, 4vw, 24px)', position: 'relative', zIndex: 10 }}>
                 {/* Warning for non-logged users */}
                 {!isLoggedIn && (
                     <div style={{
                         background: '#fee2e2',
                         border: '2px solid #fecaca',
                         borderRadius: '16px',
-                        padding: '24px',
+                        padding: 'clamp(16px, 3vw, 24px)',
                         marginBottom: '24px',
                         display: 'flex',
                         alignItems: 'flex-start',
                         gap: '16px'
                     }}>
                         <div style={{
-                            width: '48px',
-                            height: '48px',
+                            width: 'clamp(40px, 8vw, 48px)',
+                            height: 'clamp(40px, 8vw, 48px)',
                             background: '#fef2f2',
                             borderRadius: '50%',
                             display: 'flex',
@@ -196,11 +209,11 @@ export default function CreateGamePage() {
                             justifyContent: 'center',
                             flexShrink: 0
                         }}>
-                            <AlertCircle size={24} color="#dc2626" />
+                            <AlertCircle size={20} color="#dc2626" />
                         </div>
                         <div style={{ flex: 1 }}>
                             <h3 style={{
-                                fontSize: '18px',
+                                fontSize: 'clamp(16px, 4vw, 18px)',
                                 fontWeight: 700,
                                 color: '#991b1b',
                                 marginBottom: '8px'
@@ -208,19 +221,19 @@ export default function CreateGamePage() {
                                 ⚠️ تنبيه هام
                             </h3>
                             <p style={{
-                                fontSize: '15px',
+                                fontSize: 'clamp(13px, 3vw, 15px)',
                                 color: '#7f1d1d',
                                 lineHeight: 1.6,
                                 marginBottom: '16px'
                             }}>
                                 لتفعيل اللعبة ومتابعة النتائج ولوحة الصدارة، يجب عليك إنشاء حساب وتسجيل الدخول أولاً.
                             </p>
-                            <div style={{ display: 'flex', gap: '12px' }}>
+                            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                                 <button
                                     type="button"
                                     onClick={() => navigate('/login')}
                                     style={{
-                                        padding: '10px 20px',
+                                        padding: '10px 16px',
                                         background: '#dc2626',
                                         color: '#fff',
                                         border: 'none',
@@ -228,7 +241,9 @@ export default function CreateGamePage() {
                                         fontSize: '14px',
                                         fontWeight: 600,
                                         cursor: 'pointer',
-                                        transition: 'all 200ms ease'
+                                        transition: 'all 200ms ease',
+                                        flex: 1,
+                                        minWidth: '120px'
                                     }}
                                     onMouseEnter={(e) => {
                                         e.currentTarget.style.background = '#b91c1c'
@@ -245,7 +260,7 @@ export default function CreateGamePage() {
                                     type="button"
                                     onClick={() => navigate('/register')}
                                     style={{
-                                        padding: '10px 20px',
+                                        padding: '10px 16px',
                                         background: '#fff',
                                         color: '#dc2626',
                                         border: '2px solid #dc2626',
@@ -253,7 +268,9 @@ export default function CreateGamePage() {
                                         fontSize: '14px',
                                         fontWeight: 600,
                                         cursor: 'pointer',
-                                        transition: 'all 200ms ease'
+                                        transition: 'all 200ms ease',
+                                        flex: 1,
+                                        minWidth: '120px'
                                     }}
                                     onMouseEnter={(e) => {
                                         e.currentTarget.style.transform = 'translateY(-2px)'
@@ -269,16 +286,16 @@ export default function CreateGamePage() {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
                     {/* Basic Info */}
-                    <div style={{ background: '#fff', borderRadius: '20px', padding: '32px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', border: '1px solid #e5e5e5' }}>
-                        <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#171717', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ background: '#fff', borderRadius: '20px', padding: 'clamp(20px, 4vw, 32px)', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', border: '1px solid #e5e5e5' }}>
+                        <h2 style={{ fontSize: 'clamp(18px, 4vw, 20px)', fontWeight: 700, color: '#171717', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <span style={{ width: '8px', height: '24px', background: '#FF8C00', borderRadius: '4px' }}></span>
                             المعلومات الأساسية
                         </h2>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                             <div style={{ gridColumn: '1 / -1' }}>
                                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#525252', marginBottom: '8px' }}>اسمك (مُنشئ التحدي)</label>
                                 <input
@@ -319,9 +336,9 @@ export default function CreateGamePage() {
                     </div>
 
                     {/* Questions */}
-                    <div style={{ background: '#fff', borderRadius: '20px', padding: '32px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', border: '1px solid #e5e5e5' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-                            <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#171717', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ background: '#fff', borderRadius: '20px', padding: 'clamp(20px, 4vw, 32px)', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', border: '1px solid #e5e5e5' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexDirection: 'row' }}>
+                            <h2 style={{ fontSize: 'clamp(18px, 4vw, 20px)', fontWeight: 700, color: '#171717', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <span style={{ width: '8px', height: '24px', background: '#FFD700', borderRadius: '4px' }}></span>
                                 بناء الأسئلة
                             </h2>
@@ -333,23 +350,23 @@ export default function CreateGamePage() {
                         </div>
 
                         {/* Quick Add from Database */}
-                        <div style={{ marginBottom: '24px', padding: '20px', background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 140, 0, 0.1))', borderRadius: '16px', border: '2px dashed rgba(255, 140, 0, 0.3)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                        <div style={{ marginBottom: '20px', padding: 'clamp(16px, 3vw, 20px)', background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 140, 0, 0.1))', borderRadius: '16px', border: '2px dashed rgba(255, 140, 0, 0.3)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexDirection: window.innerWidth < 640 ? 'column' : 'row', gap: window.innerWidth < 640 ? '12px' : '0' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <Wand2 size={24} color="#FF8C00" />
+                                    <Wand2 size={22} color="#FF8C00" />
                                     <div>
-                                        <div style={{ fontSize: '16px', fontWeight: 700, color: '#171717' }}>اختيار أسئلة جاهزة</div>
-                                        <div style={{ fontSize: '13px', color: '#737373' }}>لدينا 50 سؤال جاهز، اختر العدد الذي تريده</div>
+                                        <div style={{ fontSize: 'clamp(15px, 3.5vw, 16px)', fontWeight: 700, color: '#171717' }}>اختيار أسئلة جاهزة</div>
+                                        <div style={{ fontSize: 'clamp(12px, 3vw, 13px)', color: '#737373' }}>لدينا 50 سؤال جاهز، اختر العدد الذي تريده</div>
                                     </div>
                                 </div>
                             </div>
-                            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', flexDirection: window.innerWidth < 480 ? 'column' : 'row' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
                                     <label style={{ fontSize: '14px', fontWeight: 600, color: '#525252' }}>عدد الأسئلة:</label>
                                     <select
                                         value={questionCount}
                                         onChange={(e) => setQuestionCount(Number(e.target.value))}
-                                        style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e5e5e5', fontSize: '14px', background: '#fff' }}
+                                        style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e5e5e5', fontSize: '14px', background: '#fff', width: window.innerWidth < 480 ? '100%' : 'auto' }}
                                     >
                                         {[5, 10, 15, 20, 25, 30, 35, 40, 45, 50].map(num => (
                                             <option key={num} value={num}>{num}</option>
@@ -359,7 +376,7 @@ export default function CreateGamePage() {
                                 <button
                                     type="button"
                                     onClick={loadRandomQuestions}
-                                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', transition: 'all 200ms ease' }}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', transition: 'all 200ms ease', flex: window.innerWidth < 480 ? 1 : 'auto', justifyContent: 'center' }}
                                     onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
                                     onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                                 >
@@ -370,7 +387,7 @@ export default function CreateGamePage() {
                                     <button
                                         type="button"
                                         onClick={() => setQuestions([])}
-                                        style={{ padding: '10px 20px', background: '#fee2e2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: '8px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}
+                                        style={{ padding: '10px 20px', background: '#fee2e2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: '8px', fontSize: '14px', fontWeight: 600, cursor: 'pointer', flex: window.innerWidth < 480 ? 1 : 'auto' }}
                                     >
                                         مسح الكل
                                     </button>

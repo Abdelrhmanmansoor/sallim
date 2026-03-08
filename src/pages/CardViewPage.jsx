@@ -3,6 +3,7 @@ import { templates } from '../data/templates'
 import { useState, useEffect, useRef } from 'react'
 import { BsDownload, BsWhatsapp, BsArrowRight, BsMoonStars } from 'react-icons/bs'
 import html2canvas from 'html2canvas'
+import { trackStat } from '../utils/api'
 
 export default function CardViewPage() {
   const [searchParams] = useSearchParams()
@@ -57,6 +58,7 @@ export default function CardViewPage() {
       link.download = `بطاقة-${name}.png`
       link.href = canvas.toDataURL('image/png')
       link.click()
+      trackStat('downloads')
     }
     img.src = template.image
   }
@@ -91,7 +93,7 @@ export default function CardViewPage() {
 
       {/* Card Content */}
       <div className={`relative z-10 max-w-md w-full transition-all duration-1000 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-        
+
         {/* Header greeting */}
         <div className="text-center mb-8">
           <p className="text-purple-400/70 text-sm mb-2">بطاقة تهنئة خاصة بـ</p>

@@ -4,7 +4,7 @@ import { Stage, Layer, Rect, Text, Image as KonvaImage, Group, Circle } from 're
 import { useEditorStore, useCompanyStore } from '../store'
 import { templates as staticTemplates, fonts, designerOnlyTemplates as staticDesignerTemplates } from '../data/templates'
 import { greetingTexts } from '../data/texts'
-import { getTemplates } from '../utils/api'
+import { getTemplates, trackStat } from '../utils/api'
 import { useCompany } from '../context/CompanyContext'
 import { calligraphy, calligraphyCategories } from '../data/calligraphy'
 import { BsDownload, BsFilePdf, BsWhatsapp, BsLink45Deg, BsShareFill, BsCheck2, BsPencilFill, BsStars, BsSearch, BsPersonCircle, BsImage, BsChatLeftText, BsSliders, BsPlusLg, BsX, BsArrowLeft, BsInfoCircle, BsBuilding, BsPeople, BsFileEarmarkText, BsCloudDownload } from 'react-icons/bs'
@@ -341,6 +341,7 @@ export default function EditorPage() {
       link.click()
       document.body.removeChild(link)
       toast.success('تم التحميل بنجاح')
+      trackStat('downloads')
     } catch { toast.error('حدث خطأ') }
   }, [])
 
@@ -353,6 +354,7 @@ export default function EditorPage() {
       pdf.addImage(uri, 'PNG', 0, 0, 1080, 1080)
       pdf.save(`eid-greeting-${Date.now()}.pdf`)
       toast.success('تم تحميل PDF')
+      trackStat('downloads')
     } catch { toast.error('خطأ في التصدير') }
   }, [])
 

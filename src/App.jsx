@@ -1,4 +1,6 @@
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { trackStat } from './utils/api'
 import Navbar from './components/Layout/Navbar'
 import Footer from './components/Layout/Footer'
 import WhatsAppFloat from './components/WhatsAppFloat'
@@ -41,6 +43,14 @@ export default function App() {
   const location = useLocation()
   const { pathname } = location
   const showParticles = location.pathname === '/' || location.pathname === '/dashboard'
+
+  useEffect(() => {
+    const tracked = sessionStorage.getItem('sallim_tracked')
+    if (!tracked) {
+      trackStat('uniqueVisitors')
+      sessionStorage.setItem('sallim_tracked', 'true')
+    }
+  }, [])
 
   const hideWhatsAppFloat = [
     '/editor',

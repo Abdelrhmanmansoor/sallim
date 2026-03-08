@@ -17,8 +17,9 @@ router.get('/', async (req, res) => {
         cardsCreated: acc.cardsCreated + s.cardsCreated,
         cardViews: acc.cardViews + s.cardViews,
         uniqueVisitors: acc.uniqueVisitors + s.uniqueVisitors,
+        downloads: (acc.downloads || 0) + (s.downloads || 0),
       }),
-      { cardsCreated: 0, cardViews: 0, uniqueVisitors: 0 }
+      { cardsCreated: 0, cardViews: 0, uniqueVisitors: 0, downloads: 0 }
     )
 
     res.json({
@@ -28,6 +29,23 @@ router.get('/', async (req, res) => {
         daily: stats,
       },
     })
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'حدث خطأ' })
+  }
+})
+
+// ═══ Increment a specific stat ═══
+router.post('/increment', async (req, res) => {
+  try {
+    const { field } = req.body
+    const allowedFields = ['cardsCreated', 'cardViews', 'uniqueVisitors', 'downloads']
+
+    if (!field || !allowedFields.includes(field)) {
+      return res.status(400).json({ success: false, error: 'حقل غير صالح' })
+    }
+
+    await Stats.incrementToday(field)
+    res.json({ success: true })
   } catch (error) {
     res.status(500).json({ success: false, error: 'حدث خطأ' })
   }
