@@ -1,4 +1,7 @@
-import { getFamilyData, createFamilyStory, joinFamily, apiRequest, getEidiyaRequests, updateEidiyaRequestStatus, deleteFamilyStory, deleteFamilyMember } from '../utils/api';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { ArrowLeft, Copy, Eye, EyeOff, Trash2, MessageCircle, Loader2, Plus, Users, BookOpen, HandCoins, Settings, ChevronLeft, Calendar, Gamepad2, Gift } from 'lucide-react';
+import { getDiwaniya, getDiwaniyaManage, getUserProfile, updateDiwaniyaGreetingVisibility, deleteDiwaniyaGreeting, updateDiwaniyaSettings, getFamilyData, createFamilyStory, joinFamily, apiRequest, getEidiyaRequests, updateEidiyaRequestStatus, deleteFamilyStory, deleteFamilyMember } from '../utils/api';
 
 export default function DiwaniyaDashboardPage() {
     const navigate = useNavigate();
@@ -50,41 +53,39 @@ export default function DiwaniyaDashboardPage() {
         loadInitialData();
 
         // Then fetch latest user profile to ensure we have the newest diwaniyas
-        import('../utils/api').then(({ getUserProfile }) => {
-            getUserProfile()
-                .then(res => {
-                    if (res.success && res.data) {
-                        // Update localStorage with fresh data
-                        localStorage.setItem('user', JSON.stringify(res.data));
+        getUserProfile()
+            .then(res => {
+                if (res.success && res.data) {
+                    // Update localStorage with fresh data
+                    localStorage.setItem('user', JSON.stringify(res.data));
 
-                        if (res.data.diwaniyas && res.data.diwaniyas.length > 0) {
-                            // If we didn't already load a diwaniya from local storage, 
-                            // or if we want to ensure we have all of them loaded into state:
-                            setDiwaniyas(res.data.diwaniyas);
+                    if (res.data.diwaniyas && res.data.diwaniyas.length > 0) {
+                        // If we didn't already load a diwaniya from local storage, 
+                        // or if we want to ensure we have all of them loaded into state:
+                        setDiwaniyas(res.data.diwaniyas);
 
-                            // If this is the first load and we previously had no diwaniyas, load the first one
-                            setDiwaniya(prevDiwaniya => {
-                                if (!prevDiwaniya) {
-                                    const username = res.data.diwaniyas[0].username;
-                                    getDiwaniyaManage(username)
-                                        .then(dRes => {
-                                            if (dRes.success) {
-                                                setDiwaniya(dRes.data);
-                                                setGreetings(dRes.data.greetings || []);
-                                            }
-                                        })
-                                        .catch(err => console.error('Error fetching diwaniya:', err))
-                                        .finally(() => setLoading(false));
+                        // If this is the first load and we previously had no diwaniyas, load the first one
+                        setDiwaniya(prevDiwaniya => {
+                            if (!prevDiwaniya) {
+                                const username = res.data.diwaniyas[0].username;
+                                getDiwaniyaManage(username)
+                                    .then(dRes => {
+                                        if (dRes.success) {
+                                            setDiwaniya(dRes.data);
+                                            setGreetings(dRes.data.greetings || []);
+                                        }
+                                    })
+                                    .catch(err => console.error('Error fetching diwaniya:', err))
+                                    .finally(() => setLoading(false));
 
-                                    return res.data.diwaniyas[0];
-                                }
-                                return prevDiwaniya;
-                            });
-                        }
+                                return res.data.diwaniyas[0];
+                            }
+                            return prevDiwaniya;
+                        });
                     }
-                })
-                .catch(err => console.error('Error fetching fresh user profile:', err));
-        });
+                }
+            })
+            .catch(err => console.error('Error fetching fresh user profile:', err));
     }, []);
 
     useEffect(() => {

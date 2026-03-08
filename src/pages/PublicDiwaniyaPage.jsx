@@ -39,7 +39,7 @@ export default function PublicDiwaniyaPage() {
                 }
                 setDiwaniya(res.data);
 
-                if (res.data.isFamilyMode) {
+                if (res.data?.isFamilyMode) {
                     const familyRes = await getFamilyData(username);
                     if (familyRes.success) {
                         setFamilyData(familyRes.data);
@@ -501,11 +501,11 @@ export default function PublicDiwaniyaPage() {
                             {/* Family Members */}
                             <div id="family-members" style={{ marginTop: '80px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
-                                    <h3 style={{ fontSize: '24px', fontWeight: 700 }}>أفراد العائلة ({familyData.familyMembers?.length || 0})</h3>
+                                    <h3 style={{ fontSize: '24px', fontWeight: 700 }}>أفراد العائلة ({familyData?.familyMembers?.length || 0})</h3>
                                     <Users size={24} color="#a3a3a3" />
                                 </div>
                                 <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', padding: '10px 0', scrollbarWidth: 'none' }}>
-                                    {familyData.familyMembers?.map(member => (
+                                    {familyData?.familyMembers?.map(member => (
                                         <div key={member._id} style={{ flexShrink: 0, textAlign: 'center', width: '80px' }}>
                                             <div style={{ width: '64px', height: '64px', borderRadius: '20px', background: '#171717', margin: '0 auto 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '20px', fontWeight: 700 }}>
                                                 {member.avatar ? <img src={member.avatar} style={{ width: '100%', height: '100%', borderRadius: '20px', objectFit: 'cover' }} /> : member.name.charAt(0)}
