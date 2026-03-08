@@ -50,6 +50,7 @@ const familyStorySchema = Joi.object({
         'string.max': 'القصة طويلة جداً (1000 حرف كحد أقصى)',
         'any.required': 'القصة مطلوبة'
     }),
+    type: Joi.string().valid('memory', 'update').required(),
     author: Joi.string().max(50).optional()
 });
 
@@ -263,7 +264,7 @@ router.get('/:username/family-data', async (req, res) => {
     try {
         const cacheKey = `family-${req.params.username}`;
         const cached = cache.get(cacheKey);
-        
+
         if (cached) {
             return res.json({ success: true, data: cached, cached: true });
         }

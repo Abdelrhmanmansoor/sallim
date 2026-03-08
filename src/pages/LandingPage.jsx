@@ -260,21 +260,22 @@ export default function LandingPage() {
             background: '#0a0a0a',
             borderTop: '1px solid rgba(255,255,255,0.05)',
             borderBottom: '1px solid rgba(255,255,255,0.05)',
-            padding: '12px 0',
+            padding: '14px 0',
             overflow: 'hidden',
             position: 'relative',
-            width: '100%'
+            width: '100%',
+            direction: 'rtl'
           }}
         >
           <style>{`
-            @keyframes scroll {
+            @keyframes scroll-ticker {
               0% { transform: translateX(0); }
-              100% { transform: translateX(-50%); }
+              100% { transform: translateX(50%); }
             }
             .ticker-container {
-              width: 200%;
               display: flex;
-              animation: scroll 40s linear infinite;
+              width: max-content;
+              animation: scroll-ticker 40s linear infinite;
             }
             .ticker-container:hover {
               animation-play-state: paused;
@@ -282,36 +283,47 @@ export default function LandingPage() {
             .ticker-item {
               display: flex;
               align-items: center;
-              padding: '0 32px',
-              color: 'rgba(255,255,255,0.8)',
-              fontSize: '14px',
-              fontWeight: 500,
-              whiteSpace: nowrap;
-              flex-shrink: 0;
+              padding-left: 32px;
+              color: rgba(255,255,255,0.85);
+              font-size: 16px;
+              font-weight: 500;
+              white-space: nowrap;
             }
-            .ticker-item-dot {
-              width: '4px',
-              height: '4px',
-              background: 'rgba(255,255,255,0.3)',
-              borderRadius: '50%',
-              flex-shrink: 0;
+            .ticker-item-separator {
+              margin-right: 32px;
+              color: rgba(255,215,0,0.6);
+              font-size: 18px;
+              user-select: none;
+            }
+            @media (max-width: 768px) {
+              .ticker-item {
+                 padding-left: 20px;
+                 font-size: 14px;
+              }
+              .ticker-item-separator {
+                 margin-right: 20px;
+                 font-size: 14px;
+              }
+              .ticker-container {
+                 animation-duration: 25s;
+              }
             }
           `}</style>
           <div className="ticker-container">
             {[...Array(2)].fill().map((_, setIndex) => (
-              <div key={setIndex} style={{ display: 'flex', whiteSpace: 'nowrap' }}>
+              <div key={setIndex} style={{ display: 'flex' }}>
                 {[
                   { text: 'تم إضافة لعبة العيدية التفاعلية - انشئ تحدياتك الخاصة' },
                   { text: 'جاري إضافة ثيمات وقوالب جديدة بشكل مستمر' },
                   { text: 'تم إضافة فكرة الديوانية - اطلق ديوانيتك الآن' },
-                  { text: 'للشركات التي تريد تركب النظام تواصل معنا عبر واتساب', link: true },
+                  { text: 'للشركات والمؤسسات التي تريد تخصيص النظام تواصل معنا' },
                   { text: 'اكتشف الميزات الجديدة في نسخة العيد 2026' },
                 ].map((item, index) => (
                   <div key={`${setIndex}-${index}`} className="ticker-item">
-                    <div className="ticker-item-dot" />
-                    <span style={{ color: item.link ? '#FFD700' : 'rgba(255,255,255,0.8)' }}>
+                    <span style={{ color: item.link ? '#FFD700' : 'rgba(255,255,255,0.85)' }}>
                       {item.text}
                     </span>
+                    <span className="ticker-item-separator">✧</span>
                   </div>
                 ))}
               </div>

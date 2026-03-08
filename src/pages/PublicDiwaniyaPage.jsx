@@ -731,54 +731,150 @@ export default function PublicDiwaniyaPage() {
 
             {/* EIDIYA REQUEST MODAL */}
             {showEidiyaRequest && (
-                <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-                    <div style={{ background: '#fff', width: '100%', maxWidth: '500px', borderRadius: '24px', padding: '40px', position: 'relative' }}>
-                        <button onClick={() => setShowEidiyaRequest(false)} style={{ position: 'absolute', top: '24px', left: '24px', background: 'none', border: 'none', cursor: 'pointer', color: '#a3a3a3' }}>
-                            <X size={24} />
+                <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+                    <div style={{
+                        background: '#171717',
+                        width: '100%',
+                        maxWidth: '500px',
+                        borderRadius: '32px',
+                        padding: '48px 40px',
+                        position: 'relative',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+                    }}>
+                        <button
+                            onClick={() => setShowEidiyaRequest(false)}
+                            style={{ position: 'absolute', top: '24px', left: '24px', background: 'rgba(255,255,255,0.05)', border: 'none', cursor: 'pointer', color: '#fff', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                            <X size={20} />
                         </button>
 
-                        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                            <div style={{ width: '64px', height: '64px', background: '#fff7ed', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                                <HandCoins size={32} color="#FF8C00" />
+                        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+                            <div style={{
+                                width: '80px',
+                                height: '80px',
+                                background: 'linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,140,0,0.1) 100%)',
+                                borderRadius: '24px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                margin: '0 auto 20px',
+                                border: '1px solid rgba(255,140,0,0.2)'
+                            }}>
+                                <Gift size={40} color="#FFD700" />
                             </div>
-                            <h2 style={{ fontSize: '24px', fontWeight: 800 }}>اطلب عيديتك</h2>
-                            <p style={{ color: '#737373' }}>أرسل طلباً لطيفاً لصاحب الديوانية</p>
+                            <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>قدم طلب عيدية</h2>
+                            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '16px' }}>أرسل طلباً لطيفاً وبإذن الله ما يقصرون معك</p>
                         </div>
 
-                        <form onSubmit={handleEidiyaRequest} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            <input
-                                required
-                                type="text"
-                                placeholder="اسمك الكريم"
-                                value={eidiyaRequestForm.requesterName}
-                                onChange={e => setEidiyaRequestForm({ ...eidiyaRequestForm, requesterName: e.target.value })}
-                                style={{ padding: '16px', background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: '12px', fontSize: '15px' }}
-                            />
-                            <div style={{ position: 'relative' }}>
+                        <form onSubmit={handleEidiyaRequest} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <label style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', fontWeight: 600, marginRight: '8px' }}>الاسم</label>
                                 <input
                                     required
-                                    type="number"
-                                    placeholder="المبلغ المقترح"
-                                    value={eidiyaRequestForm.amount}
-                                    onChange={e => setEidiyaRequestForm({ ...eidiyaRequestForm, amount: e.target.value })}
-                                    style={{ padding: '16px', paddingLeft: '60px', width: '100%', background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: '12px', fontSize: '15px' }}
+                                    type="text"
+                                    placeholder="اسمك الكريم"
+                                    value={eidiyaRequestForm.requesterName}
+                                    onChange={e => setEidiyaRequestForm({ ...eidiyaRequestForm, requesterName: e.target.value })}
+                                    style={{
+                                        padding: '18px 20px',
+                                        background: 'rgba(255,255,255,0.05)',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        borderRadius: '16px',
+                                        fontSize: '16px',
+                                        color: '#fff',
+                                        outline: 'none',
+                                        transition: 'all 200ms ease'
+                                    }}
+                                    onFocus={(e) => e.target.style.borderColor = '#FFD700'}
+                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
                                 />
-                                <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: 700, color: '#a3a3a3' }}>ريال</span>
                             </div>
-                            <textarea
-                                placeholder="رسالة لطيقة (اختياري)"
-                                value={eidiyaRequestForm.message}
-                                onChange={e => setEidiyaRequestForm({ ...eidiyaRequestForm, message: e.target.value })}
-                                style={{ padding: '16px', background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: '12px', fontSize: '15px', resize: 'none' }}
-                                rows={3}
-                            ></textarea>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <label style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', fontWeight: 600, marginRight: '8px' }}>المبلغ (ريال)</label>
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        required
+                                        type="number"
+                                        placeholder="المبلغ المقترح"
+                                        value={eidiyaRequestForm.amount}
+                                        onChange={e => setEidiyaRequestForm({ ...eidiyaRequestForm, amount: e.target.value })}
+                                        style={{
+                                            padding: '18px 20px',
+                                            paddingLeft: '60px',
+                                            width: '100%',
+                                            background: 'rgba(255,255,255,0.05)',
+                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            borderRadius: '16px',
+                                            fontSize: '16px',
+                                            color: '#fff',
+                                            outline: 'none'
+                                        }}
+                                        onFocus={(e) => e.target.style.borderColor = '#FFD700'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                                    />
+                                    <div style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', fontWeight: 700, color: '#FFD700' }}>SR</div>
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <label style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', fontWeight: 600, marginRight: '8px' }}>الرسالة</label>
+                                <textarea
+                                    placeholder="أكتب رسالة لطيفة تهنئهم فيها بالعيد..."
+                                    value={eidiyaRequestForm.message}
+                                    onChange={e => setEidiyaRequestForm({ ...eidiyaRequestForm, message: e.target.value })}
+                                    style={{
+                                        padding: '18px 20px',
+                                        background: 'rgba(255,255,255,0.05)',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        borderRadius: '16px',
+                                        fontSize: '16px',
+                                        color: '#fff',
+                                        outline: 'none',
+                                        resize: 'none',
+                                        minHeight: '100px'
+                                    }}
+                                    onFocus={(e) => e.target.style.borderColor = '#FFD700'}
+                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                                    rows={3}
+                                ></textarea>
+                            </div>
 
                             <button
                                 type="submit"
                                 disabled={requestStatus === 'loading'}
-                                style={{ padding: '18px', background: requestStatus === 'success' ? '#10b981' : 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)', color: '#fff', fontSize: '18px', fontWeight: 700, border: 'none', borderRadius: '12px', cursor: 'pointer', transition: 'all 200ms ease' }}
+                                style={{
+                                    padding: '20px',
+                                    background: requestStatus === 'success' ? '#10b981' : 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)',
+                                    color: '#171717',
+                                    fontSize: '18px',
+                                    fontWeight: 800,
+                                    border: 'none',
+                                    borderRadius: '18px',
+                                    cursor: 'pointer',
+                                    transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+                                    boxShadow: requestStatus === 'success' ? 'none' : '0 10px 20px -10px rgba(255, 140, 0, 0.5)',
+                                    marginTop: '12px'
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (requestStatus !== 'loading') {
+                                        e.currentTarget.style.transform = 'translateY(-2px)';
+                                        e.currentTarget.style.boxShadow = '0 15px 30px -10px rgba(255, 140, 0, 0.6)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = '0 10px 20px -10px rgba(255, 140, 0, 0.5)';
+                                }}
                             >
-                                {requestStatus === 'loading' ? 'جاري الإرسال...' : requestStatus === 'success' ? 'تم تقديم الطلب بنجاح ✅' : 'إرسال الطلب ✨'}
+                                {requestStatus === 'loading' ? (
+                                    <Loader2 size={24} style={{ animation: 'spin 1s linear infinite', margin: '0 auto' }} />
+                                ) : requestStatus === 'success' ? (
+                                    'تم إرسال طلبك بنجاح ✅'
+                                ) : (
+                                    'إرسال طلب العيدية ✨'
+                                )}
                             </button>
                         </form>
                     </div>

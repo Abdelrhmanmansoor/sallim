@@ -601,43 +601,113 @@ export default function DiwaniyaDashboardPage() {
 
                 {/* REQUESTS TAB Content */}
                 {activeTab === 'requests' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <h3 style={{ fontSize: '20px', fontWeight: 700 }}>طلبات العيدية ({eidiyaRequests.length})</h3>
-                            <div style={{ padding: '8px 16px', background: '#fff7ed', borderRadius: '10px', fontSize: '13px', color: '#ea580c', fontWeight: 600 }}>
-                                إجمالي المبالغ المطلوبة: {eidiyaRequests.reduce((sum, r) => sum + (r.amount || 0), 0)} ريال
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                        {/* Summary Card */}
+                        <div style={{
+                            background: 'linear-gradient(135deg, #171717 0%, #262626 100%)',
+                            padding: '40px',
+                            borderRadius: '24px',
+                            color: '#fff',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                        }}>
+                            <div>
+                                <h3 style={{ fontSize: '24px', fontWeight: 800, marginBottom: '8px', color: '#FFD700' }}>طلبات العيدية</h3>
+                                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '16px' }}>إجمالي الطلبات المستلمة حتى الآن</p>
+                            </div>
+                            <div style={{ textAlign: 'left' }}>
+                                <div style={{ fontSize: '48px', fontWeight: 900, color: '#fff' }}>
+                                    {eidiyaRequests.length} <span style={{ fontSize: '20px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>طلب</span>
+                                </div>
+                                <div style={{ fontSize: '18px', fontWeight: 700, color: '#fb923c' }}>
+                                    إجمالي: {eidiyaRequests.reduce((sum, r) => sum + (r.amount || 0), 0)} ريال
+                                </div>
                             </div>
                         </div>
 
                         {eidiyaRequests.length > 0 ? (
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
                                 {eidiyaRequests.map(request => (
-                                    <div key={request._id} style={{ background: '#fff', padding: '24px', borderRadius: '24px', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                                            <div>
-                                                <div style={{ fontWeight: 800, fontSize: '18px' }}>{request.requesterName}</div>
-                                                <div style={{ fontSize: '12px', color: '#94a3b8' }}>{formatDate(request.createdAt)}</div>
+                                    <div key={request._id} style={{
+                                        background: '#fff',
+                                        padding: '28px',
+                                        borderRadius: '24px',
+                                        border: '1px solid #e2e8f0',
+                                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
+                                        transition: 'transform 200ms ease'
+                                    }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                                <div style={{ width: '48px', height: '48px', background: '#f8fafc', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#171717', fontWeight: 800, fontSize: '20px', border: '1px solid #e2e8f0' }}>
+                                                    {request.requesterName?.charAt(0)}
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontWeight: 800, fontSize: '18px', color: '#171717' }}>{request.requesterName}</div>
+                                                    <div style={{ fontSize: '12px', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                        <Calendar size={12} /> {formatDate(request.createdAt)}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div style={{ padding: '8px 16px', background: '#171717', color: '#fff', borderRadius: '10px', fontWeight: 800, fontSize: '16px' }}>
+                                            <div style={{
+                                                padding: '8px 16px',
+                                                background: '#fff7ed',
+                                                color: '#c2410c',
+                                                borderRadius: '12px',
+                                                fontWeight: 800,
+                                                fontSize: '18px',
+                                                border: '1px solid #ffedd5'
+                                            }}>
                                                 {request.amount} ريال
                                             </div>
                                         </div>
 
                                         {request.message && (
-                                            <div style={{ padding: '12px', background: '#f8fafc', borderRadius: '12px', fontSize: '14px', color: '#475569', marginBottom: '20px', borderRight: '3px solid #e2e8f0' }}>
+                                            <div style={{
+                                                padding: '16px',
+                                                background: '#f8fafc',
+                                                borderRadius: '16px',
+                                                fontSize: '14px',
+                                                color: '#475569',
+                                                marginBottom: '24px',
+                                                lineHeight: 1.6,
+                                                fontStyle: 'italic',
+                                                borderRight: '4px solid #e2e8f0'
+                                            }}>
                                                 "{request.message}"
                                             </div>
                                         )}
 
-                                        <div style={{ display: 'flex', gap: '10px' }}>
+                                        <div style={{ display: 'flex', gap: '12px' }}>
                                             {request.status === 'pending' ? (
                                                 <>
-                                                    <button onClick={() => handleRequestStatus(request._id, 'approved')} style={{ flex: 1, padding: '10px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer' }}>موافق ✅</button>
-                                                    <button onClick={() => handleRequestStatus(request._id, 'rejected')} style={{ flex: 1, padding: '10px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer' }}>رفض ❌</button>
+                                                    <button
+                                                        onClick={() => handleRequestStatus(request._id, 'approved')}
+                                                        style={{ flex: 1, padding: '14px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '14px', fontWeight: 700, cursor: 'pointer', transition: 'all 200ms ease' }}
+                                                        onMouseEnter={(e) => e.target.style.opacity = '0.9'}
+                                                        onMouseLeave={(e) => e.target.style.opacity = '1'}
+                                                    >موافق ✅</button>
+                                                    <button
+                                                        onClick={() => handleRequestStatus(request._id, 'rejected')}
+                                                        style={{ flex: 1, padding: '14px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '14px', fontWeight: 700, cursor: 'pointer', transition: 'all 200ms ease' }}
+                                                        onMouseEnter={(e) => e.target.style.opacity = '0.9'}
+                                                        onMouseLeave={(e) => e.target.style.opacity = '1'}
+                                                    >رفض ❌</button>
                                                 </>
                                             ) : (
-                                                <div style={{ flex: 1, textAlign: 'center', padding: '10px', background: request.status === 'approved' ? '#dcfce7' : '#fee2e2', color: request.status === 'approved' ? '#166534' : '#991b1b', borderRadius: '10px', fontWeight: 700, fontSize: '14px' }}>
-                                                    {request.status === 'approved' ? 'تمت الموافقة ✅' : 'تم الرفض ❌'}
+                                                <div style={{
+                                                    flex: 1,
+                                                    textAlign: 'center',
+                                                    padding: '14px',
+                                                    background: request.status === 'approved' ? '#dcfce7' : '#fee2e2',
+                                                    color: request.status === 'approved' ? '#166534' : '#991b1b',
+                                                    borderRadius: '14px',
+                                                    fontWeight: 800,
+                                                    fontSize: '15px',
+                                                    border: `1px solid ${request.status === 'approved' ? '#bbf7d0' : '#fecaca'}`
+                                                }}>
+                                                    {request.status === 'approved' ? 'تمت الموافقة بنجاح ✨ ✅' : 'تم الرفض ❌'}
                                                 </div>
                                             )}
                                         </div>
@@ -645,9 +715,12 @@ export default function DiwaniyaDashboardPage() {
                                 ))}
                             </div>
                         ) : (
-                            <div style={{ textAlign: 'center', padding: '80px 40px', background: '#fff', borderRadius: '24px', border: '1px solid #e2e8f0', color: '#94a3b8' }}>
-                                <HandCoins size={48} style={{ marginBottom: '16px', opacity: 0.3 }} />
-                                <p>لا توجد طلبات عيدية حتى الآن</p>
+                            <div style={{ textAlign: 'center', padding: '100px 40px', background: '#fff', borderRadius: '32px', border: '1px solid #e2e8f0', color: '#94a3b8' }}>
+                                <div style={{ width: '80px', height: '80px', background: '#f8fafc', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+                                    <HandCoins size={40} style={{ opacity: 0.2 }} />
+                                </div>
+                                <h4 style={{ fontSize: '20px', fontWeight: 700, color: '#171717', marginBottom: '8px' }}>لا توجد طلبات عيدية</h4>
+                                <p>عندما يطلب زوارك عيدية ستظهر طلباتهم هنا بالتفصيل</p>
                             </div>
                         )}
                     </div>

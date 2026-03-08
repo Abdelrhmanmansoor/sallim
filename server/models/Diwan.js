@@ -137,6 +137,11 @@ const diwaniyaSchema = new mongoose.Schema({
             trim: true,
             maxlength: 1000
         },
+        type: {
+            type: String,
+            enum: ['memory', 'update'],
+            default: 'memory'
+        },
         author: {
             type: String,
             trim: true
