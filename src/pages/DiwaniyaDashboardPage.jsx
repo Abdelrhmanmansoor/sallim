@@ -319,22 +319,31 @@ export default function DiwaniyaDashboardPage() {
                                     واتساب
                                 </button>
                                 <Link
-                                    to={`/${diwaniya.username}/game`}
+                                    to="/create-game"
                                     style={{
                                         display: 'inline-flex',
                                         alignItems: 'center',
                                         gap: '6px',
                                         padding: '10px 20px',
-                                        background: '#f59e0b',
-                                        color: '#fff',
+                                        background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)',
+                                        color: '#171717',
                                         fontSize: '14px',
                                         fontWeight: 600,
                                         borderRadius: '10px',
                                         textDecoration: 'none',
                                         transition: 'all 200ms ease',
+                                        boxShadow: '0 2px 8px rgba(255, 140, 0, 0.2)',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-2px)';
+                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 140, 0, 0.3)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 140, 0, 0.2)';
                                     }}
                                 >
-                                    لعبة العيدية
+                                    🎲 لعبة العيدية
                                 </Link>
                             </div>
                         </div>
