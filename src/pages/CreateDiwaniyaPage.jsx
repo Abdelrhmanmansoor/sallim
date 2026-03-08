@@ -78,7 +78,7 @@ export default function CreateDiwaniyaPage() {
         <div style={{ fontFamily: "'Tajawal', sans-serif" }}>
 
             {/* HERO */}
-            <section style={{ background: '#171717', padding: '100px 24px', textAlign: 'center' }}>
+            <section style={{ background: '#171717', padding: '120px 24px 80px', textAlign: 'center' }}>
                 <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                     <div
                         style={{

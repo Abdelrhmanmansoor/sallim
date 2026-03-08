@@ -245,7 +245,7 @@ export default function DiwaniyaDashboardPage() {
         <div style={{ fontFamily: "'Tajawal', sans-serif", background: '#f8fafc', minHeight: '100vh' }}>
 
             {/* HERO / HEADER */}
-            <header style={{ background: '#171717', color: '#fff', padding: '60px 24px' }}>
+            <header style={{ background: '#171717', color: '#fff', padding: '100px 24px 60px' }}>
                 <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '24px' }}>
                     <div>
                         <div style={{ display: 'inline-flex', padding: '6px 16px', background: 'rgba(255,140,0,0.1)', borderRadius: '100px', color: '#fb923c', fontSize: '13px', fontWeight: 700, marginBottom: '16px', border: '1px solid rgba(251,146,60,0.2)' }}>
@@ -267,7 +267,7 @@ export default function DiwaniyaDashboardPage() {
             </header>
 
             {/* TABS NAVIGATION */}
-            <nav style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', position: 'sticky', top: 0, zIndex: 100 }}>
+            <nav style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', position: 'sticky', top: '64px', zIndex: 100 }}>
                 <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', overflowX: 'auto', padding: '0 24px', scrollbarWidth: 'none' }}>
                     {[
                         { id: 'greetings', label: 'التهاني', icon: MessageCircle },
@@ -436,7 +436,7 @@ export default function DiwaniyaDashboardPage() {
                                         transition: 'all 300ms ease',
                                     }}
                                 >
-                                    <div style={{ position: 'absolute', top: '4px', right: diwaniya?.isFamilyMode ? '4px' : '32px', width: '20px', height: '20px', background: '#fff', borderRadius: '50%', transition: 'all 300ms ease' }} />
+                                    <div style={{ position: 'absolute', top: '4px', left: diwaniya?.isFamilyMode ? '4px' : '32px', width: '20px', height: '20px', background: '#fff', borderRadius: '50%', transition: 'all 300ms ease' }} />
                                 </button>
                             </div>
 

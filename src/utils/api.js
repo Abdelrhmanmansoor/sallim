@@ -373,6 +373,15 @@ export async function likeDiwanGreeting(username, greetId) {
   })
 }
 
+/**
+ * Public: Record a real view for a Diwan
+ */
+export async function recordDiwanView(username) {
+  return apiRequest(`/diwan/${username}/view`, {
+    method: 'POST'
+  })
+}
+
 // ═════════════════════════════════════════════
 // DIWANIYAT AL-EID (Anonymous Greetings)
 // ═════════════════════════════════════════════

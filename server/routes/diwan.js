@@ -57,13 +57,30 @@ router.get('/:username', async (req, res) => {
             return res.status(404).json({ success: false, error: 'لا يوجد ديوان بهذا الاسم' });
         }
 
-        // Increment views
-        diwan.views += 1;
-        await diwan.save();
-
         res.json({ success: true, data: diwan });
     } catch (error) {
         res.status(500).json({ success: false, error: 'حدث خطأ في النظام' });
+    }
+});
+
+// ═══ Record a view for a Diwan ═══
+router.post('/:username/view', async (req, res) => {
+    try {
+        const username = req.params.username.toLowerCase().trim();
+
+        const diwan = await Diwan.findOneAndUpdate(
+            { username },
+            { $inc: { views: 1 } },
+            { new: true }
+        );
+
+        if (!diwan) {
+            return res.status(404).json({ success: false, error: 'لا يوجد ديوان بهذا الاسم' });
+        }
+
+        res.json({ success: true, data: { views: diwan.views } });
+    } catch (error) {
+        res.status(500).json({ success: false, error: 'حدث خطأ في نظام الزيارات' });
     }
 });
 

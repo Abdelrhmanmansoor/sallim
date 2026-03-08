@@ -71,7 +71,7 @@ function ProfilePage() {
 
     try {
       let avatarData = formData.avatar
-      
+
       if (avatarFile) {
         const uploadRes = await uploadAvatar(avatarFile)
         avatarData = uploadRes.data.url
@@ -86,7 +86,7 @@ function ProfilePage() {
       setUser(response.data)
       setEditing(false)
       setMessage({ text: 'تم تحديث البروفايل بنجاح!', type: 'success' })
-      
+
       // Update localStorage
       localStorage.setItem('user', JSON.stringify(response.data))
       window.dispatchEvent(new Event('storage'))
@@ -144,7 +144,7 @@ function ProfilePage() {
   return (
     <div style={{ fontFamily: "'Tajawal', sans-serif" }}>
       {/* HERO */}
-      <section style={{ background: '#171717', padding: '100px 24px', textAlign: 'center' }}>
+      <section style={{ background: '#171717', padding: '120px 24px 80px', textAlign: 'center' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <div
             style={{
@@ -269,7 +269,7 @@ function ProfilePage() {
             )}
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <label style={{ fontSize: '14px', fontWeight: 600, color: '#171717' }}>الاسم</label>
                 <input

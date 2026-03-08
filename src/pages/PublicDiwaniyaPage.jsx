@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getDiwaniya, addDiwaniyaGreeting, likeDiwaniyaGreeting, recordDiwaniyaView } from '../utils/api';
-import { ArrowLeft, Send, Heart, Calendar, Share2, MessageCircle, Loader2, Download, Gift, X, Users, BookOpen, HandCoins } from 'lucide-react';
+import { ArrowLeft, Send, Heart, Calendar, Share2, MessageCircle, Loader2, Download, Gift, X, Users, BookOpen, HandCoins, User, Eye, EyeOff, Shield } from 'lucide-react';
 import DiwaniyaImageGenerator from '../components/DiwaniyaImageGenerator';
 import EidiyaGame from '../components/EidiyaGame';
 import { getFamilyData, createEidiyaRequest } from '../utils/api';
@@ -13,7 +13,7 @@ export default function PublicDiwaniyaPage() {
     const [error, setError] = useState(null);
     const [newGreeting, setNewGreeting] = useState(null);
 
-    const [formState, setFormState] = useState({ senderName: '', message: '', isAnonymous: true, senderAvatar: '' });
+    const [formState, setFormState] = useState({ senderName: '', message: '', isAnonymous: false, senderAvatar: '' });
     const [familyData, setFamilyData] = useState(null);
     const [showGame, setShowGame] = useState(false);
     const [showEidiyaRequest, setShowEidiyaRequest] = useState(false);
@@ -86,7 +86,7 @@ export default function PublicDiwaniyaPage() {
 
     const handleShare = (platform) => {
         const url = window.location.href;
-        const text = `أرسلت لك تهنئة العيد في ديوانيتي، شاركني فرحتك هنا: ${url}`;
+        const text = `عيدكم مبارك! استقبل تهانيكم في ديوانيتي الخاصة على منصة سَلِّم. بانتظار كلماتكم الجميلة 🌙✨: \n\n ${url}`;
 
         switch (platform) {
             case 'whatsapp':
@@ -118,7 +118,7 @@ export default function PublicDiwaniyaPage() {
                     greetings: [res.data, ...prev.greetings],
                     totalGreetings: prev.totalGreetings + 1
                 }));
-                setFormState({ senderName: '', message: '', isAnonymous: true, senderAvatar: formState.senderAvatar });
+                setFormState({ senderName: '', message: '', isAnonymous: false, senderAvatar: formState.senderAvatar });
                 setSubmitStatus('success');
                 setTimeout(() => {
                     setSubmitStatus('idle');
@@ -193,7 +193,7 @@ export default function PublicDiwaniyaPage() {
         <div style={{ fontFamily: "'Tajawal', sans-serif" }}>
 
             {/* HERO */}
-            <section style={{ background: '#171717', padding: '100px 24px', textAlign: 'center' }}>
+            <section style={{ background: '#171717', padding: '120px 24px 80px', textAlign: 'center' }}>
                 <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                     <div
                         style={{
@@ -222,7 +222,10 @@ export default function PublicDiwaniyaPage() {
                     </h1>
 
                     <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.6)', maxWidth: '500px', margin: '0 auto 32px', lineHeight: 1.7 }}>
-                        اترك بصمتك الجميلة بتهنئة خاصة في ديوانية العيد
+                        اترك بصمتك الجميلة بتهنئة خاصة في ديوانية العيد.
+                    </p>
+                    <p style={{ fontSize: '14px', color: '#a3a3a3', marginTop: '12px', fontWeight: 500 }}>
+                        الديوانية: ركن رقمي مخصص لاستقبال ومعاينة تهاني العيد من الأصدقاء والمقربين.
                     </p>
 
                     <div style={{ display: 'flex', justifyContent: 'center', gap: '48px', flexWrap: 'wrap' }}>
@@ -240,7 +243,7 @@ export default function PublicDiwaniyaPage() {
 
             {/* FAMILY MODE NAVIGATION (Only if active) */}
             {diwaniya.isFamilyMode && (
-                <section style={{ background: '#fff', borderBottom: '1px solid #e5e5e5', position: 'sticky', top: 0, zIndex: 100 }}>
+                <section style={{ background: '#fff', borderBottom: '1px solid #e5e5e5', position: 'sticky', top: '64px', zIndex: 100 }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', justifyContent: 'center', gap: '24px', padding: '0 24px', overflowX: 'auto', scrollbarWidth: 'none' }}>
                         <button
                             onClick={() => setShowGame(true)}
@@ -341,8 +344,11 @@ export default function PublicDiwaniyaPage() {
 
                     <form onSubmit={handleGreetingSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', background: '#fff', borderRadius: '12px' }}>
-                            <span style={{ fontSize: '15px', fontWeight: 600, color: '#171717' }}>إرسال كمجهول</span>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', background: '#fff', borderRadius: '16px', border: '1px solid #e5e5e5' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <User size={18} style={{ color: !formState.isAnonymous ? '#171717' : '#a3a3a3' }} />
+                                <span style={{ fontSize: '14px', fontWeight: 700, color: !formState.isAnonymous ? '#171717' : '#a3a3a3' }}>باسمك</span>
+                            </div>
                             <label style={{ position: 'relative', cursor: 'pointer' }}>
                                 <input
                                     type="checkbox"
@@ -352,7 +358,7 @@ export default function PublicDiwaniyaPage() {
                                 />
                                 <div style={{
                                     width: '48px',
-                                    height: '26px',
+                                    height: '24px',
                                     background: formState.isAnonymous ? '#171717' : '#e5e5e5',
                                     borderRadius: '100px',
                                     transition: 'all 200ms ease',
@@ -361,16 +367,20 @@ export default function PublicDiwaniyaPage() {
                                     <div style={{
                                         position: 'absolute',
                                         top: '3px',
-                                        right: formState.isAnonymous ? '3px' : 'auto',
                                         left: formState.isAnonymous ? 'auto' : '3px',
-                                        width: '20px',
-                                        height: '20px',
+                                        right: formState.isAnonymous ? '3px' : 'auto',
+                                        width: '18px',
+                                        height: '18px',
                                         background: '#fff',
                                         borderRadius: '50%',
                                         transition: 'all 200ms ease',
                                     }}></div>
                                 </div>
                             </label>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span style={{ fontSize: '14px', fontWeight: 700, color: formState.isAnonymous ? '#171717' : '#a3a3a3' }}>مجهول</span>
+                                <EyeOff size={18} style={{ color: formState.isAnonymous ? '#f59e0b' : '#a3a3a3' }} />
+                            </div>
                         </div>
 
                         {!formState.isAnonymous && (

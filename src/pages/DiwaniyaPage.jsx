@@ -11,7 +11,7 @@ export default function DiwaniyaPage() {
     const [error, setError] = useState(null);
     const [newGreeting, setNewGreeting] = useState(null);
 
-    const [formState, setFormState] = useState({ senderName: '', senderEmail: '', message: '', isAnonymous: true, visibility: 'public' });
+    const [formState, setFormState] = useState({ senderName: '', senderEmail: '', message: '', isAnonymous: false, visibility: 'public' });
     const [submitStatus, setSubmitStatus] = useState('idle');
 
     useEffect(() => {
@@ -82,7 +82,7 @@ export default function DiwaniyaPage() {
                         totalGreetings: prev.totalGreetings + 1
                     }));
                 }
-                setFormState({ senderName: '', senderEmail: '', message: '', isAnonymous: true, visibility: 'public' });
+                setFormState({ senderName: '', message: '', isAnonymous: false, senderAvatar: formState.senderAvatar });
                 setSubmitStatus('success');
                 setTimeout(() => {
                     setSubmitStatus('idle');
@@ -141,8 +141,8 @@ export default function DiwaniyaPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-white via-slate-50/50 to-blue-50/30 px-4 py-12" dir="rtl">
-            
+        <div className="min-h-screen bg-gradient-to-br from-white via-slate-50/50 to-blue-50/30 px-4 pt-24 pb-12" dir="rtl">
+
             {/* Ambient Background */}
             <div className="fixed inset-0 pointer-events-none -z-10">
                 <div className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-gradient-to-br from-slate-100/30 to-transparent rounded-full blur-[120px]" />
@@ -192,8 +192,11 @@ export default function DiwaniyaPage() {
 
                     <form onSubmit={handleGreetingSubmit} className="space-y-5">
                         {/* Anonymous Toggle */}
-                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
-                            <span className="font-black text-slate-700 text-sm">إرسال كمجهول</span>
+                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100/50">
+                            <div className="flex items-center gap-2">
+                                <User className={`w-4 h-4 ${!formState.isAnonymous ? 'text-[#2563eb]' : 'text-slate-400'}`} />
+                                <span className={`text-xs font-black ${!formState.isAnonymous ? 'text-slate-900' : 'text-slate-400'}`}>الظهور باسمي</span>
+                            </div>
                             <label className="relative inline-flex items-center cursor-pointer">
                                 <input
                                     type="checkbox"
@@ -201,8 +204,12 @@ export default function DiwaniyaPage() {
                                     checked={formState.isAnonymous}
                                     onChange={(e) => setFormState({ ...formState, isAnonymous: e.target.checked })}
                                 />
-                                <div className="w-12 h-6 bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:right-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#2563eb]"></div>
+                                <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#2563eb]"></div>
                             </label>
+                            <div className="flex items-center gap-2">
+                                <span className={`text-xs font-black ${formState.isAnonymous ? 'text-slate-900' : 'text-slate-400'}`}>مجهول</span>
+                                <EyeOff className={`w-4 h-4 ${formState.isAnonymous ? 'text-amber-500' : 'text-slate-400'}`} />
+                            </div>
                         </div>
 
                         {!formState.isAnonymous && (
@@ -251,10 +258,10 @@ export default function DiwaniyaPage() {
                         </div>
 
                         {/* Visibility Toggle */}
-                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100/50">
                             <div className="flex items-center gap-2">
-                                <Eye className="w-4 h-4 text-emerald-500" />
-                                <span className="text-xs font-black text-slate-700">عامة</span>
+                                <Eye className={`w-4 h-4 ${formState.visibility === 'public' ? 'text-emerald-500' : 'text-slate-400'}`} />
+                                <span className={`text-xs font-black ${formState.visibility === 'public' ? 'text-slate-900' : 'text-slate-400'}`}>عامة (للجميع)</span>
                             </div>
                             <label className="relative inline-flex items-center cursor-pointer">
                                 <input
@@ -263,11 +270,11 @@ export default function DiwaniyaPage() {
                                     checked={formState.visibility === 'private'}
                                     onChange={(e) => setFormState({ ...formState, visibility: e.target.checked ? 'private' : 'public' })}
                                 />
-                                <div className="w-12 h-6 bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:right-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#2563eb]"></div>
+                                <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                             </label>
                             <div className="flex items-center gap-2">
-                                <Shield className="w-4 h-4 text-amber-500" />
-                                <span className="text-xs font-black text-slate-700">خاصة</span>
+                                <span className={`text-xs font-black ${formState.visibility === 'private' ? 'text-slate-900' : 'text-slate-400'}`}>خاصة (للباحث)</span>
+                                <Shield className={`w-4 h-4 ${formState.visibility === 'private' ? 'text-amber-500' : 'text-slate-400'}`} />
                             </div>
                         </div>
 

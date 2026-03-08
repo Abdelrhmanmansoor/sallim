@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getDiwan, addDiwanGreeting, likeDiwanGreeting } from '../utils/api';
+import { getDiwan, addDiwanGreeting, likeDiwanGreeting, recordDiwanView } from '../utils/api';
 import { Sparkles, Heart, Share2, Twitter, MessageCircle, Send, Loader2, Link2, Plus, Calendar, User, PartyPopper } from 'lucide-react';
 import ReactConfetti from 'react-confetti';
 
@@ -40,9 +40,21 @@ export default function DiwanPage() {
         fetchDiwan();
     }, [username]);
 
+    // Record view once per session
+    useEffect(() => {
+        const hasViewed = sessionStorage.getItem(`viewed_diwan_${username}`);
+        if (!hasViewed && username) {
+            recordDiwanView(username)
+                .then(() => {
+                    sessionStorage.setItem(`viewed_diwan_${username}`, 'true');
+                })
+                .catch(err => console.error('Failed to record view:', err));
+        }
+    }, [username]);
+
     const handleShare = (platform) => {
         const url = window.location.href;
-        const text = `أرسلت لك تهنئة العيد في ديواني المميّز، شاركني فرحتك هنا 🌙✨: \n\n ${url}`;
+        const text = `عيدكم مبارك! استقبل تهانيكم في ديواني الخاص على منصة سَلِّم. بانتظار كلماتكم الجميلة 🌙✨: \n\n ${url}`;
 
         switch (platform) {
             case 'whatsapp':
@@ -159,7 +171,10 @@ export default function DiwanPage() {
                     </h1>
 
                     <p className="text-slate-500 text-xl md:text-2xl max-w-2xl mx-auto leading-relaxed font-bold animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                        اترك بصمتك الجميلة بتهنئة خاصة لـ {diwan.ownerName} في ديوانه المميّز بمناسبة العيد.
+                        اكتب تهنئتك الآن في ديواني التفاعلي.
+                    </p>
+                    <p className="text-slate-400 text-sm mt-3 font-medium bg-slate-100/50 px-4 py-1 rounded-full">
+                        الديوانية: ركن رقمي لاستقبال ومعاينة تهاني العيد من العائلة والأصدقاء.
                     </p>
                 </header>
 
