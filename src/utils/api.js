@@ -13,11 +13,11 @@ export async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE}/api/v1${endpoint}`
 
   const config = {
+    ...options,
     headers: {
       'Content-Type': 'application/json',
       ...options.headers,
     },
-    ...options,
   }
 
   try {
@@ -381,8 +381,17 @@ export async function likeDiwanGreeting(username, greetId) {
  * Public: Create a new Diwaniya page
  */
 export async function createDiwaniya(data) {
+  const token = localStorage.getItem('token')
+  const headers = {}
+
+  // If user is logged in, send the token
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
   return apiRequest('/diwaniya', {
     method: 'POST',
+    headers,
     body: JSON.stringify(data)
   })
 }
@@ -439,49 +448,61 @@ export async function deleteDiwaniyaGreeting(username, greetId) {
   })
 }
 
-// ═════════════════════════════════════════════
-// EIDIYA GAME (Diwaniya Quiz Game)
-// ═════════════════════════════════════════════
-
 /**
- * Public: Get Eidiya Game status and questions
+ * Public: Record a real view for a Diwaniya
  */
-export async function getEidiyaGame(username) {
-  return apiRequest(`/diwaniya/${username}/game`)
+export async function recordDiwaniyaView(username) {
+  return apiRequest(`/diwaniya/${username}/view`, {
+    method: 'POST'
+  })
 }
 
-/**
- * Public: Check if player can play (with sessionId)
- */
-export async function getEidiyaGameStatus(username, sessionId) {
-  return apiRequest(`/diwaniya/${username}/game/status?sessionId=${sessionId}`)
-}
+// ═════════════════════════════════════════════
+// EIDIYA GAME (Standalone Quiz Game)
+// ═════════════════════════════════════════════
 
 /**
- * Public: Submit an answer to a question
+ * Create a new standalone Eidiya Game
  */
-export async function submitEidiyaGameAnswer(username, data) {
-  return apiRequest(`/diwaniya/${username}/game/answer`, {
+export async function createStandaloneGame(data) {
+  return apiRequest('/games', {
     method: 'POST',
     body: JSON.stringify(data)
   })
 }
 
 /**
- * Owner: Update Eidiya Game questions and settings
+ * Get Eidiya Game data to play 
  */
-export async function updateEidiyaGame(username, data) {
-  return apiRequest(`/diwaniya/${username}/game`, {
-    method: 'PUT',
+export async function getStandaloneGame(gameId) {
+  return apiRequest(`/games/${gameId}`)
+}
+
+/**
+ * Submit an answer to a question in a standalone game
+ */
+export async function submitStandaloneGameAnswer(gameId, data) {
+  return apiRequest(`/games/${gameId}/submit`, {
+    method: 'POST',
     body: JSON.stringify(data)
   })
 }
 
 /**
- * Owner: Get game statistics
+ * Finish game and save score to leaderboard
  */
-export async function getEidiyaGameStats(username) {
-  return apiRequest(`/diwaniya/${username}/game/stats`)
+export async function finishStandaloneGame(gameId, data) {
+  return apiRequest(`/games/${gameId}/finish`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Get game leaderboard
+ */
+export async function getStandaloneGameLeaderboard(gameId) {
+  return apiRequest(`/games/${gameId}/leaderboard`)
 }
 
 // ═════════════════════════════════════════════
@@ -549,10 +570,10 @@ export async function updateUserProfile(data) {
 export async function uploadAvatar(file) {
   const token = localStorage.getItem('token')
   const url = `${API_BASE}/api/v1/upload/avatar`
-  
+
   const formData = new FormData()
   formData.append('avatar', file)
-  
+
   const res = await fetch(url, {
     method: 'POST',
     headers: {
@@ -560,12 +581,12 @@ export async function uploadAvatar(file) {
     },
     body: formData
   })
-  
+
   const data = await res.json()
   if (!res.ok) {
     throw new Error(data.error || 'حدث خطأ أثناء رفع الصورة')
   }
-  
+
   return data
 }
 

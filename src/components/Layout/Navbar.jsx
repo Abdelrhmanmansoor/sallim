@@ -6,9 +6,6 @@ const links = [
   { path: '/', label: 'الرئيسية' },
   { path: '/editor', label: 'المحرر' },
   { path: '/texts', label: 'النصوص' },
-  { path: '/eidiya', label: 'العيدية' },
-  { path: '/eidiya-game', label: 'لعبة العيدية' },
-  { path: '/eidiya-luck', label: 'حظ العيدية' },
   { path: '/companies', label: 'الشركات' },
 ]
 

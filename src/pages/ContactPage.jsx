@@ -55,8 +55,8 @@ export default function ContactPage() {
                                 </div>
                                 <div>
                                     <p style={{ fontSize: '14px', fontWeight: 600, color: '#64748b', marginBottom: '4px', margin: '0 0 4px 0' }}>الهاتف</p>
-                                    <a href="tel:+966500000000" style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', textDecoration: 'none', display: 'block' }}>
-                                        +966 50 000 0000
+                                    <a href="tel:+201007835547" style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', textDecoration: 'none', display: 'block' }}>
+                                        +20 100 783 5547
                                     </a>
                                 </div>
                             </div>
@@ -78,11 +78,21 @@ export default function ContactPage() {
                                     <MapPin style={{ width: '24px', height: '24px', color: '#fff' }} />
                                 </div>
                                 <div>
-                                    <p style={{ fontSize: '14px', fontWeight: 600, color: '#64748b', marginBottom: '4px', margin: '0 0 4px 0' }}>العنوان</p>
-                                    <p style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', margin: 0, lineHeight: 1.6 }}>
-                                        المملكة العربية السعودية<br />
-                                        الرياض، المملكة العربية السعودية
-                                    </p>
+                                    <p style={{ fontSize: '14px', fontWeight: 600, color: '#64748b', marginBottom: '4px', margin: '0 0 4px 0' }}>العناوين</p>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        <div style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', lineHeight: 1.6 }}>
+                                            <span style={{ color: '#C5A75F' }}>جورجيا</span><br />
+                                            تبليسي، جورجيا
+                                        </div>
+                                        <div style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', lineHeight: 1.6 }}>
+                                            <span style={{ color: '#C5A75F' }}>المملكة العربية السعودية</span><br />
+                                            الرياض، الملز
+                                        </div>
+                                        <div style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', lineHeight: 1.6 }}>
+                                            <span style={{ color: '#C5A75F' }}>مصر</span><br />
+                                            القاهرة، مصر
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -262,7 +272,7 @@ export default function ContactPage() {
                                         name="phone"
                                         value={formData.phone}
                                         onChange={handleChange}
-                                        placeholder="+966 5XXXXXXXX"
+                                        placeholder="+20 1XXXXXXXXX"
                                         style={{
                                             width: '100%',
                                             padding: '14px 16px',

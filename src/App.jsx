@@ -8,9 +8,11 @@ import TextBankPage from './pages/TextBankPage'
 import SendPage from './pages/SendPage'
 import DashboardPage from './pages/DashboardPage'
 import CardViewPage from './pages/CardViewPage'
-import EidiyaPage from './pages/EidiyaPage'
-import EidiyaLuckPage from './pages/EidiyaLuckPage'
-import EidiyaGamePage from './pages/EidiyaGamePage'
+
+import StandaloneEidiyaGamePage from './pages/StandaloneEidiyaGamePage'
+import GameLeaderboardPage from './pages/GameLeaderboardPage'
+import CreateGamePage from './pages/CreateGamePage'
+
 import DonatePage from './pages/DonatePage'
 import TermsPage from './pages/TermsPage'
 import EidParticles from './components/effects/EidParticles'
@@ -39,12 +41,10 @@ export default function App() {
   const location = useLocation()
   const { pathname } = location
   const showParticles = location.pathname === '/' || location.pathname === '/dashboard'
+
   const hideWhatsAppFloat = [
     '/editor',
     '/send',
-    '/eidiya',
-    '/eidiya-luck',
-    '/eidiya-game',
     '/donate',
     '/card',
     '/dashboard',
@@ -56,7 +56,8 @@ export default function App() {
     '/admin/companies',
     '/admin/invite-codes',
     '/companies',
-  ].includes(pathname)
+    '/create-game',
+  ].includes(pathname) || pathname.startsWith('/game/') || pathname.startsWith('/eid/') || pathname.startsWith('/diwan/')
 
   // Define isBusiness - assuming it's false for free version
   const isBusiness = false
@@ -75,9 +76,12 @@ export default function App() {
           <Route path="/send" element={<SendPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/card" element={<CardViewPage />} />
-          <Route path="/eidiya" element={<EidiyaPage />} />
-          <Route path="/eidiya-luck" element={<EidiyaLuckPage />} />
-          <Route path="/eidiya-game" element={<EidiyaGamePage />} />
+
+          {/* Eidiya Game (Standalone) Routes */}
+          <Route path="/game/:gameId" element={<StandaloneEidiyaGamePage />} />
+          <Route path="/game/:gameId/leaderboard" element={<GameLeaderboardPage />} />
+          <Route path="/create-game" element={<CreateGamePage />} />
+
           <Route path="/donate" element={<DonatePage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />

@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getDiwaniya, addDiwaniyaGreeting, likeDiwaniyaGreeting, getEidiyaGame } from '../utils/api';
+import { getDiwaniya, addDiwaniyaGreeting, likeDiwaniyaGreeting, recordDiwaniyaView } from '../utils/api';
 import { ArrowLeft, Send, Heart, Calendar, Share2, MessageCircle, Loader2, Download, Gift, X } from 'lucide-react';
 import DiwaniyaImageGenerator from '../components/DiwaniyaImageGenerator';
-import EidiyaGame from '../components/EidiyaGame';
 
 export default function PublicDiwaniyaPage() {
     const { username } = useParams();
@@ -11,8 +10,6 @@ export default function PublicDiwaniyaPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [newGreeting, setNewGreeting] = useState(null);
-    const [showGame, setShowGame] = useState(false);
-    const [gameEnabled, setGameEnabled] = useState(false);
 
     const [formState, setFormState] = useState({ senderName: '', message: '', isAnonymous: true, senderAvatar: '' });
 
@@ -35,13 +32,22 @@ export default function PublicDiwaniyaPage() {
                 }
                 setDiwaniya(res.data);
 
-                // Fetch game status separately so it doesn't break the page if 404
+                // Record view if not seen before
                 try {
-                    const gameRes = await getEidiyaGame(username);
-                    setGameEnabled(gameRes.data && gameRes.data.enabled);
-                } catch (gameErr) {
-                    setGameEnabled(false);
+                    const viewedStr = localStorage.getItem('viewedDiwaniyas');
+                    const viewedArray = viewedStr ? JSON.parse(viewedStr) : [];
+                    if (!viewedArray.includes(username)) {
+                        const viewRes = await recordDiwaniyaView(username);
+                        if (viewRes.success) {
+                            viewedArray.push(username);
+                            localStorage.setItem('viewedDiwaniyas', JSON.stringify(viewedArray));
+                            setDiwaniya(prev => ({ ...prev, views: viewRes.data.views }));
+                        }
+                    }
+                } catch (viewErr) {
+                    console.error('Error recording view:', viewErr);
                 }
+
             } catch (err) {
                 setError(true);
             } finally {
@@ -156,10 +162,6 @@ export default function PublicDiwaniyaPage() {
         );
     }
 
-    if (showGame) {
-        return <EidiyaGame username={username} onClose={() => setShowGame(false)} />;
-    }
-
     return (
         <div style={{ fontFamily: "'Tajawal', sans-serif" }}>
 
@@ -208,44 +210,6 @@ export default function PublicDiwaniyaPage() {
                     </div>
                 </div>
             </section>
-
-            {/* GAME BUTTON - Only show if game is enabled */}
-            {gameEnabled && (
-                <section style={{ background: 'linear-gradient(135deg, #d4af37, #f5d67b)', padding: '40px 24px' }}>
-                    <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
-                        <Gift size={48} color="#fff" style={{ marginBottom: '16px' }} />
-                        <h2 style={{ fontSize: '28px', fontWeight: 700, color: '#fff', marginBottom: '12px' }}>
-                            تحدي العيدية 🎁
-                        </h2>
-                        <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.9)', marginBottom: '24px' }}>
-                            أجب على الأسئلة واربح عيديتك! جرب حظك الآن
-                        </p>
-                        <button
-                            onClick={() => setShowGame(true)}
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '12px',
-                                padding: '16px 48px',
-                                background: '#fff',
-                                color: '#d4af37',
-                                fontSize: '18px',
-                                fontWeight: 700,
-                                borderRadius: '12px',
-                                border: 'none',
-                                cursor: 'pointer',
-                                transition: 'all 200ms ease',
-                            }}
-                            onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                            onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-                        >
-                            <Gift size={20} />
-                            ابدأ التحدي
-                        </button>
-                    </div>
-                </section>
-            )}
 
             {/* GREETING FORM */}
             <section style={{ background: '#fafafa', padding: '80px 24px' }}>

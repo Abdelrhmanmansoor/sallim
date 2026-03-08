@@ -47,6 +47,11 @@ const eidGreetingSchema = new mongoose.Schema({
 });
 
 const diwaniyaSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
+    },
     username: {
         type: String,
         required: true,

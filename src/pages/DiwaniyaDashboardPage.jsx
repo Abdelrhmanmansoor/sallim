@@ -12,37 +12,76 @@ export default function DiwaniyaDashboardPage() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Get user from localStorage
-        const userData = localStorage.getItem('user');
-        if (userData) {
-            const user = JSON.parse(userData);
-            // user.diwaniyas is an array of diwaniya objects with username field
-            if (user.diwaniyas && user.diwaniyas.length > 0) {
-                setDiwaniyas(user.diwaniyas);
-                setDiwaniya(user.diwaniyas[0]);
-                
-                // Fetch the first diwaniya details
-                const username = user.diwaniyas[0].username;
-                getDiwaniyaManage(username)
-                    .then(res => {
-                        if (res.success) {
-                            setDiwaniya(res.data);
-                            setGreetings(res.data.greetings || []);
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Error fetching diwaniya:', err);
-                        setError(true);
-                    })
-                    .finally(() => {
-                        setLoading(false);
-                    });
+        // First try to load from localStorage for quick render
+        const loadInitialData = () => {
+            const userData = localStorage.getItem('user');
+            if (userData) {
+                const user = JSON.parse(userData);
+                if (user.diwaniyas && user.diwaniyas.length > 0) {
+                    setDiwaniyas(user.diwaniyas);
+                    setDiwaniya(user.diwaniyas[0]);
+
+                    const username = user.diwaniyas[0].username;
+                    getDiwaniyaManage(username)
+                        .then(res => {
+                            if (res.success) {
+                                setDiwaniya(res.data);
+                                setGreetings(res.data.greetings || []);
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error fetching diwaniya:', err);
+                            setError(true);
+                        })
+                        .finally(() => {
+                            setLoading(false);
+                        });
+                } else {
+                    setLoading(false);
+                }
             } else {
                 setLoading(false);
             }
-        } else {
-            setLoading(false);
-        }
+        };
+
+        loadInitialData();
+
+        // Then fetch latest user profile to ensure we have the newest diwaniyas
+        import('../utils/api').then(({ getUserProfile }) => {
+            getUserProfile()
+                .then(res => {
+                    if (res.success && res.data) {
+                        // Update localStorage with fresh data
+                        localStorage.setItem('user', JSON.stringify(res.data));
+
+                        if (res.data.diwaniyas && res.data.diwaniyas.length > 0) {
+                            // If we didn't already load a diwaniya from local storage, 
+                            // or if we want to ensure we have all of them loaded into state:
+                            setDiwaniyas(res.data.diwaniyas);
+
+                            // If this is the first load and we previously had no diwaniyas, load the first one
+                            setDiwaniya(prevDiwaniya => {
+                                if (!prevDiwaniya) {
+                                    const username = res.data.diwaniyas[0].username;
+                                    getDiwaniyaManage(username)
+                                        .then(dRes => {
+                                            if (dRes.success) {
+                                                setDiwaniya(dRes.data);
+                                                setGreetings(dRes.data.greetings || []);
+                                            }
+                                        })
+                                        .catch(err => console.error('Error fetching diwaniya:', err))
+                                        .finally(() => setLoading(false));
+
+                                    return res.data.diwaniyas[0];
+                                }
+                                return prevDiwaniya;
+                            });
+                        }
+                    }
+                })
+                .catch(err => console.error('Error fetching fresh user profile:', err));
+        });
     }, []);
 
     const handleCopyLink = () => {
@@ -169,6 +208,48 @@ export default function DiwaniyaDashboardPage() {
                     <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.6)', maxWidth: '500px', margin: '0 auto 32px', lineHeight: 1.7 }}>
                         إدارة تهاني العيد الخاصة بك
                     </p>
+
+                    {diwaniyas.length > 1 && (
+                        <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px' }}>
+                            <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '15px' }}>اختر ديوانية:</span>
+                            <select
+                                value={diwaniya.username}
+                                onChange={(e) => {
+                                    const selectedUsername = e.target.value;
+                                    const selectedDiwaniya = diwaniyas.find(d => d.username === selectedUsername);
+                                    if (selectedDiwaniya) {
+                                        setLoading(true);
+                                        getDiwaniyaManage(selectedUsername)
+                                            .then(res => {
+                                                if (res.success) {
+                                                    setDiwaniya(res.data);
+                                                    setGreetings(res.data.greetings || []);
+                                                }
+                                            })
+                                            .catch(err => console.error(err))
+                                            .finally(() => setLoading(false));
+                                    }
+                                }}
+                                style={{
+                                    padding: '10px 16px',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    background: 'rgba(255,255,255,0.1)',
+                                    color: '#fff',
+                                    fontSize: '15px',
+                                    outline: 'none',
+                                    cursor: 'pointer',
+                                    fontFamily: "'Tajawal', sans-serif",
+                                }}
+                            >
+                                {diwaniyas.map(d => (
+                                    <option key={d._id || d.username} value={d.username} style={{ color: '#000' }}>
+                                        {d.ownerName} (@{d.username})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -238,7 +319,7 @@ export default function DiwaniyaDashboardPage() {
                                     واتساب
                                 </button>
                                 <Link
-                                    to={`/eidiya-game?diwaniya=${diwaniya.username}`}
+                                    to={`/${diwaniya.username}/game`}
                                     style={{
                                         display: 'inline-flex',
                                         alignItems: 'center',

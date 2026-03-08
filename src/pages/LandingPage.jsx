@@ -56,16 +56,6 @@ export default function LandingPage() {
       highlight: false,
     },
     {
-      name: 'داعم',
-      price: 'تطوعي',
-      desc: 'ادعم تطوير المنصة',
-      features: ['كل الميزات المجانية', 'أولوية في الميزات الجديدة', 'اسمك في قائمة الداعمين'],
-      cta: 'ادعم المشروع',
-      href: '/donate',
-      highlight: true,
-      external: false,
-    },
-    {
       name: 'للشركات',
       price: 'اتصل بنا',
       desc: 'حلول مخصصة',
@@ -210,16 +200,14 @@ export default function LandingPage() {
               >
                 أطلق ديوانيتك ✨
               </Link>
-              <a
-                href="https://paypal.me/SOLIMANW"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                to="/dashboard/diwaniya"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
                   padding: '14px 28px',
-                  background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)', // Brighter gold/orange gradient for visibility
+                  background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)',
                   color: '#171717',
                   fontSize: '15px',
                   fontWeight: 700,
@@ -237,9 +225,9 @@ export default function LandingPage() {
                   e.currentTarget.style.boxShadow = '0 4px 14px rgba(255,140,0,0.3)'
                 }}
               >
-                <Heart size={18} fill="currentColor" />
-                ادعم المشروع
-              </a>
+                <span style={{ fontSize: '18px' }}>🎲</span>
+                لعبة العيدية
+              </Link>
             </div>
 
             {/* Stats */}
@@ -320,6 +308,264 @@ export default function LandingPage() {
                 <p style={{ fontSize: '14px', color: '#737373', lineHeight: 1.6 }}>{f.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* EIDIYA GAME FEATURE */}
+      <section style={{ padding: '100px 0', background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)', position: 'relative', overflow: 'hidden' }}>
+        <div style={{
+          position: 'absolute',
+          top: '-50%',
+          right: '-10%',
+          width: '600px',
+          height: '600px',
+          background: 'rgba(255,255,255,0.1)',
+          borderRadius: '50%',
+          filter: 'blur(100px)'
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: '-50%',
+          left: '-10%',
+          width: '500px',
+          height: '500px',
+          background: 'rgba(0,0,0,0.1)',
+          borderRadius: '50%',
+          filter: 'blur(80px)'
+        }} />
+
+        <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
+          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 20px',
+              background: 'rgba(255,255,255,0.2)',
+              borderRadius: '100px',
+              marginBottom: '20px',
+              backdropFilter: 'blur(10px)'
+            }}>
+              <span style={{ fontSize: '18px' }}>🎲</span>
+              <span style={{ fontSize: '13px', color: '#fff', fontWeight: 600, letterSpacing: '0.02em' }}>
+                ميزة جديدة وحصرية
+              </span>
+            </div>
+            <h2 style={{
+              fontSize: 'clamp(32px, 5vw, 48px)',
+              fontWeight: 800,
+              color: '#fff',
+              marginBottom: '16px',
+              lineHeight: 1.2
+            }}>
+              لعبة العيدية التفاعلية
+            </h2>
+            <p style={{
+              fontSize: '18px',
+              color: 'rgba(255,255,255,0.9)',
+              maxWidth: '600px',
+              margin: '0 auto',
+              lineHeight: 1.6
+            }}>
+              حول تهنئة العيد إلى مغامرة ممتعة جمعت فيها بين المرح والجوائز!
+            </p>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '32px',
+            marginBottom: '64px'
+          }}>
+            {[
+              {
+                icon: '🎯',
+                title: 'أنشئ أسئلتك',
+                desc: 'صمم أسئلة خاصة بثقافة عائلتك وإخوانك'
+              },
+              {
+                icon: '💰',
+                title: 'حدد الجوائز',
+                desc: 'اختر قيمة العيدية لكل سؤال صحيح'
+              },
+              {
+                icon: '🎉',
+                title: 'شارك التحدي',
+                desc: 'أرسل الرابط لعائلتك ودعهم يتنافسون'
+              },
+              {
+                icon: '🏆',
+                title: 'التنافس الممتع',
+                desc: 'سجل النتائج في لوحة الصدارة'
+              }
+            ].map((feature, i) => (
+              <div key={i} style={{
+                background: 'rgba(255,255,255,0.15)',
+                backdropFilter: 'blur(10px)',
+                borderRadius: '20px',
+                padding: '32px 24px',
+                border: '1px solid rgba(255,255,255,0.2)',
+                textAlign: 'center',
+                transition: 'all 300ms ease'
+              }} onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-8px)'
+                e.currentTarget.style.background = 'rgba(255,255,255,0.25)'
+              }} onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.background = 'rgba(255,255,255,0.15)'
+              }}>
+                <div style={{ fontSize: '48px', marginBottom: '16px' }}>{feature.icon}</div>
+                <h3 style={{
+                  fontSize: '20px',
+                  fontWeight: 700,
+                  color: '#fff',
+                  marginBottom: '12px'
+                }}>{feature.title}</h3>
+                <p style={{
+                  fontSize: '15px',
+                  color: 'rgba(255,255,255,0.9)',
+                  lineHeight: 1.6
+                }}>{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* How it works */}
+          <div style={{
+            background: '#fff',
+            borderRadius: '24px',
+            padding: '48px',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+            marginBottom: '48px'
+          }}>
+            <h3 style={{
+              fontSize: '24px',
+              fontWeight: 700,
+              color: '#171717',
+              marginBottom: '32px',
+              textAlign: 'center'
+            }}>
+              كيف تعمل اللعبة؟
+            </h3>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '32px'
+            }}>
+              {[
+                { num: '1', title: 'أنشئ اللعبة', desc: 'أدخل اسمك وأنشئ أسئلتك الممتعة' },
+                { num: '2', title: 'حدد الجوائز', desc: 'اختر قيمة العيدية لكل سؤال' },
+                { num: '3', title: 'شارك الرابط', desc: 'أرسل الرابط لعائلتك عبر واتساب' },
+                { num: '4', title: 'شاهد النتائج', desc: 'تابع صدارة الترتيب في الوقت الفعلي' }
+              ].map((step, i) => (
+                <div key={i} style={{ textAlign: 'center', position: 'relative' }}>
+                  <div style={{
+                    width: '60px',
+                    height: '60px',
+                    background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '24px',
+                    fontWeight: 800,
+                    color: '#fff',
+                    margin: '0 auto 16px'
+                  }}>{step.num}</div>
+                  <h4 style={{
+                    fontSize: '18px',
+                    fontWeight: 700,
+                    color: '#171717',
+                    marginBottom: '8px'
+                  }}>{step.title}</h4>
+                  <p style={{
+                    fontSize: '14px',
+                    color: '#737373',
+                    lineHeight: 1.6
+                  }}>{step.desc}</p>
+                  {i < 3 && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '30px',
+                      left: '-40%',
+                      width: '80%',
+                      height: '2px',
+                      background: '#e5e5e5',
+                      display: window.innerWidth > 768 ? 'block' : 'none'
+                    }} />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Features List */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '20px',
+            marginBottom: '48px'
+          }}>
+            {[
+              '📚 50 سؤال جاهز عن صلاة العيد',
+              '🎲 اختيار عشوائي للأسئلة',
+              '💰 تحديد جوائز مرنة',
+              '📱 متوافقة مع جميع الأجهزة',
+              '🏆 لوحة صدارة حية',
+              '📊 تتبع النتائج بالتفصيل'
+            ].map((item, i) => (
+              <div key={i} style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                background: 'rgba(255,255,255,0.15)',
+                backdropFilter: 'blur(10px)',
+                padding: '16px 20px',
+                borderRadius: '12px',
+                border: '1px solid rgba(255,255,255,0.2)'
+              }}>
+                <span style={{ fontSize: '20px' }}>✓</span>
+                <span style={{
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  color: '#fff'
+                }}>{item}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <div style={{ textAlign: 'center' }}>
+            <Link
+              to="/create-game"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '18px 40px',
+                background: '#fff',
+                color: '#171717',
+                fontSize: '18px',
+                fontWeight: 700,
+                borderRadius: '16px',
+                textDecoration: 'none',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                transition: 'all 200ms ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)'
+                e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.3)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.2)'
+              }}
+            >
+              <span style={{ fontSize: '24px' }}>🎲</span>
+              ابدأ إنشاء اللعبة الآن
+            </Link>
           </div>
         </div>
       </section>

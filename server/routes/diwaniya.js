@@ -1,8 +1,12 @@
 import { Router } from 'express';
 import Diwaniya from '../models/Diwan.js';
+import User from '../models/User.js';
+import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import xss from 'xss';
 import Joi from 'joi';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'sallim-diwan-secret-key-2024';
 
 const router = Router();
 
@@ -22,8 +26,8 @@ const postGreetingLimiter = rateLimit({
 
 // Validation schemas
 const createDiwaniyaSchema = Joi.object({
-    username: Joi.string().alphanum().min(3).max(30).required().messages({
-        'string.alphanum': 'اسم المستخدم يجب أن يحتوي على حروف وأرقام فقط',
+    username: Joi.string().pattern(/^[a-zA-Z0-9_\-]+$/).min(3).max(30).required().messages({
+        'string.pattern.base': 'اسم المستخدم يجب أن يحتوي على حروف إنجليزية وأرقام فقط',
         'string.min': 'اسم المستخدم يجب أن يكون 3 أحرف على الأقل',
         'string.max': 'اسم المستخدم يجب أن يكون 30 حرف كحد أقصى',
         'any.required': 'اسم المستخدم مطلوب'
@@ -92,9 +96,13 @@ const visibilityUpdateSchema = Joi.object({
 // ═══ Create a new Diwaniya page ═══
 router.post('/', async (req, res) => {
     try {
+        console.log('POST /diwaniya - Request body:', req.body);
+        console.log('POST /diwaniya - Headers:', req.headers.authorization);
+
         // Validate input
         const { error, value } = createDiwaniyaSchema.validate(req.body);
         if (error) {
+            console.log('Validation error:', error.details[0].message);
             return res.status(400).json({ success: false, error: error.details[0].message });
         }
 
@@ -103,13 +111,41 @@ router.post('/', async (req, res) => {
         // Check if username already exists
         const existing = await Diwaniya.findOne({ username });
         if (existing) {
+            console.log('Username already exists:', username);
             return res.status(400).json({ success: false, error: 'اسم المستخدم هذا مستخدم مسبقاً، اختر اسماً آخر' });
         }
 
+        // Get user from token if available
+        let userId = null;
+        const token = req.headers.authorization?.replace('Bearer ', '');
+        if (token) {
+            try {
+                const decoded = jwt.verify(token, JWT_SECRET);
+                userId = decoded.userId;
+                console.log('User ID from token:', userId);
+            } catch (error) {
+                // Invalid token, but we'll still create the diwaniya (anonymous creation)
+                console.log('Invalid token provided, creating anonymous diwaniya');
+            }
+        }
+
         const diwaniya = await Diwaniya.create({
+            user: userId,
             username,
             ownerName
         });
+
+        console.log('Diwaniya created:', diwaniya._id);
+
+        // If user is logged in, add diwaniya to user's diwaniyas array
+        if (userId) {
+            const user = await User.findById(userId);
+            if (user) {
+                user.diwaniyas.push(diwaniya._id);
+                await user.save();
+                console.log('Diwaniya added to user:', userId);
+            }
+        }
 
         res.status(201).json({ success: true, data: diwaniya });
     } catch (error) {
@@ -128,17 +164,13 @@ router.get('/:username', async (req, res) => {
             return res.status(404).json({ success: false, error: 'لا توجد ديوانية بهذا الاسم' });
         }
 
-        // Increment views
-        diwaniya.views += 1;
-        await diwaniya.save();
-
         // Only return public greetings for public view
         const publicGreetings = diwaniya.greetings
             .filter(g => g.visibility === 'public')
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             data: {
                 ...diwaniya.toObject(),
                 greetings: publicGreetings,
@@ -164,8 +196,8 @@ router.get('/:username/manage', async (req, res) => {
         const allGreetings = diwaniya.greetings
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             data: {
                 ...diwaniya.toObject(),
                 greetings: allGreetings
@@ -176,11 +208,30 @@ router.get('/:username/manage', async (req, res) => {
     }
 });
 
+// ═══ Record a view for a Diwaniya ═══
+router.post('/:username/view', async (req, res) => {
+    try {
+        const username = req.params.username.toLowerCase().trim();
+        const diwaniya = await Diwaniya.findOne({ username });
+
+        if (!diwaniya) {
+            return res.status(404).json({ success: false, error: 'ديوانية غير موجودة' });
+        }
+
+        diwaniya.views += 1;
+        await diwaniya.save();
+
+        res.json({ success: true, data: { views: diwaniya.views } });
+    } catch (error) {
+        res.status(500).json({ success: false, error: 'حدث خطأ في النظام' });
+    }
+});
+
 // ═══ Add a greeting to a Diwaniya ═══
 router.post('/:username/greet', postGreetingLimiter, async (req, res) => {
     try {
         const username = req.params.username.toLowerCase().trim();
-        
+
         // Validate input
         const { error, value } = greetingSchema.validate(req.body);
         if (error) {
@@ -250,7 +301,7 @@ router.post('/:username/greet/:greetId/like', async (req, res) => {
 router.put('/:username/greet/:greetId/visibility', async (req, res) => {
     try {
         const { username, greetId } = req.params;
-        
+
         // Validate input
         const { error, value } = visibilityUpdateSchema.validate(req.body);
         if (error) {
@@ -299,7 +350,7 @@ router.delete('/:username/greet/:greetId', async (req, res) => {
 
         res.json({ success: true, message: 'تم حذف التهنئة بنجاح' });
     } catch (error) {
-    res.status(500).json({ success: false, error: 'حدث خطأ أثناء حذف التهنئة' });
+        res.status(500).json({ success: false, error: 'حدث خطأ أثناء حذف التهنئة' });
     }
 });
 
@@ -333,8 +384,8 @@ router.get('/:username/game', async (req, res) => {
             rewardAmount: q.rewardAmount
         }));
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             data: {
                 enabled: diwaniya.eidiyaGame.enabled,
                 totalQuestions: questions.length,
@@ -372,8 +423,8 @@ router.get('/:username/game/status', async (req, res) => {
         );
 
         if (existingAttempt) {
-            return res.json({ 
-                success: true, 
+            return res.json({
+                success: true,
                 data: {
                     canPlay: false,
                     message: 'لقد قمت باللعب مسبقاً!',
@@ -383,8 +434,8 @@ router.get('/:username/game/status', async (req, res) => {
             });
         }
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             data: {
                 canPlay: true,
                 totalQuestions: diwaniya.eidiyaGame.questions.length
@@ -399,7 +450,7 @@ router.get('/:username/game/status', async (req, res) => {
 router.post('/:username/game/answer', gameAnswerLimiter, async (req, res) => {
     try {
         const username = req.params.username.toLowerCase().trim();
-        
+
         // Validate input
         const { error, value } = answerSubmissionSchema.validate(req.body);
         if (error) {
@@ -438,7 +489,7 @@ router.post('/:username/game/answer', gameAnswerLimiter, async (req, res) => {
             if (!diwaniya.eidiyaGame.playerAttempts) {
                 diwaniya.eidiyaGame.playerAttempts = [];
             }
-            
+
             playerAttempt = {
                 sessionId,
                 score: 0,
@@ -454,9 +505,9 @@ router.post('/:username/game/answer', gameAnswerLimiter, async (req, res) => {
         );
 
         if (alreadyAnswered) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'لقد أجبت على هذا السؤال مسبقاً' 
+            return res.status(400).json({
+                success: false,
+                error: 'لقد أجبت على هذا السؤال مسبقاً'
             });
         }
 
@@ -477,8 +528,8 @@ router.post('/:username/game/answer', gameAnswerLimiter, async (req, res) => {
 
         await diwaniya.save();
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             data: {
                 isCorrect,
                 rewardAmount: question.rewardAmount,
@@ -498,7 +549,7 @@ router.post('/:username/game/answer', gameAnswerLimiter, async (req, res) => {
 router.put('/:username/game', async (req, res) => {
     try {
         const username = req.params.username.toLowerCase().trim();
-        
+
         // Validate questions array
         const { questions, enabled } = req.body;
 
@@ -515,9 +566,9 @@ router.put('/:username/game', async (req, res) => {
             for (let i = 0; i < questions.length; i++) {
                 const { error } = questionSchema.validate(questions[i]);
                 if (error) {
-                    return res.status(400).json({ 
-                        success: false, 
-                        error: `خطأ في السؤال ${i + 1}: ${error.details[0].message}` 
+                    return res.status(400).json({
+                        success: false,
+                        error: `خطأ في السؤال ${i + 1}: ${error.details[0].message}`
                     });
                 }
             }
@@ -560,8 +611,8 @@ router.get('/:username/game/stats', async (req, res) => {
         }
 
         if (!diwaniya.eidiyaGame) {
-            return res.json({ 
-                success: true, 
+            return res.json({
+                success: true,
                 data: {
                     enabled: false,
                     totalQuestions: 0,
@@ -573,12 +624,12 @@ router.get('/:username/game/stats', async (req, res) => {
 
         const playerAttempts = diwaniya.eidiyaGame.playerAttempts || [];
         const totalPlayers = playerAttempts.length;
-        const averageScore = totalPlayers > 0 
-            ? playerAttempts.reduce((sum, p) => sum + p.score, 0) / totalPlayers 
+        const averageScore = totalPlayers > 0
+            ? playerAttempts.reduce((sum, p) => sum + p.score, 0) / totalPlayers
             : 0;
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             data: {
                 enabled: diwaniya.eidiyaGame.enabled,
                 totalQuestions: diwaniya.eidiyaGame.questions?.length || 0,

@@ -23,6 +23,8 @@ export default function CreateDiwaniyaPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        console.log('Form data:', formData);
+
         if (!formData.username || !formData.ownerName) {
             setErrorMsg('يرجى تعبئة جميع الحقول المطلوبة');
             setStatus('error');
@@ -40,18 +42,28 @@ export default function CreateDiwaniyaPage() {
         setErrorMsg('');
 
         try {
+            console.log('Sending request with data:', formData);
             const res = await createDiwaniya(formData);
+            console.log('Response:', res);
             if (res.success) {
-                // If user is logged in, claim this diwaniya
-                const token = localStorage.getItem('token');
-                if (token) {
+                // Diwaniya is automatically linked to user if logged in (no need to claim)
+
+                // Update localStorage if user is logged in
+                const userData = localStorage.getItem('user');
+                if (userData) {
                     try {
-                        await claimDiwaniya(res.data._id);
-                    } catch (claimError) {
-                        console.warn('Failed to claim diwaniya:', claimError);
-                        // Continue even if claim fails
+                        const parsedUser = JSON.parse(userData);
+                        // Add the new diwaniya to the user's diwaniyas array
+                        if (!parsedUser.diwaniyas) parsedUser.diwaniyas = [];
+                        parsedUser.diwaniyas.push(res.data);
+                        localStorage.setItem('user', JSON.stringify(parsedUser));
+                        // Dispatch storage event to update other components
+                        window.dispatchEvent(new Event('storage'));
+                    } catch (e) {
+                        console.error('Error updating localStorage:', e);
                     }
                 }
+
                 setStatus('success');
                 setTimeout(() => navigate(`/eid/${res.data.username}`), 1500);
             }

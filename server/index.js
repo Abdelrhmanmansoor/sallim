@@ -28,6 +28,7 @@ import adminInviteCodesRoutes from './routes/admin-invite-codes.js'
 import adminCompaniesRoutes from './routes/admin-companies.js'
 import campaignsRoutes from './routes/campaigns.js'
 import teamRoutes from './routes/team.js'
+import gamesRoutes from './routes/games.js'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -214,6 +215,7 @@ app.use('/api/v1/diwan', diwanRoutes)
 app.use('/api/v1/diwaniya', diwaniyaRoutes)
 app.use('/api/v1/diwaniya', diwaniyaFamilyRoutes)
 app.use('/api/v1/auth', authRoutes)
+app.use('/api/v1/games', gamesRoutes)
 
 // ─── 404 Handler ───
 app.use('/api/*', (req, res) => {

@@ -9,7 +9,7 @@ import toast, { Toaster } from 'react-hot-toast'
 
 export default function SendPage() {
   const store = useEditorStore()
-  const [sendMode, setSendMode] = useState('eidiya')
+  const [sendMode, setSendMode] = useState('link')
   const [phone, setPhone] = useState('')
   const [name, setName] = useState('')
   const [message, setMessage] = useState('عيد مبارك وكل عام وأنتم بخير')
@@ -61,36 +61,6 @@ export default function SendPage() {
     }).catch(() => toast.error('لم نتمكن من النسخ'))
   }
 
-  const handleGenerateEidiya = () => {
-    if (!eidiyaSenderName.trim()) {
-      toast.error('أدخل اسمك أولاً')
-      return
-    }
-    if (eidiyaMin >= eidiyaMax) {
-      toast.error('الحد الأدنى يجب أن يكون أقل من الأقصى')
-      return
-    }
-    const params = new URLSearchParams({
-      from: eidiyaSenderName.trim(),
-      min: eidiyaMin,
-      max: eidiyaMax,
-      tries: eidiyaAttempts,
-      cur: eidiyaCurrency,
-      d: eidiyaDialect,
-    })
-    const url = `${window.location.origin}/eidiya?${params.toString()}`
-    setEidiyaLink(url)
-    toast.success('تم إنشاء رابط العيدية!')
-  }
-
-  const handleCopyEidiya = () => {
-    navigator.clipboard.writeText(eidiyaLink).then(() => {
-      setEidiyaLinkCopied(true)
-      toast.success('تم نسخ رابط العيدية!')
-      setTimeout(() => setEidiyaLinkCopied(false), 2000)
-    }).catch(() => toast.error('لم نتمكن من النسخ'))
-  }
-
   const handleSingleSend = () => {
     if (!phone) {
       toast.error('أدخل رقم الهاتف')
@@ -130,12 +100,12 @@ export default function SendPage() {
       const row = csvData[i]
       const personalMessage = message.replace('{name}', row['الاسم'] || row['name'] || '')
       const phoneNum = row['الهاتف'] || row['phone'] || row['رقم'] || ''
-      
+
       if (phoneNum) {
         const link = generateWhatsAppLink(phoneNum, personalMessage)
         window.open(link, '_blank')
         setSentCount(i + 1)
-        
+
         // Wait for interval
         if (i < csvData.length - 1) {
           await new Promise(resolve => setTimeout(resolve, interval * 1000))
@@ -163,7 +133,7 @@ export default function SendPage() {
             <span className="text-[#0F172A]"> بسهولة</span>
           </h1>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">أرسل بطاقتك عبـر الواتساب فوراً، أو شاركها عبر التيليجرام أو أنشئ رابط مخصص لكل شخص</p>
-          
+
           {/* Quick visual steps */}
           <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-6 max-w-md mx-auto">
             {['اختر', 'أضف المعلومات', 'أرسل'].map((s, i) => (
@@ -176,7 +146,7 @@ export default function SendPage() {
         </div>
 
         {/* Mode Selector */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-12">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-12">
           {[
             { id: 'eidiya', icon: <BsGift />, label: 'عيدية حظ', desc: 'رابط تفاعلي' },
             { id: 'link', icon: <BsLink45Deg />, label: 'بطاقة رابط', desc: 'رابط مخصص' },
@@ -188,11 +158,10 @@ export default function SendPage() {
             <button
               key={mode.id}
               onClick={() => setSendMode(mode.id)}
-              className={`flex flex-col items-center justify-center gap-2 px-4 py-5 rounded-2xl text-sm font-medium transition-all min-h-[112px] border ${
-                sendMode === mode.id
+              className={`flex flex-col items-center justify-center gap-2 px-4 py-5 rounded-2xl text-sm font-medium transition-all min-h-[112px] border ${sendMode === mode.id
                   ? 'bg-[#6A47ED] text-white shadow-lg shadow-[#6A47ED]/20 border-[#6A47ED]/30'
                   : 'glass text-gray-300 hover:text-white border-white/5 hover:border-[#6A47ED]/20'
-              }`}
+                }`}
             >
               <span className="text-lg">{mode.icon}</span>
               <span className="font-bold text-xs">{mode.label}</span>
@@ -200,194 +169,6 @@ export default function SendPage() {
             </button>
           ))}
         </div>
-
-        {/* Eidiya Luck Spinner */}
-        {sendMode === 'eidiya' && (
-          <div className="glass rounded-3xl p-8 md:p-12 max-w-lg mx-auto border border-white/5 hover:border-[#6A47ED]/10 transition-all">
-            <div className="flex items-center gap-4 mb-10">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#6A47ED]/30 to-[#5234c7]/20 flex items-center justify-center border border-[#6A47ED]/20">
-                <BsGift className="text-[#8B6CF6] text-2xl" />
-              </div>
-              <div>
-                <h3 className="text-xl font-black text-white">عيديتك حظ!</h3>
-                <p className="text-gray-400 text-sm">أنشئ رابط عيدية و المستلم يجرب حظه بنفسه</p>
-              </div>
-            </div>
-
-            <div className="space-y-5">
-              {/* Sender Name */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-6 h-6 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">1</div>
-                  <label className="text-sm text-[#8B6CF6] font-bold">اسمك (المُرسِل)</label>
-                </div>
-                <input
-                  type="text"
-                  value={eidiyaSenderName}
-                  onChange={(e) => { setEidiyaSenderName(e.target.value); setEidiyaLink('') }}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-base text-center focus:border-[#6A47ED]/50 focus:outline-none focus:ring-1 focus:ring-[#6A47ED]/20 transition-all"
-                  dir="rtl"
-                  placeholder="أبو محمد"
-                />
-              </div>
-
-              {/* Dialect & Currency */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-6 h-6 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">2</div>
-                  <label className="text-sm text-[#8B6CF6] font-bold">اللهجة والعملة</label>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <select
-                    value={eidiyaDialect}
-                    onChange={(e) => setEidiyaDialect(e.target.value)}
-                    className="bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-[#6A47ED]/50 focus:outline-none appearance-none text-center"
-                  >
-                    <option value="sa" className="bg-gray-900">سعودي</option>
-                    <option value="ae" className="bg-gray-900">إماراتي</option>
-                    <option value="kw" className="bg-gray-900">كويتي</option>
-                    <option value="bh" className="bg-gray-900">بحريني</option>
-                    <option value="qa" className="bg-gray-900">قطري</option>
-                    <option value="om" className="bg-gray-900">عماني</option>
-                  </select>
-                  <select
-                    value={eidiyaCurrency}
-                    onChange={(e) => setEidiyaCurrency(e.target.value)}
-                    className="bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-[#6A47ED]/50 focus:outline-none appearance-none text-center"
-                  >
-                    <option value="ريال" className="bg-gray-900">ريال</option>
-                    <option value="درهم" className="bg-gray-900">درهم</option>
-                    <option value="دينار" className="bg-gray-900">دينار</option>
-                    <option value="دينار كويتي" className="bg-gray-900">دينار كويتي</option>
-                    <option value="ريال قطري" className="bg-gray-900">ريال قطري</option>
-                    <option value="ريال عماني" className="bg-gray-900">ريال عماني</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Amount Range */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-6 h-6 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">3</div>
-                  <label className="text-sm text-[#8B6CF6] font-bold">مدى العيدية</label>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs text-gray-500 block mb-1 text-center">الحد الأدنى</label>
-                    <input
-                      type="number"
-                      value={eidiyaMin}
-                      onChange={(e) => { setEidiyaMin(Number(e.target.value)); setEidiyaLink('') }}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-center text-lg font-bold focus:border-[#6A47ED]/50 focus:outline-none"
-                      min={1}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-500 block mb-1 text-center">الحد الأقصى</label>
-                    <input
-                      type="number"
-                      value={eidiyaMax}
-                      onChange={(e) => { setEidiyaMax(Number(e.target.value)); setEidiyaLink('') }}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-center text-lg font-bold focus:border-[#6A47ED]/50 focus:outline-none"
-                      min={1}
-                    />
-                  </div>
-                </div>
-                <p className="text-gray-400 text-xs text-center mt-2">العيدية ستكون عشوائية بين {eidiyaMin} و {eidiyaMax} {eidiyaCurrency}</p>
-              </div>
-
-              {/* Attempts */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-6 h-6 rounded-full bg-[#6A47ED] text-white text-xs font-bold flex items-center justify-center">4</div>
-                  <label className="text-sm text-[#8B6CF6] font-bold">عدد المحاولات</label>
-                </div>
-                <div className="flex items-center justify-center gap-4">
-                  {[1, 2, 3, 5].map((n) => (
-                    <button
-                      key={n}
-                      onClick={() => { setEidiyaAttempts(n); setEidiyaLink('') }}
-                      className={`w-12 h-12 rounded-xl text-sm font-bold transition-all border ${
-                        eidiyaAttempts === n
-                          ? 'bg-[#6A47ED] text-white border-[#6A47ED]/30 shadow-lg shadow-[#6A47ED]/20'
-                          : 'bg-white/5 text-gray-400 border-white/10 hover:border-[#6A47ED]/20'
-                      }`}
-                    >
-                      {n}
-                    </button>
-                  ))}
-                </div>
-                <p className="text-gray-400 text-xs text-center mt-2">المستلم يمكنه فتح العيدية {eidiyaAttempts === 1 ? 'مرة واحدة' : `${eidiyaAttempts} مرات`} فقط</p>
-              </div>
-
-              {/* Generate Button */}
-              <button
-                onClick={handleGenerateEidiya}
-                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-l from-[#6A47ED] to-[#8B6FF5] text-white font-black text-lg transition-all hover:shadow-xl hover:shadow-[#6A47ED]/30 hover:scale-[1.02]"
-              >
-                <BsDice5 className="text-xl" />
-                أنشئ رابط العيدية
-              </button>
-
-              {/* Generated Link */}
-              {eidiyaLink && (
-                <div className="space-y-4 pt-4 border-t border-white/5 animate-fadeInUp">
-                  <div className="bg-white/5 rounded-2xl p-4 flex items-center gap-3 border border-[#6A47ED]/20">
-                    <input
-                      type="text"
-                      readOnly
-                      value={eidiyaLink}
-                      className="flex-1 bg-transparent text-[#A78BFA] text-sm text-left truncate focus:outline-none"
-                      dir="ltr"
-                    />
-                    <button
-                      onClick={handleCopyEidiya}
-                      className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                        eidiyaLinkCopied
-                          ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                          : 'bg-[#6A47ED] text-white hover:scale-105'
-                      }`}
-                    >
-                      {eidiyaLinkCopied ? '✓ تم النسخ' : 'نسخ'}
-                    </button>
-                  </div>
-
-                  {/* Quick share */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      onClick={() => {
-                        const text = encodeURIComponent(`عيديتك من ${eidiyaSenderName}، جرّب حظك\n\n${eidiyaLink}`)
-                        window.open(`https://wa.me/?text=${text}`, '_blank')
-                      }}
-                      className="flex items-center justify-center gap-2 p-3 rounded-xl bg-green-600/10 border border-green-500/20 hover:bg-green-600/20 text-green-400 font-bold text-sm transition-all"
-                    >
-                      <BsWhatsapp /> واتساب
-                    </button>
-                    <button
-                      onClick={() => {
-                        const url = encodeURIComponent(eidiyaLink)
-                        const text = encodeURIComponent(`عيديتك من ${eidiyaSenderName}، جرّب حظك`)
-                        window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank')
-                      }}
-                      className="flex items-center justify-center gap-2 p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/20 text-blue-400 font-bold text-sm transition-all"
-                    >
-                      <BsTelegram /> تيليجرام
-                    </button>
-                  </div>
-
-                  <a
-                    href={eidiyaLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-center text-[#8B6CF6] hover:text-[#A78BFA] text-sm transition-colors"
-                  >
-                    معاينة الرابط
-                  </a>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* Link Card */}
         {sendMode === 'link' && (
@@ -430,11 +211,10 @@ export default function SendPage() {
                     <button
                       key={t.id}
                       onClick={() => { setLinkTemplate(t.id); setGeneratedLink('') }}
-                      className={`relative rounded-xl overflow-hidden border-2 transition-all aspect-[3/4] group ${
-                        linkTemplate === t.id
+                      className={`relative rounded-xl overflow-hidden border-2 transition-all aspect-[3/4] group ${linkTemplate === t.id
                           ? 'border-[#6A47ED] shadow-lg shadow-[#6A47ED]/30 scale-105'
                           : 'border-white/10 hover:border-[#6A47ED]/30'
-                      }`}
+                        }`}
                     >
                       <img src={t.image} alt={t.name} className="w-full h-full object-cover" />
                       {linkTemplate === t.id && (
@@ -485,11 +265,10 @@ export default function SendPage() {
                     />
                     <button
                       onClick={handleCopyLink}
-                      className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                        linkCopied
+                      className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${linkCopied
                           ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                           : 'bg-[#6A47ED] text-white hover:scale-105'
-                      }`}
+                        }`}
                     >
                       {linkCopied ? '✓ تم النسخ' : 'نسخ الرابط'}
                     </button>
@@ -579,7 +358,7 @@ export default function SendPage() {
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">+</span>
                 </div>
               </div>
-              
+
               <div>
                 <label className="text-sm text-[#8B6CF6] font-medium block mb-2">اسم المستلم (اختياري)</label>
                 <input
@@ -610,7 +389,7 @@ export default function SendPage() {
                 <BsWhatsapp className="text-xl" />
                 إرسال عبر واتساب
               </button>
-              
+
               <p className="text-center text-gray-400 text-xs">سيفتح تطبيق واتساب جاهزاً للإرسال</p>
             </div>
           </div>
