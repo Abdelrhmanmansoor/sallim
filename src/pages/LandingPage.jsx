@@ -262,7 +262,7 @@ export default function LandingPage() {
             borderBottom: '1px solid rgba(255,255,255,0.05)',
             padding: '16px 0',
             overflow: 'hidden',
-            position: 'relative'
+            position: 'relative',
           }}
         >
           <style>{`
@@ -270,49 +270,49 @@ export default function LandingPage() {
               0% { transform: translateX(0); }
               100% { transform: translateX(-50%); }
             }
-            .ticker-content {
+            .ticker-wrapper {
               display: flex;
-              animation: scroll 30s linear infinite;
-              white-space: nowrap;
+              width: fit-content;
+              animation: scroll 40s linear infinite;
             }
-            .ticker-content:hover {
+            .ticker-wrapper:hover {
               animation-play-state: paused;
             }
             .ticker-item {
               display: flex;
-              align-items: 'center',
+              align-items: center;
               gap: '12px',
-              padding: '0 32px',
+              padding: '0 40px',
               color: 'rgba(255,255,255,0.8)',
               fontSize: '14px',
               fontWeight: 500,
+              white-space: nowrap,
             }
             .ticker-item-dot {
               width: '4px',
               height: '4px',
               background: 'rgba(255,255,255,0.3)',
               borderRadius: '50%',
+              flex-shrink: 0;
             }
           `}</style>
-          <div className="ticker-content">
-            {[
-              { text: 'تم إضافة لعبة العيدية التفاعلية - انشئ تحدياتك الخاصة' },
-              { text: 'جاري إضافة ثيمات وقوالب جديدة بشكل مستمر' },
-              { text: 'تم إضافة فكرة الديوانية - اطلق ديوانيتك الآن' },
-              { text: 'للشركات التي تريد تركب النظام تواصل معنا عبر واتساب', link: true },
-              { text: 'اكتشف الميزات الجديدة في نسخة العيد 2026' },
-            ].concat([
-              { text: 'تم إضافة لعبة العيدية التفاعلية - انشئ تحدياتك الخاصة' },
-              { text: 'جاري إضافة ثيمات وقوالب جديدة بشكل مستمر' },
-              { text: 'تم إضافة فكرة الديوانية - اطلق ديوانيتك الآن' },
-              { text: 'للشركات التي تريد تركب النظام تواصل معنا عبر واتساب', link: true },
-              { text: 'اكتشف الميزات الجديدة في نسخة العيد 2026' },
-            ]).map((item, index) => (
-              <div key={index} className="ticker-item">
-                <div className="ticker-item-dot" />
-                <span style={{ color: item.link ? '#FFD700' : 'rgba(255,255,255,0.8)' }}>
-                  {item.text}
-                </span>
+          <div className="ticker-wrapper">
+            {[...Array(4)].fill().map((_, setIndex) => (
+              <div key={setIndex} style={{ display: 'flex', alignItems: 'center' }}>
+                {[
+                  { text: 'تم إضافة لعبة العيدية التفاعلية - انشئ تحدياتك الخاصة' },
+                  { text: 'جاري إضافة ثيمات وقوالب جديدة بشكل مستمر' },
+                  { text: 'تم إضافة فكرة الديوانية - اطلق ديوانيتك الآن' },
+                  { text: 'للشركات التي تريد تركب النظام تواصل معنا عبر واتساب', link: true },
+                  { text: 'اكتشف الميزات الجديدة في نسخة العيد 2026' },
+                ].map((item, index) => (
+                  <div key={`${setIndex}-${index}`} className="ticker-item">
+                    <div className="ticker-item-dot" />
+                    <span style={{ color: item.link ? '#FFD700' : 'rgba(255,255,255,0.8)' }}>
+                      {item.text}
+                    </span>
+                  </div>
+                ))}
               </div>
             ))}
           </div>
