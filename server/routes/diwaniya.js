@@ -154,6 +154,32 @@ router.post('/', async (req, res) => {
     }
 });
 
+// ═══ Update Diwaniya settings (owner action) ═══
+router.put('/:username', async (req, res) => {
+    try {
+        const username = req.params.username.toLowerCase().trim();
+        const { isFamilyMode, eidiyaGameEnabled } = req.body;
+
+        const diwaniya = await Diwaniya.findOne({ username });
+        if (!diwaniya) {
+            return res.status(404).json({ success: false, error: 'ديوانية غير موجودة' });
+        }
+
+        if (isFamilyMode !== undefined) diwaniya.isFamilyMode = isFamilyMode;
+
+        if (eidiyaGameEnabled !== undefined) {
+            if (!diwaniya.eidiyaGame) diwaniya.eidiyaGame = {};
+            diwaniya.eidiyaGame.enabled = eidiyaGameEnabled;
+        }
+
+        await diwaniya.save();
+        res.json({ success: true, data: diwaniya });
+    } catch (error) {
+        console.error('Error updating Diwaniya settings:', error);
+        res.status(500).json({ success: false, error: 'حدث خطأ أثناء تحديث الإعدادات' });
+    }
+});
+
 // ═══ Get a specific Diwaniya by username (public view) ═══
 router.get('/:username', async (req, res) => {
     try {
@@ -212,21 +238,24 @@ router.get('/:username/manage', async (req, res) => {
 router.post('/:username/view', async (req, res) => {
     try {
         const username = req.params.username.toLowerCase().trim();
-        const diwaniya = await Diwaniya.findOne({ username });
+
+        // Use findOneAndUpdate with $inc for atomic update
+        const diwaniya = await Diwaniya.findOneAndUpdate(
+            { username },
+            { $inc: { views: 1 } },
+            { new: true }
+        );
 
         if (!diwaniya) {
             return res.status(404).json({ success: false, error: 'ديوانية غير موجودة' });
         }
 
-        diwaniya.views += 1;
-        await diwaniya.save();
-
         res.json({ success: true, data: { views: diwaniya.views } });
     } catch (error) {
+        console.error('Error recording view:', error);
         res.status(500).json({ success: false, error: 'حدث خطأ في النظام' });
     }
 });
-
 // ═══ Add a greeting to a Diwaniya ═══
 router.post('/:username/greet', postGreetingLimiter, async (req, res) => {
     try {

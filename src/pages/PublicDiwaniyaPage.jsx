@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getDiwaniya, addDiwaniyaGreeting, likeDiwaniyaGreeting, recordDiwaniyaView } from '../utils/api';
-import { ArrowLeft, Send, Heart, Calendar, Share2, MessageCircle, Loader2, Download, Gift, X } from 'lucide-react';
+import { ArrowLeft, Send, Heart, Calendar, Share2, MessageCircle, Loader2, Download, Gift, X, Users, BookOpen, HandCoins } from 'lucide-react';
 import DiwaniyaImageGenerator from '../components/DiwaniyaImageGenerator';
+import EidiyaGame from '../components/EidiyaGame';
+import { getFamilyData, createEidiyaRequest } from '../utils/api';
 
 export default function PublicDiwaniyaPage() {
     const { username } = useParams();
@@ -12,6 +14,11 @@ export default function PublicDiwaniyaPage() {
     const [newGreeting, setNewGreeting] = useState(null);
 
     const [formState, setFormState] = useState({ senderName: '', message: '', isAnonymous: true, senderAvatar: '' });
+    const [familyData, setFamilyData] = useState(null);
+    const [showGame, setShowGame] = useState(false);
+    const [showEidiyaRequest, setShowEidiyaRequest] = useState(false);
+    const [eidiyaRequestForm, setEidiyaRequestForm] = useState({ requesterName: '', amount: '', message: '' });
+    const [requestStatus, setRequestStatus] = useState('idle');
 
     // Load user avatar on mount
     useEffect(() => {
@@ -32,17 +39,18 @@ export default function PublicDiwaniyaPage() {
                 }
                 setDiwaniya(res.data);
 
-                // Record view if not seen before
+                if (res.data.isFamilyMode) {
+                    const familyRes = await getFamilyData(username);
+                    if (familyRes.success) {
+                        setFamilyData(familyRes.data);
+                    }
+                }
+
+                // Record real view on every load
                 try {
-                    const viewedStr = localStorage.getItem('viewedDiwaniyas');
-                    const viewedArray = viewedStr ? JSON.parse(viewedStr) : [];
-                    if (!viewedArray.includes(username)) {
-                        const viewRes = await recordDiwaniyaView(username);
-                        if (viewRes.success) {
-                            viewedArray.push(username);
-                            localStorage.setItem('viewedDiwaniyas', JSON.stringify(viewedArray));
-                            setDiwaniya(prev => ({ ...prev, views: viewRes.data.views }));
-                        }
+                    const viewRes = await recordDiwaniyaView(username);
+                    if (viewRes.success) {
+                        setDiwaniya(prev => ({ ...prev, views: viewRes.data.views }));
                     }
                 } catch (viewErr) {
                     console.error('Error recording view:', viewErr);
@@ -56,6 +64,25 @@ export default function PublicDiwaniyaPage() {
         }
         fetchDiwaniya();
     }, [username]);
+
+    const handleEidiyaRequest = async (e) => {
+        e.preventDefault();
+        setRequestStatus('loading');
+        try {
+            const res = await createEidiyaRequest(username, eidiyaRequestForm);
+            if (res.success) {
+                setRequestStatus('success');
+                setTimeout(() => {
+                    setShowEidiyaRequest(false);
+                    setRequestStatus('idle');
+                    setEidiyaRequestForm({ requesterName: '', amount: '', message: '' });
+                }, 3000);
+            }
+        } catch (err) {
+            alert(err.message || 'حدث خطأ في تقديم الطلب');
+            setRequestStatus('idle');
+        }
+    };
 
     const handleShare = (platform) => {
         const url = window.location.href;
@@ -211,6 +238,101 @@ export default function PublicDiwaniyaPage() {
                 </div>
             </section>
 
+            {/* FAMILY MODE NAVIGATION (Only if active) */}
+            {diwaniya.isFamilyMode && (
+                <section style={{ background: '#fff', borderBottom: '1px solid #e5e5e5', position: 'sticky', top: 0, zIndex: 100 }}>
+                    <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', justifyContent: 'center', gap: '24px', padding: '0 24px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+                        <button
+                            onClick={() => setShowGame(true)}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '20px 0',
+                                background: 'none',
+                                border: 'none',
+                                borderBottom: '2px solid transparent',
+                                color: '#171717',
+                                fontSize: '15px',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                transition: 'all 200ms ease',
+                                whiteSpace: 'nowrap',
+                            }}
+                        >
+                            <Gift size={18} />
+                            لعبة العيدية
+                        </button>
+                        <button
+                            onClick={() => {
+                                const el = document.getElementById('family-stories');
+                                el?.scrollIntoView({ behavior: 'smooth' });
+                            }}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '20px 0',
+                                background: 'none',
+                                border: 'none',
+                                borderBottom: '2px solid transparent',
+                                color: '#171717',
+                                fontSize: '15px',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                whiteSpace: 'nowrap',
+                            }}
+                        >
+                            <BookOpen size={18} />
+                            أخبار العائلة
+                        </button>
+                        <button
+                            onClick={() => setShowEidiyaRequest(true)}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '20px 0',
+                                background: 'none',
+                                border: 'none',
+                                borderBottom: '2px solid transparent',
+                                color: '#FF8C00',
+                                fontSize: '15px',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                whiteSpace: 'nowrap',
+                            }}
+                        >
+                            <HandCoins size={18} />
+                            اطلب عيدية
+                        </button>
+                        <button
+                            onClick={() => {
+                                const el = document.getElementById('greetings-wall');
+                                el?.scrollIntoView({ behavior: 'smooth' });
+                            }}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '20px 0',
+                                background: 'none',
+                                border: 'none',
+                                borderBottom: '2px solid transparent',
+                                color: '#171717',
+                                fontSize: '15px',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                whiteSpace: 'nowrap',
+                            }}
+                        >
+                            <MessageCircle size={18} />
+                            جدار التهاني
+                        </button>
+                    </div>
+                </section>
+            )}
+
             {/* GREETING FORM */}
             <section style={{ background: '#fafafa', padding: '80px 24px' }}>
                 <div style={{ maxWidth: '600px', margin: '0 auto' }}>
@@ -328,8 +450,69 @@ export default function PublicDiwaniyaPage() {
                 </div>
             </section>
 
+            {/* FAMILY STORIES & MEMBERS (If Family Mode) */}
+            {diwaniya.isFamilyMode && familyData && (
+                <>
+                    <section id="family-stories" style={{ background: '#fff', padding: '80px 24px' }}>
+                        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+                            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+                                <div style={{ display: 'inline-flex', padding: '10px', background: '#f0f9ff', borderRadius: '12px', color: '#0ea5e9', marginBottom: '16px' }}>
+                                    <BookOpen size={24} />
+                                </div>
+                                <h2 style={{ fontSize: '32px', fontWeight: 800, color: '#171717' }}>أخبار ديوانية العائلة</h2>
+                                <p style={{ color: '#737373', marginTop: '8px' }}>لحظاتنا الجميلة وتحديثات العيد</p>
+                            </div>
+
+                            {familyData.stories && familyData.stories.length > 0 ? (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
+                                    {familyData.stories.map((story) => (
+                                        <div key={story._id} style={{ background: '#fafafa', borderRadius: '20px', overflow: 'hidden', border: '1px solid #e5e5e5' }}>
+                                            {story.image && (
+                                                <img src={story.image} alt="" style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
+                                            )}
+                                            <div style={{ padding: '24px' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                                                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#0ea5e9', textTransform: 'uppercase' }}>{story.type === 'update' ? 'تحديث' : 'ذكرى'}</span>
+                                                    <span style={{ fontSize: '12px', color: '#a3a3a3' }}>• {formatDate(story.createdAt)}</span>
+                                                </div>
+                                                <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#171717', marginBottom: '12px' }}>{story.title}</h3>
+                                                <p style={{ fontSize: '15px', color: '#525252', lineHeight: 1.6 }}>{story.content}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div style={{ textAlign: 'center', padding: '60px 40px', background: '#fafafa', borderRadius: '24px', border: '2px dashed #e5e5e5' }}>
+                                    <p style={{ fontSize: '18px', color: '#737373' }}>لا توجد أخبار عائلية بعد</p>
+                                    <p style={{ color: '#a3a3a3', marginTop: '8px' }}>كن أول من يشارك لحظة جميلة</p>
+                                </div>
+                            )}
+
+                            {/* Family Members */}
+                            <div id="family-members" style={{ marginTop: '80px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
+                                    <h3 style={{ fontSize: '24px', fontWeight: 700 }}>أفراد العائلة ({familyData.members?.length || 0})</h3>
+                                    <Users size={24} color="#a3a3a3" />
+                                </div>
+                                <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', padding: '10px 0', scrollbarWidth: 'none' }}>
+                                    {familyData.members?.map(member => (
+                                        <div key={member._id} style={{ flexShrink: 0, textAlign: 'center', width: '80px' }}>
+                                            <div style={{ width: '64px', height: '64px', borderRadius: '20px', background: '#171717', margin: '0 auto 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '20px', fontWeight: 700 }}>
+                                                {member.avatar ? <img src={member.avatar} style={{ width: '100%', height: '100%', borderRadius: '20px', objectFit: 'cover' }} /> : member.name.charAt(0)}
+                                            </div>
+                                            <div style={{ fontSize: '14px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{member.name}</div>
+                                            <div style={{ fontSize: '11px', color: '#a3a3a3' }}>{member.relation}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </>
+            )}
+
             {/* GREETINGS WALL */}
-            <section style={{ background: '#fff', padding: '80px 24px' }}>
+            <section id="greetings-wall" style={{ background: '#fff', padding: '80px 24px' }}>
                 <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                     <div style={{ textAlign: 'center', marginBottom: '48px' }}>
                         <span style={{ fontSize: '12px', fontWeight: 600, color: '#a3a3a3', letterSpacing: '0.1em' }}>التهاني</span>
@@ -510,6 +693,87 @@ export default function PublicDiwaniyaPage() {
                     </div>
                 </div>
             </section>
+
+            {/* EIDIYA GAME MODAL */}
+            {showGame && (
+                <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.9)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+                    <div style={{ width: '100%', maxWidth: '900px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', background: '#fafafa', borderRadius: '32px' }}>
+                        <button
+                            onClick={() => setShowGame(false)}
+                            style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 10, background: '#fff', border: 'none', width: '40px', height: '40px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                        >
+                            <X size={24} />
+                        </button>
+                        <div style={{ padding: '40px 24px' }}>
+                            {diwaniya.activeGame ? (
+                                <EidiyaGame gameId={diwaniya.activeGame} />
+                            ) : (
+                                <div style={{ textAlign: 'center', padding: '80px 40px' }}>
+                                    <div style={{ fontSize: '64px', marginBottom: '24px' }}>🎲</div>
+                                    <h2 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '12px' }}>لا توجد لعبة نشطة</h2>
+                                    <p style={{ color: '#737373', fontSize: '18px' }}>اطلب من صاحب الديوانية تفعيل لعبة العيدية!</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* EIDIYA REQUEST MODAL */}
+            {showEidiyaRequest && (
+                <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+                    <div style={{ background: '#fff', width: '100%', maxWidth: '500px', borderRadius: '24px', padding: '40px', position: 'relative' }}>
+                        <button onClick={() => setShowEidiyaRequest(false)} style={{ position: 'absolute', top: '24px', left: '24px', background: 'none', border: 'none', cursor: 'pointer', color: '#a3a3a3' }}>
+                            <X size={24} />
+                        </button>
+
+                        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+                            <div style={{ width: '64px', height: '64px', background: '#fff7ed', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                                <HandCoins size={32} color="#FF8C00" />
+                            </div>
+                            <h2 style={{ fontSize: '24px', fontWeight: 800 }}>اطلب عيديتك</h2>
+                            <p style={{ color: '#737373' }}>أرسل طلباً لطيفاً لصاحب الديوانية</p>
+                        </div>
+
+                        <form onSubmit={handleEidiyaRequest} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <input
+                                required
+                                type="text"
+                                placeholder="اسمك الكريم"
+                                value={eidiyaRequestForm.requesterName}
+                                onChange={e => setEidiyaRequestForm({ ...eidiyaRequestForm, requesterName: e.target.value })}
+                                style={{ padding: '16px', background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: '12px', fontSize: '15px' }}
+                            />
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    required
+                                    type="number"
+                                    placeholder="المبلغ المقترح"
+                                    value={eidiyaRequestForm.amount}
+                                    onChange={e => setEidiyaRequestForm({ ...eidiyaRequestForm, amount: e.target.value })}
+                                    style={{ padding: '16px', paddingLeft: '60px', width: '100%', background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: '12px', fontSize: '15px' }}
+                                />
+                                <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: 700, color: '#a3a3a3' }}>ريال</span>
+                            </div>
+                            <textarea
+                                placeholder="رسالة لطيقة (اختياري)"
+                                value={eidiyaRequestForm.message}
+                                onChange={e => setEidiyaRequestForm({ ...eidiyaRequestForm, message: e.target.value })}
+                                style={{ padding: '16px', background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: '12px', fontSize: '15px', resize: 'none' }}
+                                rows={3}
+                            ></textarea>
+
+                            <button
+                                type="submit"
+                                disabled={requestStatus === 'loading'}
+                                style={{ padding: '18px', background: requestStatus === 'success' ? '#10b981' : 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)', color: '#fff', fontSize: '18px', fontWeight: 700, border: 'none', borderRadius: '12px', cursor: 'pointer', transition: 'all 200ms ease' }}
+                            >
+                                {requestStatus === 'loading' ? 'جاري الإرسال...' : requestStatus === 'success' ? 'تم تقديم الطلب بنجاح ✅' : 'إرسال الطلب ✨'}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             <style>{`
                 @keyframes spin {

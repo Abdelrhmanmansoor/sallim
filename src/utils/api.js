@@ -433,9 +433,23 @@ export async function likeDiwaniyaGreeting(username, greetId) {
  * Owner: Update greeting visibility
  */
 export async function updateDiwaniyaGreetingVisibility(username, greetId, visibility) {
+  const token = localStorage.getItem('token')
   return apiRequest(`/diwaniya/${username}/greet/${greetId}/visibility`, {
     method: 'PUT',
+    headers: { 'Authorization': `Bearer ${token}` },
     body: JSON.stringify({ visibility })
+  })
+}
+
+/**
+ * Auth: Update Diwaniya settings (requires token)
+ */
+export async function updateDiwaniyaSettings(username, settings) {
+  const token = localStorage.getItem('token')
+  return apiRequest(`/diwaniya/${username}`, {
+    method: 'PUT',
+    headers: { 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify(settings)
   })
 }
 
@@ -454,6 +468,47 @@ export async function deleteDiwaniyaGreeting(username, greetId) {
 export async function recordDiwaniyaView(username) {
   return apiRequest(`/diwaniya/${username}/view`, {
     method: 'POST'
+  })
+}
+
+// ═════════════════════════════════════════════
+// FAMILY MODE (Stories, Members, Requests)
+// ═════════════════════════════════════════════
+
+/**
+ * Get family data for a Diwaniya
+ */
+export async function getFamilyData(username) {
+  return apiRequest(`/diwaniya/${username}/family`)
+}
+
+/**
+ * Submit an Eidiya request
+ */
+export async function createEidiyaRequest(username, data) {
+  return apiRequest(`/diwaniya/${username}/family/eidiya-request`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Add a family story/update
+ */
+export async function createFamilyStory(username, data) {
+  return apiRequest(`/diwaniya/${username}/family/story`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Join family as a member
+ */
+export async function joinFamily(username, data) {
+  return apiRequest(`/diwaniya/${username}/family/member`, {
+    method: 'POST',
+    body: JSON.stringify(data)
   })
 }
 

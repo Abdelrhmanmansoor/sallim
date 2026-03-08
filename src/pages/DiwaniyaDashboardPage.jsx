@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { getDiwaniya, getDiwaniyaManage, updateDiwaniyaGreetingVisibility, deleteDiwaniyaGreeting } from '../utils/api';
-import { ArrowLeft, Copy, Eye, EyeOff, Trash2, MessageCircle, Loader2 } from 'lucide-react';
+import { getDiwaniya, getDiwaniyaManage, updateDiwaniyaGreetingVisibility, deleteDiwaniyaGreeting, updateDiwaniyaSettings } from '../utils/api';
+import { ArrowLeft, Copy, Eye, EyeOff, Trash2, MessageCircle, Loader2, Plus, Users, BookOpen, HandCoins, Settings, ChevronLeft, Calendar, Gamepad2, Gift } from 'lucide-react';
+import { getFamilyData, createFamilyStory, joinFamily, apiRequest } from '../utils/api';
 
 export default function DiwaniyaDashboardPage() {
     const navigate = useNavigate();
@@ -10,6 +11,10 @@ export default function DiwaniyaDashboardPage() {
     const [greetings, setGreetings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [activeTab, setActiveTab] = useState('greetings'); // greetings | family | stories | requests | settings
+    const [familyData, setFamilyData] = useState(null);
+    const [availableGames, setAvailableGames] = useState([]);
+    const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(() => {
         // First try to load from localStorage for quick render
@@ -129,6 +134,41 @@ export default function DiwaniyaDashboardPage() {
         }
     };
 
+    const handleToggleFamilyMode = async () => {
+        if (!diwaniya || isUpdating) return;
+
+        setIsUpdating(true);
+        try {
+            const newMode = !diwaniya.isFamilyMode;
+            const res = await updateDiwaniyaSettings(diwaniya.username, { isFamilyMode: newMode });
+            if (res.success) {
+                setDiwaniya(res.data);
+                if (newMode) setActiveTab('family');
+            }
+        } catch (err) {
+            alert('حدث خطأ أثناء تحديث وضع العائلة');
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    const handleToggleGame = async () => {
+        if (!diwaniya || isUpdating) return;
+
+        setIsUpdating(true);
+        try {
+            const newEnabled = !diwaniya.eidiyaGame?.enabled;
+            const res = await updateDiwaniyaSettings(diwaniya.username, { eidiyaGameEnabled: newEnabled });
+            if (res.success) {
+                setDiwaniya(res.data);
+            }
+        } catch (err) {
+            alert('حدث خطأ أثناء تحديث حالة اللعبة');
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
     const formatDate = (dateStr) => {
         const date = new Date(dateStr);
         return date.toLocaleDateString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -148,40 +188,47 @@ export default function DiwaniyaDashboardPage() {
                 <div style={{ textAlign: 'center', maxWidth: '400px' }}>
                     <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#171717', marginBottom: '16px' }}>لم يتم العثور على الديوانية</h1>
                     <p style={{ fontSize: '16px', color: '#737373', marginBottom: '24px' }}>يرجى إنشاء ديوانية جديدة</p>
-                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
                         <Link
                             to="/create-diwaniya"
                             style={{
                                 display: 'inline-flex',
                                 alignItems: 'center',
-                                gap: '8px',
-                                padding: '14px 28px',
+                                gap: '10px',
+                                padding: '16px 32px',
                                 background: '#171717',
                                 color: '#fff',
-                                fontSize: '15px',
-                                fontWeight: 600,
-                                borderRadius: '12px',
+                                fontSize: '16px',
+                                fontWeight: 700,
+                                borderRadius: '14px',
                                 textDecoration: 'none',
+                                transition: 'all 200ms ease',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                             }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                         >
+                            <Plus size={20} />
                             إنشاء ديوانية
-                            <ArrowLeft size={18} />
                         </Link>
                         <Link
                             to="/create-game"
                             style={{
                                 display: 'inline-flex',
                                 alignItems: 'center',
-                                gap: '8px',
-                                padding: '14px 28px',
+                                gap: '10px',
+                                padding: '16px 32px',
                                 background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)',
                                 color: '#171717',
-                                fontSize: '15px',
+                                fontSize: '16px',
                                 fontWeight: 700,
-                                borderRadius: '12px',
+                                borderRadius: '14px',
                                 textDecoration: 'none',
                                 boxShadow: '0 4px 12px rgba(255, 140, 0, 0.2)',
+                                transition: 'all 200ms ease',
                             }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                         >
                             🎲 لعبة العيدية
                         </Link>
@@ -195,340 +242,236 @@ export default function DiwaniyaDashboardPage() {
     const privateGreetings = greetings.filter(g => g.visibility === 'private');
 
     return (
-        <div style={{ fontFamily: "'Tajawal', sans-serif" }}>
+        <div style={{ fontFamily: "'Tajawal', sans-serif", background: '#f8fafc', minHeight: '100vh' }}>
 
-            {/* HERO */}
-            <section style={{ background: '#171717', padding: '80px 24px' }}>
-                <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-                    <div
-                        style={{
-                            display: 'inline-block',
-                            padding: '8px 20px',
-                            background: 'rgba(255,255,255,0.1)',
-                            borderRadius: '100px',
-                            marginBottom: '24px',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                        }}
-                    >
-                        <span style={{ fontSize: '13px', color: '#fff', fontWeight: 600 }}>لوحة التحكم</span>
+            {/* HERO / HEADER */}
+            <header style={{ background: '#171717', color: '#fff', padding: '60px 24px' }}>
+                <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '24px' }}>
+                    <div>
+                        <div style={{ display: 'inline-flex', padding: '6px 16px', background: 'rgba(255,140,0,0.1)', borderRadius: '100px', color: '#fb923c', fontSize: '13px', fontWeight: 700, marginBottom: '16px', border: '1px solid rgba(251,146,60,0.2)' }}>
+                            لوحة التحكم
+                        </div>
+                        <h1 style={{ fontSize: '36px', fontWeight: 800, marginBottom: '8px' }}>ديوانيتك</h1>
+                        <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '16px' }}>أهلاً بك يا {diwaniya.ownerName} في ديوانية العيد</p>
                     </div>
 
-                    <h1
-                        style={{
-                            fontSize: 'clamp(32px, 5vw, 48px)',
-                            fontWeight: 700,
-                            color: '#fff',
-                            lineHeight: 1.2,
-                            marginBottom: '16px',
-                        }}
-                    >
-                        ديوانيتك
-                    </h1>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                        <Link
+                            to={`/eid/${diwaniya.username}`}
+                            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', background: 'rgba(255,255,255,0.1)', color: '#fff', textDecoration: 'none', borderRadius: '12px', fontWeight: 600, border: '1px solid rgba(255,255,255,0.1)' }}
+                        >
+                            <Eye size={18} /> عرض الديوانية
+                        </Link>
+                    </div>
+                </div>
+            </header>
 
-                    <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.6)', maxWidth: '500px', margin: '0 auto 32px', lineHeight: 1.7 }}>
-                        إدارة تهاني العيد الخاصة بك
-                    </p>
-
-                    {diwaniyas.length > 1 && (
-                        <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px' }}>
-                            <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '15px' }}>اختر ديوانية:</span>
-                            <select
-                                value={diwaniya.username}
-                                onChange={(e) => {
-                                    const selectedUsername = e.target.value;
-                                    const selectedDiwaniya = diwaniyas.find(d => d.username === selectedUsername);
-                                    if (selectedDiwaniya) {
-                                        setLoading(true);
-                                        getDiwaniyaManage(selectedUsername)
-                                            .then(res => {
-                                                if (res.success) {
-                                                    setDiwaniya(res.data);
-                                                    setGreetings(res.data.greetings || []);
-                                                }
-                                            })
-                                            .catch(err => console.error(err))
-                                            .finally(() => setLoading(false));
-                                    }
-                                }}
+            {/* TABS NAVIGATION */}
+            <nav style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', position: 'sticky', top: 0, zIndex: 100 }}>
+                <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', overflowX: 'auto', padding: '0 24px', scrollbarWidth: 'none' }}>
+                    {[
+                        { id: 'greetings', label: 'التهاني', icon: MessageCircle },
+                        { id: 'family', label: 'أفراد العائلة', icon: Users, familyOnly: true },
+                        { id: 'stories', label: 'الأخبار', icon: BookOpen, familyOnly: true },
+                        { id: 'requests', label: 'طلبات العيدية', icon: HandCoins, familyOnly: true },
+                        { id: 'settings', label: 'الإعدادات', icon: Settings },
+                    ].map(tab => {
+                        if (tab.familyOnly && !diwaniya?.isFamilyMode) return null;
+                        const Icon = tab.icon;
+                        const isActive = activeTab === tab.id;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
                                 style={{
-                                    padding: '10px 16px',
-                                    borderRadius: '8px',
-                                    border: '1px solid rgba(255,255,255,0.2)',
-                                    background: 'rgba(255,255,255,0.1)',
-                                    color: '#fff',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    padding: '20px 16px',
+                                    background: 'none',
+                                    border: 'none',
+                                    borderBottom: `2px solid ${isActive ? '#171717' : 'transparent'}`,
+                                    color: isActive ? '#171717' : '#64748b',
                                     fontSize: '15px',
-                                    outline: 'none',
+                                    fontWeight: isActive ? 700 : 500,
                                     cursor: 'pointer',
-                                    fontFamily: "'Tajawal', sans-serif",
+                                    whiteSpace: 'nowrap',
+                                    transition: 'all 200ms ease',
                                 }}
                             >
-                                {diwaniyas.map(d => (
-                                    <option key={d._id || d.username} value={d.username} style={{ color: '#000' }}>
-                                        {d.ownerName} (@{d.username})
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
+                                <Icon size={18} />
+                                {tab.label}
+                            </button>
+                        );
+                    })}
                 </div>
-            </section>
+            </nav>
 
-            {/* STATS & LINK */}
-            <section style={{ background: '#fafafa', padding: '60px 24px' }}>
-                <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', marginBottom: '32px' }}>
-                        <div style={{ padding: '24px', background: '#fff', borderRadius: '12px', textAlign: 'center' }}>
-                            <div style={{ fontSize: '32px', fontWeight: 700, color: '#171717', marginBottom: '8px' }}>{greetings.length}</div>
-                            <div style={{ fontSize: '14px', color: '#737373' }}>إجمالي التهاني</div>
+            <main style={{ maxWidth: '1000px', margin: '40px auto 100px', padding: '0 24px' }}>
+
+                {/* GREETINGS TAB */}
+                {activeTab === 'greetings' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                        {/* Stats & Link */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+                            <div style={{ background: '#fff', padding: '32px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
+                                <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '16px', color: '#171717' }}>رابط المشاركة</h3>
+                                <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                                    <div style={{ flex: 1, padding: '12px', background: '#f8fafc', borderRadius: '10px', fontSize: '14px', border: '1px solid #e2e8f0', color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                        {window.location.origin}/eid/{diwaniya.username}
+                                    </div>
+                                    <button onClick={handleCopyLink} style={{ padding: '12px', background: '#171717', color: '#fff', border: 'none', borderRadius: '10px', cursor: 'pointer' }}><Copy size={18} /></button>
+                                </div>
+                                <div style={{ display: 'flex', gap: '12px' }}>
+                                    <button onClick={() => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`أرسلت لك تهنئة العيد في ديوانيتي: ${window.location.origin}/eid/${diwaniya.username}`)}`)} style={{ flex: 1, padding: '12px', background: '#25D366', color: '#fff', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                        <MessageCircle size={18} /> واتساب
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style={{ background: '#fff', padding: '32px', borderRadius: '20px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+                                <div style={{ textAlign: 'center' }}>
+                                    <div style={{ fontSize: '36px', fontWeight: 800, color: '#171717' }}>{greetings.length}</div>
+                                    <div style={{ fontSize: '14px', color: '#64748b', fontWeight: 600 }}>إجمالي التهاني</div>
+                                </div>
+                                <div style={{ width: '1px', height: '40px', background: '#e2e8f0' }}></div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <div style={{ fontSize: '36px', fontWeight: 800, color: '#fb923c' }}>{diwaniya.views || 0}</div>
+                                    <div style={{ fontSize: '14px', color: '#64748b', fontWeight: 600 }}>زيارة</div>
+                                </div>
+                            </div>
                         </div>
-                        <div style={{ padding: '24px', background: '#fff', borderRadius: '12px', textAlign: 'center' }}>
-                            <div style={{ fontSize: '32px', fontWeight: 700, color: '#10b981', marginBottom: '8px' }}>{publicGreetings.length}</div>
-                            <div style={{ fontSize: '14px', color: '#737373' }}>عامة</div>
+
+                        {/* Public Greetings */}
+                        <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#16a34a' }}><Eye size={18} /></div>
+                                <h3 style={{ fontSize: '20px', fontWeight: 700 }}>التهاني العامة ({publicGreetings.length})</h3>
+                            </div>
+                            {publicGreetings.length > 0 ? (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+                                    {publicGreetings.map(g => (
+                                        <div key={g._id} style={{ background: '#fff', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', position: 'relative' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                                                <div style={{ fontSize: '14px', fontWeight: 700 }}>{g.isAnonymous ? 'مجهول' : g.senderName}</div>
+                                                <div style={{ fontSize: '12px', color: '#94a3b8' }}>{formatDate(g.createdAt)}</div>
+                                            </div>
+                                            <p style={{ fontSize: '14px', lineHeight: 1.6, color: '#334155', marginBottom: '20px' }}>{g.message}</p>
+                                            <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '16px', display: 'flex', justifyContent: 'space-between' }}>
+                                                <button onClick={() => handleToggleVisibility(g._id)} style={{ padding: '6px', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }} title="إخفاء من العامة"><EyeOff size={16} /></button>
+                                                <button onClick={() => handleDelete(g._id)} style={{ padding: '6px', background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={16} /></button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div style={{ padding: '40px', background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', textAlign: 'center', color: '#94a3b8' }}>لا توجد تهاني عامة</div>
+                            )}
                         </div>
-                        <div style={{ padding: '24px', background: '#fff', borderRadius: '12px', textAlign: 'center' }}>
-                            <div style={{ fontSize: '32px', fontWeight: 700, color: '#f59e0b', marginBottom: '8px' }}>{privateGreetings.length}</div>
-                            <div style={{ fontSize: '14px', color: '#737373' }}>خاصة</div>
+
+                        {/* Private Greetings */}
+                        <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ea580c' }}><EyeOff size={18} /></div>
+                                <h3 style={{ fontSize: '20px', fontWeight: 700 }}>التهاني الخاصة ({privateGreetings.length})</h3>
+                            </div>
+                            {privateGreetings.length > 0 ? (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+                                    {privateGreetings.map(g => (
+                                        <div key={g._id} style={{ background: '#fff', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                                                <div style={{ fontSize: '14px', fontWeight: 700 }}>{g.isAnonymous ? 'مجهول' : g.senderName}</div>
+                                                <div style={{ fontSize: '12px', color: '#94a3b8' }}>{formatDate(g.createdAt)}</div>
+                                            </div>
+                                            <p style={{ fontSize: '14px', lineHeight: 1.6, color: '#334155', marginBottom: '20px' }}>{g.message}</p>
+                                            <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '16px', display: 'flex', justifyContent: 'space-between' }}>
+                                                <button onClick={() => handleToggleVisibility(g._id)} style={{ padding: '6px', background: 'none', border: 'none', color: '#16a34a', cursor: 'pointer' }} title="إظهار للعامة"><Eye size={16} /></button>
+                                                <button onClick={() => handleDelete(g._id)} style={{ padding: '6px', background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={16} /></button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div style={{ padding: '40px', background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', textAlign: 'center', color: '#94a3b8' }}>لا توجد تهاني خاصة</div>
+                            )}
                         </div>
                     </div>
+                )}
 
-                    <div style={{ padding: '24px', background: '#fff', borderRadius: '12px', border: '1px solid #e5e5e5' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                {/* FAMILY TAB Content would go here */}
+                {activeTab === 'family' && (
+                    <div style={{ textAlign: 'center', padding: '60px' }}>
+                        <Users size={48} style={{ color: '#94a3b8', marginBottom: '16px' }} />
+                        <h3>أفراد العائلة قادم قريباً</h3>
+                        <p>هنا يمكنك إدارة أفراد عائلتك في الديوانية</p>
+                    </div>
+                )}
+
+                {/* SETTINGS TAB */}
+                {activeTab === 'settings' && (
+                    <div style={{ background: '#fff', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+                        <div style={{ padding: '32px', borderBottom: '1px solid #f1f5f9' }}>
+                            <h3 style={{ fontSize: '20px', fontWeight: 700 }}>إعدادات الديوانية</h3>
+                        </div>
+                        <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+
+                            {/* Family Mode Toggle */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <div>
+                                    <h4 style={{ fontWeight: 700, marginBottom: '4px' }}>وضع العائلة (Family Mode)</h4>
+                                    <p style={{ fontSize: '14px', color: '#64748b' }}>تفعيل ميزات الأخبار العائلية وطلبات العيدية</p>
+                                </div>
+                                <button
+                                    onClick={handleToggleFamilyMode}
+                                    disabled={isUpdating}
+                                    style={{
+                                        width: '56px',
+                                        height: '28px',
+                                        background: diwaniya?.isFamilyMode ? '#171717' : '#e2e8f0',
+                                        borderRadius: '100px',
+                                        border: 'none',
+                                        position: 'relative',
+                                        cursor: isUpdating ? 'not-allowed' : 'pointer',
+                                        opacity: isUpdating ? 0.7 : 1,
+                                        transition: 'all 300ms ease',
+                                    }}
+                                >
+                                    <div style={{ position: 'absolute', top: '4px', right: diwaniya?.isFamilyMode ? '4px' : '32px', width: '20px', height: '20px', background: '#fff', borderRadius: '50%', transition: 'all 300ms ease' }} />
+                                </button>
+                            </div>
+
+                            <div style={{ height: '1px', background: '#f1f5f9' }}></div>
+
+                            {/* Game Link */}
                             <div>
-                                <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#171717', marginBottom: '4px' }}>رابط ديوانيتك</h3>
-                                <p style={{ fontSize: '14px', color: '#737373' }}>شاركه مع الأصدقاء لتلقي التهاني</p>
-                            </div>
-                            <div style={{ display: 'flex', gap: '12px' }}>
-                                <button
-                                    onClick={handleCopyLink}
-                                    style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '6px',
-                                        padding: '10px 20px',
-                                        background: '#171717',
-                                        color: '#fff',
-                                        fontSize: '14px',
-                                        fontWeight: 600,
-                                        borderRadius: '10px',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        transition: 'all 200ms ease',
-                                    }}
-                                >
-                                    <Copy size={16} />
-                                    نسخ
-                                </button>
-                                <button
-                                    onClick={() => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`أرسلت لك تهنئة العيد في ديوانيتي: ${window.location.origin}/eid/${diwaniya.username}`)}`)}
-                                    style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '6px',
-                                        padding: '10px 20px',
-                                        background: '#25D366',
-                                        color: '#fff',
-                                        fontSize: '14px',
-                                        fontWeight: 600,
-                                        borderRadius: '10px',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        transition: 'all 200ms ease',
-                                    }}
-                                >
-                                    <MessageCircle size={16} />
-                                    واتساب
-                                </button>
-                                <Link
-                                    to="/create-game"
-                                    style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '6px',
-                                        padding: '10px 20px',
-                                        background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)',
-                                        color: '#171717',
-                                        fontSize: '14px',
-                                        fontWeight: 600,
-                                        borderRadius: '10px',
-                                        textDecoration: 'none',
-                                        transition: 'all 200ms ease',
-                                        boxShadow: '0 2px 8px rgba(255, 140, 0, 0.2)',
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 140, 0, 0.3)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 140, 0, 0.2)';
-                                    }}
-                                >
-                                    🎲 لعبة العيدية
-                                </Link>
+                                <h4 style={{ fontWeight: 700, marginBottom: '16px' }}>لعبة العيدية</h4>
+                                {diwaniya?.eidiyaGame?.enabled ? (
+                                    <div style={{ padding: '16px', background: '#f0fdf4', borderRadius: '12px', border: '1px solid #bcf0da', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                            <div style={{ width: '40px', height: '40px', background: '#16a34a', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}><Gamepad2 size={24} /></div>
+                                            <div>
+                                                <div style={{ fontSize: '15px', fontWeight: 700 }}>اللعبة مفعلة</div>
+                                                <div style={{ fontSize: '12px', color: '#166534' }}>الآن يمكن للزوار لعب تحدي العيدية</div>
+                                            </div>
+                                        </div>
+                                        <button onClick={handleToggleGame} disabled={isUpdating} style={{ padding: '8px 16px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', cursor: isUpdating ? 'not-allowed' : 'pointer', fontWeight: 600, opacity: isUpdating ? 0.7 : 1 }}>تعطيل</button>
+                                    </div>
+                                ) : (
+                                    <div style={{ padding: '24px', background: '#f8fafc', borderRadius: '16px', border: '1px dashed #e2e8f0', textAlign: 'center' }}>
+                                        <p style={{ color: '#64748b', marginBottom: '16px' }}>اللعبة معطلة حالياً</p>
+                                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                                            <button onClick={handleToggleGame} disabled={isUpdating} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: '#171717', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: isUpdating ? 'not-allowed' : 'pointer', opacity: isUpdating ? 0.7 : 1 }}>تفعيل اللعبة</button>
+                                            <Link to="/create-game" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)', color: '#171717', border: 'none', borderRadius: '10px', fontWeight: 700, textDecoration: 'none' }}>
+                                                تعديل الأسئلة
+                                            </Link>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
-                        <div style={{ fontSize: '15px', color: '#171717', fontWeight: 600, wordBreak: 'break-all', padding: '12px', background: '#fafafa', borderRadius: '8px', textAlign: 'center' }}>
-                            {window.location.origin}/eid/{diwaniya.username}
-                        </div>
                     </div>
-                </div>
-            </section>
-
-            {/* PUBLIC GREETINGS */}
-            {publicGreetings.length > 0 && (
-                <section style={{ background: '#fff', padding: '60px 24px' }}>
-                    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-                        <div style={{ marginBottom: '32px' }}>
-                            <span style={{ fontSize: '12px', fontWeight: 600, color: '#a3a3a3', letterSpacing: '0.1em' }}>تهاني عامة</span>
-                            <h2 style={{ fontSize: 'clamp(24px, 4vw, 32px)', fontWeight: 700, color: '#171717', marginTop: '8px' }}>
-                                التهاني العامة ({publicGreetings.length})
-                            </h2>
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
-                            {publicGreetings.map((g) => (
-                                <div key={g._id} style={{ padding: '20px', background: '#fafafa', borderRadius: '12px', border: '1px solid #e5e5e5' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <div style={{
-                                                width: '32px',
-                                                height: '32px',
-                                                background: '#171717',
-                                                borderRadius: '8px',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                fontSize: '14px',
-                                                fontWeight: 700,
-                                                color: '#fff',
-                                            }}>
-                                                {g.isAnonymous ? '?' : g.senderName.charAt(0)}
-                                            </div>
-                                            <div>
-                                                <div style={{ fontSize: '14px', fontWeight: 600, color: '#171717', marginBottom: '2px' }}>
-                                                    {g.isAnonymous ? 'مجهول' : g.senderName}
-                                                </div>
-                                                <div style={{ fontSize: '11px', color: '#a3a3a3' }}>{formatDate(g.createdAt)}</div>
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={() => handleToggleVisibility(g._id)}
-                                            style={{
-                                                padding: '6px',
-                                                background: 'transparent',
-                                                border: 'none',
-                                                cursor: 'pointer',
-                                                color: '#a3a3a3',
-                                                transition: 'all 200ms ease',
-                                            }}
-                                            title="تحويل إلى خاصة"
-                                        >
-                                            <EyeOff size={16} />
-                                        </button>
-                                    </div>
-                                    <p style={{ fontSize: '14px', color: '#525252', lineHeight: 1.6, marginBottom: '12px' }}>"{g.message}"</p>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '12px', borderTop: '1px solid #e5e5e5' }}>
-                                        <span style={{ fontSize: '12px', color: '#737373' }}>{g.likes || 0} إعجاب</span>
-                                        <button
-                                            onClick={() => handleDelete(g._id)}
-                                            style={{
-                                                padding: '6px',
-                                                background: 'transparent',
-                                                border: 'none',
-                                                cursor: 'pointer',
-                                                color: '#ef4444',
-                                                transition: 'all 200ms ease',
-                                            }}
-                                            title="حذف"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {/* PRIVATE GREETINGS */}
-            {privateGreetings.length > 0 && (
-                <section style={{ background: '#fafafa', padding: '60px 24px' }}>
-                    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-                        <div style={{ marginBottom: '32px' }}>
-                            <span style={{ fontSize: '12px', fontWeight: 600, color: '#a3a3a3', letterSpacing: '0.1em' }}>تهاني خاصة</span>
-                            <h2 style={{ fontSize: 'clamp(24px, 4vw, 32px)', fontWeight: 700, color: '#171717', marginTop: '8px' }}>
-                                التهاني الخاصة ({privateGreetings.length})
-                            </h2>
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
-                            {privateGreetings.map((g) => (
-                                <div key={g._id} style={{ padding: '20px', background: '#fff', borderRadius: '12px', border: '1px solid #e5e5e5' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <div style={{
-                                                width: '32px',
-                                                height: '32px',
-                                                background: '#f59e0b',
-                                                borderRadius: '8px',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                fontSize: '14px',
-                                                fontWeight: 700,
-                                                color: '#fff',
-                                            }}>
-                                                {g.isAnonymous ? '?' : g.senderName.charAt(0)}
-                                            </div>
-                                            <div>
-                                                <div style={{ fontSize: '14px', fontWeight: 600, color: '#171717', marginBottom: '2px' }}>
-                                                    {g.isAnonymous ? 'مجهول' : g.senderName}
-                                                </div>
-                                                <div style={{ fontSize: '11px', color: '#a3a3a3' }}>{formatDate(g.createdAt)}</div>
-                                            </div>
-                                        </div>
-                                        <div style={{ display: 'flex', gap: '8px' }}>
-                                            <button
-                                                onClick={() => handleToggleVisibility(g._id)}
-                                                style={{
-                                                    padding: '6px',
-                                                    background: 'transparent',
-                                                    border: 'none',
-                                                    cursor: 'pointer',
-                                                    color: '#10b981',
-                                                    transition: 'all 200ms ease',
-                                                }}
-                                                title="تحويل إلى عامة"
-                                            >
-                                                <Eye size={16} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(g._id)}
-                                                style={{
-                                                    padding: '6px',
-                                                    background: 'transparent',
-                                                    border: 'none',
-                                                    cursor: 'pointer',
-                                                    color: '#ef4444',
-                                                    transition: 'all 200ms ease',
-                                                }}
-                                                title="حذف"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <p style={{ fontSize: '14px', color: '#525252', lineHeight: 1.6, marginBottom: '12px' }}>"{g.message}"</p>
-                                    <div style={{ fontSize: '12px', color: '#737373', paddingTop: '12px', borderTop: '1px solid #e5e5e5' }}>
-                                        {g.likes || 0} إعجاب
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-            )}
+                )}
+            </main>
         </div>
     );
 }

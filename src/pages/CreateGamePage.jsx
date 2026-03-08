@@ -155,23 +155,25 @@ export default function CreateGamePage() {
             <header style={{ background: '#171717', padding: '60px 24px', textAlign: 'center', position: 'relative' }}>
                 <button
                     onClick={() => navigate('/')}
-                    style={{ position: 'absolute', top: '24px', right: '24px', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.1)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '10px', cursor: 'pointer' }}
+                    style={{ position: 'absolute', top: '24px', right: '24px', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.1)', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '12px', cursor: 'pointer', fontWeight: 600, transition: 'all 200ms ease' }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
                 >
-                    <ArrowRight size={16} /> ردا
+                    <ArrowRight size={18} /> رجوع
                 </button>
                 <div style={{ display: 'inline-flex', padding: '12px', borderRadius: '20px', background: 'rgba(255,255,255,0.1)', marginBottom: '24px' }}>
                     <Trophy size={32} color="#FFD700" />
                 </div>
-                <h1 style={{ fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: 800, color: '#fff', marginBottom: '16px' }}>
+                <h1 style={{ fontSize: 'clamp(32px, 6vw, 48px)', fontWeight: 800, color: '#fff', marginBottom: '16px', lineHeight: 1.2 }}>
                     أطلق تحدي العيدية
                 </h1>
-                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '16px', maxWidth: '500px', margin: '0 auto' }}>
+                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '18px', maxWidth: '600px', margin: '0 auto', lineHeight: 1.6 }}>
                     أنشئ أسئلتك الخاصة، حدد لكل سؤال جوائزه، ودع عائلتك تتنافس على صدارة الترتيب!
                 </p>
             </header>
 
             {/* Form */}
-            <main style={{ maxWidth: '700px', margin: '-40px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
+            <main style={{ maxWidth: '800px', margin: '-60px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
                 {/* Warning for non-logged users */}
                 {!isLoggedIn && (
                     <div style={{
