@@ -148,24 +148,44 @@ export default function DiwaniyaDashboardPage() {
                 <div style={{ textAlign: 'center', maxWidth: '400px' }}>
                     <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#171717', marginBottom: '16px' }}>لم يتم العثور على الديوانية</h1>
                     <p style={{ fontSize: '16px', color: '#737373', marginBottom: '24px' }}>يرجى إنشاء ديوانية جديدة</p>
-                    <Link
-                        to="/create-diwaniya"
-                        style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            padding: '14px 28px',
-                            background: '#171717',
-                            color: '#fff',
-                            fontSize: '15px',
-                            fontWeight: 600,
-                            borderRadius: '12px',
-                            textDecoration: 'none',
-                        }}
-                    >
-                        إنشاء ديوانية
-                        <ArrowLeft size={18} />
-                    </Link>
+                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                        <Link
+                            to="/create-diwaniya"
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '14px 28px',
+                                background: '#171717',
+                                color: '#fff',
+                                fontSize: '15px',
+                                fontWeight: 600,
+                                borderRadius: '12px',
+                                textDecoration: 'none',
+                            }}
+                        >
+                            إنشاء ديوانية
+                            <ArrowLeft size={18} />
+                        </Link>
+                        <Link
+                            to="/create-game"
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '14px 28px',
+                                background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)',
+                                color: '#171717',
+                                fontSize: '15px',
+                                fontWeight: 700,
+                                borderRadius: '12px',
+                                textDecoration: 'none',
+                                boxShadow: '0 4px 12px rgba(255, 140, 0, 0.2)',
+                            }}
+                        >
+                            🎲 لعبة العيدية
+                        </Link>
+                    </div>
                 </div>
             </div>
         );
