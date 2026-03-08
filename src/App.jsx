@@ -28,6 +28,12 @@ import RegisterPage from './pages/RegisterPage'
 import ProfilePage from './pages/ProfilePage'
 import CompaniesPage from './pages/CompaniesPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
+import AboutPage from './pages/AboutPage'
+import PricingPage from './pages/PricingPage'
+import DeliveryPage from './pages/DeliveryPage'
+import RefundPage from './pages/RefundPage'
+import ContactPage from './pages/ContactPage'
+import CheckoutPage from './pages/CheckoutPage'
 
 export default function App() {
   const location = useLocation()
@@ -52,7 +58,7 @@ export default function App() {
     '/companies',
   ].includes(pathname)
 
-  // Define isBusiness - assuming it's false for the free version
+  // Define isBusiness - assuming it's false for free version
   const isBusiness = false
 
   return (
@@ -88,6 +94,12 @@ export default function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/companies" element={<CompaniesPage />} />
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/delivery" element={<DeliveryPage />} />
+          <Route path="/refund" element={<RefundPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

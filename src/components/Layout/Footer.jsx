@@ -8,11 +8,14 @@ const footerLinks = {
   ],
   resources: [
     { to: '/', label: 'الرئيسية' },
-    { to: '/dashboard', label: 'لوحة التحكم' },
+    { to: '/about', label: 'عن المنصة' },
+    { to: '/pricing', label: 'الأسعار' },
   ],
   legal: [
     { to: '/privacy', label: 'الخصوصية' },
     { to: '/terms', label: 'الشروط' },
+    { to: '/delivery', label: 'التوصيل' },
+    { to: '/refund', label: 'الاسترداد' },
   ],
 }
 
@@ -36,7 +39,7 @@ export default function Footer() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(160px,1fr))',
             gap: '48px',
             marginBottom: '48px',
           }}
