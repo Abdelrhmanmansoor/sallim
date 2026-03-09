@@ -8,6 +8,13 @@
 // المسار: public/templates/جاهزة/
 // ═══════════════════════════════════════════════════════════════
 export const templates = [
+  { id: 10, name: 'تصميم ١٠', image: '/templates/جاهزة/10.png', textColor: '#ffffff' },
+  { id: 11, name: 'تصميم ١١', image: '/templates/جاهزة/11.png', textColor: '#ffffff' },
+  { id: 12, name: 'تصميم ١٢', image: '/templates/جاهزة/13.png', textColor: '#ffffff' },
+  { id: 13, name: 'تصميم ١٣', image: '/templates/جاهزة/14.png', textColor: '#ffffff' },
+  { id: 14, name: 'تصميم ١٤', image: '/templates/جاهزة/15.png', textColor: '#ffffff' },
+  { id: 15, name: 'تصميم ١٥', image: '/templates/جاهزة/16.png', textColor: '#ffffff' },
+  { id: 16, name: 'تصميم ١٦', image: '/templates/جاهزة/17.png', textColor: '#ffffff' },
   { id: 1, name: 'تصميم ١', image: '/templates/جاهزة/3.png', textColor: '#ffffff' },
   { id: 2, name: 'تصميم ٢', image: '/templates/جاهزة/5.png', textColor: '#ffffff' },
   { id: 3, name: 'تصميم ٣', image: '/templates/جاهزة/6.png', textColor: '#ffffff' },

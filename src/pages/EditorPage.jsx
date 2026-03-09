@@ -122,6 +122,13 @@ function ColorPicker({ value, onChange, label }) {
 
 /* ═══ Ready Designs ═══ */
 const readyDesigns = [
+  { id: 'r10', name: 'تصميم ١٠', template: '/templates/جاهزة/10.png', nameColor: '#ffffff' },
+  { id: 'r11', name: 'تصميم ١١', template: '/templates/جاهزة/11.png', nameColor: '#ffffff' },
+  { id: 'r12', name: 'تصميم ١٢', template: '/templates/جاهزة/13.png', nameColor: '#ffffff' },
+  { id: 'r13', name: 'تصميم ١٣', template: '/templates/جاهزة/14.png', nameColor: '#ffffff' },
+  { id: 'r14', name: 'تصميم ١٤', template: '/templates/جاهزة/15.png', nameColor: '#ffffff' },
+  { id: 'r15', name: 'تصميم ١٥', template: '/templates/جاهزة/16.png', nameColor: '#ffffff' },
+  { id: 'r16', name: 'تصميم ١٦', template: '/templates/جاهزة/17.png', nameColor: '#ffffff' },
   { id: 'r1', name: 'تصميم ١', template: '/templates/جاهزة/3.png', nameColor: '#ffffff' },
   { id: 'r2', name: 'تصميم ٢', template: '/templates/جاهزة/5.png', nameColor: '#ffffff' },
   { id: 'r3', name: 'تصميم ٣', template: '/templates/جاهزة/6.png', nameColor: '#ffffff' },
@@ -233,8 +240,11 @@ export default function EditorPage() {
   }, [isAuthenticated, company])
 
   // Computed - Combine API templates with static fallbacks + custom uploads
-  const finalReadyTemplates = dbReadyTemplates.length > 0 ? dbReadyTemplates : staticTemplates
-  const finalDesignerTemplates = dbDesignerTemplates.length > 0 ? dbDesignerTemplates : staticDesignerTemplates
+  const mergedReady = [...staticTemplates, ...dbReadyTemplates];
+  const finalReadyTemplates = mergedReady.filter((t, i, self) => i === self.findIndex((tx) => tx.image === t.image));
+
+  const mergedDesigner = [...staticDesignerTemplates, ...dbDesignerTemplates];
+  const finalDesignerTemplates = mergedDesigner.filter((t, i, self) => i === self.findIndex((tx) => tx.image === t.image));
 
   const allTemplates = mode === 'designer'
     ? [...finalDesignerTemplates, ...customTemplates]
