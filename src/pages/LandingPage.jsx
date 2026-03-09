@@ -1,11 +1,14 @@
 ﻿import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { ArrowLeft, Palette, Download, Smartphone, Type, Layers, Shield, ChevronDown, Heart, DollarSign } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { ArrowLeft, Palette, Download, Smartphone, Type, Layers, Shield, ChevronDown, Heart, DollarSign, X, Sparkles } from 'lucide-react'
 import { getTemplates } from '../utils/api'
 
 export default function LandingPage() {
+  const navigate = useNavigate()
   const [openFaq, setOpenFaq] = useState(null)
   const [previewTemplates, setPreviewTemplates] = useState([])
+  const [showPopup, setShowPopup] = useState(false)
+  const [popupCountdown, setPopupCountdown] = useState(8)
 
   useEffect(() => {
     async function load() {
@@ -67,8 +70,268 @@ export default function LandingPage() {
     },
   ]
 
+  const cardCategories = [
+    { id: 1, name: 'بطاقات العيد', icon: '🎉', color: '#FFD700', premium: false },
+    { id: 2, name: 'بطاقات الزفاف', icon: '💍', color: '#E91E63', premium: true },
+    { id: 3, name: 'بطاقات التخرج', icon: '🎓', color: '#9C27B0', premium: false },
+    { id: 4, name: 'بطاقات المواليد', icon: '👶', color: '#4CAF50', premium: false },
+    { id: 5, name: 'بطاقات حفلات الأطفال', icon: '🎈', color: '#FF9800', premium: false },
+    { id: 6, name: 'بطاقات افتتاح المشاريع', icon: '🏢', color: '#2196F3', premium: false },
+    { id: 7, name: 'بطاقات الشكر', icon: '🙏', color: '#795548', premium: false },
+    { id: 8, name: 'بطاقات العزاء', icon: '🕊️', color: '#607D8B', premium: false },
+    { id: 9, name: 'بطاقات دعوات المناسبات', icon: '📋', color: '#00BCD4', premium: false },
+    { id: 10, name: 'بطاقات النجاح والإنجاز', icon: '🏆', color: '#FF5722', premium: false },
+  ]
+
+  useEffect(() => {
+    // Show popup after 3 seconds
+    const timer = setTimeout(() => {
+      setShowPopup(true)
+    }, 3000)
+
+    // Countdown timer for popup
+    const countdownInterval = setInterval(() => {
+      setPopupCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval)
+          setShowPopup(false)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => {
+      clearTimeout(timer)
+      clearInterval(countdownInterval)
+    }
+  }, [])
+
+  const handleClosePopup = () => {
+    setShowPopup(false)
+  }
+
+  const handleWhatsAppLink = (message) => {
+    const phoneNumber = '201007835547'
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+    window.open(whatsappUrl, '_blank')
+  }
+
   return (
     <div style={{ fontFamily: "'Tajawal', sans-serif" }}>
+
+      {/* LUXURY POPUP */}
+      {showPopup && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            animation: 'fadeIn 0.5s ease',
+          }}
+        >
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #fff 0%, #fafafa 100%)',
+              borderRadius: '24px',
+              padding: '40px 32px',
+              maxWidth: '500px',
+              width: '100%',
+              position: 'relative',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+              border: '1px solid rgba(255, 255, 255, 0.5)',
+              animation: 'slideUp 0.5s ease',
+            }}
+          >
+            {/* Close Button */}
+            <button
+              onClick={handleClosePopup}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: 'rgba(0, 0, 0, 0.05)',
+                border: 'none',
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 200ms ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(0, 0, 0, 0.1)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(0, 0, 0, 0.05)'
+              }}
+            >
+              <X size={18} color="#171717" />
+            </button>
+
+            {/* Countdown Badge */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '16px',
+                left: '16px',
+                background: 'linear-gradient(135deg, #E91E63 0%, #9C27B0 100%)',
+                color: '#fff',
+                padding: '6px 14px',
+                borderRadius: '100px',
+                fontSize: '13px',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 4px 12px rgba(233, 30, 99, 0.3)',
+              }}
+            >
+              <span>{popupCountdown}s</span>
+            </div>
+
+            {/* Sparkle Icon */}
+            <div
+              style={{
+                width: '64px',
+                height: '64px',
+                background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)',
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '20px',
+                boxShadow: '0 8px 24px rgba(255, 140, 0, 0.3)',
+              }}
+            >
+              <Sparkles size={32} color="#fff" />
+            </div>
+
+            {/* Title */}
+            <h2
+              style={{
+                fontSize: '24px',
+                fontWeight: 800,
+                color: '#171717',
+                marginBottom: '12px',
+                textAlign: 'center',
+                lineHeight: 1.3,
+              }}
+            >
+              🎉 احتفل بالعيد بأناقة
+            </h2>
+
+            {/* Description */}
+            <p
+              style={{
+                fontSize: '15px',
+                color: '#737373',
+                textAlign: 'center',
+                marginBottom: '28px',
+                lineHeight: 1.7,
+              }}
+            >
+              ابدأ الآن في تصميم بطاقات العيد المميزة - قوالب جاهزة فوراً
+            </p>
+
+            {/* Buttons */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <button
+                onClick={() => {
+                  navigate('/editor?template=ready')
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '16px 28px',
+                  background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)',
+                  color: '#171717',
+                  fontSize: '16px',
+                  fontWeight: 700,
+                  borderRadius: '14px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 200ms ease',
+                  boxShadow: '0 4px 14px rgba(255, 140, 0, 0.3)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 140, 0, 0.4)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(255, 140, 0, 0.3)'
+                }}
+              >
+                <span style={{ fontSize: '20px' }}>🎊</span>
+                صمم تهنئة العيد
+              </button>
+
+              <button
+                onClick={() => {
+                  navigate('/wedding-invitation')
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '14px 24px',
+                  background: '#fff',
+                  color: '#E91E63',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  borderRadius: '12px',
+                  border: '2px solid #E91E63',
+                  cursor: 'pointer',
+                  transition: 'all 200ms ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(233, 30, 99, 0.05)'
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#fff'
+                  e.currentTarget.style.transform = 'translateY(0)'
+                }}
+              >
+                <span style={{ fontSize: '18px' }}>💍</span>
+                طلب دعوات الزفاف
+              </button>
+            </div>
+          </div>
+
+          <style>{`
+            @keyframes fadeIn {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+            @keyframes slideUp {
+              from {
+                opacity: 0;
+                transform: translateY(30px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+          `}</style>
+        </div>
+      )}
 
       {/* HERO */}
       <section
@@ -326,6 +589,185 @@ export default function LandingPage() {
                     <span className="ticker-item-separator">✧</span>
                   </div>
                 ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* LUXURY CARD CATEGORIES */}
+      <section style={{ padding: '100px 0', background: '#fff' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '6px 16px',
+              background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)',
+              borderRadius: '100px',
+              marginBottom: '20px',
+            }}>
+              <Sparkles size={14} color="#171717" />
+              <span style={{ fontSize: '12px', color: '#171717', fontWeight: 700, letterSpacing: '0.02em' }}>
+                منتجات فاخرة
+              </span>
+            </div>
+
+            <h2 style={{
+              fontSize: 'clamp(32px, 5vw, 48px)',
+              fontWeight: 800,
+              color: '#171717',
+              marginBottom: '16px',
+              lineHeight: 1.2
+            }}>
+              بطاقات مناسبات مميزة
+            </h2>
+
+            <p style={{
+              fontSize: '16px',
+              color: '#737373',
+              maxWidth: '540px',
+              margin: '0 auto',
+              lineHeight: 1.7
+            }}>
+              اختر من مجموعة متنوعة من البطاقات الفاخرة لكل المناسبات
+            </p>
+          </div>
+
+          {/* Cards Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '24px',
+          }}>
+            {cardCategories.map((category) => (
+              <div
+                key={category.id}
+                onClick={() => {
+                  if (category.id === 1) {
+                    // Eid cards - navigate to ready templates
+                    navigate('/editor?template=ready')
+                  } else if (category.id === 2) {
+                    // Wedding cards - show WhatsApp form
+                    navigate('/wedding-invitation')
+                  } else {
+                    // Other categories - WhatsApp
+                    handleWhatsAppLink(`مرحباً، أريد الاستفسار عن ${category.name}`)
+                  }
+                }}
+                style={{
+                  position: 'relative',
+                  padding: '36px 24px',
+                  background: '#fff',
+                  borderRadius: '20px',
+                  border: category.premium 
+                    ? '2px solid #E91E63' 
+                    : '1px solid #e5e5e5',
+                  cursor: 'pointer',
+                  transition: 'all 300ms ease',
+                  boxShadow: category.premium 
+                    ? '0 8px 24px rgba(233, 30, 99, 0.15)' 
+                    : 'none',
+                  overflow: 'hidden',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = category.premium ? 'translateY(-8px) scale(1.02)' : 'translateY(-6px)'
+                  e.currentTarget.style.boxShadow = category.premium 
+                    ? '0 12px 40px rgba(233, 30, 99, 0.25)' 
+                    : '0 12px 32px rgba(0,0,0,0.1)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)'
+                  e.currentTarget.style.boxShadow = category.premium 
+                    ? '0 8px 24px rgba(233, 30, 99, 0.15)' 
+                    : 'none'
+                }}
+              >
+                {/* Premium Badge */}
+                {category.premium && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '16px',
+                    left: '16px',
+                    background: 'linear-gradient(135deg, #E91E63 0%, #9C27B0 100%)',
+                    color: '#fff',
+                    padding: '6px 12px',
+                    borderRadius: '100px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    boxShadow: '0 4px 12px rgba(233, 30, 99, 0.3)',
+                  }}>
+                    <Sparkles size={12} />
+                    PREMIUM
+                  </div>
+                )}
+
+                {/* Icon */}
+                <div style={{
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '20px',
+                  background: category.premium 
+                    ? 'linear-gradient(135deg, #E91E63 0%, #9C27B0 100%)'
+                    : `linear-gradient(135deg, ${category.color} 0%, ${category.color}dd 100%)`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '20px',
+                  fontSize: '40px',
+                  boxShadow: `0 8px 24px ${category.color}33`,
+                }}>
+                  {category.icon}
+                </div>
+
+                {/* Title */}
+                <h3 style={{
+                  fontSize: '20px',
+                  fontWeight: 700,
+                  color: '#171717',
+                  marginBottom: '8px',
+                  lineHeight: 1.3,
+                }}>
+                  {category.name}
+                </h3>
+
+                {/* Description */}
+                <p style={{
+                  fontSize: '14px',
+                  color: '#737373',
+                  lineHeight: 1.6,
+                  marginBottom: '16px',
+                }}>
+                  {category.id === 1 && 'تصاميم جاهزة للعيد - فوراً'}
+                  {category.id === 2 && 'تصاميم مخصصة فاخرة'}
+                  {category.id === 3 && 'احتفل بإنجازك بشكل مميز'}
+                  {category.id === 4 && 'رحيب بالمولود الجديد'}
+                  {category.id === 5 && 'أجواء مرحلة للأطفال'}
+                  {category.id === 6 && 'احتفل بافتتاح مشروعك'}
+                  {category.id === 7 && 'عبر عن امتنانك'}
+                  {category.id === 8 && 'تعزية راقية ومؤثرة'}
+                  {category.id === 9 && 'دعوات لجميع المناسبات'}
+                  {category.id === 10 && 'حتفل بإنجازاتك'}
+                </p>
+
+                {/* CTA */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  color: category.premium ? '#E91E63' : '#171717',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  transition: 'all 200ms ease',
+                }}>
+                  <span>{category.id === 2 ? 'اطلب الآن' : 'تواصل معنا'}</span>
+                  <ArrowLeft size={16} />
+                </div>
               </div>
             ))}
           </div>

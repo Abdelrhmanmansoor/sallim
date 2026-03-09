@@ -38,6 +38,7 @@ import DeliveryPage from './pages/DeliveryPage'
 import RefundPage from './pages/RefundPage'
 import ContactPage from './pages/ContactPage'
 import CheckoutPage from './pages/CheckoutPage'
+import WeddingInvitationPage from './pages/WeddingInvitationPage'
 
 export default function App() {
   const location = useLocation()
@@ -67,6 +68,7 @@ export default function App() {
     '/admin/invite-codes',
     '/companies',
     '/create-game',
+    '/wedding-invitation',
   ].includes(pathname) || pathname.startsWith('/game/') || pathname.startsWith('/eid/') || pathname.startsWith('/diwan/')
 
   // Define isBusiness - assuming it's false for free version
@@ -114,6 +116,7 @@ export default function App() {
           <Route path="/refund" element={<RefundPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/wedding-invitation" element={<WeddingInvitationPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
