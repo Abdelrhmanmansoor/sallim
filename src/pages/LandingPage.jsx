@@ -976,6 +976,16 @@ export default function LandingPage() {
                 { id: 4, image: '/templates/جاهزة/7.png', name: 'تصميم ٤' },
                 { id: 5, image: '/templates/جاهزة/8.png', name: 'تصميم ٥' },
                 { id: 6, image: '/templates/جاهزة/9.png', name: 'تصميم ٦' },
+                { id: 7, image: '/templates/جاهزة/10.png', name: 'تصميم ٧' },
+                { id: 8, image: '/templates/جاهزة/11.png', name: 'تصميم ٨' },
+                { id: 9, image: '/templates/جاهزة/13.png', name: 'تصميم ٩' },
+                { id: 10, image: '/templates/جاهزة/14.png', name: 'تصميم ١٠' },
+                { id: 11, image: '/templates/جاهزة/15.png', name: 'تصميم ١١' },
+                { id: 12, image: '/templates/جاهزة/16.png', name: 'تصميم ١٢' },
+                { id: 13, image: '/templates/جاهزة/17.png', name: 'تصميم ١٣' },
+                { id: 14, image: '/templates/جاهزة/Artboard 1.png', name: 'تصميم ١٤' },
+                { id: 15, image: '/templates/جاهزة/Artboard 2.png', name: 'تصميم ١٥' },
+                { id: 16, image: '/templates/جاهزة/Artboard 4.png', name: 'تصميم ١٦' },
               ].map((template) => (
                 <Link
                   to={`/editor?template=${template.id}`}
