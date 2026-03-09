@@ -158,7 +158,6 @@ export default function EditorPage() {
 
   // Mode & State
   const [mode, setMode] = useState('ready')
-  const [readyDesign, setReadyDesign] = useState(readyDesigns[0])
   const [readyName, setReadyName] = useState('')
   const [readySenderName, setReadySenderName] = useState('')
   const [readyFontSize, setReadyFontSize] = useState(60)
@@ -626,7 +625,9 @@ export default function EditorPage() {
                 finalReadyTemplates.map((t) => (
                   <button
                     key={t.id}
-                    onClick={() => store.setTemplate(t.id)}
+                    onClick={() => {
+                      store.setTemplate(t.id)
+                    }}
                     style={{
                       position: 'relative',
                       width: 140,
