@@ -1,4 +1,16 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /company/dashboard
+Disallow: /company-activation
+Disallow: /company-login
+Disallow: /login
+Disallow: /register
+Disallow: /checkout
+Disallow: /card
+Disallow: /send
+Disallow: /editor
 
-Sitemap: https://sallim.vercel.app/sitemap.xml
+Sitemap: https://www.sallim.co/sitemap.xml
