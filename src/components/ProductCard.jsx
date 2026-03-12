@@ -58,46 +58,45 @@ const ProductCard = ({
         {/* Rating & Identity */}
         <div className="flex justify-between items-center mb-3">
           <div className="flex items-center gap-1">
-             <Star size={12} className="fill-amber-400 text-amber-400" />
-             <span className="text-[13px] font-bold text-slate-700">{rating.toFixed(2)}</span>
+             <Star size={11} className="fill-amber-400 text-amber-400" />
+             <span className="text-[12px] font-bold text-slate-500">{rating.toFixed(2)}</span>
           </div>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Premium Template</span>
+          <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Digital Template</span>
         </div>
 
-        {/* Name */}
-        <h3 className="text-xl font-black text-slate-900 mb-2 leading-tight group-hover:text-teal-700 transition-colors">
-          {name}
-        </h3>
+        {/* Name - Standardized Height */}
+        <div className="h-[48px] overflow-hidden mb-2">
+          <h3 className="text-base font-black text-slate-900 leading-tight group-hover:text-teal-700 transition-colors line-clamp-2">
+            {name}
+          </h3>
+        </div>
 
-        {/* Pricing - Forced Free but styled as a Gift */}
+        {/* Pricing - Enhanced Visibility */}
         <div className="flex items-center gap-3 mt-auto mb-6">
-          <div className="flex flex-col">
-            <span className="text-teal-600 font-black text-2xl tracking-tighter">مجانًا</span>
-            <span className="text-[9px] text-teal-600/60 font-bold -mt-1 uppercase">Limited Time Gift</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-rose-600 font-black text-2xl tracking-tighter">مجانًا</span>
+            <div className="flex flex-col -gap-1">
+              <span className="text-[10px] text-slate-400 font-bold line-through">{originalPrice > 0 ? originalPrice.toFixed(0) : '49'}</span>
+              <span className="text-[9px] text-rose-500/80 font-black uppercase tracking-tighter">ر.س</span>
+            </div>
           </div>
-          {originalPrice > 0 && (
-            <span className="text-slate-300 text-sm line-through decoration-rose-300">
-              {originalPrice.toFixed(0)} ر.س
-            </span>
-          )}
         </div>
 
         {/* Buttons - Persuasive & Bold */}
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <button 
             onClick={handleAddToEditor}
-            className="flex-grow relative bg-slate-900 text-white py-4 rounded-[18px] font-black text-[15px] transition-all hover:bg-teal-600 hover:shadow-[0_15px_30px_rgba(13,148,136,0.3)] active:scale-95 group/btn overflow-hidden"
+            className="flex-grow relative bg-slate-900 text-white py-3.5 rounded-[16px] font-black text-[14px] transition-all hover:bg-teal-600 hover:shadow-[0_12px_24px_rgba(13,148,136,0.3)] active:scale-95 group/btn overflow-hidden"
           >
             <span className="relative z-10 flex items-center justify-center gap-2">
-              امتلك هذا القالب الآن
-              <Plus size={18} className="transition-transform group-hover/btn:rotate-90" />
+              استخدم القالب
+              <Plus size={16} className="transition-transform group-hover/btn:rotate-90" />
             </span>
-            {/* Glossy Effect */}
             <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
           </button>
           
-          <button className="flex-none bg-slate-50 text-slate-900 p-4 rounded-[18px] hover:bg-slate-100 transition-all active:scale-95 border border-slate-100">
-            <Eye size={20} className="stroke-[2.5]" />
+          <button className="flex-none bg-slate-50 text-slate-400 p-3.5 rounded-[16px] hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95 border border-slate-100/50">
+            <Eye size={18} className="stroke-[2.5]" />
           </button>
         </div>
       </div>
