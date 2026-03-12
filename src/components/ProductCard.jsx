@@ -1,106 +1,140 @@
-import { Star, Eye, Plus, Sparkles } from 'lucide-react';
+import { Eye, Heart, ShoppingBag, Sparkles, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const ProductCard = ({ 
-  id, 
-  name, 
-  image, 
-  price = 0, 
-  originalPrice = 0, 
-  rating = 5.0, 
+const formatPrice = (value) =>
+  new Intl.NumberFormat('ar-SA', {
+    minimumFractionDigits: value % 1 === 0 ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+
+const ProductCard = ({
+  id,
+  name,
+  image,
+  price = 0,
+  originalPrice = 0,
+  rating = 5.0,
   reviews = 8,
-  badges = [] 
+  badges = [],
 }) => {
   const navigate = useNavigate();
-  
-  const discount = originalPrice > price 
-    ? Math.round(((originalPrice - price) / originalPrice) * 100) 
-    : 0;
+
+  const discount =
+    originalPrice > price
+      ? Math.round(((originalPrice - price) / originalPrice) * 100)
+      : 0;
+
+  const isFree = price === 0;
 
   const handleAddToEditor = () => {
     navigate(`/editor?template=${id}`);
   };
 
   return (
-    <div className="group relative bg-white border border-slate-100 rounded-[32px] p-5 transition-all duration-500 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-2 overflow-hidden flex flex-col h-full rtl">
-      {/* Badges Section */}
-      <div className="absolute top-6 left-6 z-10 flex flex-col gap-2">
-        {discount > 0 && (
-          <div className="bg-rose-500 text-white text-[10px] uppercase tracking-wider font-black px-3 py-1 rounded-full shadow-lg shadow-rose-500/20">
-            وفر {discount}%-
-          </div>
-        )}
-        {badges.map((badge, idx) => (
-          <div key={idx} className="bg-amber-400 text-amber-950 text-[10px] font-black px-3 py-1 rounded-full shadow-lg shadow-amber-400/20 flex items-center gap-1.5">
-            <Sparkles size={10} className="fill-current" />
-            {badge}
-          </div>
-        ))}
-      </div>
-
-      {/* Image Preview */}
-      <div className="relative aspect-[3/4] mb-6 rounded-[24px] bg-slate-50 overflow-hidden shadow-inner">
-        <img 
-          src={image} 
-          alt={name} 
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-[18px] border border-[#e8edf2] bg-white text-right shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
+      <div className="relative m-3 mb-0 aspect-[6/5] overflow-hidden rounded-[16px] bg-[#f8fafc]">
+        <img
+          src={image}
+          alt={name}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
         />
-        {/* Quick View Overlay */}
-        <div className="absolute inset-0 bg-slate-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-          <button className="bg-white/90 p-4 rounded-2xl shadow-2xl hover:bg-white transition-all transform translate-y-4 group-hover:translate-y-0 duration-500">
-            <Eye size={22} className="text-slate-900" />
-          </button>
-        </div>
-      </div>
 
-      {/* Content */}
-      <div className="flex flex-col flex-grow">
-        {/* Rating & Identity */}
-        <div className="flex justify-between items-center mb-3">
-          <div className="flex items-center gap-1">
-             <Star size={11} className="fill-amber-400 text-amber-400" />
-             <span className="text-[12px] font-bold text-slate-500">{rating.toFixed(2)}</span>
-          </div>
-          <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Digital Template</span>
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-        {/* Name - Standardized Height */}
-        <div className="h-[48px] overflow-hidden mb-2">
-          <h3 className="text-base font-black text-slate-900 leading-tight group-hover:text-teal-700 transition-colors line-clamp-2">
-            {name}
-          </h3>
-        </div>
-
-        {/* Pricing - Enhanced Visibility */}
-        <div className="flex items-center gap-3 mt-auto mb-6">
-          <div className="flex items-center gap-1.5">
-            <span className="text-rose-600 font-black text-2xl tracking-tighter">مجانًا</span>
-            <div className="flex flex-col -gap-1">
-              <span className="text-[10px] text-slate-400 font-bold line-through">{originalPrice > 0 ? originalPrice.toFixed(0) : '49'}</span>
-              <span className="text-[9px] text-rose-500/80 font-black uppercase tracking-tighter">ر.س</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Buttons - Persuasive & Bold */}
-        <div className="flex gap-2">
-          <button 
-            onClick={handleAddToEditor}
-            className="flex-grow relative bg-slate-900 text-white py-3.5 rounded-[16px] font-black text-[14px] transition-all hover:bg-teal-600 hover:shadow-[0_12px_24px_rgba(13,148,136,0.3)] active:scale-95 group/btn overflow-hidden"
-          >
-            <span className="relative z-10 flex items-center justify-center gap-2">
-              استخدم القالب
-              <Plus size={16} className="transition-transform group-hover/btn:rotate-90" />
+        <div className="absolute top-3 right-3 z-10 flex flex-col items-end gap-2">
+          {discount > 0 && (
+            <span className="inline-flex items-center rounded-full bg-[#e63946] px-3 py-1 text-[11px] font-extrabold text-white shadow-sm">
+              وفر {discount}%
             </span>
-            <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-          </button>
-          
-          <button className="flex-none bg-slate-50 text-slate-400 p-3.5 rounded-[16px] hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95 border border-slate-100/50">
-            <Eye size={18} className="stroke-[2.5]" />
+          )}
+
+          {badges.map((badge, idx) => (
+            <span
+              key={idx}
+              className="inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1 text-[11px] font-bold text-slate-700 shadow-sm"
+            >
+              <Sparkles size={11} className="text-amber-500" />
+              {badge}
+            </span>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={handleAddToEditor}
+          aria-label={`عرض ${name}`}
+          className="absolute top-3 left-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white/95 text-slate-700 shadow-sm transition hover:bg-white"
+        >
+          <Heart size={17} />
+        </button>
+
+        <button
+          type="button"
+          onClick={handleAddToEditor}
+          className="absolute bottom-3 left-3 z-10 inline-flex translate-y-2 items-center gap-1.5 rounded-full bg-white px-3 py-2 text-xs font-bold text-slate-800 opacity-0 shadow-md transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
+        >
+          <Eye size={15} />
+          عرض
+        </button>
+      </div>
+
+      <div className="flex flex-1 flex-col p-4 pt-3">
+        <div className="mb-3 flex items-center justify-between gap-3 text-[13px]">
+          <span className="inline-flex items-center gap-1 rounded-full bg-[#f8fafc] px-2.5 py-1 font-semibold text-slate-700">
+            <Star size={13} className="fill-[#f59e0b] text-[#f59e0b]" />
+            {rating.toFixed(1)}
+            <span className="text-slate-400">({reviews})</span>
+          </span>
+
+          <span className="text-[12px] font-medium text-slate-400">تصميم رقمي</span>
+        </div>
+
+        <h3 className="mb-4 min-h-[56px] line-clamp-2 text-[1.05rem] font-bold leading-7 text-slate-900">
+          {name}
+        </h3>
+
+        <div className="mt-auto border-t border-[#eef2f6] pt-3">
+          <div className="flex items-end justify-between gap-3">
+            <div className="flex flex-col items-start gap-1">
+              <span className="text-[11px] font-semibold text-slate-400">السعر</span>
+
+              {isFree ? (
+                <span className="text-xl font-extrabold text-emerald-600">مجاني</span>
+              ) : (
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-xl font-extrabold text-slate-900">
+                    {formatPrice(price)}
+                  </span>
+                  <span className="text-xs font-bold text-slate-500">ر.س</span>
+                </div>
+              )}
+
+              {originalPrice > price && (
+                <span className="text-sm text-slate-400 line-through decoration-red-300">
+                  {formatPrice(originalPrice)} ر.س
+                </span>
+              )}
+            </div>
+
+            {discount > 0 && (
+              <div className="rounded-2xl bg-[#fff5f5] px-3 py-2 text-center">
+                <div className="text-[11px] font-semibold text-[#e63946]">خصم</div>
+                <div className="text-sm font-extrabold text-[#e63946]">{discount}%</div>
+              </div>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleAddToEditor}
+            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#d7dde5] bg-[#f8fafc] px-4 py-3 text-sm font-bold text-slate-900 transition-all duration-200 hover:border-slate-900 hover:bg-slate-900 hover:text-white active:scale-[0.99]"
+          >
+            <ShoppingBag size={16} />
+            ابدأ التصميم
           </button>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 
