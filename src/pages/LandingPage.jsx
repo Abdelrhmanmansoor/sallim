@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { getTemplates } from '../utils/api'
 import ProductCard from '../components/ProductCard'
+import OccasionSlider from '../components/OccasionSlider'
 
 export default function LandingPage() {
   const navigate = useNavigate()
@@ -93,18 +94,6 @@ export default function LandingPage() {
     },
   ]
 
-  const cardCategories = [
-    { id: 1, name: 'بطاقات العيد', icon: Sparkles, color: '#0d9488', premium: false },
-    { id: 2, name: 'بطاقات الزفاف', icon: Heart, color: '#be185d', premium: true },
-    { id: 3, name: 'بطاقات التخرج', icon: GraduationCap, color: '#4338ca', premium: false },
-    { id: 4, name: 'بطاقات المواليد', icon: Baby, color: '#15803d', premium: false },
-    { id: 5, name: 'بطاقات حفلات الأطفال', icon: PartyPopper, color: '#b45309', premium: false },
-    { id: 6, name: 'بطاقات افتتاح المشاريع', icon: Briefcase, color: '#1d4ed8', premium: false },
-    { id: 7, name: 'بطاقات الشكر', icon: Star, color: '#a21caf', premium: false },
-    { id: 8, name: 'بطاقات العزاء', icon: Cloud, color: '#334155', premium: false },
-    { id: 9, name: 'بطاقات دعوات المناسبات', icon: Mail, color: '#0369a1', premium: false },
-    { id: 10, name: 'بطاقات النجاح والإنجاز', icon: Trophy, color: '#ea580c', premium: false },
-  ]
 
   useEffect(() => {
     // Show popup after 3 seconds
@@ -618,6 +607,9 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* OCCASION CATEGORIES SLIDER */}
+      <OccasionSlider />
+
       {/* PRODUCT SHOWCASE - EXPERT SLIDER DESIGN */}
       <section style={{ padding: '100px 0', background: '#f8fafc', overflow: 'hidden' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 24px' }}>
@@ -691,83 +683,49 @@ export default function LandingPage() {
         `}</style>
       </section>
 
-      {/* LUXURY EVENT CATEGORIES - REDESIGNED */}
-      <section className="py-24 bg-white relative overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-teal-50/20 rounded-full blur-[120px] -mr-64 -mt-64"></div>
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-purple-50/20 rounded-full blur-[100px] -ml-40 -mb-40"></div>
-
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          {/* Header */}
-          <div className="text-center mb-20">
-            <h2 className="text-[clamp(32px,5vw,48px)] font-black text-slate-900 mb-6 leading-[1.2]">
-              بطاقات مناسبات مميزة
-            </h2>
-            <p className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
-              اختر من بين تشكيلة واسعة من القوالب المصممة باحترافية لتناسب ذوقك الرفيع في جميع مناسباتك الاجتماعية والعملية
-            </p>
-          </div>
-
-          {/* Categories Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            {cardCategories.map((category) => (
-              <div
-                key={category.id}
-                onClick={() => {
-                  if (category.id === 1) {
-                    navigate('/editor?template=ready')
-                  } else if (category.id === 2) {
-                    navigate('/wedding-invitation')
-                  } else {
-                    handleWhatsAppLink(`مرحباً، أريد الاستفسار عن ${category.name}`)
-                  }
-                }}
-                className={`group relative p-8 rounded-[32px] bg-white border border-slate-100/80 transition-all duration-500 cursor-pointer overflow-hidden
-                  hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] hover:-translate-y-2 
-                  ${category.premium ? 'ring-2 ring-teal-600/10' : ''}`}
-                style={{
-                  '--card-glow': `${category.color}15`
-                }}
-              >
-                {/* Background Hover Glow */}
-                <div 
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-[radial-gradient(circle_at_center,var(--card-glow),transparent_70%)]"
-                ></div>
-
-                {/* Content Container */}
-                <div className="relative z-10 flex flex-col items-center text-center">
-                  {/* Icon Wrapper */}
-                  <div 
-                    className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all duration-500 group-hover:scale-110 shadow-sm"
-                    style={{ 
-                      backgroundColor: `${category.color}08`,
-                      color: category.color,
-                      border: `1px solid ${category.color}15`
-                    }}
-                  >
-                    <category.icon size={28} strokeWidth={2.5} className="group-hover:rotate-6 transition-transform" />
-                  </div>
-
-                  {/* Text */}
-                  <h3 className="text-lg font-bold text-slate-900 mb-3 group-hover:text-slate-950 transition-colors">
-                    {category.name}
-                  </h3>
-                  
-                  {/* Subtle Badge for Premium */}
-                  {category.premium ? (
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#be185d] bg-[#be185d]/5 px-3 py-1 rounded-full mb-4">
-                      PREMIUM
-                    </span>
-                  ) : null}
-
-                  {/* Arrow Icon */}
-                  <div className="mt-2 flex items-center gap-2 text-xs font-bold text-slate-400 group-hover:text-slate-900 transition-all group-hover:gap-3">
-                    <span>{category.id === 2 ? 'اطلب الآن' : 'استعرض'}</span>
-                    <ArrowLeft size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
+      {/* MINIMALIST SERVICE SECTION - WEDDING & EVENTS */}
+      <section className="py-20 bg-slate-50 relative overflow-hidden">
+        <div className="max-w-5xl mx-auto px-6 relative z-10">
+          <div className="flex flex-col md:flex-row gap-8 items-stretch">
+            
+            {/* Wedding Card */}
+            <div 
+              onClick={() => handleWhatsAppLink('مرحباً، أريد الاستفسار عن خدمة تصميم وتنسيق دعوات الزفاف الفاخرة')}
+              className="flex-1 group relative p-10 rounded-[40px] bg-white border border-slate-200/60 cursor-pointer overflow-hidden transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] hover:-translate-y-2"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-rose-50 rounded-full blur-3xl -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                  <Heart size={28} strokeWidth={2.5} />
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 mb-3">دعوات زفاف ملكية</h3>
+                <p className="text-slate-500 text-sm leading-relaxed mb-8">نصمم لك ليلة العمر بأدق التفاصيل، دعوات إلكترونية فاخرة تليق بمناسبتك السعيدة</p>
+                <div className="flex items-center gap-3 text-rose-600 font-black text-sm uppercase tracking-wider">
+                  <span>اطلب الآن</span>
+                  <ArrowLeft size={16} className="group-hover:-translate-x-2 transition-transform" />
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Event Card */}
+            <div 
+              onClick={() => handleWhatsAppLink('مرحباً، أريد الاستفسار عن خدمة تصميم بطاقات دعوات المناسبات')}
+              className="flex-1 group relative p-10 rounded-[40px] bg-slate-900 cursor-pointer overflow-hidden transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(13,148,136,0.3)] hover:-translate-y-2"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/20 rounded-full blur-3xl -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-teal-500/10 text-teal-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                  <Mail size={28} strokeWidth={2.5} />
+                </div>
+                <h3 className="text-2xl font-black text-white mb-3">مناسبات وفعاليات</h3>
+                <p className="text-slate-400 text-sm leading-relaxed mb-8">لجميع مناسباتك الخاصة والعامة، نوفر لك قوالب عصرية وسريعة التنفيذ بكفاءة عالية</p>
+                <div className="flex items-center gap-3 text-teal-400 font-black text-sm uppercase tracking-wider">
+                  <span>تواصل معنا</span>
+                  <ArrowLeft size={16} className="group-hover:-translate-x-2 transition-transform" />
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
