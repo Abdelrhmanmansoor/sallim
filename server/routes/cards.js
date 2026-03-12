@@ -4,10 +4,20 @@ import Stats from '../models/Stats.js'
 
 const router = Router()
 
-// ═══ Create a card (save to DB) ═══
+// Create a card
 router.post('/', async (req, res) => {
   try {
-    const { mainText, subText, senderName, recipientName, templateId, theme, font, fontSize, textColor } = req.body
+    const {
+      mainText,
+      subText,
+      senderName,
+      recipientName,
+      templateId,
+      theme,
+      font,
+      fontSize,
+      textColor,
+    } = req.body
 
     if (!mainText || !templateId) {
       return res.status(400).json({ success: false, error: 'mainText و templateId مطلوبين' })
@@ -26,7 +36,6 @@ router.post('/', async (req, res) => {
       createdByIp: req.ip,
     })
 
-    // Update stats
     await Stats.incrementToday('cardsCreated')
 
     res.status(201).json({
@@ -43,46 +52,33 @@ router.post('/', async (req, res) => {
   }
 })
 
-// ═══ Get card by shareId ═══
-router.get('/:shareId', async (req, res) => {
+// Get card by Mongo ID for checkout/editor flows
+router.get('/id/:cardId', async (req, res) => {
   try {
-    const card = await Card.findOne({
-      shareId: req.params.shareId,
-      status: 'active',
-    })
+    const card = await Card.findById(req.params.cardId)
 
-    if (!card) {
+    if (!card || card.status !== 'active') {
       return res.status(404).json({ success: false, error: 'البطاقة غير موجودة' })
     }
-
-    // Increment view count (non-blocking)
-    card.viewCount += 1
-    card.save().catch(() => { })
-    Stats.incrementToday('cardViews').catch(() => { })
 
     res.json({
       success: true,
       data: {
-        mainText: card.mainText,
-        subText: card.subText,
-        senderName: card.senderName,
-        recipientName: card.recipientName,
+        _id: card._id,
+        name: card.mainText || card.recipientName || 'بطاقة رقمية',
+        image: card.image || '',
+        price: Number(card.price || 0),
         templateId: card.templateId,
-        theme: card.theme,
-        font: card.font,
-        fontSize: card.fontSize,
-        textColor: card.textColor,
-        viewCount: card.viewCount,
-        createdAt: card.createdAt,
+        shareId: card.shareId,
       },
     })
   } catch (error) {
-    console.error('Card fetch error:', error)
+    console.error('Card by id fetch error:', error)
     res.status(500).json({ success: false, error: 'حدث خطأ' })
   }
 })
 
-// ═══ Get public stats ═══
+// Get public stats
 router.get('/public/stats', async (req, res) => {
   try {
     const totalCards = await Card.countDocuments({ status: 'active' })
@@ -103,7 +99,7 @@ router.get('/public/stats', async (req, res) => {
   }
 })
 
-// ═══ Admin: Get all cards ═══
+// Admin: Get all cards
 router.get('/admin/all', async (req, res) => {
   try {
     const adminKey = req.headers['x-admin-key']
@@ -113,15 +109,53 @@ router.get('/admin/all', async (req, res) => {
 
     const cards = await Card.find({ status: 'active' })
       .sort({ createdAt: -1 })
-      .limit(100) // Show latest 100 cards for safety
+      .limit(100)
 
     res.json({
       success: true,
-      data: cards
+      data: cards,
     })
   } catch (error) {
     console.error('Admin fetch error:', error)
     res.status(500).json({ success: false, error: 'حدث خطأ في النظام' })
+  }
+})
+
+// Get card by shareId
+router.get('/:shareId', async (req, res) => {
+  try {
+    const card = await Card.findOne({
+      shareId: req.params.shareId,
+      status: 'active',
+    })
+
+    if (!card) {
+      return res.status(404).json({ success: false, error: 'البطاقة غير موجودة' })
+    }
+
+    card.viewCount += 1
+    card.save().catch(() => {})
+    Stats.incrementToday('cardViews').catch(() => {})
+
+    res.json({
+      success: true,
+      data: {
+        mainText: card.mainText,
+        subText: card.subText,
+        senderName: card.senderName,
+        recipientName: card.recipientName,
+        templateId: card.templateId,
+        theme: card.theme,
+        font: card.font,
+        fontSize: card.fontSize,
+        textColor: card.textColor,
+        viewCount: card.viewCount,
+        createdAt: card.createdAt,
+      },
+    })
+  } catch (error) {
+    console.error('Card fetch error:', error)
+    res.status(500).json({ success: false, error: 'حدث خطأ' })
   }
 })
 

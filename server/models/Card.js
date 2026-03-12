@@ -1,6 +1,26 @@
 import mongoose from 'mongoose'
 
 const cardSchema = new mongoose.Schema({
+  // Catalog / checkout metadata
+  name: {
+    type: String,
+    trim: true,
+    default: '',
+  },
+  image: {
+    type: String,
+    default: '',
+  },
+  price: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
+  enabled: {
+    type: Boolean,
+    default: true,
+  },
+
   // Card content
   mainText: {
     type: String,

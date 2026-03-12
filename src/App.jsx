@@ -31,13 +31,13 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import ProfilePage from './pages/ProfilePage'
 import CompaniesPage from './pages/CompaniesPage'
-import AdminDashboardPage from './pages/AdminDashboardPage'
+import AdminDashboardNew from './pages/AdminDashboardNew'
 import AboutPage from './pages/AboutPage'
 import PricingPage from './pages/PricingPage'
 import DeliveryPage from './pages/DeliveryPage'
 import RefundPage from './pages/RefundPage'
 import ContactPage from './pages/ContactPage'
-import CheckoutPage from './pages/CheckoutPage'
+import CheckoutPageNew from './pages/CheckoutPageNew'
 import WeddingInvitationPage from './pages/WeddingInvitationPage'
 
 export default function App() {
@@ -109,13 +109,13 @@ export default function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/companies" element={<CompaniesPage />} />
-          <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+          <Route path="/admin/dashboard" element={<AdminDashboardNew />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/delivery" element={<DeliveryPage />} />
           <Route path="/refund" element={<RefundPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/checkout" element={<CheckoutPageNew />} />
           <Route path="/wedding-invitation" element={<WeddingInvitationPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
