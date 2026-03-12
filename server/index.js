@@ -26,9 +26,12 @@ import diwaniyaFamilyRoutes from './routes/diwaniya-family.js'
 import walletRoutes from './routes/wallet.js'
 import adminInviteCodesRoutes from './routes/admin-invite-codes.js'
 import adminCompaniesRoutes from './routes/admin-companies.js'
+import adminThemesRoutes from './routes/admin-themes.js'
+import adminPackagesRoutes from './routes/admin-packages.js'
 import campaignsRoutes from './routes/campaigns.js'
 import teamRoutes from './routes/team.js'
 import gamesRoutes from './routes/games.js'
+import companyBulkRoutes from './routes/company-bulk.js'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -204,10 +207,13 @@ app.use('/api/v1/stats', statsRoutes)
 app.use('/api/v1/admin', adminRoutes)
 app.use('/api/v1/admin/invite-codes', adminInviteCodesRoutes)
 app.use('/api/v1/admin/companies', adminCompaniesRoutes)
+app.use('/api/v1/admin/themes', adminThemesRoutes)
+app.use('/api/v1/admin/packages', adminPackagesRoutes)
 app.use('/api/v1/company', companyRoutes)
 app.use('/api/v1/company/wallet', walletRoutes)
 app.use('/api/v1/company/campaigns', campaignsRoutes)
 app.use('/api/v1/company/team', teamRoutes)
+app.use('/api/v1/company/bulk', companyBulkRoutes)
 app.use('/api/v1/templates', templateRoutes)
 app.use('/api/v1/blog', blogRoutes)
 app.use('/api/v1/tickets', ticketRoutes)
@@ -240,4 +246,20 @@ app.use((err, req, res, next) => {
 // ─── Start Server ───
 app.listen(PORT, () => {
   console.log(`Sallim API running on port ${PORT} [${isProd ? 'production' : 'development'}]`)
+
+  // ─── Keep-Alive Mechanism (Self-Ping) ───
+  // Prevents the server from sleeping on platforms like Render
+  const BACKEND_URL = process.env.BACKEND_URL
+  if (isProd && BACKEND_URL) {
+    console.log('Keep-alive mechanism activated.')
+    setInterval(async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/health`)
+        const data = await response.json()
+        console.log(`[Keep-Alive] Ping successful: ${data.timestamp}`)
+      } catch (error) {
+        console.error('[Keep-Alive] Ping failed:', error.message)
+      }
+    }, 10 * 60 * 1000) // Every 10 minutes
+  }
 })

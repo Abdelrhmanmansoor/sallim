@@ -1,7 +1,8 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Palette, Download, Smartphone, Type, Layers, Shield, ChevronDown, Heart, DollarSign, X, Sparkles } from 'lucide-react'
+import { ArrowLeft, Palette, Download, Smartphone, Type, Layers, Shield, ChevronDown, Heart, DollarSign, X, Sparkles, Star } from 'lucide-react'
 import { getTemplates } from '../utils/api'
+import ProductCard from '../components/ProductCard'
 
 export default function LandingPage() {
   const navigate = useNavigate()
@@ -591,6 +592,114 @@ export default function LandingPage() {
                 ))}
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PRODUCT SHOWCASE - EXPERT DESIGN */}
+      <section style={{ padding: '100px 0', background: '#f8fafc' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 20px',
+              background: 'rgba(13, 148, 136, 0.1)',
+              borderRadius: '100px',
+              marginBottom: '16px',
+              border: '1px solid rgba(13, 148, 136, 0.2)',
+            }}>
+              <Sparkles size={14} className="text-teal-600" />
+              <span style={{ fontSize: '13px', color: '#0d9488', fontWeight: 700, letterSpacing: '0.05em' }}>
+                نماذج مختارة بعناية
+              </span>
+            </div>
+            
+            <h2 style={{ 
+              fontSize: 'clamp(32px, 5vw, 44px)', 
+              fontWeight: 900, 
+              color: '#0f172a', 
+              marginBottom: '16px',
+              letterSpacing: '-0.02em'
+            }}>
+              أحدث تصاميم ٢٠٢٦
+            </h2>
+            <p style={{ fontSize: '17px', color: '#64748b', maxWidth: '600px', margin: '0 auto', lineHeight: 1.6 }}>
+              تجمع بين الأصالة العربية والحداثة الرقمية، جاهزة للتخصيص الفوري
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <ProductCard 
+              id="10" 
+              name="تصميم الكاليجرافي الملكي" 
+              image="/templates/جاهزة/10.png" 
+              price={0} 
+              originalPrice={49} 
+              rating={4.95}
+              badges={['الأكثر طلباً']}
+            />
+            <ProductCard 
+              id="11" 
+              name="بطاقة العيد المودرن" 
+              image="/templates/جاهزة/11.png" 
+              price={25} 
+              originalPrice={59} 
+              rating={4.99}
+              badges={['جديد']}
+            />
+            <ProductCard 
+              id="14" 
+              name="نموذج التجريد الإسلامي" 
+              image="/templates/جاهزة/15.png" 
+              price={35} 
+              originalPrice={45} 
+              rating={4.88}
+            />
+            <ProductCard 
+              id="114" 
+              name="باترن السدو الفاخر" 
+              image="/templates/مصمم/Artboard 12.png" 
+              price={0} 
+              originalPrice={0} 
+              rating={5.00}
+              badges={['حصري']}
+            />
+            <ProductCard 
+              id="13" 
+              name="تهنئة الزخرفة الكلاسيكية" 
+              image="/templates/جاهزة/14.png" 
+              price={19} 
+              originalPrice={29} 
+              rating={4.75}
+            />
+            <ProductCard 
+              id="16" 
+              name="بطاقة الخط الديواني" 
+              image="/templates/جاهزة/17.png" 
+              price={45} 
+              originalPrice={75} 
+              rating={4.92}
+              badges={['Premium']}
+            />
+            <ProductCard 
+              id="105" 
+              name="ثيم الواحة الهادئة" 
+              image="/templates/مصمم/18.png" 
+              price={29} 
+              originalPrice={29} 
+              rating={4.80}
+            />
+            <ProductCard 
+              id="3" 
+              name="تصميم اللؤلؤة العربية" 
+              image="/templates/جاهزة/6.png" 
+              price={0} 
+              originalPrice={0} 
+              rating={4.98}
+              badges={['مجاني لفترة محدودة']}
+            />
           </div>
         </div>
       </section>

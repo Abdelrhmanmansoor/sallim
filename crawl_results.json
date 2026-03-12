@@ -1,0 +1,114 @@
+[
+  {
+    "url": "https://www.sallim.co/",
+    "last_modified": "2026-03-10",
+    "status_code": 200,
+    "canonical": "https://www.sallim.co/",
+    "robots": "index, follow",
+    "depth": 1
+  },
+  {
+    "url": "https://www.sallim.co/editor",
+    "last_modified": "2026-03-10",
+    "status_code": 200,
+    "canonical": "https://www.sallim.co/editor",
+    "robots": "index, follow",
+    "depth": 2
+  },
+  {
+    "url": "https://www.sallim.co/texts",
+    "last_modified": "2026-03-10",
+    "status_code": 200,
+    "canonical": "https://www.sallim.co/texts",
+    "robots": "index, follow",
+    "depth": 2
+  },
+  {
+    "url": "https://www.sallim.co/donate",
+    "last_modified": "2026-03-10",
+    "status_code": 200,
+    "canonical": "https://www.sallim.co/donate",
+    "robots": "index, follow",
+    "depth": 2
+  },
+  {
+    "url": "https://www.sallim.co/privacy",
+    "last_modified": "2026-03-10",
+    "status_code": 200,
+    "canonical": "https://www.sallim.co/privacy",
+    "robots": "index, follow",
+    "depth": 2
+  },
+  {
+    "url": "https://www.sallim.co/terms",
+    "last_modified": "2026-03-10",
+    "status_code": 200,
+    "canonical": "https://www.sallim.co/terms",
+    "robots": "index, follow",
+    "depth": 2
+  },
+  {
+    "url": "https://www.sallim.co/blog",
+    "last_modified": "2026-03-10",
+    "status_code": 200,
+    "canonical": "https://www.sallim.co/blog",
+    "robots": "index, follow",
+    "depth": 2
+  },
+  {
+    "url": "https://www.sallim.co/companies",
+    "last_modified": "2026-03-10",
+    "status_code": 200,
+    "canonical": "https://www.sallim.co/companies",
+    "robots": "index, follow",
+    "depth": 2
+  },
+  {
+    "url": "https://www.sallim.co/about",
+    "last_modified": "2026-03-10",
+    "status_code": 200,
+    "canonical": "https://www.sallim.co/about",
+    "robots": "index, follow",
+    "depth": 2
+  },
+  {
+    "url": "https://www.sallim.co/pricing",
+    "last_modified": "2026-03-10",
+    "status_code": 200,
+    "canonical": "https://www.sallim.co/pricing",
+    "robots": "index, follow",
+    "depth": 2
+  },
+  {
+    "url": "https://www.sallim.co/delivery",
+    "last_modified": "2026-03-10",
+    "status_code": 200,
+    "canonical": "https://www.sallim.co/delivery",
+    "robots": "index, follow",
+    "depth": 2
+  },
+  {
+    "url": "https://www.sallim.co/refund",
+    "last_modified": "2026-03-10",
+    "status_code": 200,
+    "canonical": "https://www.sallim.co/refund",
+    "robots": "index, follow",
+    "depth": 2
+  },
+  {
+    "url": "https://www.sallim.co/contact",
+    "last_modified": "2026-03-10",
+    "status_code": 200,
+    "canonical": "https://www.sallim.co/contact",
+    "robots": "index, follow",
+    "depth": 2
+  },
+  {
+    "url": "https://www.sallim.co/wedding-invitation",
+    "last_modified": "2026-03-10",
+    "status_code": 200,
+    "canonical": "https://www.sallim.co/wedding-invitation",
+    "robots": "index, follow",
+    "depth": 2
+  }
+]

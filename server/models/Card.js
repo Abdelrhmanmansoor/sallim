@@ -203,6 +203,24 @@ const cardSchema = new mongoose.Schema({
     }
   },
 
+  // White Label: Sending and tracking
+  sentAt: {
+    type: Date
+  },
+  openedAt: {
+    type: Date
+  },
+  uniqueToken: {
+    type: String,
+    unique: true,
+    index: true
+  },
+  deliveryStatus: {
+    type: String,
+    enum: ['pending', 'sent', 'delivered', 'opened', 'failed'],
+    default: 'pending'
+  },
+
   // Tracking
   createdByIp: {
     type: String,

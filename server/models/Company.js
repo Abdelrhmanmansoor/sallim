@@ -116,6 +116,26 @@ const companySchema = new mongoose.Schema({
         }
     },
 
+    // White Label: Package reference
+    package: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Package'
+    },
+    // White Label: Allowed themes for this company
+    allowedThemeIds: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Theme'
+    }],
+    // White Label: Card limits and usage
+    cardsLimit: {
+        type: Number,
+        default: 0 // 0 = unlimited
+    },
+    cardsUsed: {
+        type: Number,
+        default: 0
+    },
+    
     // Enterprise: Subscription info
     subscription: {
         plan: {
@@ -125,6 +145,7 @@ const companySchema = new mongoose.Schema({
         },
         startDate: Date,
         renewalDate: Date,
+        expiresAt: Date,
         isActive: {
             type: Boolean,
             default: true

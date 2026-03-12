@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 const auditLogSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true
+    required: false
   },
   userType: {
     type: String,
@@ -13,12 +13,12 @@ const auditLogSchema = new mongoose.Schema({
   action: {
     type: String,
     required: true,
-    enum: ['create', 'read', 'update', 'delete', 'login', 'logout', 'purchase', 'activate', 'deactivate', 'send', 'upload', 'download']
+    enum: ['create', 'read', 'update', 'delete', 'login', 'logout', 'purchase', 'activate', 'deactivate', 'send', 'upload', 'download', 'assign', 'unassign', 'bulk_send']
   },
   entity: {
     type: String,
     required: true,
-    enum: ['company', 'user', 'wallet', 'transaction', 'template', 'card', 'campaign', 'ticket', 'invite_code', 'feature_flag']
+    enum: ['company', 'user', 'wallet', 'transaction', 'template', 'card', 'campaign', 'ticket', 'invite_code', 'feature_flag', 'theme', 'package', 'card_campaign']
   },
   entityId: {
     type: mongoose.Schema.Types.ObjectId,

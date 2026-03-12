@@ -1,0 +1,99 @@
+{
+  "config": {
+    "siteUrl": "https://www.sallim.co",
+    "maxDepth": 3,
+    "crawlDelay": 1000
+  },
+  "crawlData": [
+    {
+      "url": "https://www.sallim.co",
+      "status_code": 200,
+      "last_modified": "Mon, 09 Mar 2026 11:53:00 GMT",
+      "depth": 0,
+      "canonical": "https://sallim.com/",
+      "robots": "index, follow, max-snippet:-1, max-image-preview:large",
+      "hasTitle": true,
+      "hasDescription": true,
+      "hasOgTags": true,
+      "hasStructuredData": true,
+      "titleLength": 57,
+      "descriptionLength": 133
+    }
+  ],
+  "audit": {
+    "crawlSummary": {
+      "totalUrls": 1,
+      "brokenLinks": 0,
+      "redirectChains": 0,
+      "orphanPages": 1
+    },
+    "metaTagsIssues": {
+      "missingTitles": 0,
+      "missingDescriptions": 0,
+      "titlesTooShort": 0,
+      "titlesTooLong": 0,
+      "descriptionsTooShort": 0,
+      "descriptionsTooLong": 0,
+      "missingCanonicals": 1,
+      "missingOgTags": 0,
+      "missingStructuredData": 0
+    },
+    "crawlabilityIssues": {
+      "noindexPages": 0,
+      "blockedByRobots": 0
+    },
+    "pagesWithIssues": [
+      {
+        "url": "https://www.sallim.co",
+        "issues": [
+          "Canonical mismatch: https://www.sallim.co → https://sallim.com/"
+        ]
+      }
+    ]
+  },
+  "brokenLinks": [],
+  "redirectChains": [],
+  "orphanPages": [
+    {
+      "url": "https://www.sallim.co",
+      "depth": 0
+    }
+  ],
+  "summary": {
+    "generatedAt": "2026-03-10T06:27:08.449Z",
+    "siteUrl": "https://www.sallim.co",
+    "crawlSummary": {
+      "totalUrls": 1,
+      "brokenLinks": 0,
+      "redirectChains": 0,
+      "orphanPages": 1
+    },
+    "sitemap": {
+      "file": "sitemap.xml",
+      "totalUrls": 1,
+      "sitemapIndex": false
+    },
+    "crawlabilityIssues": {
+      "missingCanonicalTags": 1,
+      "missingMetaDescription": 0,
+      "missingTitleTags": 0,
+      "missingOgTags": 0,
+      "missingStructuredData": 0,
+      "noindexPages": 0
+    },
+    "recommendations": [
+      {
+        "priority": "HIGH",
+        "title": "Add canonical tags to all pages",
+        "description": "1 pages are missing canonical tags.",
+        "action": "Add <link rel=\"canonical\"> tags to prevent duplicate content issues."
+      },
+      {
+        "priority": "MEDIUM",
+        "title": "Link to orphan pages",
+        "description": "1 orphan pages detected (no internal links).",
+        "action": "Add internal links to these pages to help Google discover and index them."
+      }
+    ]
+  }
+}

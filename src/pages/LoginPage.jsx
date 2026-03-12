@@ -5,7 +5,7 @@ import { ArrowLeft, Loader2, Mail, Lock } from 'lucide-react';
 
 export default function LoginPage() {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({ email: '', password: '' });
+    const [formData, setFormData] = useState({ email: '', password: '', role: 'user' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -22,8 +22,14 @@ export default function LoginPage() {
                 localStorage.setItem('user', JSON.stringify(res.data.user));
                 window.dispatchEvent(new Event('user-update'));
 
-                // Redirect to dashboard
-                navigate('/dashboard/diwaniya');
+                // Redirect based on role
+                if (formData.role === 'admin') {
+                    navigate('/admin/dashboard');
+                } else if (formData.role === 'company') {
+                    navigate('/company/dashboard');
+                } else {
+                    navigate('/dashboard/diwaniya');
+                }
             }
         } catch (err) {
             setError(err.message || 'حدث خطأ أثناء تسجيل الدخول');
@@ -56,9 +62,54 @@ export default function LoginPage() {
                     <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#171717', marginBottom: '8px', textAlign: 'center' }}>
                         تسجيل الدخول
                     </h1>
-                    <p style={{ fontSize: '15px', color: '#737373', textAlign: 'center', marginBottom: '32px' }}>
+                <p style={{ fontSize: '15px', color: '#737373', textAlign: 'center', marginBottom: '16px' }}>
                         أهلاً بك مجدداً في ديوانيات العيد
                     </p>
+
+                    {/* Account Type Selection */}
+                    <div style={{ marginBottom: '24px' }}>
+                        <label style={{ fontSize: '14px', fontWeight: 600, color: '#171717', marginBottom: '8px', display: 'block', textAlign: 'center' }}>
+                            نوع الحساب
+                        </label>
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, role: 'user' })}
+                                style={{
+                                    flex: 1,
+                                    padding: '10px 16px',
+                                    background: formData.role === 'user' ? '#171717' : '#fff',
+                                    color: formData.role === 'user' ? '#fff' : '#737373',
+                                    border: formData.role === 'user' ? '2px solid #171717' : '2px solid #e5e5e5',
+                                    borderRadius: '8px',
+                                    fontSize: '14px',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    transition: 'all 200ms ease',
+                                }}
+                            >
+                                مستخدم
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, role: 'company' })}
+                                style={{
+                                    flex: 1,
+                                    padding: '10px 16px',
+                                    background: formData.role === 'company' ? '#171717' : '#fff',
+                                    color: formData.role === 'company' ? '#fff' : '#737373',
+                                    border: formData.role === 'company' ? '2px solid #171717' : '2px solid #e5e5e5',
+                                    borderRadius: '8px',
+                                    fontSize: '14px',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    transition: 'all 200ms ease',
+                                }}
+                            >
+                                شركة
+                            </button>
+                        </div>
+                    </div>
 
                     {error && (
                         <div style={{
