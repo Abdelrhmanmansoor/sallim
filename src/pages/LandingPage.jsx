@@ -596,9 +596,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* PRODUCT SHOWCASE - EXPERT DESIGN */}
-      <section style={{ padding: '100px 0', background: '#f8fafc' }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
+      {/* PRODUCT SHOWCASE - EXPERT SLIDER DESIGN */}
+      <section style={{ padding: '100px 0', background: '#f8fafc', overflow: 'hidden' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 24px' }}>
           <div style={{ textAlign: 'center', marginBottom: '64px' }}>
             <div style={{
               display: 'inline-flex',
@@ -610,9 +610,8 @@ export default function LandingPage() {
               marginBottom: '16px',
               border: '1px solid rgba(13, 148, 136, 0.2)',
             }}>
-              <Sparkles size={14} className="text-teal-600" />
               <span style={{ fontSize: '13px', color: '#0d9488', fontWeight: 700, letterSpacing: '0.05em' }}>
-                نماذج مختارة بعناية
+                قوالب مجانية جاهزة
               </span>
             </div>
             
@@ -623,85 +622,65 @@ export default function LandingPage() {
               marginBottom: '16px',
               letterSpacing: '-0.02em'
             }}>
-              أحدث تصاميم ٢٠٢٦
+              صمم تهنئتك
             </h2>
             <p style={{ fontSize: '17px', color: '#64748b', maxWidth: '600px', margin: '0 auto', lineHeight: 1.6 }}>
-              تجمع بين الأصالة العربية والحداثة الرقمية، جاهزة للتخصيص الفوري
+              جميع هذه القوالب متاحة للاستخدام مجانًا، ابدأ في تخصيص تصميمك المفضل الآن
             </p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            <ProductCard 
-              id="10" 
-              name="تصميم الكاليجرافي الملكي" 
-              image="/templates/جاهزة/10.png" 
-              price={0} 
-              originalPrice={49} 
-              rating={4.95}
-              badges={['الأكثر طلباً']}
-            />
-            <ProductCard 
-              id="11" 
-              name="بطاقة العيد المودرن" 
-              image="/templates/جاهزة/11.png" 
-              price={25} 
-              originalPrice={59} 
-              rating={4.99}
-              badges={['جديد']}
-            />
-            <ProductCard 
-              id="14" 
-              name="نموذج التجريد الإسلامي" 
-              image="/templates/جاهزة/15.png" 
-              price={35} 
-              originalPrice={45} 
-              rating={4.88}
-            />
-            <ProductCard 
-              id="114" 
-              name="باترن السدو الفاخر" 
-              image="/templates/مصمم/Artboard 12.png" 
-              price={0} 
-              originalPrice={0} 
-              rating={5.00}
-              badges={['حصري']}
-            />
-            <ProductCard 
-              id="13" 
-              name="تهنئة الزخرفة الكلاسيكية" 
-              image="/templates/جاهزة/14.png" 
-              price={19} 
-              originalPrice={29} 
-              rating={4.75}
-            />
-            <ProductCard 
-              id="16" 
-              name="بطاقة الخط الديواني" 
-              image="/templates/جاهزة/17.png" 
-              price={45} 
-              originalPrice={75} 
-              rating={4.92}
-              badges={['Premium']}
-            />
-            <ProductCard 
-              id="105" 
-              name="ثيم الواحة الهادئة" 
-              image="/templates/مصمم/18.png" 
-              price={29} 
-              originalPrice={29} 
-              rating={4.80}
-            />
-            <ProductCard 
-              id="3" 
-              name="تصميم اللؤلؤة العربية" 
-              image="/templates/جاهزة/6.png" 
-              price={0} 
-              originalPrice={0} 
-              rating={4.98}
-              badges={['مجاني لفترة محدودة']}
-            />
+          {/* PRODUCT SLIDER */}
+          <div 
+            className="flex gap-6 overflow-x-auto pb-12 snap-x snap-mandatory scrollbar-hide"
+            style={{ 
+              paddingRight: 'min(5vw, 60px)', 
+              paddingLeft: 'min(5vw, 60px)',
+              marginRight: 'calc(-1 * min(5vw, 60px))',
+              marginLeft: 'calc(-1 * min(5vw, 60px))'
+            }}
+          >
+            {[
+              { id: "10", name: "تصميم الخط الديواني الملكي", img: "/templates/جاهزة/10.png", badge: "الأكثر طلباً", original: 49 },
+              { id: "11", name: "بطاقة العيد العصرية", img: "/templates/جاهزة/11.png", badge: "جديد", original: 59 },
+              { id: "14", name: "نموذج التجريد الإسلامي", img: "/templates/جاهزة/15.png", original: 45 },
+              { id: "114", name: "باترن السدو الفاخر", img: "/templates/مصمم/Artboard 12.png", badge: "حصري" },
+              { id: "13", name: "تهنئة الزخرفة الكلاسيكية", img: "/templates/جاهزة/14.png", original: 29 },
+              { id: "16", name: "بطاقة الخط العربي الفاخر", img: "/templates/جاهزة/17.png", badge: "Premium", original: 75 },
+              { id: "105", name: "ثيم الواحة الهادئة", img: "/templates/مصمم/18.png", original: 29 },
+              { id: "3", name: "تصميم اللؤلؤة العربية", img: "/templates/جاهزة/6.png", badge: "مجاني لفترة محدودة" },
+            ].map((p, idx) => (
+              <div 
+                key={idx} 
+                className="flex-none w-[280px] sm:w-[320px] snap-center first:mr-0"
+              >
+                <ProductCard 
+                  id={p.id} 
+                  name={p.name} 
+                  image={p.img} 
+                  price={0} 
+                  originalPrice={p.original || 0} 
+                  rating={4.9 + (Math.random() * 0.1)}
+                  badges={p.badge ? [p.badge] : []}
+                />
+              </div>
+            ))}
+          </div>
+          
+          {/* Scroll Indicators / Help */}
+          <div className="flex justify-center gap-2 mt-4 text-gray-400 sm:hidden">
+            <span className="text-xs font-bold">اسحب لليمين لرؤية المزيد</span>
           </div>
         </div>
+        
+        <style>{`
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+          .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+        `}</style>
       </section>
 
       {/* LUXURY CARD CATEGORIES */}

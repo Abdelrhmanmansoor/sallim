@@ -39,7 +39,7 @@ const ProductCard = ({
       </div>
 
       {/* Image Preview */}
-      <div className="relative aspect-[16/10] mb-5 rounded-[14px] bg-gray-50 overflow-hidden">
+      <div className="relative aspect-[3/4] mb-5 rounded-[14px] bg-gray-50 overflow-hidden">
         <img 
           src={image} 
           alt={name} 
@@ -66,22 +66,13 @@ const ProductCard = ({
           {name}
         </h3>
 
-        {/* Pricing */}
+        {/* Pricing - Forced Free */}
         <div className="flex items-center gap-3 mt-auto mb-5 min-h-[28px]">
-          {price === 0 ? (
-            <span className="text-teal-600 font-extrabold text-xl">مجاني</span>
-          ) : (
-            <>
-              <span className="text-red-500 font-extrabold text-xl flex items-center gap-1">
-                <span className="text-xs font-normal">ر.س</span>
-                {price.toFixed(2)}
-              </span>
-              {originalPrice > price && (
-                <span className="text-gray-400 text-sm line-through decoration-red-400/50">
-                  {originalPrice.toFixed(2)}
-                </span>
-              )}
-            </>
+          <span className="text-teal-600 font-extrabold text-xl">مجانًا</span>
+          {originalPrice > 0 && (
+            <span className="text-gray-400 text-sm line-through decoration-red-400/50">
+              {originalPrice.toFixed(2)} ر.س
+            </span>
           )}
         </div>
 
