@@ -1,6 +1,28 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Palette, Download, Smartphone, Type, Layers, Shield, ChevronDown, Heart, DollarSign, X, Sparkles, Star } from 'lucide-react'
+import { 
+  ArrowLeft, 
+  Palette, 
+  Download, 
+  Smartphone, 
+  Type, 
+  Layers, 
+  Shield, 
+  ChevronDown, 
+  Heart, 
+  DollarSign, 
+  X, 
+  Sparkles, 
+  Star,
+  GraduationCap,
+  Baby,
+  PartyPopper,
+  Briefcase,
+  Mail,
+  Trophy,
+  Cloud,
+  Award
+} from 'lucide-react'
 import { getTemplates } from '../utils/api'
 import ProductCard from '../components/ProductCard'
 
@@ -72,16 +94,16 @@ export default function LandingPage() {
   ]
 
   const cardCategories = [
-    { id: 1, name: 'بطاقات العيد', icon: '🎉', color: '#FFD700', premium: false },
-    { id: 2, name: 'بطاقات الزفاف', icon: '💍', color: '#E91E63', premium: true },
-    { id: 3, name: 'بطاقات التخرج', icon: '🎓', color: '#9C27B0', premium: false },
-    { id: 4, name: 'بطاقات المواليد', icon: '👶', color: '#4CAF50', premium: false },
-    { id: 5, name: 'بطاقات حفلات الأطفال', icon: '🎈', color: '#FF9800', premium: false },
-    { id: 6, name: 'بطاقات افتتاح المشاريع', icon: '🏢', color: '#2196F3', premium: false },
-    { id: 7, name: 'بطاقات الشكر', icon: '🙏', color: '#795548', premium: false },
-    { id: 8, name: 'بطاقات العزاء', icon: '🕊️', color: '#607D8B', premium: false },
-    { id: 9, name: 'بطاقات دعوات المناسبات', icon: '📋', color: '#00BCD4', premium: false },
-    { id: 10, name: 'بطاقات النجاح والإنجاز', icon: '🏆', color: '#FF5722', premium: false },
+    { id: 1, name: 'بطاقات العيد', icon: Sparkles, color: '#0d9488', premium: false },
+    { id: 2, name: 'بطاقات الزفاف', icon: Heart, color: '#be185d', premium: true },
+    { id: 3, name: 'بطاقات التخرج', icon: GraduationCap, color: '#4338ca', premium: false },
+    { id: 4, name: 'بطاقات المواليد', icon: Baby, color: '#15803d', premium: false },
+    { id: 5, name: 'بطاقات حفلات الأطفال', icon: PartyPopper, color: '#b45309', premium: false },
+    { id: 6, name: 'بطاقات افتتاح المشاريع', icon: Briefcase, color: '#1d4ed8', premium: false },
+    { id: 7, name: 'بطاقات الشكر', icon: Star, color: '#a21caf', premium: false },
+    { id: 8, name: 'بطاقات العزاء', icon: Cloud, color: '#334155', premium: false },
+    { id: 9, name: 'بطاقات دعوات المناسبات', icon: Mail, color: '#0369a1', premium: false },
+    { id: 10, name: 'بطاقات النجاح والإنجاز', icon: Trophy, color: '#ea580c', premium: false },
   ]
 
   useEffect(() => {
@@ -600,20 +622,6 @@ export default function LandingPage() {
       <section style={{ padding: '100px 0', background: '#f8fafc', overflow: 'hidden' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 24px' }}>
           <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '8px 20px',
-              background: 'rgba(13, 148, 136, 0.1)',
-              borderRadius: '100px',
-              marginBottom: '16px',
-              border: '1px solid rgba(13, 148, 136, 0.2)',
-            }}>
-              <span style={{ fontSize: '13px', color: '#0d9488', fontWeight: 700, letterSpacing: '0.05em' }}>
-                قوالب مجانية جاهزة
-              </span>
-            </div>
             
             <h2 style={{ 
               fontSize: 'clamp(32px, 5vw, 44px)', 
@@ -683,178 +691,80 @@ export default function LandingPage() {
         `}</style>
       </section>
 
-      {/* LUXURY CARD CATEGORIES */}
-      <section style={{ padding: '100px 0', background: '#fff' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
-          {/* Header */}
-          <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '6px 16px',
-              background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)',
-              borderRadius: '100px',
-              marginBottom: '20px',
-            }}>
-              <Sparkles size={14} color="#171717" />
-              <span style={{ fontSize: '12px', color: '#171717', fontWeight: 700, letterSpacing: '0.02em' }}>
-                منتجات فاخرة
-              </span>
-            </div>
+      {/* LUXURY EVENT CATEGORIES - REDESIGNED */}
+      <section className="py-24 bg-white relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-teal-50/20 rounded-full blur-[120px] -mr-64 -mt-64"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-purple-50/20 rounded-full blur-[100px] -ml-40 -mb-40"></div>
 
-            <h2 style={{
-              fontSize: 'clamp(32px, 5vw, 48px)',
-              fontWeight: 800,
-              color: '#171717',
-              marginBottom: '16px',
-              lineHeight: 1.2
-            }}>
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          {/* Header */}
+          <div className="text-center mb-20">
+            <h2 className="text-[clamp(32px,5vw,48px)] font-black text-slate-900 mb-6 leading-[1.2]">
               بطاقات مناسبات مميزة
             </h2>
-
-            <p style={{
-              fontSize: '16px',
-              color: '#737373',
-              maxWidth: '540px',
-              margin: '0 auto',
-              lineHeight: 1.7
-            }}>
-              اختر من مجموعة متنوعة من البطاقات الفاخرة لكل المناسبات
+            <p className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
+              اختر من بين تشكيلة واسعة من القوالب المصممة باحترافية لتناسب ذوقك الرفيع في جميع مناسباتك الاجتماعية والعملية
             </p>
           </div>
 
-          {/* Cards Grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '24px',
-          }}>
+          {/* Categories Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {cardCategories.map((category) => (
               <div
                 key={category.id}
                 onClick={() => {
                   if (category.id === 1) {
-                    // Eid cards - navigate to ready templates
                     navigate('/editor?template=ready')
                   } else if (category.id === 2) {
-                    // Wedding cards - show WhatsApp form
                     navigate('/wedding-invitation')
                   } else {
-                    // Other categories - WhatsApp
                     handleWhatsAppLink(`مرحباً، أريد الاستفسار عن ${category.name}`)
                   }
                 }}
+                className={`group relative p-8 rounded-[32px] bg-white border border-slate-100/80 transition-all duration-500 cursor-pointer overflow-hidden
+                  hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] hover:-translate-y-2 
+                  ${category.premium ? 'ring-2 ring-teal-600/10' : ''}`}
                 style={{
-                  position: 'relative',
-                  padding: '36px 24px',
-                  background: '#fff',
-                  borderRadius: '20px',
-                  border: category.premium 
-                    ? '2px solid #E91E63' 
-                    : '1px solid #e5e5e5',
-                  cursor: 'pointer',
-                  transition: 'all 300ms ease',
-                  boxShadow: category.premium 
-                    ? '0 8px 24px rgba(233, 30, 99, 0.15)' 
-                    : 'none',
-                  overflow: 'hidden',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = category.premium ? 'translateY(-8px) scale(1.02)' : 'translateY(-6px)'
-                  e.currentTarget.style.boxShadow = category.premium 
-                    ? '0 12px 40px rgba(233, 30, 99, 0.25)' 
-                    : '0 12px 32px rgba(0,0,0,0.1)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0) scale(1)'
-                  e.currentTarget.style.boxShadow = category.premium 
-                    ? '0 8px 24px rgba(233, 30, 99, 0.15)' 
-                    : 'none'
+                  '--card-glow': `${category.color}15`
                 }}
               >
-                {/* Premium Badge */}
-                {category.premium && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '16px',
-                    left: '16px',
-                    background: 'linear-gradient(135deg, #E91E63 0%, #9C27B0 100%)',
-                    color: '#fff',
-                    padding: '6px 12px',
-                    borderRadius: '100px',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    boxShadow: '0 4px 12px rgba(233, 30, 99, 0.3)',
-                  }}>
-                    <Sparkles size={12} />
-                    PREMIUM
+                {/* Background Hover Glow */}
+                <div 
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-[radial-gradient(circle_at_center,var(--card-glow),transparent_70%)]"
+                ></div>
+
+                {/* Content Container */}
+                <div className="relative z-10 flex flex-col items-center text-center">
+                  {/* Icon Wrapper */}
+                  <div 
+                    className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all duration-500 group-hover:scale-110 shadow-sm"
+                    style={{ 
+                      backgroundColor: `${category.color}08`,
+                      color: category.color,
+                      border: `1px solid ${category.color}15`
+                    }}
+                  >
+                    <category.icon size={28} strokeWidth={2.5} className="group-hover:rotate-6 transition-transform" />
                   </div>
-                )}
 
-                {/* Icon */}
-                <div style={{
-                  width: '80px',
-                  height: '80px',
-                  borderRadius: '20px',
-                  background: category.premium 
-                    ? 'linear-gradient(135deg, #E91E63 0%, #9C27B0 100%)'
-                    : `linear-gradient(135deg, ${category.color} 0%, ${category.color}dd 100%)`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '20px',
-                  fontSize: '40px',
-                  boxShadow: `0 8px 24px ${category.color}33`,
-                }}>
-                  {category.icon}
-                </div>
+                  {/* Text */}
+                  <h3 className="text-lg font-bold text-slate-900 mb-3 group-hover:text-slate-950 transition-colors">
+                    {category.name}
+                  </h3>
+                  
+                  {/* Subtle Badge for Premium */}
+                  {category.premium ? (
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#be185d] bg-[#be185d]/5 px-3 py-1 rounded-full mb-4">
+                      PREMIUM
+                    </span>
+                  ) : null}
 
-                {/* Title */}
-                <h3 style={{
-                  fontSize: '20px',
-                  fontWeight: 700,
-                  color: '#171717',
-                  marginBottom: '8px',
-                  lineHeight: 1.3,
-                }}>
-                  {category.name}
-                </h3>
-
-                {/* Description */}
-                <p style={{
-                  fontSize: '14px',
-                  color: '#737373',
-                  lineHeight: 1.6,
-                  marginBottom: '16px',
-                }}>
-                  {category.id === 1 && 'تصاميم جاهزة للعيد - فوراً'}
-                  {category.id === 2 && 'تصاميم مخصصة فاخرة'}
-                  {category.id === 3 && 'احتفل بإنجازك بشكل مميز'}
-                  {category.id === 4 && 'رحيب بالمولود الجديد'}
-                  {category.id === 5 && 'أجواء مرحلة للأطفال'}
-                  {category.id === 6 && 'احتفل بافتتاح مشروعك'}
-                  {category.id === 7 && 'عبر عن امتنانك'}
-                  {category.id === 8 && 'تعزية راقية ومؤثرة'}
-                  {category.id === 9 && 'دعوات لجميع المناسبات'}
-                  {category.id === 10 && 'حتفل بإنجازاتك'}
-                </p>
-
-                {/* CTA */}
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  color: category.premium ? '#E91E63' : '#171717',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  transition: 'all 200ms ease',
-                }}>
-                  <span>{category.id === 2 ? 'اطلب الآن' : 'تواصل معنا'}</span>
-                  <ArrowLeft size={16} />
+                  {/* Arrow Icon */}
+                  <div className="mt-2 flex items-center gap-2 text-xs font-bold text-slate-400 group-hover:text-slate-900 transition-all group-hover:gap-3">
+                    <span>{category.id === 2 ? 'اطلب الآن' : 'استعرض'}</span>
+                    <ArrowLeft size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
                 </div>
               </div>
             ))}
@@ -928,7 +838,7 @@ export default function LandingPage() {
             color: '#fff',
             marginBottom: '12px'
           }}>
-            🎲 لعبة العيدية التفاعلية
+            لعبة العيدية التفاعلية
           </h2>
           <p style={{
             fontSize: '16px',
