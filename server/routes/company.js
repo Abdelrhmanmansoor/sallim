@@ -192,6 +192,29 @@ router.post('/login', loginLimiter, async (req, res) => {
     }
 })
 
+// Authentication Middleware to protect company routes
+export const protectCompanyRoute = async (req, res, next) => {
+    let token
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1]
+    }
+
+    if (!token) {
+        return res.status(401).json({ success: false, error: 'تسجيل الدخول مطلوب' })
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET)
+        req.company = await Company.findById(decoded.id)
+        if (!req.company) {
+            return res.status(404).json({ success: false, error: 'الشركة غير موجودة' })
+        }
+        next()
+    } catch (error) {
+        res.status(401).json({ success: false, error: 'الجلسة منتهية أو غير صالحة' })
+    }
+}
+
 // ═══ Dashboard (Company Auth) ═══
 router.get('/dashboard', protectCompanyRoute, async (req, res) => {
   try {
@@ -216,29 +239,6 @@ router.get('/dashboard', protectCompanyRoute, async (req, res) => {
     res.status(500).json({ success: false, error: 'تعذر جلب البيانات' })
   }
 })
-
-// Authentication Middleware to protect company routes
-export const protectCompanyRoute = async (req, res, next) => {
-    let token
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        token = req.headers.authorization.split(' ')[1]
-    }
-
-    if (!token) {
-        return res.status(401).json({ success: false, error: 'تسجيل الدخول مطلوب' })
-    }
-
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET)
-        req.company = await Company.findById(decoded.id)
-        if (!req.company) {
-            return res.status(404).json({ success: false, error: 'الشركة غير موجودة' })
-        }
-        next()
-    } catch (error) {
-        res.status(401).json({ success: false, error: 'الجلسة منتهية أو غير صالحة' })
-    }
-}
 
 // Middleware to check team member permissions
 export const checkTeamPermission = (requiredPermission) => {
