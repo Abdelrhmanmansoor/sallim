@@ -31,7 +31,7 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import ProfilePage from './pages/ProfilePage'
 import CompaniesPage from './pages/CompaniesPage'
-import AdminDashboardNew from './pages/AdminDashboardNew'
+import AdminDashboardPage from './pages/AdminDashboardPage'
 import AboutPage from './pages/AboutPage'
 import PricingPage from './pages/PricingPage'
 import DeliveryPage from './pages/DeliveryPage'
@@ -109,7 +109,7 @@ export default function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/companies" element={<CompaniesPage />} />
-          <Route path="/admin/dashboard" element={<AdminDashboardNew />} />
+          <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/delivery" element={<DeliveryPage />} />
