@@ -13,78 +13,18 @@ import JSZip from 'jszip'
 import toast, { Toaster } from 'react-hot-toast'
 
 class EditorErrorBoundary extends React.Component {
-  constructor(props) { super(props); this.state = { hasError: false, errorInfo: null } }
-  static getDerivedStateFromError(error) { 
-    console.error('EditorErrorBoundary caught an error:', error)
-    return { hasError: true, errorInfo: error?.message || 'Unknown error' } 
-  }
-  
-  componentDidCatch(err, info) {
-    console.error('EditorPage error:', err)
-    console.error('Error info:', info)
-    console.error('Component stack:', info.componentStack)
-    
-    try {
-      const errors = JSON.parse(localStorage.getItem('editor_errors') || '[]')
-      errors.push({
-        message: err?.message,
-        stack: err?.stack,
-        timestamp: new Date().toISOString()
-      })
-      if (errors.length > 10) errors.shift()
-      localStorage.setItem('editor_errors', JSON.stringify(errors))
-    } catch (e) {
-      console.error('Failed to log error:', e)
-    }
-  }
-  
+  constructor(props) { super(props); this.state = { hasError: false } }
+  static getDerivedStateFromError() { return { hasError: true } }
+  componentDidCatch(err, info) { console.error('EditorPage error:', err, info) }
   render() {
     if (this.state.hasError) {
       return (
         <div style={{ padding: 40, textAlign: 'center', fontFamily: "'Tajawal', sans-serif", direction: 'rtl' }}>
-          <h2 style={{ fontSize: 24, marginBottom: 16 }}>⚠️ حدث خطأ في المحرر</h2>
-          <p style={{ marginBottom: 20, color: '#666' }}>
-            {this.state.errorInfo || 'يرجى إعادة تحميل الصفحة'}
-          </p>
-          <button 
-            onClick={() => {
-              this.setState({ hasError: false, errorInfo: null })
-              window.location.reload()
-            }}
-            style={{ 
-              padding: '12px 28px', 
-              background: '#000', 
-              color: '#fff', 
-              border: 'none', 
-              borderRadius: 12, 
-              fontSize: 16, 
-              cursor: 'pointer',
-              marginBottom: 16
-            }}
-          >
+          <h2>⚠️ حدث خطأ في المحرر</h2>
+          <p>يرجى إعادة تحميل الصفحة</p>
+          <button onClick={() => { this.setState({ hasError: false }); window.location.reload() }}
+            style={{ padding: '12px 28px', background: '#000', color: '#fff', border: 'none', borderRadius: 12, fontSize: 16, cursor: 'pointer' }}>
             إعادة تحميل
-          </button>
-          <button 
-            onClick={() => {
-              try {
-                localStorage.removeItem('editor_errors')
-                this.setState({ hasError: false, errorInfo: null })
-              } catch (e) {
-                console.error('Failed to clear errors:', e)
-              }
-            }}
-            style={{ 
-              padding: '10px 20px', 
-              background: 'transparent', 
-              color: '#666', 
-              border: '1px solid #ddd', 
-              borderRadius: 12, 
-              fontSize: 14, 
-              cursor: 'pointer',
-              fontFamily: ds.font
-            }}
-          >
-            محاولة المتابعة
           </button>
         </div>
       )
@@ -550,42 +490,12 @@ function EditorPageInner() {
   // Safe template selection handler
   const handleTemplateSelect = useCallback((template) => {
     try {
-      console.log('handleTemplateSelect called with:', template)
-      
-      // Validate template object
-      if (!template) {
-        console.error('Template selection failed: template is null/undefined')
-        toast.error('تعذر اختيار القالب')
-        return
-      }
-
-      if (!template.id) {
-        console.error('Template selection failed: template has no id', template)
-        toast.error('تعذر اختيار القالب - معرف غير صالح')
-        return
-      }
-
-      if (!template.image) {
-        console.error('Template selection failed: template has no image', template)
-        toast.error('تعذر اختيار القالب - صورة غير موجودة')
-        return
-      }
-
-      console.log('Selecting template:', template.id, template.name)
-      
-      // Safely set template
+      if (!template?.id) return
       store.setTemplate(template.id)
-      
-      // If in ready mode, set default colors from template
-      if (mode === 'ready' && template.textColor) {
-        setReadyNameColor(template.textColor)
-      }
-      
-      console.log('Template selected successfully:', template.id)
-    } catch (error) {
-      console.error('Error in handleTemplateSelect:', error)
+      if (mode === 'ready' && template.textColor) setReadyNameColor(template.textColor)
+    } catch (err) {
+      console.error('Template select error:', err)
       toast.error('حدث خطأ أثناء اختيار القالب')
-      // Don't let error propagate to error boundary
     }
   }, [store, mode])
 

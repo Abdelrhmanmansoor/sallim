@@ -259,7 +259,7 @@ export default function AdminDashboardPage() {
               })}
               {/* Add New */}
               <button onClick={() => navigate('/admin/invite-codes')}
-                style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', borderRadius: 16, padding: '20px', border: 'none', cursor: 'pointer', textAlign: 'right', fontFamily: "'Tajawal', sans-serif', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 8 }}>
+                style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', borderRadius: 16, padding: '20px', border: 'none', cursor: 'pointer', textAlign: 'right', fontFamily: "'Tajawal', sans-serif", transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 8 }}>
                 <div style={{ width: 48, height: 48, background: 'rgba(255,255,255,0.2)', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Plus size={22} color="#fff" />
                 </div>
