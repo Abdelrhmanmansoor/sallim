@@ -487,6 +487,18 @@ function EditorPageInner() {
   const filteredCalligraphy = allFilteredCalligraphy.slice(0, calligraphyLimit)
   const filteredTexts = greetingTexts.filter(t => t.text.includes(searchText) || t.category?.includes(searchText))
 
+  // Safe template selection handler
+  const handleTemplateSelect = useCallback((template) => {
+    try {
+      if (!template?.id) return
+      store.setTemplate(template.id)
+      if (mode === 'ready' && template.textColor) setReadyNameColor(template.textColor)
+    } catch (err) {
+      console.error('Template select error:', err)
+      toast.error('حدث خطأ أثناء اختيار القالب')
+    }
+  }, [store, mode])
+
   // Resize handler
   useEffect(() => {
     function handleResize() {
@@ -2055,9 +2067,7 @@ function EditorPageInner() {
                 finalReadyTemplates.map((t) => (
                   <button
                     key={t.id}
-                    onClick={() => {
-                      store.setTemplate(t.id)
-                    }}
+                    onClick={() => handleTemplateSelect(t)}
                     style={{
                       position: 'relative',
                       width: 140,
@@ -2535,7 +2545,7 @@ function EditorPageInner() {
                 allTemplates.filter(t => !t.image?.includes('ط·ع¾ط·آµط¸â€¦ط¸ظ¹ط¸â€¦ ط¸â€‍ط·آ±ط¸ظ¾ط·آ¹ ط·آµط¸ث†ط·آ±ط·آ©')).map((t) => (
                   <button
                     key={t.id}
-                    onClick={() => store.setTemplate(t.id)}
+                    onClick={() => handleTemplateSelect(t)}
                     style={{
                       position: 'relative', width: 140, minWidth: 140, aspectRatio: '9/16', borderRadius: 16, overflow: 'hidden',
                       border: store.selectedTemplate === t.id ? '3px solid #000' : '2px solid #eee',
@@ -3426,7 +3436,7 @@ function EditorPageInner() {
         {/* Templates Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
           {allTemplates.map((t) => (
-            <button key={t.id} onClick={() => store.setTemplate(t.id)} style={{
+            <button key={t.id} onClick={() => handleTemplateSelect(t)} style={{
               position: 'relative', aspectRatio: '1', borderRadius: 14, overflow: 'hidden', padding: 0,
               border: store.selectedTemplate === t.id ? '3px solid #000' : '2px solid #eee',
               cursor: 'pointer', transition: 'all 200ms'
