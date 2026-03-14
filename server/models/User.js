@@ -30,6 +30,11 @@ const userSchema = new mongoose.Schema({
         maxlength: 200,
         default: ''
     },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
     diwaniyas: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Diwaniya'
