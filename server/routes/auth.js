@@ -51,7 +51,8 @@ const loginSchema = Joi.object({
     }),
     password: Joi.string().required().messages({
         'any.required': 'كلمة المرور مطلوبة'
-    })
+    }),
+    role: Joi.string().optional()
 });
 
 const claimDiwaniyaSchema = Joi.object({

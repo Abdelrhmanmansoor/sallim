@@ -32,6 +32,7 @@ import RegisterPage from './pages/RegisterPage'
 import ProfilePage from './pages/ProfilePage'
 import CompaniesPage from './pages/CompaniesPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
+import AdminLoginPage from './pages/AdminLoginPage'
 import AboutPage from './pages/AboutPage'
 import PricingPage from './pages/PricingPage'
 import DeliveryPage from './pages/DeliveryPage'
@@ -66,6 +67,7 @@ export default function App() {
     '/admin/dashboard',
     '/admin/companies',
     '/admin/invite-codes',
+    '/admin-x9k2/login',
     '/companies',
     '/create-game',
     '/wedding-invitation',
@@ -110,6 +112,7 @@ export default function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/companies" element={<CompaniesPage />} />
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+          <Route path="/admin-x9k2/login" element={<AdminLoginPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/delivery" element={<DeliveryPage />} />
