@@ -30,7 +30,6 @@
     "node-cache": "^5.1.2",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.15",
-    "compression": "^1.7.4",
     "xss": "^1.0.15"
   }
 }

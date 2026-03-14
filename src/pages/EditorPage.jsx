@@ -356,11 +356,26 @@ export default function EditorPage() {
   }, [isAuthenticated, company])
 
   // Computed - Combine API templates with static fallbacks + custom uploads
-  const mergedReady = [...staticTemplates, ...dbReadyTemplates];
-  const finalReadyTemplates = mergedReady.filter((t, i, self) => i === self.findIndex((tx) => tx.image === t.image));
+  const normalizeImage = (img) => {
+    if (!img) return ''
+    // Encode each path segment to handle Arabic/space characters without breaking slashes
+    const segments = img.split('/').filter(Boolean).map((seg) => {
+      try {
+        return encodeURIComponent(decodeURIComponent(seg))
+      } catch {
+        return encodeURIComponent(seg)
+      }
+    })
+    return '/' + segments.join('/')
+  }
 
-  const mergedDesigner = [...staticDesignerTemplates, ...dbDesignerTemplates];
-  const finalDesignerTemplates = mergedDesigner.filter((t, i, self) => i === self.findIndex((tx) => tx.image === t.image));
+  const mergedReady = [...staticTemplates, ...dbReadyTemplates]
+    .map(t => ({ ...t, image: normalizeImage(t.image) }))
+  const finalReadyTemplates = mergedReady.filter((t, i, self) => i === self.findIndex((tx) => tx.image === t.image))
+
+  const mergedDesigner = [...staticDesignerTemplates, ...dbDesignerTemplates]
+    .map(t => ({ ...t, image: normalizeImage(t.image) }))
+  const finalDesignerTemplates = mergedDesigner.filter((t, i, self) => i === self.findIndex((tx) => tx.image === t.image))
 
   const allTemplates = mode === 'designer'
     ? [...finalDesignerTemplates, ...customTemplates]
