@@ -33,6 +33,8 @@ import ProfilePage from './pages/ProfilePage'
 import CompaniesPage from './pages/CompaniesPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
 import AdminLoginPage from './pages/AdminLoginPage'
+import AdminCompaniesPage from './pages/AdminCompaniesPage'
+import AdminInviteCodesPage from './pages/AdminInviteCodesPage'
 import AboutPage from './pages/AboutPage'
 import PricingPage from './pages/PricingPage'
 import DeliveryPage from './pages/DeliveryPage'
@@ -112,6 +114,8 @@ export default function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/companies" element={<CompaniesPage />} />
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+          <Route path="/admin/companies" element={<AdminCompaniesPage />} />
+          <Route path="/admin/invite-codes" element={<AdminInviteCodesPage />} />
           <Route path="/admin-x9k2/login" element={<AdminLoginPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/pricing" element={<PricingPage />} />

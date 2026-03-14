@@ -94,6 +94,34 @@ router.get('/', async (req, res) => {
   }
 })
 
+// ═══ Stats Summary (must be before /:id) ═══
+router.get('/stats/summary', async (req, res) => {
+  try {
+    const total = await InviteCode.countDocuments()
+    const generated = await InviteCode.countDocuments({ status: 'generated' })
+    const sent = await InviteCode.countDocuments({ status: 'sent' })
+    const activated = await InviteCode.countDocuments({ status: 'activated' })
+    const expired = await InviteCode.countDocuments({ status: 'expired' })
+    const revoked = await InviteCode.countDocuments({ status: 'revoked' })
+
+    res.json({
+      success: true,
+      data: {
+        total,
+        generated,
+        sent,
+        activated,
+        expired,
+        revoked,
+        activationRate: total > 0 ? Math.round((activated / total) * 100) : 0
+      }
+    })
+  } catch (error) {
+    console.error('Get stats error:', error)
+    res.status(500).json({ success: false, error: 'حدث خطأ في جلب الإحصائيات' })
+  }
+})
+
 // ═══ Get Single Invite Code ═══
 router.get('/:id', async (req, res) => {
   try {
@@ -249,34 +277,6 @@ router.post('/:id/resend', async (req, res) => {
   } catch (error) {
     console.error('Resend invite code error:', error)
     res.status(500).json({ success: false, error: 'حدث خطأ في إرسال الكود' })
-  }
-})
-
-// ═══ Get Invite Code Statistics ═══
-router.get('/stats/summary', async (req, res) => {
-  try {
-    const total = await InviteCode.countDocuments()
-    const generated = await InviteCode.countDocuments({ status: 'generated' })
-    const sent = await InviteCode.countDocuments({ status: 'sent' })
-    const activated = await InviteCode.countDocuments({ status: 'activated' })
-    const expired = await InviteCode.countDocuments({ status: 'expired' })
-    const revoked = await InviteCode.countDocuments({ status: 'revoked' })
-
-    res.json({
-      success: true,
-      data: {
-        total,
-        generated,
-        sent,
-        activated,
-        expired,
-        revoked,
-        activationRate: total > 0 ? Math.round((activated / total) * 100) : 0
-      }
-    })
-  } catch (error) {
-    console.error('Get stats error:', error)
-    res.status(500).json({ success: false, error: 'حدث خطأ في جلب الإحصائيات' })
   }
 })
 
