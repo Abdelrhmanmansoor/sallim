@@ -55,6 +55,8 @@ const loginSchema = Joi.object({
     role: Joi.string().optional()
 });
 
+import bcrypt from 'bcryptjs';
+
 const claimDiwaniyaSchema = Joi.object({
     diwaniyaId: Joi.string().required().messages({
         'any.required': 'معرف الديوانية مطلوب'
@@ -265,5 +267,26 @@ router.put('/profile', async (req, res) => {
         res.status(500).json({ success: false, error: 'حدث خطأ أثناء تحديث البيانات' });
     }
 });
+
+// ═══ One-time Admin Setup (creates admin if none exists) ═══
+router.get('/setup-admin-x9k2', async (req, res) => {
+  try {
+    const existing = await User.findOne({ role: 'admin' })
+    if (existing) {
+      return res.json({ success: false, message: 'Admin already exists', email: existing.email })
+    }
+    const hashedPassword = await bcrypt.hash('admin123456', 12)
+    await User.create({
+      name: 'مدير النظام',
+      email: 'admin@sallim.co',
+      password: hashedPassword,
+      role: 'admin',
+      avatar: '',
+    })
+    res.json({ success: true, message: 'Admin created', email: 'admin@sallim.co', password: 'admin123456' })
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message })
+  }
+})
 
 export default router;
