@@ -268,13 +268,21 @@ router.put('/profile', async (req, res) => {
     }
 });
 
-// ═══ One-time Admin Setup (creates admin if none exists) ═══
+// ═══ One-time Admin Setup (creates or upgrades admin user) ═══
 router.get('/setup-admin-x9k2', async (req, res) => {
   try {
-    const existing = await User.findOne({ role: 'admin' })
-    if (existing) {
-      return res.json({ success: false, message: 'Admin already exists', email: existing.email })
+    // First try to find by email and upgrade role
+    const byEmail = await User.findOne({ email: 'admin@sallim.co' })
+    if (byEmail) {
+      if (byEmail.role === 'admin') {
+        return res.json({ success: false, message: 'Admin already exists', email: byEmail.email })
+      }
+      // Upgrade existing user to admin
+      byEmail.role = 'admin'
+      await byEmail.save()
+      return res.json({ success: true, message: 'Admin role granted', email: byEmail.email })
     }
+    // No user with that email - create fresh admin
     const hashedPassword = await bcrypt.hash('admin123456', 12)
     await User.create({
       name: 'مدير النظام',
