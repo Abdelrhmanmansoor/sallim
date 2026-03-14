@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Key, Plus, Search, ArrowRight, RefreshCw, Copy, Check } from 'lucide-react'
+import { Key, Plus, Search, ArrowRight, RefreshCw, Copy, Check, Link2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const API = import.meta.env.VITE_API_URL
+const CLIENT = import.meta.env.VITE_CLIENT_URL || 'https://www.sallim.co'
 
 export default function AdminInviteCodesPage() {
   const navigate = useNavigate()
@@ -17,8 +18,17 @@ export default function AdminInviteCodesPage() {
   const [copied, setCopied] = useState(null)
 
   // Generate form
-  const [form, setForm] = useState({ companyName: '', companyEmail: '', expirationDays: 7, initialCredits: 0 })
+  const [form, setForm] = useState({
+    companyName: '',
+    companyEmail: '',
+    expirationDays: 7,
+    downloadLimit: 100,
+    readyTemplates: true,
+    batchMode: true,
+    designerMode: false,
+  })
   const [showForm, setShowForm] = useState(false)
+  const [lastCode, setLastCode] = useState(null)
 
   const user = JSON.parse(localStorage.getItem('user') || '{}')
 
@@ -64,16 +74,29 @@ export default function AdminInviteCodesPage() {
     try {
       setGenerating(true)
       const token = localStorage.getItem('token')
+      const features = []
+      if (form.readyTemplates) features.push('ready_templates')
+      if (form.batchMode) features.push('batch_templates')
+      if (form.designerMode) features.push('designer_mode')
+
       const res = await fetch(`${API}/api/v1/admin/invite-codes/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ ...form, createdBy: user._id || user.id })
+        body: JSON.stringify({
+          companyName: form.companyName,
+          companyEmail: form.companyEmail,
+          expirationDays: form.expirationDays,
+          initialCredits: form.downloadLimit,
+          features,
+          createdBy: user._id || user.id
+        })
       })
       const data = await res.json()
       if (data.success) {
         toast.success('تم إنشاء الكود بنجاح ✅')
         setShowForm(false)
-        setForm({ companyName: '', companyEmail: '', expirationDays: 7, initialCredits: 0 })
+        setForm({ companyName: '', companyEmail: '', expirationDays: 7, downloadLimit: 100, readyTemplates: true, batchMode: true, designerMode: false })
+        setLastCode(data.data?.code)
         loadCodes()
         loadStats()
       } else {
@@ -131,9 +154,23 @@ export default function AdminInviteCodesPage() {
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 4 }}>رصيد ابتدائي</label>
-                <input type="number" min="0" value={form.initialCredits} onChange={e => setForm(p => ({ ...p, initialCredits: +e.target.value }))}
+                <input type="number" min="0" value={form.downloadLimit} onChange={e => setForm(p => ({ ...p, downloadLimit: +e.target.value }))}
                   style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 14, fontFamily: "'Tajawal', sans-serif", boxSizing: 'border-box', outline: 'none' }} />
               </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#111827' }}>
+                <input type="checkbox" checked={form.readyTemplates} onChange={e => setForm(p => ({ ...p, readyTemplates: e.target.checked }))} />
+                تمبلت جاهزة
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#111827' }}>
+                <input type="checkbox" checked={form.batchMode} onChange={e => setForm(p => ({ ...p, batchMode: e.target.checked }))} />
+                وضع جماعي (Batch)
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#111827' }}>
+                <input type="checkbox" checked={form.designerMode} onChange={e => setForm(p => ({ ...p, designerMode: e.target.checked }))} />
+                وضع المصمم
+              </label>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button type="submit" disabled={generating} style={{ padding: '10px 20px', background: '#a855f7', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontFamily: "'Tajawal', sans-serif", fontWeight: 600 }}>
@@ -143,6 +180,13 @@ export default function AdminInviteCodesPage() {
                 إلغاء
               </button>
             </div>
+            {lastCode && (
+              <div style={{ marginTop: 12, padding: '10px 12px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Link2 size={16} color="#0f172a" />
+                <span style={{ fontSize: 13, direction: 'ltr' }}>{`${CLIENT}/company-activation?code=${lastCode}`}</span>
+                <button onClick={() => copyCode(`${CLIENT}/company-activation?code=${lastCode}`)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a855f7', fontWeight: 700 }}>نسخ الرابط</button>
+              </div>
+            )}
           </form>
         )}
 
@@ -169,7 +213,7 @@ export default function AdminInviteCodesPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                  {['الكود', 'الشركة', 'البريد', 'الحالة', 'تاريخ الانتهاء'].map(h => (
+                  {['الكود', 'الشركة', 'البريد', 'الحالة', 'تاريخ الانتهاء', 'رابط التسجيل'].map(h => (
                     <th key={h} style={{ padding: '12px 16px', textAlign: 'right', fontSize: 12, fontWeight: 600, color: '#64748b' }}>{h}</th>
                   ))}
                 </tr>
@@ -177,6 +221,7 @@ export default function AdminInviteCodesPage() {
               <tbody>
                 {codes.map(c => {
                   const [bg, color] = statusColor[c.status] || ['#f1f5f9', '#475569']
+                  const signupLink = `${CLIENT}/company-activation?code=${c.code}`
                   return (
                     <tr key={c._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                       <td style={{ padding: '14px 16px' }}>
@@ -193,6 +238,11 @@ export default function AdminInviteCodesPage() {
                         <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: bg, color }}>{c.status}</span>
                       </td>
                       <td style={{ padding: '14px 16px', fontSize: 12, color: '#94a3b8' }}>{new Date(c.expirationDate).toLocaleDateString('ar-SA')}</td>
+                      <td style={{ padding: '14px 16px' }}>
+                        <button onClick={() => copyCode(signupLink)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a855f7', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <Link2 size={14} /> نسخ رابط التسجيل
+                        </button>
+                      </td>
                     </tr>
                   )
                 })}
