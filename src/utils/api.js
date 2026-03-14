@@ -12,10 +12,18 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 export async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE}/api/v1${endpoint}`
 
+  let licenseToken
+  try {
+    licenseToken = window?.localStorage?.getItem('eidgreet_license_token')
+  } catch {
+    licenseToken = null
+  }
+
   const config = {
     ...options,
     headers: {
       'Content-Type': 'application/json',
+      ...(licenseToken ? { 'x-license-token': licenseToken } : {}),
       ...options.headers,
     },
   }
@@ -131,6 +139,134 @@ export async function updateCompanyProfile(token, formData) {
   }
 
   return data
+}
+
+/**
+ * Company: Purchase enterprise product and create account
+ */
+export async function purchaseCompanyPlan(data) {
+  return apiRequest('/company/purchase', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Company: Resolve a direct access link
+ */
+export async function resolveCompanyAccessLink(code) {
+  return apiRequest(`/company/access/${code}`)
+}
+
+/**
+ * Company: Get dashboard data
+ */
+export async function getCompanyDashboard(token) {
+  return apiRequest('/company/dashboard', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+}
+
+/**
+ * Company: Get team members
+ */
+export async function getCompanyTeam(token) {
+  return apiRequest('/company/team', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+}
+
+/**
+ * Company: Invite team member
+ */
+export async function inviteCompanyTeamMember(token, data) {
+  return apiRequest('/company/team/invite', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Personal: Create a paid single-card order
+ */
+export async function createPersonalOrder(data) {
+  return apiRequest('/orders/personal/checkout', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Personal: Get a specific order
+ */
+export async function getPersonalOrder(orderId) {
+  return apiRequest(`/orders/personal/${orderId}`)
+}
+
+/**
+ * Personal: Consume the one-time download after payment
+ */
+export async function consumePersonalOrder(orderId, snapshot) {
+  return apiRequest('/orders/personal/consume', {
+    method: 'POST',
+    body: JSON.stringify({ orderId, snapshot })
+  })
+}
+
+export async function createBatchOrder(data) {
+  return apiRequest('/orders/batch/checkout', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+}
+
+export async function consumeBatchOrder(orderId, snapshot, names) {
+  return apiRequest('/orders/batch/consume', {
+    method: 'POST',
+    body: JSON.stringify({ orderId, snapshot, names })
+  })
+}
+
+export async function createPayPalOrder() {
+  return apiRequest('/orders/paypal/create', {
+    method: 'POST',
+    body: JSON.stringify({ product: 'batch' })
+  })
+}
+
+export async function capturePayPalOrder(orderId) {
+  return apiRequest('/orders/paypal/capture', {
+    method: 'POST',
+    body: JSON.stringify({ orderId })
+  })
+}
+
+export async function activateLicense(code, deviceId) {
+  return apiRequest('/orders/license/activate', {
+    method: 'POST',
+    body: JSON.stringify({ code, deviceId }),
+  })
+}
+
+export async function verifyLicense() {
+  return apiRequest('/orders/license/verify')
+}
+
+/**
+ * Public: Log preview/security events
+ */
+export async function logProtectionEvent(eventType, payload = {}) {
+  return apiRequest('/orders/events', {
+    method: 'POST',
+    body: JSON.stringify({ eventType, ...payload })
+  })
 }
 
 /**

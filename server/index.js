@@ -12,13 +12,9 @@ import cloudinary from 'cloudinary'
 import { CloudinaryStorage } from 'multer-storage-cloudinary'
 import multer from 'multer'
 import connectDB from './config/db.js'
-import { createServer } from 'http'
-import { initializeSocket } from './socket.js'
 import cardRoutes from './routes/cards.js'
 import statsRoutes from './routes/stats.js'
 import adminRoutes from './routes/admin.js'
-import checkoutRoutes from './routes/checkout.js'
-import analyticsRoutes from './routes/analytics.js'
 import companyRoutes from './routes/company.js'
 import templateRoutes from './routes/templates.js'
 import blogRoutes from './routes/blog.js'
@@ -36,6 +32,7 @@ import campaignsRoutes from './routes/campaigns.js'
 import teamRoutes from './routes/team.js'
 import gamesRoutes from './routes/games.js'
 import companyBulkRoutes from './routes/company-bulk.js'
+import ordersRoutes from './routes/orders.js'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -50,18 +47,6 @@ const __dirname = path.dirname(__filename)
 const app = express()
 const PORT = process.env.PORT || 3001
 const isProd = process.env.NODE_ENV === 'production'
-
-// Create HTTP server for Socket.io
-const httpServer = createServer(app)
-
-// Initialize Socket.io
-const io = initializeSocket(httpServer)
-
-// Make io available to routes
-app.use((req, res, next) => {
-  req.io = io
-  next()
-})
 
 // ─── Connect to MongoDB ───
 await connectDB()
@@ -107,7 +92,7 @@ const corsOptions = {
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Admin-Key'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Admin-Key', 'X-License-Token'],
 };
 
 app.use(cors(corsOptions))
@@ -221,8 +206,6 @@ app.get('/api/health', (req, res) => {
 app.use('/api/v1/cards', createLimiter, cardRoutes)
 app.use('/api/v1/stats', statsRoutes)
 app.use('/api/v1/admin', adminRoutes)
-app.use('/api/v1/checkout', checkoutRoutes)
-app.use('/api/v1/analytics', analyticsRoutes)
 app.use('/api/v1/admin/invite-codes', adminInviteCodesRoutes)
 app.use('/api/v1/admin/companies', adminCompaniesRoutes)
 app.use('/api/v1/admin/themes', adminThemesRoutes)
@@ -232,6 +215,7 @@ app.use('/api/v1/company/wallet', walletRoutes)
 app.use('/api/v1/company/campaigns', campaignsRoutes)
 app.use('/api/v1/company/team', teamRoutes)
 app.use('/api/v1/company/bulk', companyBulkRoutes)
+app.use('/api/v1/orders', ordersRoutes)
 app.use('/api/v1/templates', templateRoutes)
 app.use('/api/v1/blog', blogRoutes)
 app.use('/api/v1/tickets', ticketRoutes)
@@ -262,7 +246,7 @@ app.use((err, req, res, next) => {
 })
 
 // ─── Start Server ───
-httpServer.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Sallim API running on port ${PORT} [${isProd ? 'production' : 'development'}]`)
 
   // ─── Keep-Alive Mechanism (Self-Ping) ───

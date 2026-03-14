@@ -3,6 +3,7 @@ import crypto from 'crypto'
 import Company from '../models/Company.js'
 import Template from '../models/Template.js'
 import Post from '../models/Post.js'
+import LicenseKey from '../models/LicenseKey.js'
 import { upload } from '../config/upload.js'
 import { sendEmail, getActivationEmailHtml } from '../utils/sendMail.js'
 
@@ -16,6 +17,39 @@ const isAdmin = (req, res, next) => {
     }
     next()
 }
+
+router.post('/licenses/generate', isAdmin, async (req, res) => {
+    try {
+        const count = Math.max(1, Math.min(Number(req.body?.count || 1), 200))
+        const maxRecipients = Math.max(1, Math.min(Number(req.body?.maxRecipients || 500), 10000))
+        const note = String(req.body?.note || '').trim().slice(0, 200)
+
+        const codes = []
+        for (let i = 0; i < count; i++) {
+            const code = crypto.randomBytes(10).toString('hex').toUpperCase()
+            const codeHash = crypto.createHash('sha256').update(code).digest('hex')
+            await LicenseKey.create({
+                codeHash,
+                status: 'new',
+                maxRecipients,
+                note,
+            })
+            codes.push(code)
+        }
+
+        res.status(201).json({
+            success: true,
+            data: {
+                count: codes.length,
+                maxRecipients,
+                codes,
+            }
+        })
+    } catch (error) {
+        console.error('Generate license error:', error)
+        res.status(500).json({ success: false, error: 'حدث خطأ أثناء إنشاء الأكواد' })
+    }
+})
 
 // ═══ Create a new company and send invitation ═══
 router.post('/companies', isAdmin, async (req, res) => {
