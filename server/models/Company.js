@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
+import { nanoid } from 'nanoid'
 
 const companySchema = new mongoose.Schema({
     name: {
@@ -13,6 +14,14 @@ const companySchema = new mongoose.Schema({
         unique: true,
         lowercase: true,
         trim: true,
+    },
+    slug: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
+        default: () => nanoid(10).toLowerCase(),
     },
     password: {
         type: String,
@@ -186,6 +195,12 @@ const companySchema = new mongoose.Schema({
     onboardingCompleted: {
         type: Boolean,
         default: false
+    },
+
+    // Basic stats for dashboards
+    stats: {
+        views: { type: Number, default: 0 },
+        downloads: { type: Number, default: 0 }
     },
 
     // Metadata

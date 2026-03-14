@@ -1,14 +1,15 @@
 import { Router } from 'express'
 import crypto from 'crypto'
 import CompanyTeam from '../models/CompanyTeam.js'
+import Company from '../models/Company.js'
 import Card from '../models/Card.js'
-import { protectCompanyRoute } from './company.js'
+import { protectCompanyRoute, checkTeamPermission } from './company.js'
 import AuditLog from '../models/AuditLog.js'
 
 const router = Router()
 
 // ═══ Invite Team Member ═══
-router.post('/invite', protectCompanyRoute, async (req, res) => {
+router.post('/invite', protectCompanyRoute, checkTeamPermission('manageTeam'), async (req, res) => {
   try {
     const { name, email, role, permissions, invitedBy } = req.body
 
@@ -143,7 +144,7 @@ router.get('/:id', protectCompanyRoute, async (req, res) => {
 })
 
 // ═══ Update Team Member ═══
-router.put('/:id', protectCompanyRoute, async (req, res) => {
+router.put('/:id', protectCompanyRoute, checkTeamPermission('manageTeam'), async (req, res) => {
   try {
     const { name, role, permissions, status } = req.body
 
@@ -194,7 +195,7 @@ router.put('/:id', protectCompanyRoute, async (req, res) => {
 })
 
 // ═══ Delete Team Member ═══
-router.delete('/:id', protectCompanyRoute, async (req, res) => {
+router.delete('/:id', protectCompanyRoute, checkTeamPermission('manageTeam'), async (req, res) => {
   try {
     const teamMember = await CompanyTeam.findOne({
       _id: req.params.id,

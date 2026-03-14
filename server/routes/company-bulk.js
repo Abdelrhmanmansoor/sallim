@@ -4,6 +4,7 @@ import CardCampaign from '../models/CardCampaign.js'
 import Company from '../models/Company.js'
 import Theme from '../models/Theme.js'
 import AuditLog from '../models/AuditLog.js'
+import { protectCompanyRoute, checkTeamPermission } from './company.js'
 import crypto from 'crypto'
 import csv from 'csv-parser'
 import multer from 'multer'
@@ -57,7 +58,7 @@ async function parseCSV(filePath) {
 }
 
 // ═══ Upload and Parse Recipients File ═══
-router.post('/upload-recipients', upload.single('file'), async (req, res) => {
+router.post('/upload-recipients', protectCompanyRoute, checkTeamPermission('createCampaigns'), upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, error: 'يجب رفع ملف' })
@@ -99,13 +100,12 @@ router.post('/upload-recipients', upload.single('file'), async (req, res) => {
 })
 
 // ═══ Bulk Send Cards ═══
-router.post('/bulk-send', async (req, res) => {
+router.post('/bulk-send', protectCompanyRoute, checkTeamPermission('createCampaigns'), async (req, res) => {
   const session = await Card.startSession()
   session.startTransaction()
 
   try {
     const { 
-      companyId, 
       recipients, 
       themeId, 
       templateId, 
@@ -114,15 +114,17 @@ router.post('/bulk-send', async (req, res) => {
       sendVia = 'whatsapp' 
     } = req.body
 
-    if (!companyId || !recipients || !Array.isArray(recipients) || recipients.length === 0) {
-      await session.abortTransaction()
-      return res.status(400).json({ success: false, error: 'بيانات ناقصة' })
-    }
+    // Get company from authenticated session
+    const company = req.company
 
-    const company = await Company.findById(companyId).session(session)
     if (!company) {
       await session.abortTransaction()
-      return res.status(404).json({ success: false, error: 'الشركة غير موجودة' })
+      return res.status(401).json({ success: false, error: 'تسجيل الدخول مطلوب' })
+    }
+
+    if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
+      await session.abortTransaction()
+      return res.status(400).json({ success: false, error: 'بيانات ناقصة' })
     }
 
     // Check company subscription and limits
@@ -154,7 +156,7 @@ router.post('/bulk-send', async (req, res) => {
     // Check if theme is accessible to this company
     if (theme.status === 'exclusive') {
       const hasAccess = theme.exclusiveCompanies.some(
-        compId => compId.toString() === companyId
+        compId => compId.toString() === company._id.toString()
       ) || company.allowedThemeIds.some(
         themeIdRef => themeIdRef.toString() === themeId
       )
@@ -176,7 +178,7 @@ router.post('/bulk-send', async (req, res) => {
 
     // Create campaign
     const campaign = await CardCampaign.create([{
-      company: companyId,
+      company: company._id,
       name: `حملة ${new Date().toLocaleDateString('ar-SA')}`,
       recipients: recipients.map(r => r.name),
       message,
@@ -200,7 +202,7 @@ router.post('/bulk-send', async (req, res) => {
     for (const recipient of recipients) {
       const uniqueToken = generateUniqueToken()
       const card = await Card.create([{
-        company: companyId,
+        company: company._id,
         campaign: campaignId,
         recipientName: recipient.name,
         recipientData: {
@@ -237,7 +239,7 @@ router.post('/bulk-send', async (req, res) => {
 
     // Log action
     await AuditLog.create({
-      user: companyId,
+      user: company._id,
       userType: 'company',
       action: 'bulk_send',
       entity: 'card_campaign',

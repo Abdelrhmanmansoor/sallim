@@ -111,17 +111,18 @@ companyTeamSchema.pre('save', async function () {
   if (!this.isModified('password') || !this.password) return
 
   try {
-    const bcrypt = await import('bcrypt')
+    const bcrypt = (await import('bcrypt')).default
     const salt = await bcrypt.genSalt(10)
     this.password = await bcrypt.hash(this.password, salt)
   } catch (error) {
-    throw error
+    console.error('Password hashing error:', error)
+    throw new Error('فشل تشفير كلمة المرور')
   }
 })
 
 // Method to compare password
 companyTeamSchema.methods.comparePassword = async function (candidatePassword) {
-  const bcrypt = await import('bcrypt')
+  const bcrypt = (await import('bcrypt')).default
   return await bcrypt.compare(candidatePassword, this.password)
 }
 

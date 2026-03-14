@@ -8,6 +8,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import mongoSanitize from 'express-mongo-sanitize'
+import compression from 'compression'
 import cloudinary from 'cloudinary'
 import { CloudinaryStorage } from 'multer-storage-cloudinary'
 import multer from 'multer'
@@ -33,6 +34,7 @@ import teamRoutes from './routes/team.js'
 import gamesRoutes from './routes/games.js'
 import companyBulkRoutes from './routes/company-bulk.js'
 import ordersRoutes from './routes/orders.js'
+import { scheduleMonthlyReset } from './jobs/reset-monthly-usage.js'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -56,6 +58,8 @@ await connectDB()
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }))
+// Compression: reduce payload size
+app.use(compression())
 
 // CORS: Only allow our frontend
 const allowedOrigins = [
@@ -248,6 +252,9 @@ app.use((err, req, res, next) => {
 // ─── Start Server ───
 app.listen(PORT, () => {
   console.log(`Sallim API running on port ${PORT} [${isProd ? 'production' : 'development'}]`)
+
+  // ─── Schedule Monthly Usage Reset ───
+  scheduleMonthlyReset()
 
   // ─── Keep-Alive Mechanism (Self-Ping) ───
   // Prevents the server from sleeping on platforms like Render

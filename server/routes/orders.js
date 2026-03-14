@@ -7,6 +7,7 @@ import LicenseKey from '../models/LicenseKey.js'
 import Stats from '../models/Stats.js'
 import { getAuditRequestMeta, safeAuditLog } from '../utils/audit.js'
 import { capturePayPalOrder, createPayPalOrder, getPayPalCapture } from '../utils/paypal.js'
+import { authLimiter } from '../middleware/rateLimiter.js'
 
 const router = Router()
 
@@ -17,7 +18,15 @@ const BATCH_ZIP_REFUSAL_MESSAGE = `عذراً 🙏 كل عملية شراء جم
 const BATCH_DEFAULT_MAX_RECIPIENTS = 50
 const BATCH_PAYPAL_AMOUNT = Number(process.env.BATCH_PAYPAL_AMOUNT || 21)
 const BATCH_PAYPAL_CURRENCY = String(process.env.BATCH_PAYPAL_CURRENCY || 'USD').toUpperCase()
-const LICENSE_JWT_SECRET = process.env.LICENSE_JWT_SECRET || process.env.JWT_SECRET || 'sallim_license_secret_key'
+
+// License JWT Secret - MUST be set in environment variables
+if (!process.env.LICENSE_JWT_SECRET && !process.env.JWT_SECRET) {
+  console.error('❌ FATAL ERROR: LICENSE_JWT_SECRET or JWT_SECRET is not defined in environment variables.')
+  console.error('👉 Add LICENSE_JWT_SECRET (or JWT_SECRET) to your .env file and restart the server.')
+  process.exit(1)
+}
+const LICENSE_JWT_SECRET = process.env.LICENSE_JWT_SECRET || process.env.JWT_SECRET
+
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173'
 
 function normalizeText(value, maxLength = 120) {
@@ -646,7 +655,7 @@ router.post('/batch/consume', async (req, res) => {
   }
 })
 
-router.post('/license/activate', async (req, res) => {
+router.post('/license/activate', authLimiter, async (req, res) => {
   try {
     const code = normalizeText(req.body?.code, 200)
     const deviceId = normalizeText(req.body?.deviceId, 120)

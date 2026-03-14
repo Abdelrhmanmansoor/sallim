@@ -1,155 +1,150 @@
 import { Router } from 'express'
 import jwt from 'jsonwebtoken'
+import crypto from 'crypto'
+import { nanoid } from 'nanoid'
 import Company from '../models/Company.js'
+import CompanyTeam from '../models/CompanyTeam.js'
+import LicenseKey from '../models/LicenseKey.js'
+import Card from '../models/Card.js'
 import { upload } from '../config/upload.js'
-import fs from 'fs'
-import path from 'path'
+import { loginLimiter, activationLimiter, employeeLimiter } from '../middleware/rateLimiter.js'
 
 const router = Router()
 
-// Initialize JWT secret
-const JWT_SECRET = process.env.JWT_SECRET || 'sallim_super_secret_corporate_key'
+// JWT Secret - MUST be set in environment variables
+if (!process.env.JWT_SECRET) {
+  console.error('❌ FATAL ERROR: JWT_SECRET is not defined in environment variables.')
+  console.error('👉 Add JWT_SECRET to your .env file and restart the server.')
+  process.exit(1)
+}
+const JWT_SECRET = process.env.JWT_SECRET
 
-// Helper function to get mock database
-const getMockCompanies = () => {
-    const dbPath = path.join(process.cwd(), 'server', 'mock-companies.json')
-    console.log('🔍 Looking for mock DB at:', dbPath)
-    console.log('📁 File exists:', fs.existsSync(dbPath))
-    
-    if (fs.existsSync(dbPath)) {
-        const data = fs.readFileSync(dbPath, 'utf-8')
-        const companies = JSON.parse(data)
-        console.log('📊 Loaded', companies.length, 'companies from mock DB')
-        return companies
-    }
-    console.log('⚠️ Mock DB not found')
-    return []
+// ─── Helpers ───
+const hashLicenseCode = (code) => {
+  return crypto
+    .createHash('sha256')
+    .update(String(code || '').trim().toUpperCase())
+    .digest('hex')
 }
 
-// Helper function to save mock database
-const saveMockCompanies = (companies) => {
-    const dbPath = path.join(process.cwd(), 'server', 'mock-companies.json')
-    fs.writeFileSync(dbPath, JSON.stringify(companies, null, 2))
-}
+const generateSlug = () => nanoid(10).toLowerCase()
 
-// ═══ Activate Company Account ═══
-// Handles the activation link that the user clicks from their email
-router.post('/activate', async (req, res) => {
-    try {
-        const { email, code, password } = req.body
+const generateEmail = (slug) => `company_${slug}@sallim.co`
 
-        if (!email || !code || !password) {
-            return res.status(400).json({ success: false, error: 'البريد الإلكتروني وكود التفعيل وكلمة المرور مطلوبة' })
-        }
+const generateStrongPassword = () => crypto.randomBytes(12).toString('base64url')
 
-        if (password.length < 6) {
-            return res.status(400).json({ success: false, error: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' })
-        }
+// ═══ تفعيل الشركة باستخدام كود التفعيل ═══
+router.post('/activate', activationLimiter, async (req, res) => {
+  try {
+    const code = String(req.body?.code || '').trim()
 
-        // Try mock database first
-        const mockCompanies = getMockCompanies()
-        const mockCompany = mockCompanies.find(c => 
-            c.email.toLowerCase() === email.toLowerCase() && c.activationCode === code
-        )
-
-        if (mockCompany) {
-            // Check expiration
-            if (new Date() > new Date(mockCompany.activationExpires)) {
-                return res.status(400).json({ success: false, error: 'كود التفعيل هذا منتهي الصلاحية. يرجى طلب كود جديد.' })
-            }
-
-            // Activate account in mock database
-            mockCompany.status = 'active'
-            mockCompany.password = password // In real app, this would be hashed
-            mockCompany.activationCode = undefined
-            mockCompany.activationExpires = undefined
-
-            // Update mock database
-            const updatedCompanies = mockCompanies.map(c => 
-                c._id === mockCompany._id ? mockCompany : c
-            )
-            saveMockCompanies(updatedCompanies)
-
-            // Generate JWT token
-            const token = jwt.sign(
-                { id: mockCompany._id, role: mockCompany.role },
-                JWT_SECRET,
-                { expiresIn: '30d' }
-            )
-
-            return res.json({
-                success: true,
-                message: 'تم تفعيل الحساب بنجاح',
-                data: {
-                    token,
-                    company: {
-                        id: mockCompany._id,
-                        name: mockCompany.name,
-                        email: mockCompany.email,
-                        logoUrl: mockCompany.logoUrl,
-                        features: mockCompany.features
-                    }
-                }
-            })
-        }
-
-        // If not found in mock database, try MongoDB
-        const company = await Company.findOne({
-            email: email.toLowerCase(),
-            activationCode: code
-        }).select('+activationCode +activationExpires +password')
-
-        if (!company) {
-            return res.status(400).json({ success: false, error: 'بيانات التفعيل غير صحيحة' })
-        }
-
-        if (company.status === 'active') {
-            return res.status(400).json({ success: false, error: 'هذا الحساب مفعل مسبقاً' })
-        }
-
-        // Check expiration
-        if (new Date() > company.activationExpires) {
-            return res.status(400).json({ success: false, error: 'كود التفعيل هذا منتهي الصلاحية. يرجى طلب كود جديد.' })
-        }
-
-        // Activate account
-        company.status = 'active'
-        company.password = password
-        company.activationCode = undefined // clear it
-        company.activationExpires = undefined
-
-        await company.save()
-
-        // Generate JWT token
-        const token = jwt.sign(
-            { id: company._id, role: company.role },
-            JWT_SECRET,
-            { expiresIn: '30d' }
-        )
-
-        res.json({
-            success: true,
-            message: 'تم تفعيل الحساب بنجاح',
-            data: {
-                token,
-                company: {
-                    id: company._id,
-                    name: company.name,
-                    email: company.email,
-                    logoUrl: company.logoUrl,
-                    features: company.features
-                }
-            }
-        })
-
-    } catch (error) {
-        console.error('Activation error:', error)
-        res.status(500).json({ success: false, error: 'حدث خطأ أثناء التفعيل' })
+    if (!code) {
+      return res.status(400).json({ success: false, error: 'كود التفعيل مطلوب' })
     }
+
+    console.warn('Activation attempt', {
+      code: code.slice(0, 5),
+      ip: req.ip,
+      time: new Date()
+    })
+
+    const codeHash = hashLicenseCode(code)
+    const license = await LicenseKey.findOne({ codeHash, status: 'new' })
+
+    if (!license) {
+      return res.status(400).json({ success: false, error: 'كود التفعيل غير صحيح أو مستخدم' })
+    }
+
+    // Generate unique slug/email pair
+    let slug = generateSlug()
+    let email = generateEmail(slug)
+    for (let i = 0; i < 5; i++) {
+      const exists = await Company.findOne({ $or: [{ slug }, { email }] })
+      if (!exists) break
+      slug = generateSlug()
+      email = generateEmail(slug)
+    }
+
+    const collision = await Company.findOne({ $or: [{ slug }, { email }] })
+    if (collision) {
+      return res.status(500).json({ success: false, error: 'تعذر إنشاء حساب الآن، حاول مرة أخرى.' })
+    }
+
+    const password = generateStrongPassword()
+    const now = new Date()
+    const expiresAt = new Date(now)
+    expiresAt.setFullYear(expiresAt.getFullYear() + 1)
+
+    const company = await Company.create({
+      name: `شركة ${slug}`,
+      email,
+      password,
+      slug,
+      cardsLimit: Number(license.maxRecipients || 0),
+      cardsUsed: 0,
+      status: 'active',
+      subscription: {
+        plan: 'basic',
+        startDate: now,
+        renewalDate: expiresAt,
+        expiresAt,
+        isActive: true,
+        limits: {
+          cardsPerMonth: 100,
+          teamMembers: 3,
+          campaignsPerMonth: 5
+        }
+      },
+      usage: {
+        cardsThisMonth: 0,
+        campaignsThisMonth: 0,
+        lastReset: now,
+      },
+      stats: {
+        views: 0,
+        downloads: 0
+      }
+    })
+
+    // Mark license as used
+    license.status = 'activated'
+    license.activatedAt = now
+    license.activatedIp = req.ip
+    license.activatedUserAgent = req.headers['user-agent'] || ''
+    await license.save()
+
+    // JWT for dashboard access
+    const token = jwt.sign(
+      { id: company._id, role: company.role },
+      JWT_SECRET,
+      { expiresIn: '30d' }
+    )
+
+    res.json({
+      success: true,
+      message: '🎉 تم تفعيل حساب شركتك',
+      data: {
+        token,
+        login: { email, password },
+        company: {
+          id: company._id,
+          slug: company.slug,
+          cardsLimit: company.cardsLimit,
+          cardsUsed: company.cardsUsed,
+          subscriptionActive: company.subscription?.isActive,
+          link: `${process.env.CLIENT_URL || ''}/c/${company.slug}?utm=company`
+        }
+      },
+      notice: 'احتفظ ببيانات الدخول لن تظهر مرة أخرى'
+    })
+  } catch (error) {
+    console.error('Activation error:', error)
+    res.status(500).json({ success: false, error: 'حدث خطأ أثناء التفعيل' })
+  }
 })
 
 // ═══ Company Login ═══
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
     try {
         const { email, password } = req.body
 
@@ -197,6 +192,31 @@ router.post('/login', async (req, res) => {
     }
 })
 
+// ═══ Dashboard (Company Auth) ═══
+router.get('/dashboard', protectCompanyRoute, async (req, res) => {
+  try {
+    const company = req.company
+    const remaining = company.cardsLimit === 0
+      ? 'unlimited'
+      : Math.max(0, company.cardsLimit - company.cardsUsed)
+
+    res.json({
+      success: true,
+      data: {
+        name: company.name,
+        email: company.email,
+        slug: company.slug,
+        cardsLimit: company.cardsLimit,
+        cardsUsed: company.cardsUsed,
+        cardsRemaining: remaining,
+        link: `${process.env.CLIENT_URL || ''}/c/${company.slug}?utm=company`,
+      }
+    })
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'تعذر جلب البيانات' })
+  }
+})
+
 // Authentication Middleware to protect company routes
 export const protectCompanyRoute = async (req, res, next) => {
     let token
@@ -218,6 +238,127 @@ export const protectCompanyRoute = async (req, res, next) => {
     } catch (error) {
         res.status(401).json({ success: false, error: 'الجلسة منتهية أو غير صالحة' })
     }
+}
+
+// Middleware to check team member permissions
+export const checkTeamPermission = (requiredPermission) => {
+  return async (req, res, next) => {
+    try {
+      // If user is company admin (logged in as company), allow all
+      if (req.company) {
+        return next()
+      }
+
+      // If user is team member, check their permissions
+      const token = req.headers.authorization?.split(' ')[1]
+      if (!token) {
+        console.warn('🚨 [SECURITY] Unauthorized access attempt - No token provided', {
+          ip: req.ip,
+          path: req.path,
+          method: req.method
+        })
+        return res.status(401).json({ success: false, error: 'تسجيل الدخول مطلوب' })
+      }
+
+      const decoded = jwt.verify(token, JWT_SECRET)
+      
+      // Check if this is a team member token
+      if (decoded.type === 'team_member') {
+        const teamMember = await CompanyTeam.findById(decoded.id).select('+permissions')
+        
+        if (!teamMember || teamMember.status !== 'active') {
+          console.warn('🚨 [SECURITY] Inactive account access attempt', {
+            teamMemberId: decoded.id,
+            status: teamMember?.status,
+            ip: req.ip,
+            path: req.path
+          })
+          return res.status(403).json({ success: false, error: 'حسابك غير نشط' })
+        }
+
+        // CRITICAL: Verify team member belongs to the same company FIRST
+        const companyId = req.params.companyId || req.body.companyId || req.company?._id
+        if (companyId && teamMember.company.toString() !== companyId.toString()) {
+          console.error('🚨 [SECURITY] CRITICAL - Cross-company access attempt blocked', {
+            teamMemberId: teamMember._id,
+            teamMemberEmail: teamMember.email,
+            teamMemberCompany: teamMember.company,
+            attemptedCompany: companyId,
+            ip: req.ip,
+            path: req.path,
+            method: req.method,
+            userAgent: req.headers['user-agent']
+          })
+          return res.status(403).json({ 
+            success: false, 
+            error: 'غير مصرح' // Generic message - no data leak
+          })
+        }
+
+        // Check if team member has the required permission
+        if (requiredPermission && !teamMember.hasPermission(requiredPermission)) {
+          console.warn('🚨 [SECURITY] Permission denied', {
+            teamMemberId: teamMember._id,
+            teamMemberEmail: teamMember.email,
+            companyId: teamMember.company,
+            requiredPermission,
+            hasPermission: teamMember.permissions[requiredPermission],
+            ip: req.ip,
+            path: req.path,
+            method: req.method
+          })
+          return res.status(403).json({ 
+            success: false, 
+            error: `ليس لديك صلاحية ${getPermissionNameInArabic(requiredPermission)}` 
+          })
+        }
+
+        // Success - log access granted
+        console.log('✅ [ACCESS] Team member access granted', {
+          teamMemberId: teamMember._id,
+          companyId: teamMember.company,
+          permission: requiredPermission,
+          path: req.path
+        })
+
+        // Attach team member to request
+        req.teamMember = teamMember
+        req.company = await Company.findById(teamMember.company)
+        return next()
+      }
+
+      // If neither company nor team member, deny access
+      console.warn('🚨 [SECURITY] Unknown user type access attempt', {
+        tokenType: decoded.type,
+        ip: req.ip,
+        path: req.path
+      })
+      return res.status(403).json({ success: false, error: 'غير مصرح' })
+      
+    } catch (error) {
+      console.error('🚨 [SECURITY] Permission check error', {
+        error: error.message,
+        ip: req.ip,
+        path: req.path
+      })
+      return res.status(401).json({ success: false, error: 'الجلسة منتهية أو غير صالحة' })
+    }
+  }
+}
+
+// Helper: Get permission name in Arabic for error messages
+function getPermissionNameInArabic(permission) {
+  const names = {
+    createCards: 'إنشاء البطاقات',
+    editCards: 'تعديل البطاقات',
+    deleteCards: 'حذف البطاقات',
+    viewAnalytics: 'عرض الإحصائيات',
+    manageTemplates: 'إدارة القوالب',
+    manageTeam: 'إدارة الفريق',
+    viewWallet: 'عرض المحفظة',
+    createCampaigns: 'إنشاء الحملات'
+  }
+  return names[permission] || permission
 }
 
 // ═══ Get Current Company Profile ═══
@@ -256,6 +397,111 @@ router.put('/profile', protectCompanyRoute, upload.single('logo'), async (req, r
         console.error('Update profile error:', error)
         res.status(500).json({ success: false, error: 'حدث خطأ أثناء تحديث البيانات' })
     }
+})
+
+// ═══ Public company info (for /c/:slug) ═══
+router.get('/public/:slug', async (req, res) => {
+  try {
+    const company = await Company.findOne({ slug: req.params.slug, status: 'active' })
+      .select('name slug logoUrl cardsLimit cardsUsed subscription usage')
+
+    if (!company) {
+      return res.status(404).json({ success: false, error: 'الشركة غير موجودة أو غير مفعلة' })
+    }
+
+    Company.updateOne(
+      { _id: company._id },
+      { $inc: { 'stats.views': 1 } }
+    ).catch(() => {})
+
+    const remaining = company.cardsLimit === 0
+      ? 'unlimited'
+      : Math.max(0, company.cardsLimit - company.cardsUsed)
+
+    res.json({
+      success: true,
+      data: {
+        name: company.name,
+        slug: company.slug,
+        logoUrl: company.logoUrl,
+        cardsLimit: company.cardsLimit,
+        cardsUsed: company.cardsUsed,
+        cardsRemaining: remaining,
+        subscriptionActive: company.subscription?.isActive !== false,
+      }
+    })
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'حدث خطأ' })
+  }
+})
+
+// ═══ إنشاء بطاقة من صفحة الموظف (public) ═══
+router.post('/public/:slug/cards', employeeLimiter, async (req, res) => {
+  try {
+    const company = await Company.findOne({ slug: req.params.slug, status: 'active' })
+
+    if (!company) {
+      return res.status(404).json({ success: false, error: 'الشركة غير موجودة أو غير مفعلة' })
+    }
+
+    // Subscription check
+    const isExpired = company.subscription?.expiresAt && new Date(company.subscription.expiresAt) < new Date()
+    if (company.subscription?.isActive === false || isExpired) {
+      return res.status(403).json({ success: false, error: 'انتهت صلاحية الاشتراك، يرجى التواصل مع الإدارة' })
+    }
+
+    // Quota check
+    if (company.cardsLimit > 0 && company.cardsUsed >= company.cardsLimit) {
+      return res.status(403).json({ success: false, error: 'عذراً انتهت بطاقات الشركة.' })
+    }
+
+    const senderName = String(req.body?.name || req.body?.senderName || '').trim().slice(0, 100)
+    const customMainText = String(req.body?.mainText || '').trim().slice(0, 500)
+    const customSubText = String(req.body?.subText || '').trim().slice(0, 500)
+    const templateId = String(req.body?.templateId || company.settings?.defaultTemplate || 'default-template').trim()
+
+    if (!senderName) {
+      return res.status(400).json({ success: false, error: 'الاسم مطلوب' })
+    }
+    if (!templateId) {
+      return res.status(400).json({ success: false, error: 'القالب مطلوب' })
+    }
+
+    const card = await Card.create({
+      mainText: customMainText || `كل عام وأنت بخير ${senderName}`,
+      subText: customSubText,
+      senderName,
+      recipientName: '',
+      templateId,
+      theme: req.body?.theme || 'golden',
+      font: req.body?.font || 'cairo',
+      fontSize: req.body?.fontSize || 42,
+      textColor: req.body?.textColor || '#ffffff',
+      createdByIp: req.ip,
+      company: company._id,
+      category: 'business',
+    })
+
+    await Company.findByIdAndUpdate(company._id, {
+      $inc: {
+        cardsUsed: 1,
+        'usage.cardsThisMonth': 1,
+        'stats.downloads': 1
+      }
+    })
+
+    res.status(201).json({
+      success: true,
+      data: {
+        shareId: card.shareId,
+        shareUrl: `${process.env.CLIENT_URL || ''}/card/${card.shareId}`,
+        createdAt: card.createdAt,
+      },
+    })
+  } catch (error) {
+    console.error('Public card create error:', error)
+    res.status(500).json({ success: false, error: 'حدث خطأ أثناء إنشاء البطاقة' })
+  }
 })
 
 export default router

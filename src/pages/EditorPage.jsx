@@ -464,7 +464,7 @@ export default function EditorPage() {
 
         if (mode === 'ready') {
           // Maintain natural aspect ratio of the loaded image
-          if (bgImage) {
+          if (bgImage && bgLoaded && bgImage.width > 0 && bgImage.height > 0) {
             const ratio = bgImage.height / bgImage.width
             setStageSize({ width: baseWidth, height: baseWidth * ratio })
           } else {
@@ -483,7 +483,7 @@ export default function EditorPage() {
 
     // Also re-run when the image loads
     const img = bgImage
-    if (img) {
+    if (img && !bgLoaded) {
       img.addEventListener('load', handleResize)
     }
 
@@ -492,7 +492,7 @@ export default function EditorPage() {
       window.removeEventListener('resize', handleResize)
       if (img) img.removeEventListener('load', handleResize)
     }
-  }, [mode, bgImage])
+  }, [mode, bgImage, bgLoaded])
 
   // Disable pull-to-refresh on mobile
   useEffect(() => {

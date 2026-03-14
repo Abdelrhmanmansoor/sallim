@@ -1,11 +1,13 @@
 import { Router } from 'express'
 import Card from '../models/Card.js'
+import Company from '../models/Company.js'
 import Stats from '../models/Stats.js'
+import { protectCompanyRoute, checkTeamPermission } from './company.js'
 
 const router = Router()
 
 // Create a card
-router.post('/', async (req, res) => {
+router.post('/', protectCompanyRoute, checkTeamPermission('createCards'), async (req, res) => {
   try {
     const {
       mainText,
@@ -23,6 +25,29 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ success: false, error: 'mainText و templateId مطلوبين' })
     }
 
+    // Get company from authenticated session (set by protectCompanyRoute)
+    const company = req.company
+
+    if (!company) {
+      return res.status(401).json({ success: false, error: 'تسجيل الدخول مطلوب' })
+    }
+
+    // Check if subscription is active
+    if (!company.subscription.isActive || new Date(company.subscription.expiresAt) < new Date()) {
+      return res.status(403).json({ 
+        success: false, 
+        error: 'انتهت صلاحية الاشتراك. يرجى التواصل مع الإدارة' 
+      })
+    }
+
+    // Check card limit (0 = unlimited)
+    if (company.cardsLimit > 0 && company.cardsUsed >= company.cardsLimit) {
+      return res.status(403).json({ 
+        success: false, 
+        error: `تم استنفاد رصيد البطاقات (${company.cardsLimit}). يرجى ترقية الباقة` 
+      })
+    }
+
     const card = await Card.create({
       mainText: mainText.slice(0, 500),
       subText: (subText || '').slice(0, 500),
@@ -34,6 +59,15 @@ router.post('/', async (req, res) => {
       fontSize: fontSize || 42,
       textColor: textColor || '#ffffff',
       createdByIp: req.ip,
+      company: company._id,
+    })
+
+    // Increment authenticated company usage
+    await Company.findByIdAndUpdate(company._id, {
+      $inc: { 
+        cardsUsed: 1,
+        'usage.cardsThisMonth': 1 
+      }
     })
 
     await Stats.incrementToday('cardsCreated')

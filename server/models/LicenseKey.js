@@ -9,7 +9,7 @@ const licenseKeySchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['new', 'activated', 'revoked'],
+    enum: ['new', 'activated', 'revoked', 'expired'],
     default: 'new',
     index: true,
   },

@@ -6,7 +6,13 @@ import rateLimit from 'express-rate-limit';
 import xss from 'xss';
 import Joi from 'joi';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'sallim-diwan-secret-key-2024';
+// JWT Secret - MUST be set in environment variables
+if (!process.env.JWT_SECRET) {
+  console.error('❌ FATAL ERROR: JWT_SECRET is not defined in environment variables.')
+  console.error('👉 Add JWT_SECRET to your .env file and restart the server.')
+  process.exit(1)
+}
+const JWT_SECRET = process.env.JWT_SECRET
 
 const router = Router();
 

@@ -2,25 +2,23 @@ import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import Diwaniya from '../models/Diwan.js';
-import rateLimit from 'express-rate-limit';
+import { authLimiter } from '../middleware/rateLimiter.js';
 import Joi from 'joi';
 
 const router = Router();
 
-// JWT Secret (in production, use environment variable)
-const JWT_SECRET = process.env.JWT_SECRET || 'sallim-diwan-secret-key-2024';
+// JWT Secret - MUST be set in environment variables
+if (!process.env.JWT_SECRET) {
+  console.error('❌ FATAL ERROR: JWT_SECRET is not defined in environment variables.')
+  console.error('👉 Add JWT_SECRET to your .env file and restart the server.')
+  process.exit(1)
+}
+const JWT_SECRET = process.env.JWT_SECRET
 
 // Generate JWT Token
 const generateToken = (userId) => {
     return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '30d' });
 };
-
-// Rate limit for auth attempts
-const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 50, // 50 attempts (increased for testing/development)
-    message: { success: false, error: 'محاولات كثيرة جداً. حاول مجدداً بعد 15 دقيقة' }
-});
 
 // Validation schemas
 const registerSchema = Joi.object({
