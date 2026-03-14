@@ -75,20 +75,20 @@ function useImage(src) {
   const [loaded, setLoaded] = useState(false)
   useEffect(() => {
     if (!src) { setImage(null); setLoaded(false); return }
-    // Reset state while new image loads
     setImage(null)
     setLoaded(false)
     let cancelled = false
     const img = new window.Image()
-    img.crossOrigin = 'anonymous'
+    // Only set crossOrigin for external URLs to avoid tainted canvas issues
+    if (src.startsWith('http')) img.crossOrigin = 'anonymous'
     img.onload = () => {
       if (cancelled) return
-      if (img.naturalWidth === 0 || img.naturalHeight === 0) {
-        setImage(null); setLoaded(false); return
-      }
       setImage(img); setLoaded(true)
     }
-    img.onerror = () => { if (!cancelled) { setImage(null); setLoaded(false) } }
+    img.onerror = (err) => {
+      console.warn('Image load failed:', src, err)
+      if (!cancelled) { setImage(null); setLoaded(false) }
+    }
     img.src = src
     return () => { cancelled = true }
   }, [src])
@@ -388,17 +388,10 @@ function EditorPageInner() {
   }, [isAuthenticated, company])
 
   // Computed - Combine API templates with static fallbacks + custom uploads
-  const normalizeImage = (img) => {
-    if (!img) return ''
-    try { return encodeURI(decodeURI(img)) } catch { return encodeURI(img) }
-  }
-
   const mergedReady = [...staticTemplates, ...dbReadyTemplates]
-    .map(t => ({ ...t, image: normalizeImage(t.image) }))
   const finalReadyTemplates = mergedReady.filter((t, i, self) => i === self.findIndex((tx) => tx.image === t.image))
 
   const mergedDesigner = [...staticDesignerTemplates, ...dbDesignerTemplates]
-    .map(t => ({ ...t, image: normalizeImage(t.image) }))
   const finalDesignerTemplates = mergedDesigner.filter((t, i, self) => i === self.findIndex((tx) => tx.image === t.image))
 
   const allTemplates = mode === 'designer'
@@ -2083,7 +2076,7 @@ function EditorPageInner() {
                       background: '#f8f9fa'
                     }}
                   >
-                    <img src={t.image} alt={t.name} crossOrigin="anonymous" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none' }} />
+                    <img src={t.image} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none' }} />
                     {store.selectedTemplate === t.id && (
                       <div style={{ position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: '50%', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <BsCheck2 size={16} />
@@ -2292,7 +2285,7 @@ function EditorPageInner() {
                   <Stage ref={stageRef} width={stageSize.width} height={stageSize.height} style={{ borderRadius: 12, overflow: 'hidden' }}>
                     <Layer>
                       <Rect width={stageSize.width} height={stageSize.height} fill="#17012C" />
-                      {bgImage && bgLoaded && bgImage.naturalWidth > 0 && <KonvaImage image={bgImage} width={stageSize.width} height={stageSize.height} />}
+                      {bgImage && bgLoaded && <KonvaImage image={bgImage} width={stageSize.width} height={stageSize.height} />}
                       {readyName && (
                         <Text text={readyName} x={0} y={stageSize.height * readyNameY} width={stageSize.width} align="center"
                           fontFamily={currentFont.family} fontSize={readyFontSize * scale} fill={readyNameColor || currentTemplate?.textColor || '#ffffff'} lineHeight={1.5} />
@@ -2370,7 +2363,7 @@ function EditorPageInner() {
                   <Stage ref={stageRef} width={stageSize.width} height={stageSize.height} style={{ borderRadius: 14, overflow: 'hidden', cursor: 'grab' }}>
                     <Layer>
                       <Rect width={stageSize.width} height={stageSize.height} fill="#17012C" />
-                      {bgImage && bgLoaded && bgImage.naturalWidth > 0 && <KonvaImage image={bgImage} width={stageSize.width} height={stageSize.height} />}
+                      {bgImage && bgLoaded && <KonvaImage image={bgImage} width={stageSize.width} height={stageSize.height} />}
                       {store.overlayOpacity > 0 && <Rect width={stageSize.width} height={stageSize.height} fill={store.overlayColor} opacity={store.overlayOpacity} />}
                       {!bgLoaded && !store.selectedCalligraphy && (
                         <Text text="اختر خلفية للبطاقة" x={0} y={stageSize.height * 0.45} width={stageSize.width} align="center" fontFamily="'Cairo', sans-serif" fontSize={16 * scale} fill="#888" lineHeight={1.8} />
@@ -2552,7 +2545,7 @@ function EditorPageInner() {
                       flexShrink: 0, scrollSnapAlign: 'start', background: '#f8f9fa'
                     }}
                   >
-                    <img src={t.image} alt={t.name} crossOrigin="anonymous" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none' }} />
+                    <img src={t.image} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none' }} />
                     {store.selectedTemplate === t.id && (
                       <div style={{ position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: '50%', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <BsCheck2 size={16} />
@@ -2678,7 +2671,7 @@ function EditorPageInner() {
                 <Stage ref={stageRef} width={stageSize.width} height={stageSize.height} style={{ borderRadius: 10, overflow: 'hidden' }}>
                   <Layer>
                     <Rect width={stageSize.width} height={stageSize.height} fill="#17012C" />
-                    {bgImage && bgLoaded && bgImage.naturalWidth > 0 && <KonvaImage image={bgImage} width={stageSize.width} height={stageSize.height} />}
+                    {bgImage && bgLoaded && <KonvaImage image={bgImage} width={stageSize.width} height={stageSize.height} />}
                     {store.overlayOpacity > 0 && <Rect width={stageSize.width} height={stageSize.height} fill={store.overlayColor} opacity={store.overlayOpacity} />}
                     {calligraphyImg && calligraphyLoaded && (
                       <KonvaImage image={calligraphyImg}
