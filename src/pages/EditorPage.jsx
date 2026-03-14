@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Stage, Layer, Rect, Text, Image as KonvaImage, Group, Circle } from 'react-konva'
 import { useEditorStore, useCompanyStore } from '../store'
@@ -11,6 +11,27 @@ import { BsDownload, BsFilePdf, BsWhatsapp, BsLink45Deg, BsShareFill, BsCheck2, 
 import { HiPhotograph, HiOutlineColorSwatch } from 'react-icons/hi'
 import JSZip from 'jszip'
 import toast, { Toaster } from 'react-hot-toast'
+
+class EditorErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false } }
+  static getDerivedStateFromError() { return { hasError: true } }
+  componentDidCatch(err, info) { console.error('EditorPage error:', err, info) }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: 40, textAlign: 'center', fontFamily: "'Tajawal', sans-serif", direction: 'rtl' }}>
+          <h2>⚠️ حدث خطأ في المحرر</h2>
+          <p>يرجى إعادة تحميل الصفحة</p>
+          <button onClick={() => { this.setState({ hasError: false }); window.location.reload() }}
+            style={{ padding: '12px 28px', background: '#000', color: '#fff', border: 'none', borderRadius: 12, fontSize: 16, cursor: 'pointer' }}>
+            إعادة تحميل
+          </button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 
 /* أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯
    DESIGN SYSTEM - Tajawal Font, Clean UI
@@ -54,11 +75,22 @@ function useImage(src) {
   const [loaded, setLoaded] = useState(false)
   useEffect(() => {
     if (!src) { setImage(null); setLoaded(false); return }
+    // Reset state while new image loads
+    setImage(null)
+    setLoaded(false)
+    let cancelled = false
     const img = new window.Image()
     img.crossOrigin = 'anonymous'
-    img.onload = () => { setImage(img); setLoaded(true) }
-    img.onerror = () => { setImage(null); setLoaded(false) }
+    img.onload = () => {
+      if (cancelled) return
+      if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+        setImage(null); setLoaded(false); return
+      }
+      setImage(img); setLoaded(true)
+    }
+    img.onerror = () => { if (!cancelled) { setImage(null); setLoaded(false) } }
     img.src = src
+    return () => { cancelled = true }
   }, [src])
   return [image, loaded]
 }
@@ -156,7 +188,7 @@ const readyDesigns = [
 /* أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯
    MAIN EDITOR COMPONENT
 أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯ */
-export default function EditorPage() {
+function EditorPageInner() {
   const store = useEditorStore()
   const { company, isAuthenticated } = useCompany()
   const navigate = useNavigate()
@@ -358,15 +390,7 @@ export default function EditorPage() {
   // Computed - Combine API templates with static fallbacks + custom uploads
   const normalizeImage = (img) => {
     if (!img) return ''
-    // Encode each path segment to handle Arabic/space characters without breaking slashes
-    const segments = img.split('/').filter(Boolean).map((seg) => {
-      try {
-        return encodeURIComponent(decodeURIComponent(seg))
-      } catch {
-        return encodeURIComponent(seg)
-      }
-    })
-    return '/' + segments.join('/')
+    try { return encodeURI(decodeURI(img)) } catch { return encodeURI(img) }
   }
 
   const mergedReady = [...staticTemplates, ...dbReadyTemplates]
@@ -2059,7 +2083,7 @@ export default function EditorPage() {
                       background: '#f8f9fa'
                     }}
                   >
-                    <img src={t.image} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={t.image} alt={t.name} crossOrigin="anonymous" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none' }} />
                     {store.selectedTemplate === t.id && (
                       <div style={{ position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: '50%', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <BsCheck2 size={16} />
@@ -2268,7 +2292,7 @@ export default function EditorPage() {
                   <Stage ref={stageRef} width={stageSize.width} height={stageSize.height} style={{ borderRadius: 12, overflow: 'hidden' }}>
                     <Layer>
                       <Rect width={stageSize.width} height={stageSize.height} fill="#17012C" />
-                      {bgImage && bgLoaded && <KonvaImage image={bgImage} width={stageSize.width} height={stageSize.height} />}
+                      {bgImage && bgLoaded && bgImage.naturalWidth > 0 && <KonvaImage image={bgImage} width={stageSize.width} height={stageSize.height} />}
                       {readyName && (
                         <Text text={readyName} x={0} y={stageSize.height * readyNameY} width={stageSize.width} align="center"
                           fontFamily={currentFont.family} fontSize={readyFontSize * scale} fill={readyNameColor || currentTemplate?.textColor || '#ffffff'} lineHeight={1.5} />
@@ -2346,7 +2370,7 @@ export default function EditorPage() {
                   <Stage ref={stageRef} width={stageSize.width} height={stageSize.height} style={{ borderRadius: 14, overflow: 'hidden', cursor: 'grab' }}>
                     <Layer>
                       <Rect width={stageSize.width} height={stageSize.height} fill="#17012C" />
-                      {bgImage && bgLoaded && <KonvaImage image={bgImage} width={stageSize.width} height={stageSize.height} />}
+                      {bgImage && bgLoaded && bgImage.naturalWidth > 0 && <KonvaImage image={bgImage} width={stageSize.width} height={stageSize.height} />}
                       {store.overlayOpacity > 0 && <Rect width={stageSize.width} height={stageSize.height} fill={store.overlayColor} opacity={store.overlayOpacity} />}
                       {!bgLoaded && !store.selectedCalligraphy && (
                         <Text text="اختر خلفية للبطاقة" x={0} y={stageSize.height * 0.45} width={stageSize.width} align="center" fontFamily="'Cairo', sans-serif" fontSize={16 * scale} fill="#888" lineHeight={1.8} />
@@ -2528,7 +2552,7 @@ export default function EditorPage() {
                       flexShrink: 0, scrollSnapAlign: 'start', background: '#f8f9fa'
                     }}
                   >
-                    <img src={t.image} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    <img src={t.image} alt={t.name} crossOrigin="anonymous" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none' }} />
                     {store.selectedTemplate === t.id && (
                       <div style={{ position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: '50%', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <BsCheck2 size={16} />
@@ -2654,7 +2678,7 @@ export default function EditorPage() {
                 <Stage ref={stageRef} width={stageSize.width} height={stageSize.height} style={{ borderRadius: 10, overflow: 'hidden' }}>
                   <Layer>
                     <Rect width={stageSize.width} height={stageSize.height} fill="#17012C" />
-                    {bgImage && bgLoaded && <KonvaImage image={bgImage} width={stageSize.width} height={stageSize.height} />}
+                    {bgImage && bgLoaded && bgImage.naturalWidth > 0 && <KonvaImage image={bgImage} width={stageSize.width} height={stageSize.height} />}
                     {store.overlayOpacity > 0 && <Rect width={stageSize.width} height={stageSize.height} fill={store.overlayColor} opacity={store.overlayOpacity} />}
                     {calligraphyImg && calligraphyLoaded && (
                       <KonvaImage image={calligraphyImg}
@@ -3926,4 +3950,12 @@ export default function EditorPage() {
 
     return null
   }
+}
+
+export default function EditorPage() {
+  return (
+    <EditorErrorBoundary>
+      <EditorPageInner />
+    </EditorErrorBoundary>
+  )
 }
