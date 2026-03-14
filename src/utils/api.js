@@ -4,7 +4,8 @@
 
 // In production, VITE_API_URL is set in Vercel environment variables
 // pointing to the Render backend URL
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const RAW_API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const API_BASE = RAW_API_BASE.replace(/\/+$/, '')
 
 /**
  * Make an API request to the Sallim backend

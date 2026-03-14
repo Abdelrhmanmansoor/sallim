@@ -27,7 +27,7 @@ function normalizeText(value, maxLength = 120) {
 function hashLicenseCode(code) {
   return crypto
     .createHash('sha256')
-    .update(String(code || '').trim())
+    .update(String(code || '').trim().toUpperCase())
     .digest('hex')
 }
 
