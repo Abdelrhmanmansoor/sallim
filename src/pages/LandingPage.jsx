@@ -729,21 +729,11 @@ export default function LandingPage() {
             {/* Image area */}
             <div style={{
               height: '220px',
-              background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
               position: 'relative',
               overflow: 'hidden',
             }}>
-              <div style={{ position: 'absolute', top: '-40px', left: '-40px', width: '160px', height: '160px', borderRadius: '50%', background: 'rgba(129,140,248,0.15)', filter: 'blur(40px)' }} />
-              <div style={{ position: 'absolute', bottom: '-20px', right: '-20px', width: '120px', height: '120px', borderRadius: '50%', background: 'rgba(251,191,36,0.1)', filter: 'blur(30px)' }} />
-              <div style={{ textAlign: 'center', zIndex: 1 }}>
-                <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', backdropFilter: 'blur(8px)' }}>
-                  <Star size={36} color="#fbbf24" />
-                </div>
-                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', fontWeight: 600 }}>خدمة حصرية</p>
-              </div>
+              <img src="/eid-song-cover.png" alt="أغنية العيد" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 60%)' }} />
             </div>
 
             {/* Content */}

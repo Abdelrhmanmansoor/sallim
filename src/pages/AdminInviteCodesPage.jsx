@@ -26,6 +26,7 @@ export default function AdminInviteCodesPage() {
     readyTemplates: true,
     batchMode: true,
     designerMode: false,
+    codeType: 'batch', // 'batch' = جماعي, 'company' = تسجيل شركة
   })
   const [showForm, setShowForm] = useState(false)
   const [lastCode, setLastCode] = useState(null)
@@ -78,6 +79,7 @@ export default function AdminInviteCodesPage() {
       if (form.readyTemplates) features.push('ready_templates')
       if (form.batchMode) features.push('batch_templates')
       if (form.designerMode) features.push('designer_mode')
+      if (form.codeType === 'company') features.push('company_registration')
 
       const res = await fetch(`${API}/api/v1/admin/invite-codes/generate`, {
         method: 'POST',
@@ -88,14 +90,15 @@ export default function AdminInviteCodesPage() {
           expirationDays: form.expirationDays,
           initialCredits: form.downloadLimit,
           features,
-          createdBy: user._id || user.id
+          createdBy: user._id || user.id,
+          metadata: { codeType: form.codeType }
         })
       })
       const data = await res.json()
       if (data.success) {
-        toast.success('تم إنشاء الكود بنجاح ✅')
+        toast.success(form.codeType === 'company' ? 'تم إنشاء كود تسجيل الشركة بنجاح' : 'تم إنشاء كود التفعيل الجماعي بنجاح')
         setShowForm(false)
-        setForm({ companyName: '', companyEmail: '', expirationDays: 7, downloadLimit: 100, readyTemplates: true, batchMode: true, designerMode: false })
+        setForm({ companyName: '', companyEmail: '', expirationDays: 7, downloadLimit: 100, readyTemplates: true, batchMode: true, designerMode: false, codeType: 'batch' })
         setLastCode(data.data?.code)
         loadCodes()
         loadStats()
@@ -126,7 +129,7 @@ export default function AdminInviteCodesPage() {
           <span style={{ background: '#f5f3ff', color: '#7c3aed', padding: '2px 10px', borderRadius: 20, fontSize: 13 }}>الكل: {stats.total}</span>
           <span style={{ background: '#dcfce7', color: '#16a34a', padding: '2px 10px', borderRadius: 20, fontSize: 13 }}>مفعّل: {stats.activated}</span>
         </div>
-        <button onClick={() => setShowForm(!showForm)} style={{ padding: '8px 16px', background: '#a855f7', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Tajawal', sans-serif" }}>
+        <button onClick={() => { setForm(p => ({ ...p, codeType: 'batch' })); setShowForm(!showForm) }} style={{ padding: '8px 16px', background: '#a855f7', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Tajawal', sans-serif" }}>
           <Plus size={14} /> إنشاء كود
         </button>
       </div>
@@ -136,15 +139,44 @@ export default function AdminInviteCodesPage() {
         {showForm && (
           <form onSubmit={handleGenerate} style={{ background: '#fff', borderRadius: 14, border: '1px solid #e2e8f0', padding: 24, marginBottom: 20 }}>
             <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700 }}>إنشاء كود اشتراك جديد</h3>
+            
+            {/* Code Type Selector */}
+            <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
+              <button type="button" onClick={() => setForm(p => ({ ...p, codeType: 'batch', batchMode: true, readyTemplates: true, designerMode: false }))}
+                style={{
+                  flex: 1, padding: '14px 16px', borderRadius: 12, cursor: 'pointer',
+                  fontFamily: "'Tajawal', sans-serif", fontWeight: 700, fontSize: 14,
+                  border: form.codeType === 'batch' ? '2px solid #7c3aed' : '2px solid #e2e8f0',
+                  background: form.codeType === 'batch' ? '#f5f3ff' : '#fff',
+                  color: form.codeType === 'batch' ? '#7c3aed' : '#64748b',
+                  transition: 'all 0.2s'
+                }}>
+                <div style={{ fontSize: 20, marginBottom: 4 }}>جماعي</div>
+                <div style={{ fontSize: 11, fontWeight: 400 }}>كود تفعيل نظام جماعي (Batch) مع تحكم في التحميلات</div>
+              </button>
+              <button type="button" onClick={() => setForm(p => ({ ...p, codeType: 'company', batchMode: true, readyTemplates: true, designerMode: true }))}
+                style={{
+                  flex: 1, padding: '14px 16px', borderRadius: 12, cursor: 'pointer',
+                  fontFamily: "'Tajawal', sans-serif", fontWeight: 700, fontSize: 14,
+                  border: form.codeType === 'company' ? '2px solid #2563eb' : '2px solid #e2e8f0',
+                  background: form.codeType === 'company' ? '#eff6ff' : '#fff',
+                  color: form.codeType === 'company' ? '#2563eb' : '#64748b',
+                  transition: 'all 0.2s'
+                }}>
+                <div style={{ fontSize: 20, marginBottom: 4 }}>تسجيل شركة</div>
+                <div style={{ fontSize: 11, fontWeight: 400 }}>كود تسجيل شركة جديدة مع داشبورد كامل</div>
+              </button>
+            </div>
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
               <div>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 4 }}>اسم الشركة *</label>
-                <input value={form.companyName} onChange={e => setForm(p => ({ ...p, companyName: e.target.value }))} required
+                <input value={form.companyName} onChange={e => setForm(p => ({ ...p, companyName: e.target.value }))} required placeholder="مثال: شركة سلّم"
                   style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 14, fontFamily: "'Tajawal', sans-serif", boxSizing: 'border-box', outline: 'none' }} />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 4 }}>البريد الإلكتروني *</label>
-                <input type="email" value={form.companyEmail} onChange={e => setForm(p => ({ ...p, companyEmail: e.target.value }))} required
+                <input type="email" value={form.companyEmail} onChange={e => setForm(p => ({ ...p, companyEmail: e.target.value }))} required placeholder="email@company.com"
                   style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 14, fontFamily: "'Tajawal', sans-serif", boxSizing: 'border-box', outline: 'none' }} />
               </div>
               <div>
@@ -213,7 +245,7 @@ export default function AdminInviteCodesPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                  {['الكود', 'الشركة', 'البريد', 'الحالة', 'تاريخ الانتهاء', 'رابط التسجيل'].map(h => (
+                  {['الكود', 'الشركة', 'النوع', 'الحالة', 'الميزات', 'تاريخ الانتهاء', 'رابط التسجيل'].map(h => (
                     <th key={h} style={{ padding: '12px 16px', textAlign: 'right', fontSize: 12, fontWeight: 600, color: '#64748b' }}>{h}</th>
                   ))}
                 </tr>
@@ -233,9 +265,24 @@ export default function AdminInviteCodesPage() {
                         </div>
                       </td>
                       <td style={{ padding: '14px 16px', fontWeight: 600, fontSize: 14 }}>{c.companyName}</td>
-                      <td style={{ padding: '14px 16px', color: '#64748b', fontSize: 13 }}>{c.companyEmail}</td>
+                      <td style={{ padding: '14px 16px' }}>
+                        <span style={{
+                          padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600,
+                          background: c.features?.includes('company_registration') ? '#eff6ff' : '#f5f3ff',
+                          color: c.features?.includes('company_registration') ? '#2563eb' : '#7c3aed'
+                        }}>
+                          {c.features?.includes('company_registration') ? 'تسجيل شركة' : 'جماعي'}
+                        </span>
+                      </td>
                       <td style={{ padding: '14px 16px' }}>
                         <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: bg, color }}>{c.status}</span>
+                      </td>
+                      <td style={{ padding: '14px 16px' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                          {c.features?.includes('batch_templates') && <span style={{ padding: '2px 8px', borderRadius: 12, fontSize: 10, fontWeight: 600, background: '#f5f3ff', color: '#7c3aed' }}>جماعي</span>}
+                          {c.features?.includes('ready_templates') && <span style={{ padding: '2px 8px', borderRadius: 12, fontSize: 10, fontWeight: 600, background: '#ecfdf5', color: '#059669' }}>جاهز</span>}
+                          {c.features?.includes('designer_mode') && <span style={{ padding: '2px 8px', borderRadius: 12, fontSize: 10, fontWeight: 600, background: '#fffbeb', color: '#d97706' }}>مصمم</span>}
+                        </div>
                       </td>
                       <td style={{ padding: '14px 16px', fontSize: 12, color: '#94a3b8' }}>{new Date(c.expirationDate).toLocaleDateString('ar-SA')}</td>
                       <td style={{ padding: '14px 16px' }}>
