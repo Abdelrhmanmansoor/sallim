@@ -391,6 +391,9 @@ export default function CheckoutPageNew() {
                 <p style={{ textAlign: 'center', fontSize: 11, color: '#9ca3af', margin: 0, lineHeight: 1.6 }}>
                   ستنتقل لبوابة الدفع المشفرة لإتمام العملية بأمان
                 </p>
+                <div style={{ marginTop: 14, padding: '10px 14px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, fontSize: 11, color: '#92400e', lineHeight: 1.8, textAlign: 'center' }}>
+                  قد يظهر المبلغ في إشعار البنك بعملة مختلفة (جنيه مصري أو دولار) — المبلغ الفعلي المسحوب هو نفسه بالريال السعودي بدون أي رسوم إضافية.
+                </div>
               </div>
             )}
           </div>
