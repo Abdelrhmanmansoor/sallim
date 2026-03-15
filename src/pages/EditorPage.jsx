@@ -7,7 +7,7 @@ import { greetingTexts } from '../data/texts'
 import { activateLicense, capturePayPalOrder, consumeBatchOrder, consumePersonalOrder, createBatchOrder, createPayPalOrder, createPersonalOrder, getPersonalOrder, getTemplates, logProtectionEvent, trackStat, verifyLicense } from '../utils/api'
 import { useCompany } from '../context/CompanyContext'
 import { calligraphy, calligraphyCategories } from '../data/calligraphy'
-import { BsDownload, BsFilePdf, BsWhatsapp, BsLink45Deg, BsShareFill, BsCheck2, BsPencilFill, BsStars, BsSearch, BsPersonCircle, BsImage, BsChatLeftText, BsSliders, BsPlusLg, BsX, BsArrowLeft, BsInfoCircle, BsBuilding, BsPeople, BsFileEarmarkText, BsCloudDownload } from 'react-icons/bs'
+import { BsDownload, BsFilePdf, BsWhatsapp, BsLink45Deg, BsShareFill, BsCheck2, BsPencilFill, BsStars, BsSearch, BsPersonCircle, BsImage, BsChatLeftText, BsSliders, BsPlusLg, BsX, BsArrowLeft, BsInfoCircle, BsBuilding, BsPeople, BsFileEarmarkText, BsCloudDownload, BsTwitterX, BsFacebook } from 'react-icons/bs'
 import { HiPhotograph, HiOutlineColorSwatch } from 'react-icons/hi'
 import JSZip from 'jszip'
 import toast, { Toaster } from 'react-hot-toast'
@@ -490,8 +490,9 @@ function EditorPageInner() {
     protectionStateRef.current = {
       isCompanyUnlocked,
       personalOrderStatus: activePersonalOrder?.status || null,
+      temporarilyUnlocked,
     }
-  }, [activePersonalOrder?.status, isCompanyUnlocked])
+  }, [activePersonalOrder?.status, isCompanyUnlocked, temporarilyUnlocked])
 
   // Images - use currentTemplate when no readyDesign is selected
   const [bgImage, bgLoaded] = useImage(currentTemplate?.image)
@@ -830,9 +831,10 @@ function EditorPageInner() {
 
   useEffect(() => {
     if (isCompanyUnlocked) return
+    if (temporarilyUnlocked) return
     if (sessionStorage.getItem(PREVIEW_NOTICE_KEY)) return
     setShowProtectionNotice(true)
-  }, [isCompanyUnlocked])
+  }, [isCompanyUnlocked, temporarilyUnlocked])
 
   useEffect(() => {
     if (!purchaseOrderId) {
@@ -1445,8 +1447,9 @@ function EditorPageInner() {
 
   const handleExportPNG = useCallback(async () => {
     if (!stageRef.current) return
-    if (!protectionStateRef.current.isCompanyUnlocked) {
-      if (protectionStateRef.current.personalOrderStatus === 'paid') {
+    const { isCompanyUnlocked: compUnlocked, personalOrderStatus, temporarilyUnlocked: freeUnlocked } = protectionStateRef.current
+    if (!compUnlocked && !freeUnlocked) {
+      if (personalOrderStatus === 'paid') {
         personalDownloadRef.current?.()
       } else {
         toast.error('التحميل متاح بعد الدفع فقط.')
@@ -1469,7 +1472,8 @@ function EditorPageInner() {
 
   const handleExportPDF = useCallback(async () => {
     if (!stageRef.current) return
-    if (!protectionStateRef.current.isCompanyUnlocked) {
+    const { isCompanyUnlocked: compUnlocked, temporarilyUnlocked: freeUnlocked } = protectionStateRef.current
+    if (!compUnlocked && !freeUnlocked) {
       toast.error('تحميل PDF متاح بعد الدفع فقط.')
       logProtectedActionRef.current('download_before_payment', { format: 'pdf' })
       return
@@ -1487,7 +1491,8 @@ function EditorPageInner() {
 
   const handleShareWhatsApp = useCallback(async () => {
     if (!stageRef.current) return
-    if (!protectionStateRef.current.isCompanyUnlocked) {
+    const { isCompanyUnlocked: compUnlocked, temporarilyUnlocked: freeUnlocked } = protectionStateRef.current
+    if (!compUnlocked && !freeUnlocked) {
       toast.error('المشاركة متاحة بعد الدفع فقط.')
       logProtectedActionRef.current('download_before_payment', { action: 'share_whatsapp' })
       return
@@ -1508,7 +1513,8 @@ function EditorPageInner() {
 
   const handleCopyImage = useCallback(async () => {
     if (!stageRef.current) return
-    if (!protectionStateRef.current.isCompanyUnlocked) {
+    const { isCompanyUnlocked: compUnlocked, temporarilyUnlocked: freeUnlocked } = protectionStateRef.current
+    if (!compUnlocked && !freeUnlocked) {
       toast.error('نسخ الصورة متاح بعد الدفع فقط.')
       logProtectedActionRef.current('download_before_payment', { action: 'copy_image' })
       return
@@ -1526,7 +1532,8 @@ function EditorPageInner() {
 
   const handleShareNative = useCallback(async () => {
     if (!stageRef.current) return
-    if (!protectionStateRef.current.isCompanyUnlocked) {
+    const { isCompanyUnlocked: compUnlocked, temporarilyUnlocked: freeUnlocked } = protectionStateRef.current
+    if (!compUnlocked && !freeUnlocked) {
       toast.error('المشاركة متاحة بعد الدفع فقط.')
       logProtectedActionRef.current('download_before_payment', { action: 'share_native' })
       return
@@ -2436,7 +2443,7 @@ function EditorPageInner() {
               </div>
 
               {/* Action Buttons */}
-              <div style={{ display: isCompanyUnlocked ? 'flex' : 'none', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <div style={{ display: (isCompanyUnlocked || temporarilyUnlocked) ? 'flex' : 'none', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <Tooltip text="تحميل PNG">
                   <button onClick={handleExportPNG} style={{
                     display: 'flex', alignItems: 'center', gap: 10, padding: '14px 28px',
@@ -2455,17 +2462,62 @@ function EditorPageInner() {
                     <BsWhatsapp size={18} /> واتساب
                   </button>
                 </Tooltip>
+                <Tooltip text="مشاركة عبر X">
+                  <button onClick={() => {
+                    const text = encodeURIComponent('بطاقة تهنئة العيد من سَلِّم 🌙✨')
+                    const url = encodeURIComponent('https://www.sallim.co')
+                    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank')
+                  }} style={{
+                    display: 'flex', alignItems: 'center', gap: 8, padding: '14px 20px',
+                    background: '#000', color: '#fff', border: 'none', borderRadius: 14,
+                    fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: ds.font
+                  }}>
+                    <BsTwitterX size={16} /> X
+                  </button>
+                </Tooltip>
+                <Tooltip text="مشاركة عبر فيسبوك">
+                  <button onClick={() => {
+                    const url = encodeURIComponent('https://www.sallim.co')
+                    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank')
+                  }} style={{
+                    display: 'flex', alignItems: 'center', gap: 8, padding: '14px 20px',
+                    background: '#1877F2', color: '#fff', border: 'none', borderRadius: 14,
+                    fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: ds.font
+                  }}>
+                    <BsFacebook size={16} /> فيسبوك
+                  </button>
+                </Tooltip>
+              </div>
+              <div style={{ display: (isCompanyUnlocked || temporarilyUnlocked) ? 'flex' : 'none', gap: 10, justifyContent: 'center', marginTop: 10, flexWrap: 'wrap' }}>
                 <Tooltip text="تحميل PDF">
                   <button onClick={handleExportPDF} style={{
-                    display: 'flex', alignItems: 'center', gap: 8, padding: '14px 20px',
-                    background: '#fff', color: '#333', border: '2px solid #eee', borderRadius: 14,
-                    fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: ds.font
+                    display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px',
+                    background: '#fff', color: '#333', border: '2px solid #eee', borderRadius: 12,
+                    fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: ds.font
                   }}>
                     <BsFilePdf size={16} /> PDF
                   </button>
                 </Tooltip>
+                <Tooltip text="نسخ الصورة">
+                  <button onClick={handleCopyImage} style={{
+                    display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px',
+                    background: '#fff', color: '#333', border: '2px solid #eee', borderRadius: 12,
+                    fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: ds.font
+                  }}>
+                    {copied ? <BsCheck2 color="#10b981" /> : <BsLink45Deg />} {copied ? 'تم النسخ' : 'نسخ'}
+                  </button>
+                </Tooltip>
+                <Tooltip text="مشاركة (استوري واتساب وغيره)">
+                  <button onClick={handleShareNative} style={{
+                    display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px',
+                    background: '#fff', color: '#333', border: '2px solid #eee', borderRadius: 12,
+                    fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: ds.font
+                  }}>
+                    <BsShareFill /> مشاركة
+                  </button>
+                </Tooltip>
               </div>
-              {!isCompanyUnlocked && typeof renderPersonalCheckoutCard === 'function' && renderPersonalCheckoutCard()}
+              {!isCompanyUnlocked && !temporarilyUnlocked && typeof renderPersonalCheckoutCard === 'function' && renderPersonalCheckoutCard()}
             </div>
           )}
         </div>
