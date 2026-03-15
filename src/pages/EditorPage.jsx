@@ -81,7 +81,7 @@ class EditorErrorBoundary extends React.Component {
               borderRadius: 12, 
               fontSize: 14, 
               cursor: 'pointer',
-              fontFamily: ds.font
+              fontFamily: "'Tajawal', sans-serif"
             }}
           >
             محاولة المتابعة
@@ -124,6 +124,7 @@ const BATCH_ZIP_MAX_RECIPIENTS = 50
 const LICENSE_TOKEN_KEY = 'eidgreet_license_token'
 const LICENSE_DEVICE_KEY = 'eidgreet_license_device'
 const PAYPAL_BATCH_PENDING_KEY = 'eidgreet_paypal_batch_pending'
+const PAYPAL_RETURN_PATH_KEY = 'eidgreet_paypal_return_path'
 const SUPPORT_CONTACT = '+201007835547'
 const PREVIEW_NOTICE_KEY = 'sallim_preview_notice_seen'
 const PAYMENT_WARNING_KEY = 'sallim_payment_warning_seen'
@@ -1035,6 +1036,10 @@ function EditorPageInner() {
         names,
         ts: Date.now(),
       }))
+      try {
+        const returnPath = `${window.location.pathname}${window.location.search}`
+        localStorage.setItem(PAYPAL_RETURN_PATH_KEY, returnPath || '/editor')
+      } catch {}
 
       setProcessingPayPal(true)
       const res = await createPayPalOrder()
@@ -1059,10 +1064,10 @@ function EditorPageInner() {
   }, [buildPersonalSnapshot, currentTemplate?.id, normalizeBatchNames, store])
 
   useEffect(() => {
-    const paypalFlag = searchParams.get('paypal')
     const token = searchParams.get('token')
-    if (paypalFlag !== '1' || !token) return
+    if (!token) return
 
+    const paypalFlag = searchParams.get('paypal')
     let cancelled = false
     async function finalize() {
       try {
@@ -1090,17 +1095,25 @@ function EditorPageInner() {
           paypalCaptureId: captureId,
         })
 
-        try { localStorage.removeItem(PAYPAL_BATCH_PENDING_KEY) } catch { }
-        navigate('/editor', { replace: true })
+        const returnPath = localStorage.getItem(PAYPAL_RETURN_PATH_KEY) || '/editor'
+        try {
+          localStorage.removeItem(PAYPAL_BATCH_PENDING_KEY)
+          localStorage.removeItem(PAYPAL_RETURN_PATH_KEY)
+        } catch { }
+        navigate(returnPath || '/editor', { replace: true })
         toast.success('تم الدفع بنجاح.')
       } catch (err) {
-        try { localStorage.removeItem(PAYPAL_BATCH_PENDING_KEY) } catch { }
+        const returnPath = localStorage.getItem(PAYPAL_RETURN_PATH_KEY) || '/editor'
+        try {
+          localStorage.removeItem(PAYPAL_BATCH_PENDING_KEY)
+          localStorage.removeItem(PAYPAL_RETURN_PATH_KEY)
+        } catch { }
         if (!cancelled) {
           const message = err?.message || 'تعذر تأكيد الدفع.'
           setPayPalError(message)
           toast.error(message)
         }
-        navigate('/editor', { replace: true })
+        navigate(returnPath || '/editor', { replace: true })
       } finally {
         if (!cancelled) setProcessingPayPal(false)
       }
@@ -1113,8 +1126,12 @@ function EditorPageInner() {
   useEffect(() => {
     const paypalFlag = searchParams.get('paypal')
     if (paypalFlag !== '0') return
-    try { localStorage.removeItem(PAYPAL_BATCH_PENDING_KEY) } catch { }
-    navigate('/editor', { replace: true })
+    const returnPath = localStorage.getItem(PAYPAL_RETURN_PATH_KEY) || '/editor'
+    try {
+      localStorage.removeItem(PAYPAL_BATCH_PENDING_KEY)
+      localStorage.removeItem(PAYPAL_RETURN_PATH_KEY)
+    } catch { }
+    navigate(returnPath || '/editor', { replace: true })
   }, [navigate, searchParams])
 
   const setBatchNameAtIndex = useCallback((index, value) => {
@@ -1595,7 +1612,6 @@ function EditorPageInner() {
     { id: 'text', label: 'النصوص', icon: <BsChatLeftText size={20} />, tip: 'عدّل نصوص البطاقة' },
     { id: 'style', label: 'التنسيق', icon: <HiOutlineColorSwatch size={20} />, tip: 'تحكم بالألوان والخطوط' },
   ]
-  /* أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯
   const renderProtectionOverlay = () => {
     if (!isPreviewProtected) return null
 
@@ -1805,7 +1821,6 @@ function EditorPageInner() {
       </div>
     )
   }
-  أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯ */
   return (
     <div style={{ fontFamily: ds.font, background: '#f5f5f5', minHeight: '100vh', paddingTop: 0 }}>
       <Toaster position="top-center" toastOptions={{
@@ -2407,7 +2422,7 @@ function EditorPageInner() {
                       )}
                     </Layer>
                   </Stage>
-                  {renderProtectionOverlay()}
+                  {typeof renderProtectionOverlay === 'function' ? renderProtectionOverlay() : null}
                 </div>
               </div>
 
@@ -2441,7 +2456,7 @@ function EditorPageInner() {
                   </button>
                 </Tooltip>
               </div>
-              {!isCompanyUnlocked && renderPersonalCheckoutCard()}
+              {!isCompanyUnlocked && typeof renderPersonalCheckoutCard === 'function' && renderPersonalCheckoutCard()}
             </div>
           )}
         </div>

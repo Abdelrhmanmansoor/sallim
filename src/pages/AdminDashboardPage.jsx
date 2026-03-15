@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { 
   LayoutDashboard, Building2, Key, CreditCard, Activity, LogOut,
   Menu, X, TrendingUp, DollarSign, Eye, Plus, ChevronLeft,
-  Users, ShoppingBag, RefreshCw, BarChart2, Shield
+  Users, ShoppingBag, RefreshCw, BarChart2, Shield, Download, Percent
 } from 'lucide-react'
 
 const API = import.meta.env.VITE_API_URL
@@ -17,6 +17,9 @@ export default function AdminDashboardPage() {
     activeCompanies: 0,
     totalCodes: 0,
     activatedCodes: 0,
+    totalDownloads: 0,
+    totalViews: 0,
+    activationRate: 0,
   })
   const [loading, setLoading] = useState(true)
   const [activeMenu, setActiveMenu] = useState('dashboard')
@@ -36,20 +39,25 @@ export default function AdminDashboardPage() {
       const token = localStorage.getItem('token')
       const headers = { Authorization: `Bearer ${token}` }
 
-      const [codesRes, companiesRes] = await Promise.all([
+      const [codesRes, companiesRes, platformRes] = await Promise.all([
         fetch(`${API}/api/v1/admin/invite-codes/stats/summary`, { headers }),
-        fetch(`${API}/api/v1/admin/companies?limit=100`, { headers })
+        fetch(`${API}/api/v1/admin/companies?limit=100`, { headers }),
+        fetch(`${API}/api/v1/stats`, { headers }).catch(() => ({ json: () => ({ success: false }) }))
       ])
       const codesData = await codesRes.json()
       const companiesData = await companiesRes.json()
+      const platformData = await (typeof platformRes.json === 'function' ? platformRes.json() : platformRes)
       
       setStats({
         totalCodes: codesData.success ? codesData.data.total : 0,
         activatedCodes: codesData.success ? codesData.data.activated : 0,
+        activationRate: codesData.success ? codesData.data.activationRate : 0,
         totalCompanies: companiesData.success ? companiesData.data.total : 0,
         activeCompanies: companiesData.success
           ? (companiesData.data.companies?.filter(c => c.status === 'active').length || 0)
           : 0,
+        totalDownloads: platformData.success ? (platformData.data?.downloads || 0) : 0,
+        totalViews: platformData.success ? (platformData.data?.cardViews || 0) : 0,
       })
     } catch (error) {
       console.error('Error loading stats:', error)
@@ -77,7 +85,9 @@ export default function AdminDashboardPage() {
     { icon: Building2, label: 'إجمالي الشركات', value: stats.totalCompanies, color: '#3b82f6', bg: '#eff6ff', trend: '+0%' },
     { icon: Users, label: 'الشركات النشطة', value: stats.activeCompanies, color: '#10b981', bg: '#ecfdf5', trend: '+0%' },
     { icon: Key, label: 'أكواد الاشتراك', value: stats.totalCodes, color: '#8b5cf6', bg: '#f5f3ff', trend: '+0%' },
-    { icon: BarChart2, label: 'الكودات المفعّلة', value: stats.activatedCodes, color: '#f59e0b', bg: '#fffbeb', trend: '+0%' },
+    { icon: BarChart2, label: 'الكودات المفعّلة', value: stats.activatedCodes, color: '#f59e0b', bg: '#fffbeb', trend: `${stats.activationRate}%` },
+    { icon: Download, label: 'إجمالي التحميلات', value: stats.totalDownloads, color: '#ec4899', bg: '#fdf2f8', trend: '+0%' },
+    { icon: Eye, label: 'مشاهدات المنصة', value: stats.totalViews, color: '#06b6d4', bg: '#ecfeff', trend: '+0%' },
   ]
 
   const quickActions = [
