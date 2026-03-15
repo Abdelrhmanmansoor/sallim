@@ -49,11 +49,29 @@ let _cacheTs = 0
 let _inflight = null
 const TTL = 30 * 1000
 
+function getPreferredCurrency() {
+  try { return localStorage.getItem('sallim_currency') || null } catch { return null }
+}
+
+export function setPreferredCurrency(code) {
+  try {
+    if (code) localStorage.setItem('sallim_currency', code)
+    else localStorage.removeItem('sallim_currency')
+  } catch {}
+  _cache = null
+  _cacheTs = 0
+}
+
 export async function fetchRates() {
   if (_cache && Date.now() - _cacheTs < TTL) return _cache
   if (_inflight) return _inflight
   const country = detectCountry()
-  const url = `${apiBase}/api/v1/checkout/exchange-rate${country ? `?country=${country}` : ''}`
+  const preferred = getPreferredCurrency()
+  const params = new URLSearchParams()
+  if (country) params.set('country', country)
+  if (preferred) params.set('currency', preferred)
+  const qs = params.toString()
+  const url = `${apiBase}/api/v1/checkout/exchange-rate${qs ? `?${qs}` : ''}`
   _inflight = fetch(url)
     .then(r => r.json())
     .then(d => { if (d?.success) { _cache = d; _cacheTs = Date.now() }; _inflight = null; return _cache })
@@ -75,6 +93,13 @@ export function useCurrency() {
   useEffect(() => {
     const id = setInterval(() => fetchRates().then(d => { if (d) setInfo(d) }), TTL)
     return () => clearInterval(id)
+  }, [])
+
+  // Re-fetch when currency preference changes (custom event)
+  useEffect(() => {
+    const onCurrencyChange = () => fetchRates().then(d => { if (d) setInfo(d) })
+    window.addEventListener('currency-change', onCurrencyChange)
+    return () => window.removeEventListener('currency-change', onCurrencyChange)
   }, [])
 
   const isForeign = !!(info && info.country !== 'SA' && info.visitorCurrency && info.visitorCurrency !== 'SAR')

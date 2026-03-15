@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Menu, X, ArrowLeft, User, LogOut } from 'lucide-react'
+import CurrencySwitcher from '../CurrencySwitcher'
 
 const links = [
   { path: '/', label: 'الرئيسية' },
@@ -134,6 +135,7 @@ export default function Navbar() {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex" style={{ alignItems: 'center', gap: '12px' }}>
+            <CurrencySwitcher dark={showDark} />
             {user ? (
               <>
                 <Link
@@ -352,6 +354,7 @@ export default function Navbar() {
             </div>
 
             <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #f0f0f0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <CurrencySwitcher />
               <Link
                 to={user ? "/dashboard/diwaniya" : "/create-diwaniya"}
                 onClick={() => setOpen(false)}

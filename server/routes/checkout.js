@@ -382,7 +382,8 @@ router.get('/exchange-rate', async (req, res) => {
   try {
     const rates = await getExchangeRates()
     const country = (req.query.country || detectCountryFromRequest(req) || 'SA').toUpperCase()
-    const visitorCurrency = COUNTRY_CURRENCY[country] || 'USD'
+    const forcedCurrency = req.query.currency?.toUpperCase()
+    const visitorCurrency = forcedCurrency || COUNTRY_CURRENCY[country] || 'USD'
     const visitorRate = rates[visitorCurrency] || rates.USD || 1
     const egpRate = rates.EGP || 13.16
 
