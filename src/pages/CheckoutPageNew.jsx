@@ -146,7 +146,7 @@ export default function CheckoutPageNew() {
     if (existing) { existing.addEventListener('load', () => setPaypalReady(true)); return }
     const s = document.createElement('script')
     s.id = 'paypal-sdk-script'
-    s.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=SAR&locale=ar_SA&intent=capture`
+    s.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=USD&locale=ar_SA&intent=capture`
     s.async = true
     s.onload = () => setPaypalReady(true)
     s.onerror = () => console.error('Failed to load PayPal SDK')
@@ -275,6 +275,8 @@ export default function CheckoutPageNew() {
   }
 
   const price = cardData?.price || 0
+  const SAR_TO_USD = 0.2667
+  const priceUSD = price ? (Math.ceil(price * SAR_TO_USD * 100) / 100).toFixed(2) : '0.00'
 
   // Post-PayPal-payment handler
   const handlePayPalSuccess = useCallback((captureData) => {
@@ -501,6 +503,12 @@ export default function CheckoutPageNew() {
                     <span style={{ fontSize: 15, fontWeight: 800 }}>الإجمالي</span>
                     <span style={{ fontSize: 18, fontWeight: 900, display: 'flex', alignItems: 'center', gap: 4 }}>{price} <SAR size={15} /></span>
                   </div>
+                  {paymentMethod === 'paypal' && (
+                    <div style={{ borderTop: '1px dashed #e5e7eb', paddingTop: 8, marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: '#6b7280' }}>
+                      <span>المبلغ بالدولار (PayPal)</span>
+                      <span style={{ fontWeight: 700, color: '#003087' }}>${priceUSD} USD</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* ── Payment Method Selector ── */}
@@ -515,7 +523,7 @@ export default function CheckoutPageNew() {
                         <LogoPayPal size={36} />
                       </div>
                       <span className="co-pay-tab-label">PayPal</span>
-                      <span className="co-pay-tab-sub">Visa / Mastercard / PayPal</span>
+                      <span className="co-pay-tab-sub">يتم الدفع بالدولار (${priceUSD})</span>
                     </div>
                   )}
 
@@ -535,8 +543,10 @@ export default function CheckoutPageNew() {
 
                 {/* ── PayPal Warning ── */}
                 {paymentMethod === 'paypal' && PAYPAL_CLIENT_ID && (
-                  <div style={{ padding: '10px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, fontSize: 11, color: '#991b1b', lineHeight: 1.8, textAlign: 'center', marginBottom: 14 }}>
-                    PayPal لا يدعم بطاقات مدى -- استخدم Visa او Mastercard او رصيد حسابك في PayPal
+                  <div style={{ padding: '10px 14px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 8, fontSize: 11, color: '#1e40af', lineHeight: 1.8, textAlign: 'center', marginBottom: 14 }}>
+                    سيتم تحويل المبلغ تلقائياً من {price} ر.س إلى <strong>${priceUSD} USD</strong> — PayPal لا يدعم الريال السعودي مباشرة
+                    <br />
+                    <span style={{ color: '#991b1b' }}>⚠ لا يدعم بطاقات مدى — استخدم Visa أو Mastercard أو رصيد PayPal</span>
                   </div>
                 )}
 
@@ -582,7 +592,10 @@ export default function CheckoutPageNew() {
                 )}
 
                 <div style={{ marginTop: 10, padding: '10px 14px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, fontSize: 11, color: '#92400e', lineHeight: 1.8, textAlign: 'center' }}>
-                  قد يظهر المبلغ في إشعار البنك بعملة مختلفة (جنيه مصري أو دولار) -- المبلغ الفعلي المسحوب هو نفسه بالريال السعودي بدون أي رسوم إضافية.
+                  {paymentMethod === 'paypal'
+                    ? `سيظهر المبلغ في إشعار البنك بالدولار ($${priceUSD} USD) وهو ما يعادل ${price} ر.س — بدون رسوم إضافية.`
+                    : 'قد يظهر المبلغ في إشعار البنك بعملة مختلفة (جنيه مصري أو دولار) — المبلغ الفعلي المسحوب هو نفسه بالريال السعودي بدون أي رسوم إضافية.'
+                  }
                 </div>
               </div>
             )}

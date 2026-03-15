@@ -459,8 +459,9 @@ setInterval(() => {
 router.post('/paypal/create', async (req, res) => {
   try {
     const product = normalizeText(req.body?.product || 'batch', 40).toLowerCase()
-    const reqCurrency = normalizeText(req.body?.currency || 'SAR', 5).toUpperCase()
 
+    // PayPal doesn't support SAR — convert all prices to USD
+    const SAR_TO_USD = 0.2667  // 1 SAR ≈ 0.2667 USD (1 USD ≈ 3.75 SAR)
     let amount, currency, description
 
     if (product === 'batch') {
@@ -468,19 +469,20 @@ router.post('/paypal/create', async (req, res) => {
       currency = BATCH_PAYPAL_CURRENCY
       description = 'بطاقات تهنئة جماعية'
     } else if (product === 'eid-song') {
-      amount = 50
-      currency = reqCurrency
+      amount = Math.ceil(50 * SAR_TO_USD * 100) / 100  // ~13.34 USD
+      currency = 'USD'
       description = 'أغنية العيد'
     } else if (product === 'custom-design') {
-      amount = 35
-      currency = reqCurrency
+      amount = Math.ceil(35 * SAR_TO_USD * 100) / 100  // ~9.34 USD
+      currency = 'USD'
       description = 'تصميم خاص'
     } else if (product === 'template' || product === 'card') {
-      amount = Number(req.body?.amount)
-      if (!Number.isFinite(amount) || amount < 1 || amount > 500) {
+      const sarAmount = Number(req.body?.amount)
+      if (!Number.isFinite(sarAmount) || sarAmount < 1 || sarAmount > 500) {
         return res.status(400).json({ success: false, error: 'سعر غير صالح.' })
       }
-      currency = reqCurrency
+      amount = Math.ceil(sarAmount * SAR_TO_USD * 100) / 100
+      currency = 'USD'
       description = normalizeText(req.body?.description || 'قالب مميز', 80)
     } else {
       return res.status(400).json({ success: false, error: 'نوع المنتج غير صالح.' })
