@@ -30,6 +30,7 @@ export default function AdminInviteCodesPage() {
   })
   const [showForm, setShowForm] = useState(false)
   const [lastCode, setLastCode] = useState(null)
+  const [lastCodeType, setLastCodeType] = useState('batch')
 
   const user = JSON.parse(localStorage.getItem('user') || '{}')
 
@@ -100,6 +101,7 @@ export default function AdminInviteCodesPage() {
         setShowForm(false)
         setForm({ companyName: '', companyEmail: '', expirationDays: 7, downloadLimit: 100, readyTemplates: true, batchMode: true, designerMode: false, codeType: 'batch' })
         setLastCode(data.data?.code)
+        setLastCodeType(form.codeType)
         loadCodes()
         loadStats()
       } else {
@@ -213,10 +215,34 @@ export default function AdminInviteCodesPage() {
               </button>
             </div>
             {lastCode && (
-              <div style={{ marginTop: 12, padding: '10px 12px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Link2 size={16} color="#0f172a" />
-                <span style={{ fontSize: 13, direction: 'ltr' }}>{`${CLIENT}/company-activation?code=${lastCode}`}</span>
-                <button onClick={() => copyCode(`${CLIENT}/company-activation?code=${lastCode}`)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a855f7', fontWeight: 700 }}>نسخ الرابط</button>
+              <div style={{ marginTop: 16, borderRadius: 14, overflow: 'hidden', border: '1px solid #c4b5fd' }}>
+                {/* Batch Access Link */}
+                <div style={{ padding: '14px 16px', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Check size={18} color="#fff" />
+                  <span style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>
+                    {lastCodeType === 'batch' ? 'رابط الوصول الجماعي — مفعّل تلقائياً' : 'رابط تسجيل الشركة'}
+                  </span>
+                </div>
+                <div style={{ padding: '12px 16px', background: '#f5f3ff', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                  <code style={{ flex: 1, fontSize: 12, color: '#374151', direction: 'ltr', wordBreak: 'break-all' }}>
+                    {lastCodeType === 'batch'
+                      ? `${CLIENT}/batch-access?code=${lastCode}`
+                      : `${CLIENT}/company-activation?code=${lastCode}`}
+                  </code>
+                  <button onClick={() => copyCode(lastCodeType === 'batch'
+                    ? `${CLIENT}/batch-access?code=${lastCode}`
+                    : `${CLIENT}/company-activation?code=${lastCode}`)}
+                    style={{ padding: '8px 14px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontFamily: "'Tajawal', sans-serif", fontWeight: 700, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
+                    {copied === `${CLIENT}/batch-access?code=${lastCode}` || copied === `${CLIENT}/company-activation?code=${lastCode}`
+                      ? <><Check size={14} /> تم النسخ</>
+                      : <><Copy size={14} /> نسخ الرابط</>}
+                  </button>
+                </div>
+                <div style={{ padding: '10px 16px', background: '#ede9fe', fontSize: 12, color: '#6d28d9' }}>
+                  {lastCodeType === 'batch'
+                    ? 'يمكن للمستخدم فتح هذا الرابط في أي وقت وسيجده مفعلاً حتى ينتهي الرصيد'
+                    : 'يستخدم هذا الرابط للتسجيل لمرة واحدة فقط'}
+                </div>
               </div>
             )}
           </form>

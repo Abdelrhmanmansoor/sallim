@@ -79,9 +79,11 @@ const ProductCard = ({
 
           <button
             type="button"
-            className="w-full rounded-xl bg-slate-900 py-2.5 text-sm font-bold text-white transition hover:bg-slate-800"
+            className="w-full rounded-xl py-3.5 text-base font-extrabold text-white transition"
+            style={{ background: '#f59e0b', letterSpacing: '0.01em' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#d97706' }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = '#f59e0b' }}
           >
-            <ShoppingBag size={14} className="ml-1.5 inline" />
             ابدأ التصميم
           </button>
         </div>

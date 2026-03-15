@@ -33,6 +33,24 @@ export default function LandingPage() {
   const [previewTemplates, setPreviewTemplates] = useState([])
   const [showPopup, setShowPopup] = useState(false)
   const [popupCountdown, setPopupCountdown] = useState(8)
+  const [playingAudio, setPlayingAudio] = useState(null)
+
+  const audioSamples = [
+    { id: 1, label: 'نموذج صوتي 1', file: '/SOUND/ssstwitter.com_1773546744734.mp3' },
+    { id: 2, label: 'نموذج صوتي 2', file: '/SOUND/ssstwitter.com_1773546772130.mp3' },
+    { id: 3, label: 'نموذج صوتي 3', file: '/SOUND/ssstwitter.com_1773546797691.mp3' },
+  ]
+
+  const handlePlaySample = (id) => {
+    document.querySelectorAll('audio[data-sample]').forEach(a => { a.pause(); a.currentTime = 0 })
+    if (playingAudio === id) { setPlayingAudio(null); return }
+    const audio = document.querySelector(`audio[data-sample="${id}"]`)
+    if (audio) {
+      audio.play()
+      setPlayingAudio(id)
+      audio.onended = () => setPlayingAudio(null)
+    }
+  }
 
   useEffect(() => {
     async function load() {
@@ -746,9 +764,33 @@ export default function LandingPage() {
               <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', marginBottom: '8px', lineHeight: 1.4 }}>
                 اصنع أغنية العيد لمن تحب
               </h3>
-              <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.7, marginBottom: '20px' }}>
-                أرسل تهنئة صوتية مميزة باسم من تحب — أغنية عيد مخصصة تبقى في الذاكرة
+              <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.7, marginBottom: '16px' }}>
+                أرسل تهنئة صوتية مميزة مخصصة باسم من تحب — أغنية عيد فريدة تُحفظ في القلب وتبقى في الذاكرة. مثالية كهدية للأهل والأصدقاء في عيد الفطر وعيد الأضحى.
               </p>
+
+              {/* Audio Samples */}
+              <div style={{ marginBottom: '20px' }}>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: '#94a3b8', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>استمع لنماذج الأغاني</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {audioSamples.map(sample => (
+                    <div key={sample.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: playingAudio === sample.id ? '#f5f3ff' : '#f8fafc', borderRadius: 12, border: '1px solid ' + (playingAudio === sample.id ? '#c4b5fd' : '#e2e8f0'), transition: 'all 200ms', cursor: 'pointer' }}
+                      onClick={() => handlePlaySample(sample.id)}>
+                      <audio data-sample={sample.id} src={sample.file} preload="none" />
+                      <div style={{ width: 36, height: 36, borderRadius: '50%', background: playingAudio === sample.id ? '#7c3aed' : '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 200ms' }}>
+                        {playingAudio === sample.id ? (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                        ) : (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="#64748b"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        )}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: playingAudio === sample.id ? '#7c3aed' : '#374151' }}>{sample.label}</div>
+                        {playingAudio === sample.id && <div style={{ fontSize: 11, color: '#7c3aed' }}>جاري التشغيل...</div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
               <button
                 onClick={() => navigate('/checkout?product=eid-song&price=50')}

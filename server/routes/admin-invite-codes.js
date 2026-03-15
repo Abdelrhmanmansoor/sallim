@@ -20,6 +20,7 @@ router.post('/generate', async (req, res) => {
     const expirationDate = new Date()
     expirationDate.setDate(expirationDate.getDate() + expirationDays)
 
+    const isBatchCode = features && features.includes('batch_templates') && !(features.includes('company_registration'))
     const inviteCode = await InviteCode.create({
       code,
       companyName,
@@ -28,7 +29,7 @@ router.post('/generate', async (req, res) => {
       features: features || ['basic_templates'],
       initialCredits: initialCredits || 0,
       createdBy,
-      status: 'generated'
+      status: isBatchCode ? 'activated' : 'generated'
     })
 
     // Log action
@@ -277,6 +278,32 @@ router.post('/:id/resend', async (req, res) => {
   } catch (error) {
     console.error('Resend invite code error:', error)
     res.status(500).json({ success: false, error: 'حدث خطأ في إرسال الكود' })
+  }
+})
+
+// ═══ Public: Check batch code by code string ═══
+router.get('/public/check/:code', async (req, res) => {
+  try {
+    const inviteCode = await InviteCode.findOne({ code: req.params.code })
+    if (!inviteCode) {
+      return res.status(404).json({ success: false, error: 'الكود غير موجود' })
+    }
+    const isExpired = new Date() > inviteCode.expirationDate
+    res.json({
+      success: true,
+      data: {
+        code: inviteCode.code,
+        companyName: inviteCode.companyName,
+        status: inviteCode.status,
+        features: inviteCode.features,
+        initialCredits: inviteCode.initialCredits,
+        expirationDate: inviteCode.expirationDate,
+        isExpired,
+        isBatch: inviteCode.features.includes('batch_templates') && !inviteCode.features.includes('company_registration')
+      }
+    })
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'حدث خطأ' })
   }
 })
 

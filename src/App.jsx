@@ -36,6 +36,7 @@ import AdminLoginPage from './pages/AdminLoginPage'
 import AdminCompaniesPage from './pages/AdminCompaniesPage'
 import AdminInviteCodesPage from './pages/AdminInviteCodesPage'
 import AdminTemplatesPage from './pages/AdminTemplatesPage'
+import BatchAccessPage from './pages/BatchAccessPage'
 import AboutPage from './pages/AboutPage'
 import PricingPage from './pages/PricingPage'
 import DeliveryPage from './pages/DeliveryPage'
@@ -130,6 +131,7 @@ export default function App() {
           <Route path="/refund" element={<RefundPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/checkout" element={<CheckoutPageNew />} />
+          <Route path="/batch-access" element={<BatchAccessPage />} />
           <Route path="/wedding-invitation" element={<WeddingInvitationPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
