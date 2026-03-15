@@ -695,6 +695,116 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ROTATING MARKETING SECTION — Typewriter style */}
+      <section style={{ padding: '48px 0', background: '#fff', overflow: 'hidden' }}>
+        <div style={{ maxWidth: '700px', margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
+          <div style={{ position: 'relative', minHeight: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {/* For Corporates */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: marketingIdx === 0 ? 1 : 0,
+              transform: marketingIdx === 0 ? 'translateY(0)' : 'translateY(12px)',
+              transition: 'all 0.6s ease',
+              pointerEvents: marketingIdx === 0 ? 'auto' : 'none',
+            }}>
+              <span style={{ fontSize: '13px', color: '#a855f7', fontWeight: 700, marginBottom: '12px', letterSpacing: '0.05em' }}>🏢 للشركات والمؤسسات</span>
+              <h2 className="typewriter-text" style={{ fontSize: 'clamp(22px, 4vw, 34px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.4, marginBottom: '10px' }}>
+                عزّز علاقتك بموظفيك وعملائك
+              </h2>
+              <p style={{ fontSize: '15px', color: '#64748b', lineHeight: 1.8, maxWidth: '520px' }}>
+                أرسل تهنئة مخصصة باسم كل موظف وعميل دفعة واحدة — بهوية شركتك وشعارها
+              </p>
+              <Link
+                to="/editor?mode=batch"
+                style={{ marginTop: '20px', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', background: '#a855f7', color: '#fff', fontSize: '14px', fontWeight: 700, borderRadius: '12px', textDecoration: 'none', transition: 'all 200ms' }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(168,85,247,0.3)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
+              >
+                جرّب النظام الجماعي ←
+              </Link>
+            </div>
+
+            {/* For Individuals */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: marketingIdx === 1 ? 1 : 0,
+              transform: marketingIdx === 1 ? 'translateY(0)' : 'translateY(12px)',
+              transition: 'all 0.6s ease',
+              pointerEvents: marketingIdx === 1 ? 'auto' : 'none',
+            }}>
+              <span style={{ fontSize: '13px', color: '#b8860b', fontWeight: 700, marginBottom: '12px', letterSpacing: '0.05em' }}>👨‍👩‍👧‍👦 للأفراد والعائلات</span>
+              <h2 className="typewriter-text" style={{ fontSize: 'clamp(22px, 4vw, 34px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.4, marginBottom: '10px' }}>
+                اصنع فرحة العيد بلمستك الخاصة
+              </h2>
+              <p style={{ fontSize: '15px', color: '#64748b', lineHeight: 1.8, maxWidth: '520px' }}>
+                صمّم بطاقة فريدة لأحبابك — اختر قالباً أنيقاً، أضف اسمهم، وشاركها فوراً
+              </p>
+              <Link
+                to="/editor?mode=ready"
+                style={{ marginTop: '20px', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', background: '#b8860b', color: '#fff', fontSize: '14px', fontWeight: 700, borderRadius: '12px', textDecoration: 'none', transition: 'all 200ms' }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(184,134,11,0.3)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
+              >
+                ابدأ تصميم بطاقتك ←
+              </Link>
+            </div>
+          </div>
+
+          {/* Dots */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: '12px' }}>
+            {[0, 1].map(i => (
+              <button key={i} onClick={() => setMarketingIdx(i)} style={{
+                width: marketingIdx === i ? 24 : 8,
+                height: 8,
+                borderRadius: 100,
+                border: 'none',
+                cursor: 'pointer',
+                background: marketingIdx === i ? '#0f172a' : '#e2e8f0',
+                transition: 'all 0.3s',
+              }} />
+            ))}
+          </div>
+        </div>
+
+        <style>{`
+          .typewriter-text {
+            overflow: hidden;
+            border-left: 3px solid #0f172a;
+            white-space: nowrap;
+            animation: typing 1.2s steps(30, end) forwards, blink-caret 0.6s step-end infinite;
+          }
+          @keyframes typing {
+            from { max-width: 0; }
+            to { max-width: 100%; }
+          }
+          @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #0f172a; }
+          }
+          @media (max-width: 600px) {
+            .typewriter-text {
+              white-space: normal;
+              border-left: none;
+              animation: fadeInUp 0.6s ease forwards;
+            }
+            @keyframes fadeInUp {
+              from { opacity: 0; transform: translateY(10px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+          }
+        `}</style>
+      </section>
+
       {/* OCCASION CATEGORIES SLIDER */}
       <OccasionSlider />
 
@@ -806,90 +916,6 @@ export default function LandingPage() {
           .scrollbar-hide::-webkit-scrollbar { display: none; }
           .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         `}</style>
-      </section>
-
-      {/* ROTATING MARKETING SECTION */}
-      <section style={{ padding: '64px 0', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', overflow: 'hidden' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
-          <div style={{ position: 'relative', minHeight: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {/* For Corporates */}
-            <div style={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              opacity: marketingIdx === 0 ? 1 : 0,
-              transform: marketingIdx === 0 ? 'translateY(0)' : 'translateY(20px)',
-              transition: 'all 0.6s ease',
-            }}>
-              <span style={{ display: 'inline-block', background: 'rgba(168,85,247,0.15)', color: '#c084fc', padding: '6px 18px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, marginBottom: '20px', border: '1px solid rgba(168,85,247,0.2)' }}>
-                🏢 للشركات والمؤسسات
-              </span>
-              <h2 style={{ fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: 900, color: '#fff', lineHeight: 1.3, marginBottom: '16px' }}>
-                عزّز علاقتك بموظفيك وعملائك
-              </h2>
-              <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.8, maxWidth: '560px' }}>
-                أرسل تهنئة مخصصة باسم كل موظف وعميل دفعة واحدة — بهوية شركتك وشعارها — نظام جماعي يوفر وقتك ويترك أثراً مميزاً
-              </p>
-              <Link
-                to="/editor?mode=batch"
-                style={{ marginTop: '24px', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 32px', background: 'linear-gradient(135deg, #a855f7, #7e22ce)', color: '#fff', fontSize: '15px', fontWeight: 700, borderRadius: '14px', textDecoration: 'none', transition: 'all 200ms', boxShadow: '0 4px 20px rgba(168,85,247,0.4)' }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)' }}
-              >
-                جرّب النظام الجماعي
-              </Link>
-            </div>
-
-            {/* For Individuals */}
-            <div style={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              opacity: marketingIdx === 1 ? 1 : 0,
-              transform: marketingIdx === 1 ? 'translateY(0)' : 'translateY(20px)',
-              transition: 'all 0.6s ease',
-            }}>
-              <span style={{ display: 'inline-block', background: 'rgba(212,175,55,0.15)', color: '#f5d77a', padding: '6px 18px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, marginBottom: '20px', border: '1px solid rgba(212,175,55,0.2)' }}>
-                👨‍👩‍👧‍👦 للأفراد والعائلات
-              </span>
-              <h2 style={{ fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: 900, color: '#fff', lineHeight: 1.3, marginBottom: '16px' }}>
-                اصنع فرحة العيد بلمستك الخاصة
-              </h2>
-              <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.8, maxWidth: '560px' }}>
-                صمّم بطاقة تهنئة فريدة لأحبابك — اختر قالباً أنيقاً، أضف اسمهم، وشاركها فوراً عبر واتساب — مجاناً وبدون تسجيل
-              </p>
-              <Link
-                to="/editor?mode=ready"
-                style={{ marginTop: '24px', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 32px', background: 'linear-gradient(135deg, #d4af37, #b8860b)', color: '#fff', fontSize: '15px', fontWeight: 700, borderRadius: '14px', textDecoration: 'none', transition: 'all 200ms', boxShadow: '0 4px 20px rgba(212,175,55,0.4)' }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)' }}
-              >
-                ابدأ تصميم بطاقتك
-              </Link>
-            </div>
-          </div>
-
-          {/* Dots indicator */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: '16px' }}>
-            {[0, 1].map(i => (
-              <button key={i} onClick={() => setMarketingIdx(i)} style={{
-                width: marketingIdx === i ? 24 : 8,
-                height: 8,
-                borderRadius: 100,
-                border: 'none',
-                cursor: 'pointer',
-                background: marketingIdx === i ? '#d4af37' : 'rgba(255,255,255,0.2)',
-                transition: 'all 0.3s',
-              }} />
-            ))}
-          </div>
-        </div>
       </section>
 
       {/* EID SONG — Premium Product Card */}
