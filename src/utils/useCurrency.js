@@ -102,12 +102,19 @@ export function useCurrency() {
     return () => window.removeEventListener('currency-change', onCurrencyChange)
   }, [])
 
-  const isForeign = !!(info && info.country !== 'SA' && info.visitorCurrency && info.visitorCurrency !== 'SAR')
+  // isForeign: true whenever the active currency is not SAR (auto-detected or manually chosen)
+  const isForeign = !!(info && info.visitorCurrency && info.visitorCurrency !== 'SAR')
 
   function convertFromSAR(amountSAR) {
     if (!isForeign || !amountSAR || !info.visitorRate) return null
     return (Math.ceil(amountSAR * info.visitorRate * 100) / 100).toFixed(2)
   }
+
+  // For the flag: prefer the visitor's country flag; fall back to a flag matching the chosen currency
+  const currencyCountry = info?.country || Object.keys(COUNTRY_FLAG).find(
+    c => (({ SA:'SAR',AE:'AED',KW:'KWD',BH:'BHD',OM:'OMR',QA:'QAR',EG:'EGP',JO:'JOD',
+              US:'USD',GB:'GBP',DE:'EUR',JP:'JPY' })[c] === info?.visitorCurrency)
+  )
 
   return {
     exchangeInfo: info,
@@ -115,6 +122,6 @@ export function useCurrency() {
     convertFromSAR,
     currency: info?.visitorCurrency || 'SAR',
     currencyName: CURRENCY_NAMES[info?.visitorCurrency] || '',
-    flag: COUNTRY_FLAG[info?.country] || '🌍',
+    flag: COUNTRY_FLAG[currencyCountry] || '🌍',
   }
 }
