@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { 
   LayoutDashboard, Building2, Key, CreditCard, Activity, LogOut,
   Menu, X, TrendingUp, DollarSign, Eye, Plus, ChevronLeft,
-  Users, ShoppingBag, RefreshCw, BarChart2, Shield, Download, Percent
+  Users, ShoppingBag, RefreshCw, BarChart2, Shield, Download, Percent, Image
 } from 'lucide-react'
 
 const API = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '')
@@ -80,6 +80,7 @@ export default function AdminDashboardPage() {
     { id: 'dashboard', icon: LayoutDashboard, label: 'الرئيسية', path: '/admin/dashboard' },
     { id: 'companies', icon: Building2, label: 'إدارة الشركات', path: '/admin/companies' },
     { id: 'codes', icon: Key, label: 'أكواد الاشتراك', path: '/admin/invite-codes' },
+    { id: 'templates', icon: Image, label: 'إدارة القوالب', path: '/admin/templates' },
     { id: 'wallets', icon: CreditCard, label: 'المحفظات', path: '/admin/wallets' },
     { id: 'support', icon: ShoppingBag, label: 'الدعم الفني', path: '/admin/support' },
     { id: 'logs', icon: Activity, label: 'سجل المراقبة', path: '/admin/audit-logs' },

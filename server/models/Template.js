@@ -30,6 +30,14 @@ const templateSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
+    },
+    price: {
+        type: Number,
+        default: 0
+    },
+    isFree: {
+        type: Boolean,
+        default: true
     }
 }, { timestamps: true })
 

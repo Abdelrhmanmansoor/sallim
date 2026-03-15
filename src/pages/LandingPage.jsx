@@ -713,106 +713,81 @@ export default function LandingPage() {
         `}</style>
       </section>
 
-      {/* 🎵 EID SONG FEATURE CARD */}
-      <section style={{ padding: '60px 0', background: '#fff' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px' }}>
+      {/* EID SONG — Premium Product Card */}
+      <section style={{ padding: '80px 0', background: '#fff' }}>
+        <div style={{ maxWidth: '480px', margin: '0 auto', padding: '0 24px' }}>
           <div
-            onClick={() => navigate('/editor?mode=ready')}
             style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: '40px',
-              padding: '48px',
-              borderRadius: '32px',
-              background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%)',
-              cursor: 'pointer',
-              position: 'relative',
+              borderRadius: '24px',
               overflow: 'hidden',
+              background: '#fff',
+              border: '1px solid #e2e8f0',
+              boxShadow: '0 8px 40px rgba(0,0,0,0.06)',
               transition: 'all 300ms ease',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
             }}
           >
-            <div style={{ position: 'absolute', top: '-50px', left: '-50px', width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(129,140,248,0.15)', filter: 'blur(40px)' }} />
-            <div style={{ position: 'absolute', bottom: '-30px', right: '-30px', width: '150px', height: '150px', borderRadius: '50%', background: 'rgba(251,191,36,0.1)', filter: 'blur(30px)' }} />
-            
-            <div style={{ width: '80px', height: '80px', borderRadius: '24px', background: 'rgba(251,191,36,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}><Star size={40} color="#fbbf24" /></div>
-            
-            <div style={{ flex: 1, minWidth: '250px', zIndex: 1 }}>
-              <div style={{ display: 'inline-block', background: 'rgba(251,191,36,0.2)', color: '#fbbf24', padding: '4px 14px', borderRadius: '100px', fontSize: '12px', fontWeight: 700, marginBottom: '12px' }}>
-                جديد
+            {/* Image area */}
+            <div style={{
+              height: '220px',
+              background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+              overflow: 'hidden',
+            }}>
+              <div style={{ position: 'absolute', top: '-40px', left: '-40px', width: '160px', height: '160px', borderRadius: '50%', background: 'rgba(129,140,248,0.15)', filter: 'blur(40px)' }} />
+              <div style={{ position: 'absolute', bottom: '-20px', right: '-20px', width: '120px', height: '120px', borderRadius: '50%', background: 'rgba(251,191,36,0.1)', filter: 'blur(30px)' }} />
+              <div style={{ textAlign: 'center', zIndex: 1 }}>
+                <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', backdropFilter: 'blur(8px)' }}>
+                  <Star size={36} color="#fbbf24" />
+                </div>
+                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', fontWeight: 600 }}>خدمة حصرية</p>
               </div>
-              <h3 style={{ fontSize: '28px', fontWeight: 900, color: '#fff', marginBottom: '10px', lineHeight: 1.3 }}>
+            </div>
+
+            {/* Content */}
+            <div style={{ padding: '28px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{ background: '#f0fdf4', color: '#16a34a', padding: '4px 12px', borderRadius: '100px', fontSize: '11px', fontWeight: 700 }}>جديد</span>
+                <span style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a' }}>50 ر.س</span>
+              </div>
+
+              <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', marginBottom: '8px', lineHeight: 1.4 }}>
                 اصنع أغنية العيد لمن تحب
               </h3>
-              <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, marginBottom: '20px' }}>
+              <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.7, marginBottom: '20px' }}>
                 أرسل تهنئة صوتية مميزة باسم من تحب — أغنية عيد مخصصة تبقى في الذاكرة
               </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                <span style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '12px 28px',
-                  background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                  color: '#1e1b4b',
+
+              <button
+                onClick={() => navigate('/checkout?product=eid-song&price=50')}
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  background: '#0f172a',
+                  color: '#fff',
                   fontSize: '15px',
                   fontWeight: 800,
                   borderRadius: '14px',
-                }}>
-                  اطلب الآن
-                </span>
-                <span style={{ fontSize: '24px', fontWeight: 900, color: '#fbbf24' }}>50 ر.س</span>
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 200ms',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#1e293b' }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = '#0f172a' }}
+              >
+                اطلب الآن
+              </button>
+
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '14px' }}>
+                <span style={{ fontSize: '11px', color: '#94a3b8' }}>دفع آمن</span>
+                <span style={{ fontSize: '11px', color: '#94a3b8' }}>·</span>
+                <span style={{ fontSize: '11px', color: '#94a3b8' }}>تسليم فوري</span>
+                <span style={{ fontSize: '11px', color: '#94a3b8' }}>·</span>
+                <span style={{ fontSize: '11px', color: '#94a3b8' }}>تواصل مباشر</span>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* MINIMALIST SERVICE SECTION - WEDDING & EVENTS */}
-      <section className="py-20 bg-slate-50 relative overflow-hidden">
-        <div className="max-w-5xl mx-auto px-6 relative z-10">
-          <div className="flex flex-col md:flex-row gap-8 items-stretch">
-            
-            {/* Wedding Card */}
-            <div 
-              onClick={() => handleWhatsAppLink('مرحباً، أريد الاستفسار عن خدمة تصميم وتنسيق دعوات الزفاف الفاخرة')}
-              className="flex-1 group relative p-10 rounded-[40px] bg-white border border-slate-200/60 cursor-pointer overflow-hidden transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] hover:-translate-y-2"
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-rose-50 rounded-full blur-3xl -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative z-10">
-                <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-                  <Heart size={28} strokeWidth={2.5} />
-                </div>
-                <h3 className="text-2xl font-black text-slate-900 mb-3">دعوات زفاف ملكية</h3>
-                <p className="text-slate-500 text-sm leading-relaxed mb-8">نصمم لك ليلة العمر بأدق التفاصيل، دعوات إلكترونية فاخرة تليق بمناسبتك السعيدة</p>
-                <div className="flex items-center gap-3 text-rose-600 font-black text-sm uppercase tracking-wider">
-                  <span>اطلب الآن</span>
-                  <ArrowLeft size={16} className="group-hover:-translate-x-2 transition-transform" />
-                </div>
-              </div>
-            </div>
-
-            {/* Event Card */}
-            <div 
-              onClick={() => handleWhatsAppLink('مرحباً، أريد الاستفسار عن خدمة تصميم بطاقات دعوات المناسبات')}
-              className="flex-1 group relative p-10 rounded-[40px] bg-slate-900 cursor-pointer overflow-hidden transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(13,148,136,0.3)] hover:-translate-y-2"
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/20 rounded-full blur-3xl -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative z-10">
-                <div className="w-14 h-14 rounded-2xl bg-teal-500/10 text-teal-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-                  <Mail size={28} strokeWidth={2.5} />
-                </div>
-                <h3 className="text-2xl font-black text-white mb-3">مناسبات وفعاليات</h3>
-                <p className="text-slate-400 text-sm leading-relaxed mb-8">لجميع مناسباتك الخاصة والعامة، نوفر لك قوالب عصرية وسريعة التنفيذ بكفاءة عالية</p>
-                <div className="flex items-center gap-3 text-teal-400 font-black text-sm uppercase tracking-wider">
-                  <span>تواصل معنا</span>
-                  <ArrowLeft size={16} className="group-hover:-translate-x-2 transition-transform" />
-                </div>
-              </div>
-            </div>
-
           </div>
         </div>
       </section>

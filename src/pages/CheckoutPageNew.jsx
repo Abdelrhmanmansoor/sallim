@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   Check,
   ShieldCheck,
+  Star,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -23,6 +24,10 @@ export default function CheckoutPageNew() {
   const status = searchParams.get('status')
   const orderId = searchParams.get('orderId')
   const purchaseId = searchParams.get('purchase')
+  const productType = searchParams.get('product')
+  const productPrice = searchParams.get('price')
+
+  const isEidSong = productType === 'eid-song'
 
   const [loadingCard, setLoadingCard] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -31,6 +36,7 @@ export default function CheckoutPageNew() {
     customerName: '',
     customerPhone: '',
     customerEmail: '',
+    recipientName: '',
   })
 
   useEffect(() => {
@@ -41,6 +47,17 @@ export default function CheckoutPageNew() {
 
     if (status === 'failed') {
       toast.error('فشلت عملية الدفع. يمكنك المحاولة مرة أخرى.')
+    }
+
+    if (isEidSong) {
+      setCardData({
+        name: 'اصنع أغنية العيد لمن تحب',
+        price: parseInt(productPrice) || 50,
+        image: null,
+        description: 'أغنية عيد مخصصة باسم من تحب',
+      })
+      setLoadingCard(false)
+      return
     }
 
     if (!cardId) {
@@ -62,7 +79,16 @@ export default function CheckoutPageNew() {
         return
       }
 
-      toast.success('تم الدفع بنجاح، سيتم تحويلك للمحرر')
+      toast.success('تم الدفع بنجاح')
+
+      if (isEidSong) {
+        const recipientName = formData.recipientName || ''
+        const msg = encodeURIComponent(`مرحباً، تم دفع طلب أغنية العيد باسم: ${recipientName}\nرقم الطلب: ${currentOrderId}`)
+        window.location.href = `https://wa.me/966559955339?text=${msg}`
+        return
+      }
+
+      toast('سيتم تحويلك للمحرر')
       navigate(data.data.redirectUrl, { replace: true })
     } catch (error) {
       console.error('Verify success error:', error)
@@ -230,6 +256,19 @@ export default function CheckoutPageNew() {
                 />
               </label>
 
+              {isEidSong && (
+                <label className="block">
+                  <span className="mb-2 block text-sm font-bold text-slate-700">اسم الشخص المُهدى إليه</span>
+                  <input
+                    name="recipientName"
+                    value={formData.recipientName}
+                    onChange={handleChange}
+                    placeholder="اكتب اسم الشخص اللي تبي الأغنية باسمه"
+                    className="w-full rounded-xl border border-slate-200 bg-amber-50 px-4 py-3.5 text-sm text-slate-900 outline-none transition focus:border-amber-400 focus:bg-white focus:ring-4 focus:ring-amber-100"
+                  />
+                </label>
+              )}
+
               {/* Separator */}
               <div className="border-t border-slate-100" />
 
@@ -274,6 +313,11 @@ export default function CheckoutPageNew() {
                 {loadingCard ? (
                   <div className="flex h-full items-center justify-center text-sm text-slate-400">
                     جاري تحميل البطاقة...
+                  </div>
+                ) : isEidSong ? (
+                  <div className="flex h-full flex-col items-center justify-center gap-3" style={{ background: 'linear-gradient(135deg, #1e1b4b, #4338ca)' }}>
+                    <Star className="h-12 w-12 text-amber-400" />
+                    <span className="text-sm font-bold text-white/70">أغنية العيد</span>
                   </div>
                 ) : (
                   <img

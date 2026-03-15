@@ -201,7 +201,7 @@ router.post('/templates', isAdmin, upload.single('image'), async (req, res) => {
 // ═══ Update template (e.g., toggle active status) ═══
 router.put('/templates/:id', isAdmin, async (req, res) => {
     try {
-        const { isActive, name, type } = req.body
+        const { isActive, name, type, price, isFree } = req.body
         const template = await Template.findById(req.params.id)
 
         if (!template) {
@@ -211,6 +211,8 @@ router.put('/templates/:id', isAdmin, async (req, res) => {
         if (isActive !== undefined) template.isActive = isActive
         if (name) template.name = name
         if (type) template.type = type
+        if (price !== undefined) template.price = Number(price)
+        if (isFree !== undefined) template.isFree = isFree
 
         await template.save()
 

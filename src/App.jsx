@@ -35,6 +35,7 @@ import AdminDashboardPage from './pages/AdminDashboardPage'
 import AdminLoginPage from './pages/AdminLoginPage'
 import AdminCompaniesPage from './pages/AdminCompaniesPage'
 import AdminInviteCodesPage from './pages/AdminInviteCodesPage'
+import AdminTemplatesPage from './pages/AdminTemplatesPage'
 import AboutPage from './pages/AboutPage'
 import PricingPage from './pages/PricingPage'
 import DeliveryPage from './pages/DeliveryPage'
@@ -69,6 +70,7 @@ export default function App() {
     '/admin/dashboard',
     '/admin/companies',
     '/admin/invite-codes',
+    '/admin/templates',
     '/admin-x9k2/login',
     '/companies',
     '/create-game',
@@ -78,8 +80,8 @@ export default function App() {
   // Define isBusiness - assuming it's false for free version
   const isBusiness = false
 
-  const hideNavbar = pathname.startsWith('/admin') || pathname === '/admin-x9k2/login' || pathname === '/editor'
-  const hideFooter = hideNavbar || pathname === '/checkout'
+  const hideNavbar = pathname === '/editor'
+  const hideFooter = pathname === '/editor'
   const noNavPadding = hideNavbar || pathname === '/'
 
   return (
@@ -120,6 +122,7 @@ export default function App() {
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
           <Route path="/admin/companies" element={<AdminCompaniesPage />} />
           <Route path="/admin/invite-codes" element={<AdminInviteCodesPage />} />
+          <Route path="/admin/templates" element={<AdminTemplatesPage />} />
           <Route path="/admin-x9k2/login" element={<AdminLoginPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/pricing" element={<PricingPage />} />
