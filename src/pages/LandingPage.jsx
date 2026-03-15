@@ -141,187 +141,184 @@ export default function LandingPage() {
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(0, 0, 0, 0.6)',
-            backdropFilter: 'blur(8px)',
+            background: 'rgba(0, 0, 0, 0.7)',
+            backdropFilter: 'blur(12px)',
             zIndex: 9999,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             padding: '20px',
-            animation: 'fadeIn 0.5s ease',
+            animation: 'fadeIn 0.4s ease',
           }}
         >
           <div
             style={{
-              background: 'linear-gradient(135deg, #fff 0%, #fafafa 100%)',
-              borderRadius: '24px',
-              padding: '40px 32px',
-              maxWidth: '500px',
+              background: '#fff',
+              borderRadius: '28px',
+              padding: '0',
+              maxWidth: '460px',
               width: '100%',
               position: 'relative',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-              border: '1px solid rgba(255, 255, 255, 0.5)',
-              animation: 'slideUp 0.5s ease',
+              boxShadow: '0 25px 80px rgba(0, 0, 0, 0.35)',
+              animation: 'slideUp 0.4s ease',
+              overflow: 'hidden',
             }}
           >
-            {/* Close Button */}
-            <button
-              onClick={handleClosePopup}
-              style={{
-                position: 'absolute',
-                top: '16px',
-                right: '16px',
-                background: 'rgba(0, 0, 0, 0.05)',
-                border: 'none',
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 200ms ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(0, 0, 0, 0.1)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(0, 0, 0, 0.05)'
-              }}
-            >
-              <X size={18} color="#171717" />
-            </button>
+            {/* Top Gradient Strip */}
+            <div style={{ height: '6px', background: 'linear-gradient(90deg, #f59e0b, #a855f7, #ec4899)' }} />
 
-            {/* Countdown Badge */}
-            <div
-              style={{
-                position: 'absolute',
-                top: '16px',
-                left: '16px',
-                background: 'linear-gradient(135deg, #E91E63 0%, #9C27B0 100%)',
-                color: '#fff',
-                padding: '6px 14px',
-                borderRadius: '100px',
-                fontSize: '13px',
-                fontWeight: 700,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                boxShadow: '0 4px 12px rgba(233, 30, 99, 0.3)',
-              }}
-            >
-              <span>{popupCountdown}s</span>
-            </div>
-
-            {/* Sparkle Icon */}
-            <div
-              style={{
-                width: '64px',
-                height: '64px',
-                background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)',
-                borderRadius: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '20px',
-                boxShadow: '0 8px 24px rgba(255, 140, 0, 0.3)',
-              }}
-            >
-              <Sparkles size={32} color="#fff" />
-            </div>
-
-            {/* Title */}
-            <h2
-              style={{
-                fontSize: '24px',
-                fontWeight: 800,
-                color: '#171717',
-                marginBottom: '12px',
-                textAlign: 'center',
-                lineHeight: 1.3,
-              }}
-            >
-              🎉 احتفل بالعيد بأناقة
-            </h2>
-
-            {/* Description */}
-            <p
-              style={{
-                fontSize: '15px',
-                color: '#737373',
-                textAlign: 'center',
-                marginBottom: '28px',
-                lineHeight: 1.7,
-              }}
-            >
-              ابدأ الآن في تصميم بطاقات العيد المميزة - قوالب جاهزة فوراً
-            </p>
-
-            {/* Buttons */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ padding: '36px 32px 32px' }}>
+              {/* Close Button */}
               <button
-                onClick={() => {
-                  navigate('/editor?template=ready')
-                }}
+                onClick={handleClosePopup}
                 style={{
-                  display: 'inline-flex',
+                  position: 'absolute',
+                  top: '20px',
+                  right: '20px',
+                  background: '#f1f5f9',
+                  border: 'none',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 200ms ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#e2e8f0' }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = '#f1f5f9' }}
+              >
+                <X size={16} color="#64748b" />
+              </button>
+
+              {/* Countdown Badge */}
+              <div style={{
+                position: 'absolute',
+                top: '20px',
+                left: '20px',
+                background: '#0f172a',
+                color: '#fff',
+                padding: '5px 12px',
+                borderRadius: '100px',
+                fontSize: '12px',
+                fontWeight: 700,
+              }}>
+                {popupCountdown}s
+              </div>
+
+              {/* Icon + Title */}
+              <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                <div style={{ width: '56px', height: '56px', margin: '0 auto 16px', borderRadius: '16px', background: 'linear-gradient(135deg, #f59e0b, #d97706)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Sparkles size={28} color="#fff" /></div>
+                <h2 style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a', marginBottom: '8px', lineHeight: 1.4 }}>
+                  عيدك أجمل مع سَلِّم
+                </h2>
+                <p style={{ fontSize: '14px', color: '#94a3b8', lineHeight: 1.6 }}>
+                  اختر نوع التهنئة وابدأ فوراً
+                </p>
+              </div>
+
+              {/* 3 Mode Options */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
+                <button
+                  onClick={() => navigate('/editor?mode=ready')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '14px 18px',
+                    background: '#f8fafc',
+                    border: '2px solid #e2e8f0',
+                    borderRadius: '16px',
+                    cursor: 'pointer',
+                    transition: 'all 200ms',
+                    textAlign: 'right',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0f172a'; e.currentTarget.style.background = '#fff' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.background = '#f8fafc' }}
+                >
+                  <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Palette size={22} color="#0f172a" /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>قوالب جاهزة</div>
+                    <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>اختر واكتب الاسم وحمّل فوراً</div>
+                  </div>
+                  <span style={{ background: '#16a34a', color: '#fff', padding: '4px 10px', borderRadius: '100px', fontSize: '11px', fontWeight: 700 }}>مجاني</span>
+                </button>
+
+                <button
+                  onClick={() => navigate('/editor?mode=designer')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '14px 18px',
+                    background: '#fffbeb',
+                    border: '2px solid #fde68a',
+                    borderRadius: '16px',
+                    cursor: 'pointer',
+                    transition: 'all 200ms',
+                    textAlign: 'right',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#f59e0b'; e.currentTarget.style.background = '#fefce8' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#fde68a'; e.currentTarget.style.background = '#fffbeb' }}
+                >
+                  <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Type size={22} color="#d97706" /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>مصمم احترافي</div>
+                    <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>تحكم كامل بالتصميم والخطوط والألوان</div>
+                  </div>
+                  <span style={{ background: '#f59e0b', color: '#fff', padding: '4px 10px', borderRadius: '100px', fontSize: '11px', fontWeight: 700 }}>مدفوع</span>
+                </button>
+
+                <button
+                  onClick={() => navigate('/editor?mode=batch')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '14px 18px',
+                    background: '#faf5ff',
+                    border: '2px solid #e9d5ff',
+                    borderRadius: '16px',
+                    cursor: 'pointer',
+                    transition: 'all 200ms',
+                    textAlign: 'right',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#a855f7'; e.currentTarget.style.background = '#f5f3ff' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#e9d5ff'; e.currentTarget.style.background = '#faf5ff' }}
+                >
+                  <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#f3e8ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Layers size={22} color="#a855f7" /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>جماعي</div>
+                    <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>أرسل تهنئة مخصصة لعدة أشخاص دفعة واحدة</div>
+                  </div>
+                  <span style={{ background: '#a855f7', color: '#fff', padding: '4px 10px', borderRadius: '100px', fontSize: '11px', fontWeight: 700 }}>للشركات</span>
+                </button>
+              </div>
+
+              {/* Song CTA */}
+              <button
+                onClick={() => navigate('/editor?mode=ready')}
+                style={{
+                  width: '100%',
+                  display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  padding: '16px 28px',
-                  background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)',
-                  color: '#171717',
-                  fontSize: '16px',
+                  padding: '14px',
+                  background: 'linear-gradient(135deg, #1e1b4b, #4338ca)',
+                  color: '#fff',
+                  fontSize: '14px',
                   fontWeight: 700,
                   borderRadius: '14px',
                   border: 'none',
                   cursor: 'pointer',
-                  transition: 'all 200ms ease',
-                  boxShadow: '0 4px 14px rgba(255, 140, 0, 0.3)',
+                  transition: 'all 200ms',
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)'
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 140, 0, 0.4)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(255, 140, 0, 0.3)'
-                }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)' }}
               >
-                <span style={{ fontSize: '20px' }}>🎊</span>
-                صمم تهنئة العيد
-              </button>
-
-              <button
-                onClick={() => {
-                  navigate('/wedding-invitation')
-                }}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  padding: '14px 24px',
-                  background: '#fff',
-                  color: '#E91E63',
-                  fontSize: '15px',
-                  fontWeight: 600,
-                  borderRadius: '12px',
-                  border: '2px solid #E91E63',
-                  cursor: 'pointer',
-                  transition: 'all 200ms ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(233, 30, 99, 0.05)'
-                  e.currentTarget.style.transform = 'translateY(-2px)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = '#fff'
-                  e.currentTarget.style.transform = 'translateY(0)'
-                }}
-              >
-                <span style={{ fontSize: '18px' }}>💍</span>
-                طلب دعوات الزفاف
+                اصنع أغنية العيد لمن تحب — 50 ر.س
               </button>
             </div>
           </div>
@@ -332,14 +329,8 @@ export default function LandingPage() {
               to { opacity: 1; }
             }
             @keyframes slideUp {
-              from {
-                opacity: 0;
-                transform: translateY(30px);
-              }
-              to {
-                opacity: 1;
-                transform: translateY(0);
-              }
+              from { opacity: 0; transform: translateY(30px); }
+              to { opacity: 1; transform: translateY(0); }
             }
           `}</style>
         </div>
@@ -427,53 +418,99 @@ export default function LandingPage() {
               اختر من قوالب فاخرة، خصّصها، وشاركها في ثوانٍ
             </p>
 
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            {/* 3 Mode Buttons */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap', marginBottom: '24px' }}>
               <Link
-                to="/editor"
+                to="/editor?mode=ready"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  padding: '14px 28px',
+                  gap: '10px',
+                  padding: '16px 32px',
                   background: '#fff',
                   color: '#171717',
-                  fontSize: '15px',
-                  fontWeight: 600,
-                  borderRadius: '12px',
+                  fontSize: '16px',
+                  fontWeight: 800,
+                  borderRadius: '16px',
                   textDecoration: 'none',
                   transition: 'all 200ms ease',
+                  boxShadow: '0 4px 14px rgba(255,255,255,0.15)',
                 }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(255,255,255,0.2)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(255,255,255,0.15)' }}
               >
-                ابدأ التصميم
-                <ArrowLeft size={18} />
+                جاهز
+                <span style={{ fontSize: '11px', background: '#16a34a', color: '#fff', padding: '3px 8px', borderRadius: '100px', fontWeight: 700 }}>مجاني</span>
               </Link>
 
+              <Link
+                to="/editor?mode=designer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '16px 32px',
+                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                  color: '#fff',
+                  fontSize: '16px',
+                  fontWeight: 800,
+                  borderRadius: '16px',
+                  textDecoration: 'none',
+                  transition: 'all 200ms ease',
+                  boxShadow: '0 4px 14px rgba(245,158,11,0.4)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(245,158,11,0.5)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(245,158,11,0.4)' }}
+              >
+                مصمم
+                <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.25)', padding: '3px 8px', borderRadius: '100px', fontWeight: 700 }}>مدفوع</span>
+              </Link>
+
+              <Link
+                to="/editor?mode=batch"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '16px 32px',
+                  background: 'linear-gradient(135deg, #a855f7, #7e22ce)',
+                  color: '#fff',
+                  fontSize: '16px',
+                  fontWeight: 800,
+                  borderRadius: '16px',
+                  textDecoration: 'none',
+                  transition: 'all 200ms ease',
+                  boxShadow: '0 4px 14px rgba(168,85,247,0.4)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(168,85,247,0.5)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(168,85,247,0.4)' }}
+              >
+                جماعي
+              </Link>
+            </div>
+
+            {/* Secondary Links */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
               <Link
                 to="/create-diwaniya"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
-                  padding: '14px 28px',
-                  background: 'linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)', // Vibrant Purple / Magenta gradient
+                  padding: '12px 24px',
+                  background: 'rgba(255,255,255,0.1)',
                   color: '#fff',
-                  fontSize: '15px',
-                  fontWeight: 700,
+                  fontSize: '14px',
+                  fontWeight: 600,
                   borderRadius: '12px',
                   textDecoration: 'none',
-                  boxShadow: '0 4px 14px rgba(168,85,247,0.3)',
+                  border: '1px solid rgba(255,255,255,0.15)',
                   transition: 'all 200ms ease',
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)'
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(168,85,247,0.4)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(168,85,247,0.3)'
-                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.15)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)' }}
               >
-                أطلق ديوانيتك ✨
+                أطلق ديوانيتك
               </Link>
               <Link
                 to="/dashboard/diwaniya"
@@ -481,26 +518,19 @@ export default function LandingPage() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
-                  padding: '14px 28px',
-                  background: 'linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)',
-                  color: '#171717',
-                  fontSize: '15px',
-                  fontWeight: 700,
+                  padding: '12px 24px',
+                  background: 'rgba(255,255,255,0.1)',
+                  color: '#fff',
+                  fontSize: '14px',
+                  fontWeight: 600,
                   borderRadius: '12px',
                   textDecoration: 'none',
-                  boxShadow: '0 4px 14px rgba(255,140,0,0.3)',
+                  border: '1px solid rgba(255,255,255,0.15)',
                   transition: 'all 200ms ease',
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)'
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(255,140,0,0.4)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(255,140,0,0.3)'
-                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.15)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)' }}
               >
-                <span style={{ fontSize: '18px' }}>🎲</span>
                 لعبة العيدية
               </Link>
             </div>
@@ -681,6 +711,63 @@ export default function LandingPage() {
             scrollbar-width: none;
           }
         `}</style>
+      </section>
+
+      {/* 🎵 EID SONG FEATURE CARD */}
+      <section style={{ padding: '60px 0', background: '#fff' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px' }}>
+          <div
+            onClick={() => navigate('/editor?mode=ready')}
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: '40px',
+              padding: '48px',
+              borderRadius: '32px',
+              background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%)',
+              cursor: 'pointer',
+              position: 'relative',
+              overflow: 'hidden',
+              transition: 'all 300ms ease',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+            }}
+          >
+            <div style={{ position: 'absolute', top: '-50px', left: '-50px', width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(129,140,248,0.15)', filter: 'blur(40px)' }} />
+            <div style={{ position: 'absolute', bottom: '-30px', right: '-30px', width: '150px', height: '150px', borderRadius: '50%', background: 'rgba(251,191,36,0.1)', filter: 'blur(30px)' }} />
+            
+            <div style={{ width: '80px', height: '80px', borderRadius: '24px', background: 'rgba(251,191,36,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}><Star size={40} color="#fbbf24" /></div>
+            
+            <div style={{ flex: 1, minWidth: '250px', zIndex: 1 }}>
+              <div style={{ display: 'inline-block', background: 'rgba(251,191,36,0.2)', color: '#fbbf24', padding: '4px 14px', borderRadius: '100px', fontSize: '12px', fontWeight: 700, marginBottom: '12px' }}>
+                جديد
+              </div>
+              <h3 style={{ fontSize: '28px', fontWeight: 900, color: '#fff', marginBottom: '10px', lineHeight: 1.3 }}>
+                اصنع أغنية العيد لمن تحب
+              </h3>
+              <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, marginBottom: '20px' }}>
+                أرسل تهنئة صوتية مميزة باسم من تحب — أغنية عيد مخصصة تبقى في الذاكرة
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '12px 28px',
+                  background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                  color: '#1e1b4b',
+                  fontSize: '15px',
+                  fontWeight: 800,
+                  borderRadius: '14px',
+                }}>
+                  اطلب الآن
+                </span>
+                <span style={{ fontSize: '24px', fontWeight: 900, color: '#fbbf24' }}>50 ر.س</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* MINIMALIST SERVICE SECTION - WEDDING & EVENTS */}

@@ -29,7 +29,7 @@ export default function BlogPage() {
     }
 
     return (
-        <div className="pt-24 pb-20 min-h-screen relative overflow-hidden bg-[#f8fafc]">
+        <div className="pt-8 pb-20 min-h-screen relative overflow-hidden bg-[#f8fafc]">
             {/* Background decorations */}
             <div className="fixed inset-0 pointer-events-none -z-10">
                 <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#2563eb]/5 rounded-full blur-[120px] mix-blend-multiply" />

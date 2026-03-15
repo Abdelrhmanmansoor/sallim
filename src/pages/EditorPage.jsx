@@ -2004,10 +2004,6 @@ function EditorPageInner() {
             <BsStars size={16} /> جاهز
           </button>
           <button onClick={() => {
-            if (!isCompanyUnlocked) {
-              toast('قسم المصمم متاح للشركات فقط', { icon: '🔒' })
-              return
-            }
             if (isPersonalDesignLocked && mode !== 'designer') return
             setMode('designer')
           }} style={{
@@ -2025,11 +2021,10 @@ function EditorPageInner() {
             flex: '1 1 140px',
             justifyContent: 'center',
             background: mode === 'designer' ? '#000' : 'transparent',
-            color: mode === 'designer' ? '#fff' : '#aaa',
-            opacity: isCompanyUnlocked ? 1 : 0.5,
+            color: mode === 'designer' ? '#fff' : '#555',
             transition: 'all 200ms'
           }}>
-            <BsPencilFill size={14} /> مصمم {!isCompanyUnlocked && '🔒'}
+            <BsPencilFill size={14} /> مصمم
           </button>
           <button onClick={() => {
             if (isPersonalDesignLocked && mode !== 'batch') return
@@ -2040,7 +2035,7 @@ function EditorPageInner() {
             gap: 8,
             padding: 'clamp(10px, 2.6vw, 12px) clamp(12px, 4.6vw, 24px)',
             borderRadius: 12,
-            border: 'none',
+            border: mode === 'batch' ? 'none' : '2px solid #a855f7',
             cursor: 'pointer',
             fontSize: 'clamp(12px, 3.2vw, 14px)',
             fontWeight: 700,
@@ -2048,8 +2043,8 @@ function EditorPageInner() {
             whiteSpace: 'nowrap',
             flex: '1 1 140px',
             justifyContent: 'center',
-            background: mode === 'batch' ? '#000' : 'transparent',
-            color: mode === 'batch' ? '#fff' : '#555',
+            background: mode === 'batch' ? 'linear-gradient(135deg, #a855f7, #7e22ce)' : 'transparent',
+            color: mode === 'batch' ? '#fff' : '#a855f7',
             transition: 'all 200ms'
           }}>
             <BsPeople size={16} /> جماعي

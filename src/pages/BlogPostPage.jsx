@@ -42,7 +42,7 @@ export default function BlogPostPage() {
 
     if (loading) {
         return (
-            <div className="pt-32 pb-20 min-h-screen flex flex-col items-center justify-center bg-[#f8fafc]">
+            <div className="pt-16 pb-20 min-h-screen flex flex-col items-center justify-center bg-[#f8fafc]">
                 <Loader2 className="w-10 h-10 text-[#2563eb] animate-spin mb-4" />
                 <p className="text-[#64748b]">جاري تحميل المقال...</p>
             </div>
@@ -51,7 +51,7 @@ export default function BlogPostPage() {
 
     if (error || !post) {
         return (
-            <div className="pt-32 pb-20 min-h-screen flex flex-col items-center justify-center text-center px-4 bg-[#f8fafc]">
+            <div className="pt-16 pb-20 min-h-screen flex flex-col items-center justify-center text-center px-4 bg-[#f8fafc]">
                 <h2 className="text-2xl font-bold mb-4 text-[#0f172a]">عذراً! المقال غير موجود</h2>
                 <p className="text-[#64748b] mb-8">{error}</p>
                 <button onClick={() => navigate('/blog')} className="btn-primary">

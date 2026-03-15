@@ -4,7 +4,7 @@ export default function RefundPage() {
     return (
         <div dir="rtl" style={{ fontFamily: "'Tajawal', sans-serif" }}>
             {/* Hero */}
-            <section style={{ background: 'linear-gradient(180deg, #070d1a, #0c1929, #111f36)', paddingTop: '140px', paddingBottom: '60px', textAlign: 'center' }}>
+            <section style={{ background: 'linear-gradient(180deg, #070d1a, #0c1929, #111f36)', paddingTop: '76px', paddingBottom: '60px', textAlign: 'center' }}>
                 <div style={{ maxWidth: '600px', margin: '0 auto', padding: '0 24px' }}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 20px', borderRadius: '9999px', border: '1px solid rgba(45,212,191,0.2)', background: 'rgba(45,212,191,0.06)', marginBottom: '24px' }}>
                         <RefreshCw style={{ width: '14px', height: '14px', color: '#2dd4bf' }} />

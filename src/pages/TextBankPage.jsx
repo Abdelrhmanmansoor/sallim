@@ -44,7 +44,7 @@ export default function TextBankPage() {
       {/* Hero header */}
       <section style={{
         background: 'linear-gradient(180deg, #070d1a 0%, #0c1929 50%, #111f36 100%)',
-        paddingTop: '140px',
+        paddingTop: '76px',
         paddingBottom: '60px',
         textAlign: 'center',
       }}>

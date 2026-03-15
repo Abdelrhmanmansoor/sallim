@@ -32,6 +32,10 @@ export default function AdminDashboardPage() {
     }
     setUser(JSON.parse(userData))
     loadStats()
+
+    // Auto-refresh stats every 30 seconds
+    const interval = setInterval(loadStats, 30000)
+    return () => clearInterval(interval)
   }, [])
 
   const loadStats = async () => {

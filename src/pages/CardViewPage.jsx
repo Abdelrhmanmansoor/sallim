@@ -20,6 +20,7 @@ export default function CardViewPage() {
   useEffect(() => {
     // Small delay for entrance animation
     const timer = setTimeout(() => setShowConfetti(true), 800)
+    trackStat('cardViews')
     return () => clearTimeout(timer)
   }, [])
 

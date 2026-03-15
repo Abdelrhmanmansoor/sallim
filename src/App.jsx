@@ -78,13 +78,17 @@ export default function App() {
   // Define isBusiness - assuming it's false for free version
   const isBusiness = false
 
+  const hideNavbar = pathname.startsWith('/admin') || pathname === '/admin-x9k2/login' || pathname === '/editor'
+  const hideFooter = hideNavbar || pathname === '/checkout'
+  const noNavPadding = hideNavbar || pathname === '/'
+
   return (
     <div className="flex flex-col min-h-screen w-full max-w-full bg-white text-[#0F172A] overflow-x-hidden" dir="rtl">
       {showParticles && <EidParticles />}
 
-      <Navbar />
+      {!hideNavbar && <Navbar />}
 
-      <main className="flex-1 w-full relative z-10">
+      <main className="flex-1 w-full relative z-10" style={!noNavPadding ? { paddingTop: '64px' } : undefined}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/editor" element={<EditorPage />} />
@@ -128,7 +132,7 @@ export default function App() {
         </Routes>
       </main>
 
-      {!isBusiness && <Footer />}
+      {!isBusiness && !hideFooter && <Footer />}
 
       {!hideWhatsAppFloat && <WhatsAppFloat />}
     </div>
