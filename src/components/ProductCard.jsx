@@ -1,5 +1,6 @@
 import { Star, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import SAR from './SAR';
 
 const ProductCard = ({
   id,
@@ -34,7 +35,7 @@ const ProductCard = ({
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
 
-        {/* Paid overlay hint */}
+        {/* Paid overlay */}
         {!isFree && (
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center">
             <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 rounded-full p-3">
@@ -46,19 +47,14 @@ const ProductCard = ({
         {/* Badges */}
         <div className="absolute top-3 right-3 z-10 flex flex-col items-end gap-1.5">
           {isFree ? (
-            <span className="rounded-lg bg-emerald-500 px-2.5 py-1 text-[11px] font-bold text-white">
-              مجاني
-            </span>
+            <span className="rounded-lg bg-emerald-500 px-2.5 py-1 text-[11px] font-bold text-white">مجاني</span>
           ) : (
-            <span className="rounded-lg bg-amber-500 px-2.5 py-1 text-[11px] font-bold text-white">
-              {price} ر.س
+            <span className="rounded-lg bg-amber-500 px-2.5 py-1 text-[11px] font-bold text-white" style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+              {price} <SAR size={10} color="#fff" />
             </span>
           )}
           {badges.map((badge, idx) => (
-            <span
-              key={idx}
-              className="rounded-lg bg-white/90 px-2.5 py-1 text-[11px] font-bold text-slate-700 backdrop-blur-sm"
-            >
+            <span key={idx} className="rounded-lg bg-white/90 px-2.5 py-1 text-[11px] font-bold text-slate-700 backdrop-blur-sm">
               {badge}
             </span>
           ))}
@@ -77,20 +73,17 @@ const ProductCard = ({
         </div>
 
         {/* Name */}
-        <h3 className="mb-3 line-clamp-2 text-sm font-bold leading-relaxed text-slate-900">
-          {name}
-        </h3>
+        <h3 className="mb-3 line-clamp-2 text-sm font-bold leading-relaxed text-slate-900">{name}</h3>
 
         {/* Price + CTA */}
         <div className="mt-auto">
-          <div className="mb-3 flex items-baseline gap-2">
+          <div className="mb-3 flex items-center gap-1">
             {isFree ? (
               <span className="text-lg font-extrabold text-emerald-600">مجاني تماماً</span>
             ) : (
-              <>
-                <span className="text-lg font-extrabold text-slate-900">{price}</span>
-                <span className="text-xs font-bold text-slate-400">ر.س</span>
-              </>
+              <span className="text-lg font-extrabold text-slate-900" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                {price} <SAR size={14} color="#0f172a" />
+              </span>
             )}
           </div>
 

@@ -7,6 +7,7 @@ import {
   Star,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import SARSymbol from '../components/SARSymbol'
 
 const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
 
@@ -28,6 +29,8 @@ export default function CheckoutPageNew() {
   const productPrice = searchParams.get('price')
 
   const isEidSong = productType === 'eid-song'
+  const isCustomDesign = productType === 'custom-design'
+  const productName = searchParams.get('name') ? decodeURIComponent(searchParams.get('name')) : null
 
   const [loadingCard, setLoadingCard] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -49,12 +52,12 @@ export default function CheckoutPageNew() {
       toast.error('فشلت عملية الدفع. يمكنك المحاولة مرة أخرى.')
     }
 
-    if (isEidSong) {
+    if (isEidSong || isCustomDesign || productType === 'template') {
       setCardData({
-        name: 'اصنع أغنية العيد لمن تحب',
+        name: productName || (isEidSong ? 'اصنع أغنية العيد لمن تحب' : isCustomDesign ? 'طلب تصميم خاص' : 'قالب مميز'),
         price: parseInt(productPrice) || 50,
         image: null,
-        description: 'أغنية عيد مخصصة باسم من تحب',
+        description: isEidSong ? 'أغنية عيد مخصصة باسم من تحب' : isCustomDesign ? 'تصميم بطاقة تهنئة خاص ومميز' : 'قالب احترافي للعيد',
       })
       setLoadingCard(false)
       return
@@ -81,9 +84,12 @@ export default function CheckoutPageNew() {
 
       toast.success('تم الدفع بنجاح')
 
-      if (isEidSong) {
+      if (isEidSong || isCustomDesign) {
         const recipientName = formData.recipientName || ''
-        const msg = encodeURIComponent(`مرحباً، تم دفع طلب أغنية العيد باسم: ${recipientName}\nرقم الطلب: ${currentOrderId}`)
+        const msgText = isEidSong
+          ? `مرحباً، تم دفع طلب أغنية العيد باسم: ${recipientName}\nرقم الطلب: ${currentOrderId}`
+          : `مرحباً، تم دفع طلب تصميم خاص\nالاسم: ${formData.customerName}\nرقم الطلب: ${currentOrderId}`
+        const msg = encodeURIComponent(msgText)
         window.location.href = `https://wa.me/966559955339?text=${msg}`
         return
       }
@@ -288,7 +294,7 @@ export default function CheckoutPageNew() {
                 className="w-full rounded-2xl px-6 py-4 text-base font-extrabold text-white shadow-lg transition hover:shadow-xl hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
                 style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}
               >
-                {submitting ? 'جاري تجهيز الدفع...' : `إتمام الدفع — ${cardData?.price || 0} ر.س`}
+                {submitting ? 'جاري تجهيز الدفع...' : <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>إتمام الدفع — {cardData?.price || 0} <SARSymbol size={14} color="#fff" /></span>}
               </button>
 
               {/* Micro text */}
@@ -339,8 +345,8 @@ export default function CheckoutPageNew() {
                       تُفتح فور نجاح الدفع
                     </p>
                   </div>
-                  <span className="whitespace-nowrap rounded-full bg-amber-400 px-3 py-1 text-sm font-black text-slate-950">
-                    {cardData?.price || 0} ر.س
+                  <span className="whitespace-nowrap rounded-full bg-amber-400 px-3 py-1 text-sm font-black text-slate-950 flex items-center gap-1">
+                    {cardData?.price || 0} <SARSymbol size={11} />
                   </span>
                 </div>
               </div>

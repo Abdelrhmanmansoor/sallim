@@ -26,6 +26,8 @@ import {
 import { getTemplates } from '../utils/api'
 import ProductCard from '../components/ProductCard'
 import OccasionSlider from '../components/OccasionSlider'
+import SAR from '../components/SAR'
+import SARSymbol from '../components/SARSymbol'
 
 export default function LandingPage() {
   const navigate = useNavigate()
@@ -337,7 +339,7 @@ export default function LandingPage() {
                 onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)' }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)' }}
               >
-                اصنع أغنية العيد لمن تحب — 50 ر.س
+                اصنع أغنية العيد لمن تحب — 50 <SARSymbol size={11} style={{ verticalAlign: '-1px' }} />
               </button>
             </div>
           </div>
@@ -732,11 +734,11 @@ export default function LandingPage() {
               { id: "3",   name: "تصميم اللؤلؤة العربية",    img: "/templates/جاهزة/6.png",            badge: "مجاني" },
               { id: "114", name: "باترن السدو الفاخر",       img: "/templates/مصمم/Artboard 12.png",   badge: "مجاني" },
             ] : [
-              { id: "10",  name: "تصميم الخط الديواني الملكي", img: "/templates/جاهزة/10.png",  price: 49,  badge: "الأكثر طلباً" },
-              { id: "11",  name: "بطاقة العيد العصرية",        img: "/templates/جاهزة/11.png",  price: 59,  badge: "جديد" },
-              { id: "14",  name: "نموذج التجريد الإسلامي",     img: "/templates/جاهزة/15.png",  price: 45 },
-              { id: "13",  name: "تهنئة الزخرفة الكلاسيكية",  img: "/templates/جاهزة/14.png",  price: 29 },
-              { id: "16",  name: "بطاقة الخط العربي الفاخر",  img: "/templates/جاهزة/17.png",  price: 75,  badge: "Premium" },
+              { id: "10",  name: "تصميم الخط الديواني الملكي", img: "/templates/جاهزة/10.png",  price: 10,  badge: "الأكثر طلباً" },
+              { id: "11",  name: "بطاقة العيد العصرية",        img: "/templates/جاهزة/11.png",  price: 12,  badge: "جديد" },
+              { id: "14",  name: "نموذج التجريد الإسلامي",     img: "/templates/جاهزة/15.png",  price: 15 },
+              { id: "13",  name: "تهنئة الزخرفة الكلاسيكية",  img: "/templates/جاهزة/14.png",  price: 18 },
+              { id: "16",  name: "بطاقة الخط العربي الفاخر",  img: "/templates/جاهزة/17.png",  price: 22,  badge: "Premium" },
               { id: "105", name: "ثيم الواحة الهادئة",         img: "/templates/مصمم/18.png",   price: 29 },
             ]).map((p, idx) => (
               <div key={idx} className="flex-none w-[260px] sm:w-[300px] snap-center">
@@ -791,7 +793,7 @@ export default function LandingPage() {
             <div style={{ padding: '28px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                 <span style={{ background: '#f0fdf4', color: '#16a34a', padding: '4px 12px', borderRadius: '100px', fontSize: '11px', fontWeight: 700 }}>جديد</span>
-                <span style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a' }}>50 ر.س</span>
+                <span style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 4 }}>50 <SARSymbol size={16} /></span>
               </div>
 
               <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', marginBottom: '8px', lineHeight: 1.4 }}>
@@ -852,6 +854,69 @@ export default function LandingPage() {
                 <span style={{ fontSize: '11px', color: '#94a3b8' }}>·</span>
                 <span style={{ fontSize: '11px', color: '#94a3b8' }}>تواصل مباشر</span>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CUSTOM DESIGN REQUEST — طلب تصميم خاص */}
+      <section style={{ padding: '80px 0', background: '#f8fafc' }}>
+        <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 40, alignItems: 'center' }}>
+            
+            {/* Image */}
+            <div style={{ borderRadius: 24, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.12)', maxWidth: 340, margin: '0 auto' }}>
+              <img src="/custom-design-cover.png" alt="طلب تصميم خاص" style={{ width: '100%', display: 'block', objectFit: 'cover' }} />
+            </div>
+
+            {/* Content */}
+            <div>
+              <span style={{ display: 'inline-block', background: '#fffbeb', color: '#d97706', padding: '4px 14px', borderRadius: '100px', fontSize: '12px', fontWeight: 700, marginBottom: 16 }}>خدمة حصرية</span>
+              <h2 style={{ fontSize: 'clamp(26px, 4vw, 36px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.3, marginBottom: 12 }}>
+                طلب تصميم خاص
+              </h2>
+              <p style={{ fontSize: 15, color: '#64748b', lineHeight: 1.8, marginBottom: 24 }}>
+                هل تريد تصميماً مخصصاً يعكس هويتك أو علامتك التجارية؟ نصمم لك بطاقة تهنئة عيد فريدة من نوعها — بخطوط مميزة وألوان وعناصر تختارها أنت.
+              </p>
+              
+              {/* Benefits */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
+                {['تصميم يعكس هويتك وعلامتك', 'تسليم خلال 24 ساعة', 'مراجعات غير محدودة حتى ترضى', 'صيغ متعددة: PNG, PDF, JPG'].map((b, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span style={{ fontSize: 14, color: '#374151', fontWeight: 500 }}>{b}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Price + CTA */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                  <span style={{ fontSize: 32, fontWeight: 900, color: '#0f172a' }}>35</span>
+                  <SARSymbol size={20} style={{ verticalAlign: '-2px' }} />
+                </div>
+                <button
+                  onClick={() => navigate('/checkout?product=custom-design&price=35&name=' + encodeURIComponent('طلب تصميم خاص'))}
+                  style={{
+                    flex: 1, minWidth: 180, padding: '14px 28px',
+                    background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                    color: '#fff', fontSize: 16, fontWeight: 900,
+                    borderRadius: 14, border: 'none', cursor: 'pointer',
+                    fontFamily: "'Tajawal', sans-serif",
+                    boxShadow: '0 4px 20px rgba(245,158,11,0.35)',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                >
+                  اطلب تصميمك الآن
+                </button>
+              </div>
+              <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 10 }}>
+                بعد الدفع يتم التواصل معك مباشرة عبر واتساب لمناقشة التفاصيل
+              </p>
             </div>
           </div>
         </div>
