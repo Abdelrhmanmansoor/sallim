@@ -169,6 +169,37 @@ export default function CheckoutPageNew() {
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eef3f8_100%)]" dir="rtl" style={{ fontFamily: "'Tajawal', sans-serif" }}>
+      {/* Step Progress Bar */}
+      <div className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-4">
+          {[
+            { step: 1, label: 'بيانات العميل' },
+            { step: 2, label: 'الدفع الآمن' },
+            { step: 3, label: 'التأكيد' },
+          ].map((s, i, arr) => (
+            <div key={s.step} className="flex items-center gap-3" style={{ flex: i < arr.length - 1 ? 1 : 'none' }}>
+              <div className="flex flex-col items-center gap-1">
+                <div
+                  className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-extrabold ${
+                    s.step === 1
+                      ? 'bg-slate-900 text-white'
+                      : 'border-2 border-slate-200 bg-white text-slate-400'
+                  }`}
+                >
+                  {s.step}
+                </div>
+                <span className={`text-[11px] font-bold ${s.step === 1 ? 'text-slate-900' : 'text-slate-400'}`}>
+                  {s.label}
+                </span>
+              </div>
+              {i < arr.length - 1 && (
+                <div className="mt-[-18px] h-[2px] flex-1 bg-slate-200" />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center justify-between">
           <button
@@ -188,9 +219,9 @@ export default function CheckoutPageNew() {
         </div>
 
         <div className="mb-8 max-w-2xl">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-xs font-bold text-amber-700">
-            <Sparkles className="h-4 w-4" />
-            صفحة دفع محسنة ومربوطة بفلو الشراء
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700">
+            <Lock className="h-4 w-4 text-slate-500" />
+            إتمام الشراء الآمن 🔒
           </div>
           <h1 className="text-3xl font-black tracking-tight text-slate-950 sm:text-5xl">
             إتمام الشراء
@@ -260,11 +291,22 @@ export default function CheckoutPageNew() {
               <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-4">
                 <div className="mb-2 flex items-center gap-2 text-emerald-800">
                   <Lock className="h-4 w-4" />
-                  <span className="text-sm font-extrabold">دفع آمن</span>
+                  <span className="text-sm font-extrabold">✅ نحن نحمي بياناتك</span>
                 </div>
                 <p className="text-sm leading-7 text-emerald-700">
                   عند الضغط على زر الإكمال سيتم تحويلك إلى صفحة الدفع الآمنة، وبعد النجاح يتم تسجيل العملية في التحليلات لتظهر في لوحة الإدارة.
                 </p>
+                <p className="mt-2 text-[11px] text-emerald-600">لن يتم مشاركة بياناتك مع أي طرف ثالث</p>
+              </div>
+
+              {/* Payment Method Logos */}
+              <div className="flex items-center justify-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+                <span className="text-[11px] font-semibold text-slate-400">ندعم:</span>
+                {['مدى', 'Visa', 'Mastercard', 'Apple Pay'].map((method) => (
+                  <span key={method} className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[12px] font-bold text-slate-600">
+                    {method}
+                  </span>
+                ))}
               </div>
 
               <button
@@ -276,6 +318,11 @@ export default function CheckoutPageNew() {
                 {submitting ? 'جاري تجهيز الدفع...' : `ادفع الآن ${cardData?.price || 0} ر.س`}
               </button>
             </form>
+
+            {/* Security Footer */}
+            <div className="mt-4 text-center">
+              <p className="text-[11px] font-medium text-slate-400">🔒 جميع المعاملات مشفرة ومحمية بتقنية SSL 256-bit</p>
+            </div>
 
             {/* Trust Badges - Salla-inspired */}
             <div className="mt-6 flex flex-wrap items-center justify-center gap-6 rounded-2xl border border-slate-100 bg-slate-50 px-5 py-4">

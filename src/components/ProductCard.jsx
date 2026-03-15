@@ -59,14 +59,21 @@ const ProductCard = ({
           ))}
         </div>
 
-        <button
-          type="button"
-          onClick={handleAddToEditor}
-          aria-label={`عرض ${name}`}
-          className="absolute top-3 left-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white/95 text-slate-700 shadow-sm transition hover:bg-white"
-        >
-          <Heart size={17} />
-        </button>
+        <div className="absolute top-3 left-3 z-10 flex flex-col items-start gap-2">
+          {isFree && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500 px-3 py-1.5 text-[12px] font-extrabold text-white shadow-md">
+              مجاني
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={handleAddToEditor}
+            aria-label={`عرض ${name}`}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white/95 text-slate-700 shadow-sm transition hover:bg-white"
+          >
+            <Heart size={17} />
+          </button>
+        </div>
 
         <button
           type="button"
@@ -127,11 +134,17 @@ const ProductCard = ({
           <button
             type="button"
             onClick={handleAddToEditor}
-            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#d7dde5] bg-[#f8fafc] px-4 py-3 text-sm font-bold text-slate-900 transition-all duration-200 hover:border-slate-900 hover:bg-slate-900 hover:text-white active:scale-[0.99]"
+            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-900 bg-slate-900 px-4 py-3 text-sm font-bold text-white transition-all duration-200 hover:bg-amber-600 hover:border-amber-600 active:scale-[0.99]"
           >
             <ShoppingBag size={16} />
             ابدأ التصميم
           </button>
+          <p className="mt-2 text-center text-[11px] font-medium text-slate-400">شراء آمن ✓</p>
+        </div>
+
+        <div className="flex items-center justify-center gap-1.5 border-t border-[#eef2f6] px-4 py-2.5">
+          <span className="text-[11px]">🇸🇦</span>
+          <span className="text-[11px] font-semibold text-slate-400">منتج سعودي</span>
         </div>
       </div>
     </article>

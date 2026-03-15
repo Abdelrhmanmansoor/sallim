@@ -328,10 +328,11 @@ function EditorPageInner() {
     if (urlTemplateId) {
       const numericTemplateId = Number(urlTemplateId)
       const id = Number.isNaN(numericTemplateId) ? urlTemplateId : numericTemplateId
-      store.setTemplate(id)
+      useEditorStore.getState().setTemplate(id)
       setMode('ready')
     }
-  }, [urlTemplateId, store])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlTemplateId])
 
   // Load custom templates
   useEffect(() => {
@@ -524,7 +525,8 @@ function EditorPageInner() {
   const logoPos = getLogoPosition()
 
   const handleLogoDragEnd = useCallback((e) => {
-    if (!store.companyLogo) return
+    const s = useEditorStore.getState()
+    if (!s.companyLogo) return
 
     const padding = stageSize.width * 0.03
     const clamp = (value, min, max) => Math.max(min, Math.min(value, max))
@@ -536,12 +538,12 @@ function EditorPageInner() {
     node.x(nextX)
     node.y(nextY)
 
-    store.setLogoPosition('free')
-    store.setLogoPos({
+    s.setLogoPosition('free')
+    s.setLogoPos({
       x: (nextX + logoW / 2) / stageSize.width,
       y: (nextY + logoH / 2) / stageSize.height,
     })
-  }, [logoH, logoW, stageSize.height, stageSize.width, store])
+  }, [logoH, logoW, stageSize.height, stageSize.width])
 
   // Calligraphy filtering
   const allFilteredCalligraphy = calligraphy.filter(c => c.category === calligraphyCat)
@@ -1024,7 +1026,7 @@ function EditorPageInner() {
         return
       }
 
-      const templateId = String(store.selectedTemplate || currentTemplate?.id || '')
+      const templateId = String(useEditorStore.getState().selectedTemplate || currentTemplate?.id || '')
       const snapshot = buildPersonalSnapshot()
 
       localStorage.setItem(PAYPAL_BATCH_PENDING_KEY, JSON.stringify({
@@ -1058,7 +1060,7 @@ function EditorPageInner() {
     } finally {
       setProcessingPayPal(false)
     }
-  }, [buildPersonalSnapshot, currentTemplate?.id, normalizeBatchNames, store])
+  }, [buildPersonalSnapshot, currentTemplate?.id, normalizeBatchNames])
 
   const paypalToken = searchParams.get('token')
   const paypalFlag = searchParams.get('paypal')
@@ -1079,8 +1081,9 @@ function EditorPageInner() {
         if (savedRaw) {
           const saved = JSON.parse(savedRaw)
           if (saved?.snapshot) applyPersonalSnapshot(saved.snapshot)
-          if (saved?.templateId) store.setTemplate(saved.templateId)
-          if (Array.isArray(saved?.names) && saved.names.length) store.setBatchNames(saved.names)
+          const s = useEditorStore.getState()
+          if (saved?.templateId) s.setTemplate(saved.templateId)
+          if (Array.isArray(saved?.names) && saved.names.length) s.setBatchNames(saved.names)
         }
 
         if (cancelled) return
@@ -1119,7 +1122,8 @@ function EditorPageInner() {
 
     finalize()
     return () => { cancelled = true }
-  }, [navigate, paypalToken, store])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate, paypalToken])
 
   useEffect(() => {
     if (paypalFlag !== '0') return
@@ -1132,31 +1136,34 @@ function EditorPageInner() {
   }, [navigate, paypalFlag])
 
   const setBatchNameAtIndex = useCallback((index, value) => {
-    const names = (store.batchNames || []).slice()
+    const s = useEditorStore.getState()
+    const names = (s.batchNames || []).slice()
     if (index < 0) return
     if (names.length === 0 && index === 0) names.push('')
     if (index >= names.length) return
     names[index] = value
-    store.setBatchNames(names)
-  }, [store])
+    s.setBatchNames(names)
+  }, [])
 
   const insertBatchNameAfter = useCallback((index) => {
-    const names = (store.batchNames || []).slice(0, batchMaxRecipients)
+    const s = useEditorStore.getState()
+    const names = (s.batchNames || []).slice(0, batchMaxRecipients)
     const safeIndex = Math.max(-1, Math.min(index, names.length - 1))
     const next = names.slice()
     next.splice(safeIndex + 1, 0, '')
-    store.setBatchNames(next.slice(0, batchMaxRecipients))
+    s.setBatchNames(next.slice(0, batchMaxRecipients))
     window.setTimeout(() => batchNameRefs.current[safeIndex + 1]?.focus?.(), 0)
-  }, [batchMaxRecipients, store])
+  }, [batchMaxRecipients])
 
   const removeBatchNameAt = useCallback((index) => {
-    const names = (store.batchNames || []).slice()
+    const s = useEditorStore.getState()
+    const names = (s.batchNames || []).slice()
     if (names.length <= 1) return
     if (index < 0 || index >= names.length) return
     names.splice(index, 1)
-    store.setBatchNames(names)
+    s.setBatchNames(names)
     window.setTimeout(() => batchNameRefs.current[Math.max(0, index - 1)]?.focus?.(), 0)
-  }, [store])
+  }, [])
 
   const validateBatchPayment = useCallback(() => {
     setBatchPaymentError('')
@@ -1997,6 +2004,10 @@ function EditorPageInner() {
             <BsStars size={16} /> جاهز
           </button>
           <button onClick={() => {
+            if (!isCompanyUnlocked) {
+              toast('قسم المصمم متاح للشركات فقط', { icon: '🔒' })
+              return
+            }
             if (isPersonalDesignLocked && mode !== 'designer') return
             setMode('designer')
           }} style={{
@@ -2014,10 +2025,11 @@ function EditorPageInner() {
             flex: '1 1 140px',
             justifyContent: 'center',
             background: mode === 'designer' ? '#000' : 'transparent',
-            color: mode === 'designer' ? '#fff' : '#555',
+            color: mode === 'designer' ? '#fff' : '#aaa',
+            opacity: isCompanyUnlocked ? 1 : 0.5,
             transition: 'all 200ms'
           }}>
-            <BsPencilFill size={14} /> مصمم
+            <BsPencilFill size={14} /> مصمم {!isCompanyUnlocked && '🔒'}
           </button>
           <button onClick={() => {
             if (isPersonalDesignLocked && mode !== 'batch') return
@@ -2207,7 +2219,7 @@ function EditorPageInner() {
 
           {/* Step 2: Customize */}
           {store.selectedTemplate && (
-            <div style={{ background: '#fff', borderRadius: 20, padding: 28, marginBottom: 20, boxShadow: ds.shadow.sm, animation: 'fadeUp 300ms ease', opacity: isPersonalDesignLocked ? 0.6 : 1, pointerEvents: isPersonalDesignLocked ? 'none' : 'auto' }}>
+            <div style={{ background: '#fff', borderRadius: 20, padding: 28, marginBottom: 20, boxShadow: ds.shadow.sm, animation: 'fadeUp 300ms ease' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800 }}>2</div>
                 <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>خصّص البطاقة</h2>

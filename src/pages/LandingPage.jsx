@@ -1199,6 +1199,14 @@ export default function LandingPage() {
       {/* TRUST & SOCIAL PROOF - Salla-inspired */}
       <section style={{ padding: '80px 0', background: '#fafafa', borderTop: '1px solid #f0f0f0' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 24px' }}>
+          {/* Trust Headline */}
+          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+            <p style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
+              82% من العملاء تزداد ثقتهم بعد أول استخدام
+            </p>
+            <p style={{ fontSize: '13px', color: '#94a3b8' }}>أرقام حقيقية من منصتنا</p>
+          </div>
+
           {/* Stats Row */}
           <div style={{
             display: 'grid',
@@ -1208,7 +1216,7 @@ export default function LandingPage() {
           }}>
             {[
               { num: '+5,000', label: 'بطاقة تم إنشاؤها', icon: '🎨' },
-              { num: '+50', label: 'شركة تثق بنا', icon: '🏢' },
+              { num: '+120', label: 'عميل سعودي يثق بنا', icon: '🇸🇦' },
               { num: '99%', label: 'رضا العملاء', icon: '⭐' },
               { num: '24/7', label: 'دعم فني متواصل', icon: '💬' },
             ].map((stat, i) => (
@@ -1220,7 +1228,7 @@ export default function LandingPage() {
                 border: '1px solid #e5e5e5',
               }}>
                 <div style={{ fontSize: '28px', marginBottom: '8px' }}>{stat.icon}</div>
-                <div style={{ fontSize: '28px', fontWeight: 800, color: '#171717', marginBottom: '4px' }}>{stat.num}</div>
+                <div style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>{stat.num}</div>
                 <div style={{ fontSize: '14px', color: '#737373' }}>{stat.label}</div>
               </div>
             ))}
@@ -1232,6 +1240,7 @@ export default function LandingPage() {
             flexWrap: 'wrap',
             justifyContent: 'center',
             gap: '16px',
+            marginBottom: '32px',
           }}>
             {[
               { icon: '🔒', text: 'دفع آمن ومشفّر' },
@@ -1254,6 +1263,30 @@ export default function LandingPage() {
                 <span style={{ fontSize: '16px' }}>{badge.icon}</span>
                 {badge.text}
               </div>
+            ))}
+          </div>
+
+          {/* Payment Methods Row */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '12px',
+            flexWrap: 'wrap',
+          }}>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#94a3b8' }}>وسائل الدفع المعتمدة:</span>
+            {['مدى', 'Visa', 'Mastercard', 'Apple Pay'].map((method, i) => (
+              <span key={i} style={{
+                padding: '6px 16px',
+                background: '#fff',
+                borderRadius: '8px',
+                border: '1px solid #e2e8f0',
+                fontSize: '12px',
+                fontWeight: 700,
+                color: '#475569',
+              }}>
+                {method}
+              </span>
             ))}
           </div>
         </div>
