@@ -7,7 +7,7 @@ import {
   Star,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
-import SARSymbol from '../components/SARSymbol'
+import SAR from '../components/SAR'
 
 const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
 
@@ -294,7 +294,7 @@ export default function CheckoutPageNew() {
                 className="w-full rounded-2xl px-6 py-4 text-base font-extrabold text-white shadow-lg transition hover:shadow-xl hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
                 style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}
               >
-                {submitting ? 'جاري تجهيز الدفع...' : <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>إتمام الدفع — {cardData?.price || 0} <SARSymbol size={14} color="#fff" /></span>}
+                {submitting ? 'جاري تجهيز الدفع...' : <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>إتمام الدفع — {cardData?.price || 0} <SAR size={14} color="#fff" /></span>}
               </button>
 
               {/* Micro text */}
@@ -346,7 +346,7 @@ export default function CheckoutPageNew() {
                     </p>
                   </div>
                   <span className="whitespace-nowrap rounded-full bg-amber-400 px-3 py-1 text-sm font-black text-slate-950 flex items-center gap-1">
-                    {cardData?.price || 0} <SARSymbol size={11} />
+                    {cardData?.price || 0} <SAR size={11} />
                   </span>
                 </div>
               </div>

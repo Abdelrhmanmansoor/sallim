@@ -27,7 +27,6 @@ import { getTemplates } from '../utils/api'
 import ProductCard from '../components/ProductCard'
 import OccasionSlider from '../components/OccasionSlider'
 import SAR from '../components/SAR'
-import SARSymbol from '../components/SARSymbol'
 
 export default function LandingPage() {
   const navigate = useNavigate()
@@ -339,7 +338,7 @@ export default function LandingPage() {
                 onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)' }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)' }}
               >
-                اصنع أغنية العيد لمن تحب — 50 <SARSymbol size={11} style={{ verticalAlign: '-1px' }} />
+                اصنع أغنية العيد لمن تحب — 50 <SAR size={11} style={{ verticalAlign: '-1px' }} />
               </button>
             </div>
           </div>
@@ -793,7 +792,7 @@ export default function LandingPage() {
             <div style={{ padding: '28px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                 <span style={{ background: '#f0fdf4', color: '#16a34a', padding: '4px 12px', borderRadius: '100px', fontSize: '11px', fontWeight: 700 }}>جديد</span>
-                <span style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 4 }}>50 <SARSymbol size={16} /></span>
+                <span style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 4 }}>50 <SAR size={16} /></span>
               </div>
 
               <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', marginBottom: '8px', lineHeight: 1.4 }}>
@@ -895,7 +894,7 @@ export default function LandingPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
                   <span style={{ fontSize: 32, fontWeight: 900, color: '#0f172a' }}>35</span>
-                  <SARSymbol size={20} style={{ verticalAlign: '-2px' }} />
+                  <SAR size={20} style={{ verticalAlign: '-2px' }} />
                 </div>
                 <button
                   onClick={() => navigate('/checkout?product=custom-design&price=35&name=' + encodeURIComponent('طلب تصميم خاص'))}

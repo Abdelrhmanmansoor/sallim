@@ -1,24 +1,22 @@
 /**
- * New Saudi Riyal Symbol (2020)
- * Renders the official SAR symbol as inline SVG
- * Usage: <SAR /> or <SAR size={14} color="#0f172a" />
+ * Official New Saudi Riyal Symbol (SAMA 2020)
+ * Paths extracted from the official high-res SVG
  */
-export default function SAR({ size = 14, color = 'currentColor', className = '' }) {
+export default function SAR({ size = 14, color = 'currentColor', className = '', style = {} }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width={size}
+      viewBox="0 0 1124.14 1256.39"
+      width={size * 0.9}
       height={size}
       fill={color}
       className={className}
-      style={{ display: 'inline', verticalAlign: 'middle', marginBottom: '1px' }}
+      style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0, ...style }}
       aria-label="ريال سعودي"
+      role="img"
     >
-      {/* New Saudi Riyal Symbol — stylized ر with two horizontal bars */}
-      <path d="M4 5 C4 5 7 5 10 5 C13 5 15 6.5 15 9 C15 11.5 13 13 10 13 L7 13 L7 15 L13 15 L13 17 L7 17 L7 20 L5 20 L5 17 L3 17 L3 15 L5 15 L5 13 L4 13 Z M7 7 L7 11 L10 11 C11.7 11 13 10.1 13 9 C13 7.9 11.7 7 10 7 Z" />
-      <line x1="16" y1="8" x2="21" y2="8" stroke={color} strokeWidth="2" strokeLinecap="round"/>
-      <line x1="16" y1="12" x2="21" y2="12" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+      <path d="M699.62,1113.02h0c-20.06,44.48-33.32,92.75-38.4,143.37l424.51-90.24c20.06-44.47,33.31-92.75,38.4-143.37l-424.51,90.24Z"/>
+      <path d="M1085.73,895.8c20.06-44.47,33.32-92.75,38.4-143.37l-330.68,70.33v-135.2l292.27-62.11c20.06-44.47,33.32-92.75,38.4-143.37l-330.68,70.27V66.13c-50.67,28.45-95.67,66.32-132.25,110.99v403.35l-132.25,28.11V0c-50.67,28.44-95.67,66.32-132.25,110.99v525.69l-295.91,62.88c-20.06,44.47-33.33,92.75-38.42,143.37l334.33-71.05v170.26l-358.3,76.14c-20.06,44.47-33.32,92.75-38.4,143.37l375.04-79.7c30.53-6.35,56.77-24.4,73.83-49.24l68.78-101.97v-.02c7.14-10.55,11.3-23.27,11.3-36.97v-149.98l132.25-28.11v270.4l424.53-90.28Z"/>
     </svg>
   )
 }

@@ -330,6 +330,10 @@ function EditorPageInner() {
       const id = Number.isNaN(numericTemplateId) ? urlTemplateId : numericTemplateId
       useEditorStore.getState().setTemplate(id)
       setMode('ready')
+      // Free templates bypass payment protection
+      if (searchParams.get('free') === '1') {
+        setTemporarilyUnlocked(true)
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlTemplateId])

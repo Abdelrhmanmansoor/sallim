@@ -16,7 +16,7 @@ const ProductCard = ({
 
   const handleClick = () => {
     if (isFree) {
-      navigate(`/editor?template=${id}`);
+      navigate(`/editor?template=${id}&free=1`);
     } else {
       navigate(`/checkout?product=template&templateId=${id}&price=${price}&name=${encodeURIComponent(name)}`);
     }
