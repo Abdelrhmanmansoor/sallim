@@ -2,56 +2,10 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import SAR from '../components/SAR'
+import { useCurrency, CURRENCY_NAMES, COUNTRY_FLAG } from '../utils/useCurrency'
 
 const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID || ''
-
-/* ── Timezone → Country detection ── */
-const TZ_COUNTRY = {
-  'Asia/Riyadh': 'SA', 'Asia/Dubai': 'AE', 'Asia/Muscat': 'OM', 'Asia/Qatar': 'QA',
-  'Asia/Bahrain': 'BH', 'Asia/Kuwait': 'KW', 'Africa/Cairo': 'EG', 'Asia/Amman': 'JO',
-  'Asia/Baghdad': 'IQ', 'Asia/Beirut': 'LB', 'Asia/Damascus': 'SY', 'Asia/Aden': 'YE',
-  'Africa/Casablanca': 'MA', 'Africa/Tunis': 'TN', 'Africa/Algiers': 'DZ', 'Africa/Tripoli': 'LY',
-  'Africa/Khartoum': 'SD', 'Asia/Gaza': 'PS', 'Asia/Hebron': 'PS',
-  'Europe/Istanbul': 'TR', 'Asia/Karachi': 'PK', 'Asia/Kolkata': 'IN', 'Asia/Dhaka': 'BD',
-  'America/New_York': 'US', 'America/Chicago': 'US', 'America/Denver': 'US', 'America/Los_Angeles': 'US',
-  'Europe/London': 'GB', 'Europe/Berlin': 'DE', 'Europe/Paris': 'FR', 'Europe/Madrid': 'ES',
-  'Europe/Rome': 'IT', 'Europe/Amsterdam': 'NL', 'Asia/Tokyo': 'JP', 'Asia/Shanghai': 'CN',
-  'Asia/Seoul': 'KR', 'Asia/Kuala_Lumpur': 'MY', 'Asia/Jakarta': 'ID', 'Asia/Manila': 'PH',
-  'Asia/Singapore': 'SG', 'Asia/Hong_Kong': 'HK', 'Asia/Bangkok': 'TH',
-  'Australia/Sydney': 'AU', 'Pacific/Auckland': 'NZ', 'America/Toronto': 'CA',
-  'America/Sao_Paulo': 'BR', 'America/Mexico_City': 'MX', 'Africa/Johannesburg': 'ZA',
-}
-const CURRENCY_NAMES = {
-  SAR: 'ريال سعودي', AED: 'درهم إماراتي', KWD: 'دينار كويتي', BHD: 'دينار بحريني',
-  OMR: 'ريال عماني', QAR: 'ريال قطري', EGP: 'جنيه مصري', JOD: 'دينار أردني',
-  LBP: 'ليرة لبنانية', IQD: 'دينار عراقي', SYP: 'ليرة سورية', YER: 'ريال يمني',
-  MAD: 'درهم مغربي', TND: 'دينار تونسي', DZD: 'دينار جزائري', LYD: 'دينار ليبي',
-  SDG: 'جنيه سوداني', ILS: 'شيكل', USD: 'دولار أمريكي', EUR: 'يورو',
-  GBP: 'جنيه إسترليني', TRY: 'ليرة تركية', INR: 'روبية هندية', PKR: 'روبية باكستانية',
-  BDT: 'تاكا بنغلاديشية', MYR: 'رينغيت ماليزي', IDR: 'روبية إندونيسية',
-  PHP: 'بيزو فلبيني', JPY: 'ين ياباني', CNY: 'يوان صيني', KRW: 'وون كوري',
-  THB: 'بات تايلاندي', SGD: 'دولار سنغافوري', HKD: 'دولار هونغ كونغ',
-  CAD: 'دولار كندي', AUD: 'دولار أسترالي', NZD: 'دولار نيوزلندي',
-  BRL: 'ريال برازيلي', MXN: 'بيزو مكسيكي', ZAR: 'راند جنوب أفريقي',
-  CHF: 'فرنك سويسري', SEK: 'كرونة سويدية', NOK: 'كرونة نرويجية',
-  DKK: 'كرونة دنماركية', PLN: 'زلوتي بولندي', RUB: 'روبل روسي', NGN: 'نيرة نيجيرية',
-}
-const COUNTRY_FLAG = {
-  SA: '🇸🇦', AE: '🇦🇪', KW: '🇰🇼', BH: '🇧🇭', OM: '🇴🇲', QA: '🇶🇦',
-  EG: '🇪🇬', JO: '🇯🇴', LB: '🇱🇧', IQ: '🇮🇶', SY: '🇸🇾', YE: '🇾🇪',
-  MA: '🇲🇦', TN: '🇹🇳', DZ: '🇩🇿', LY: '🇱🇾', SD: '🇸🇩', PS: '🇵🇸',
-  US: '🇺🇸', GB: '🇬🇧', DE: '🇩🇪', FR: '🇫🇷', ES: '🇪🇸', IT: '🇮🇹', NL: '🇳🇱',
-  TR: '🇹🇷', IN: '🇮🇳', PK: '🇵🇰', BD: '🇧🇩', MY: '🇲🇾', ID: '🇮🇩', PH: '🇵🇭',
-  JP: '🇯🇵', CN: '🇨🇳', KR: '🇰🇷', TH: '🇹🇭', SG: '🇸🇬', HK: '🇭🇰',
-  AU: '🇦🇺', NZ: '🇳🇿', CA: '🇨🇦', BR: '🇧🇷', MX: '🇲🇽', ZA: '🇿🇦', NG: '🇳🇬',
-}
-function detectCountryFromTimezone() {
-  try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
-    return TZ_COUNTRY[tz] || null
-  } catch { return null }
-}
 
 /* ── inject checkout styles once ── */
 const injectCheckoutCSS = (() => {
@@ -175,7 +129,7 @@ export default function CheckoutPageNew() {
   const [errors, setErrors] = useState({})
   const [paypalReady, setPaypalReady] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState('card') // 'card' | 'paypal'
-  const [exchangeInfo, setExchangeInfo] = useState(null) // { country, visitorCurrency, visitorRate, egpRate, updatedAt }
+  const { exchangeInfo, isForeign, convertFromSAR, currency: visitorCurrency, currencyName, flag } = useCurrency()
   const paypalContainerRef = useRef(null)
   const paypalButtonsRef = useRef(null)
   const [formData, setFormData] = useState({
@@ -186,18 +140,6 @@ export default function CheckoutPageNew() {
   })
 
   useEffect(() => { injectCheckoutCSS() }, [])
-
-  // Detect country & fetch live exchange rates, auto-refresh every 30s
-  useEffect(() => {
-    const country = detectCountryFromTimezone()
-    const fetchRates = () => {
-      const url = `${apiBase}/api/v1/checkout/exchange-rate${country ? `?country=${country}` : ''}`
-      fetch(url).then(r => r.json()).then(d => { if (d.success) setExchangeInfo(d) }).catch(() => {})
-    }
-    fetchRates()
-    const interval = setInterval(fetchRates, 30000)
-    return () => clearInterval(interval)
-  }, [])
 
   // Load PayPal JS SDK
   useEffect(() => {
@@ -272,6 +214,10 @@ export default function CheckoutPageNew() {
   }
 
   const loadCardData = async (id) => {
+    // Show URL price immediately to avoid blank state (price mismatch prevention)
+    if (productPrice) {
+      setCardData(prev => prev || { price: parseInt(productPrice), name: '', _preloaded: true })
+    }
     try {
       setLoadingCard(true)
       const token = localStorage.getItem('token')
@@ -280,7 +226,12 @@ export default function CheckoutPageNew() {
       })
       const data = await response.json()
       if (!response.ok || !data.success) throw new Error(data.error || 'تعذر تحميل البطاقة')
-      setCardData(data.data)
+      const dbCard = data.data
+      // If DB price differs from what the user saw in the listing — show warning
+      if (productPrice && Number(productPrice) !== Number(dbCard.price)) {
+        toast(`تم تحديث السعر: ${dbCard.price} ر.س`, { icon: 'ℹ️', duration: 5000 })
+      }
+      setCardData(dbCard)
     } catch (error) {
       console.error('Load card error:', error)
       toast.error(error.message || 'فشل تحميل بيانات البطاقة')
@@ -338,6 +289,7 @@ export default function CheckoutPageNew() {
   const price = cardData?.price || 0
   const SAR_TO_USD = 0.2667
   const priceUSD = price ? (Math.ceil(price * SAR_TO_USD * 100) / 100).toFixed(2) : '0.00'
+  const localPrice = convertFromSAR(price) // null for Saudis
 
   // Post-PayPal-payment handler
   const handlePayPalSuccess = useCallback((captureData) => {
@@ -628,14 +580,14 @@ export default function CheckoutPageNew() {
                 {paymentMethod === 'card' && (
                   <>
                     {/* ── Currency Converter — visible for non-Saudi visitors ── */}
-                    {exchangeInfo && exchangeInfo.country !== 'SA' && exchangeInfo.visitorCurrency !== 'SAR' && (
+                    {isForeign && localPrice && (
                       <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '14px 16px', marginBottom: 14 }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#22c55e', display: 'inline-block', animation: 'co-pulse 2s infinite' }} />
                             <span style={{ fontSize: 11, fontWeight: 700, color: '#374151' }}>💱 محوّل العملات — سعر لحظي</span>
                           </div>
-                          {exchangeInfo.updatedAt && (
+                          {exchangeInfo?.updatedAt && (
                             <span style={{ fontSize: 9, color: '#9ca3af', fontWeight: 600 }}>
                               {new Date(exchangeInfo.updatedAt).toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' })}
                             </span>
@@ -643,19 +595,17 @@ export default function CheckoutPageNew() {
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
                           <div style={{ flex: 1, textAlign: 'center', background: '#f8fafc', borderRadius: 10, padding: '10px 6px', border: '1px solid #e2e8f0' }}>
-                            <div style={{ fontSize: 9, fontWeight: 700, color: '#9ca3af', marginBottom: 3 }}>{COUNTRY_FLAG.SA || '🇸🇦'} ريال سعودي</div>
+                            <div style={{ fontSize: 9, fontWeight: 700, color: '#9ca3af', marginBottom: 3 }}>🇸🇦 ريال سعودي</div>
                             <div style={{ fontSize: 20, fontWeight: 900, color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>{price} <SAR size={14} /></div>
                           </div>
                           <div style={{ fontSize: 18, color: '#b8860b', fontWeight: 900 }}>≈</div>
                           <div style={{ flex: 1, textAlign: 'center', background: '#f0fdf4', borderRadius: 10, padding: '10px 6px', border: '1px solid #bbf7d0' }}>
-                            <div style={{ fontSize: 9, fontWeight: 700, color: '#9ca3af', marginBottom: 3 }}>{COUNTRY_FLAG[exchangeInfo.country] || '🌍'} {CURRENCY_NAMES[exchangeInfo.visitorCurrency] || exchangeInfo.visitorCurrency}</div>
-                            <div style={{ fontSize: 20, fontWeight: 900, color: '#166534' }}>
-                              {(Math.ceil(price * exchangeInfo.visitorRate * 100) / 100).toFixed(2)}
-                            </div>
+                            <div style={{ fontSize: 9, fontWeight: 700, color: '#9ca3af', marginBottom: 3 }}>{flag} {currencyName}</div>
+                            <div style={{ fontSize: 20, fontWeight: 900, color: '#166534' }}>{localPrice}</div>
                           </div>
                         </div>
                         <p style={{ fontSize: 9, color: '#9ca3af', textAlign: 'center', margin: '8px 0 0', lineHeight: 1.6 }}>
-                          سعر الصرف: 1 ر.س = {exchangeInfo.visitorRate.toFixed(4)} {exchangeInfo.visitorCurrency} · المصدر: open.er-api.com · تتم المعالجة عبر بوابة دفع معتمدة (EGP)
+                          سعر الصرف: 1 ر.س = {exchangeInfo?.visitorRate?.toFixed(4)} {visitorCurrency} · المصدر: open.er-api.com
                         </p>
                       </div>
                     )}
@@ -688,8 +638,8 @@ export default function CheckoutPageNew() {
                 <div style={{ marginTop: 10, padding: '10px 14px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, fontSize: 11, color: '#92400e', lineHeight: 1.8, textAlign: 'center' }}>
                   {paymentMethod === 'paypal'
                     ? `سيظهر المبلغ في إشعار البنك بالدولار ($${priceUSD} USD) وهو ما يعادل ${price} ر.س — بدون رسوم إضافية.`
-                    : exchangeInfo && exchangeInfo.country !== 'SA' && exchangeInfo.visitorCurrency !== 'SAR'
-                      ? `المبلغ ${price} ر.س (≈ ${(Math.ceil(price * exchangeInfo.visitorRate * 100) / 100).toFixed(2)} ${CURRENCY_NAMES[exchangeInfo.visitorCurrency] || exchangeInfo.visitorCurrency}) — يتم التحويل تلقائياً بسعر الصرف اللحظي بدون رسوم إضافية.`
+                    : isForeign && localPrice
+                      ? `المبلغ ${price} ر.س (≈ ${localPrice} ${currencyName}) — يتم التحويل تلقائياً بسعر الصرف اللحظي بدون رسوم إضافية.`
                       : `المبلغ المطلوب ${price} ر.س فقط — تتم معالجة الدفع بشكل آمن ومشفّر.`
                   }
                 </div>
@@ -736,7 +686,12 @@ export default function CheckoutPageNew() {
               {/* Total */}
               <div className="co-total-row">
                 <span className="co-total-label">الإجمالي</span>
-                <span className="co-total-value">{price} <SAR size={15} /></span>
+                <div>
+                  <span className="co-total-value">{price} <SAR size={15} /></span>
+                  {isForeign && localPrice && (
+                    <div style={{ fontSize: 11, color: '#6b7280', textAlign: 'left', marginTop: 2 }}>≈ {localPrice} {currencyName}</div>
+                  )}
+                </div>
               </div>
 
               {/* Payment methods */}

@@ -27,9 +27,11 @@ import { getTemplates } from '../utils/api'
 import ProductCard from '../components/ProductCard'
 import OccasionSlider from '../components/OccasionSlider'
 import SAR from '../components/SAR'
+import { useCurrency } from '../utils/useCurrency'
 
 export default function LandingPage() {
   const navigate = useNavigate()
+  const { isForeign, convertFromSAR, currencyName } = useCurrency()
   const [openFaq, setOpenFaq] = useState(null)
   const [previewTemplates, setPreviewTemplates] = useState([])
   const [showPopup, setShowPopup] = useState(false)
@@ -907,7 +909,12 @@ export default function LandingPage() {
             <div style={{ padding: '28px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                 <span style={{ background: '#f0fdf4', color: '#16a34a', padding: '4px 12px', borderRadius: '100px', fontSize: '11px', fontWeight: 700 }}>جديد</span>
-                <span style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 4 }}>50 <SAR size={16} /></span>
+                <span style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  50 <SAR size={16} />
+                  {isForeign && convertFromSAR(50) && (
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', marginRight: 4 }}>≈ {convertFromSAR(50)} {currencyName}</span>
+                  )}
+                </span>
               </div>
 
               <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', marginBottom: '8px', lineHeight: 1.4 }}>
@@ -1007,9 +1014,14 @@ export default function LandingPage() {
 
               {/* Price + CTA */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                  <span style={{ fontSize: 32, fontWeight: 900, color: '#0f172a' }}>35</span>
-                  <SAR size={20} style={{ verticalAlign: '-2px' }} />
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                    <span style={{ fontSize: 32, fontWeight: 900, color: '#0f172a' }}>35</span>
+                    <SAR size={20} style={{ verticalAlign: '-2px' }} />
+                  </div>
+                  {isForeign && convertFromSAR(35) && (
+                    <div style={{ fontSize: 12, color: '#6b7280', fontWeight: 600 }}>≈ {convertFromSAR(35)} {currencyName}</div>
+                  )}
                 </div>
                 <button
                   onClick={() => navigate('/checkout?product=custom-design&price=35&name=' + encodeURIComponent('طلب تصميم خاص'))}

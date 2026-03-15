@@ -1,6 +1,7 @@
 import { Star, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SAR from './SAR';
+import { useCurrency } from '../utils/useCurrency';
 
 const ProductCard = ({
   id,
@@ -12,7 +13,9 @@ const ProductCard = ({
   badges = [],
 }) => {
   const navigate = useNavigate();
+  const { isForeign, convertFromSAR, currencyName } = useCurrency();
   const isFree = price === 0;
+  const localPrice = isFree ? null : convertFromSAR(price);
 
   const handleClick = () => {
     if (isFree) {
@@ -77,13 +80,23 @@ const ProductCard = ({
 
         {/* Price + CTA */}
         <div className="mt-auto">
-          <div className="mb-3 flex items-center gap-1">
+          <div className="mb-3">
             {isFree ? (
               <span className="text-lg font-extrabold text-emerald-600">مجاني تماماً</span>
             ) : (
-              <span className="text-lg font-extrabold text-slate-900" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                {price} <SAR size={14} color="#0f172a" />
-              </span>
+              <>
+                <div className="flex items-center gap-1">
+                  <span className="text-lg font-extrabold text-slate-900" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    {price} <SAR size={14} color="#0f172a" />
+                  </span>
+                </div>
+                {/* Local currency equivalent for non-Saudi visitors */}
+                {isForeign && localPrice && (
+                  <div className="text-[11px] text-slate-400 font-medium mt-0.5">
+                    ≈ {localPrice} {currencyName}
+                  </div>
+                )}
+              </>
             )}
           </div>
 
