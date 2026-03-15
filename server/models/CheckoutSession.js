@@ -49,6 +49,13 @@ const checkoutSessionSchema = new mongoose.Schema(
       type: String,
       default: 'SAR',
     },
+    amountEGP: {
+      type: Number,
+      min: 0,
+    },
+    exchangeRate: {
+      type: Number,
+    },
     status: {
       type: String,
       enum: ['initiated', 'completed', 'failed'],

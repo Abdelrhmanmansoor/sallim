@@ -12,6 +12,61 @@ const PAYMOB_HMAC_SECRET = process.env.PAYMOB_HMAC_SECRET
 const PAYMOB_IFRAME_ID = process.env.PAYMOB_IFRAME_ID
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173'
 
+// Live exchange rates — cached for 5 minutes, ALL currencies from SAR
+let cachedRates = null
+let cacheTimestamp = 0
+const CACHE_TTL = 5 * 60 * 1000
+
+async function getExchangeRates() {
+  if (cachedRates && Date.now() - cacheTimestamp < CACHE_TTL) {
+    return cachedRates
+  }
+  try {
+    const res = await fetch('https://open.er-api.com/v6/latest/SAR')
+    const data = await res.json()
+    if (data?.result === 'success' && data.rates) {
+      cachedRates = data.rates
+      cacheTimestamp = Date.now()
+      console.log('[Exchange] Rates updated, EGP:', cachedRates.EGP)
+      return cachedRates
+    }
+  } catch (err) {
+    console.error('[Exchange] Failed to fetch rates:', err.message)
+  }
+  if (cachedRates) return cachedRates
+  return { EGP: 13.16, USD: 0.2667, SAR: 1 }
+}
+
+async function getSarToEgpRate() {
+  const rates = await getExchangeRates()
+  return rates.EGP || 13.16
+}
+
+async function convertSarToEgp(amountSAR) {
+  const rate = await getSarToEgpRate()
+  return { amountEGP: Math.round(amountSAR * rate * 100) / 100, rate }
+}
+
+// Country → Currency mapping
+const COUNTRY_CURRENCY = {
+  SA: 'SAR', AE: 'AED', KW: 'KWD', BH: 'BHD', OM: 'OMR', QA: 'QAR',
+  EG: 'EGP', JO: 'JOD', LB: 'LBP', IQ: 'IQD', SY: 'SYP', YE: 'YER',
+  PS: 'ILS', MA: 'MAD', TN: 'TND', DZ: 'DZD', LY: 'LYD', SD: 'SDG',
+  US: 'USD', GB: 'GBP', CA: 'CAD', AU: 'AUD', NZ: 'NZD',
+  TR: 'TRY', IN: 'INR', PK: 'PKR', BD: 'BDT',
+  MY: 'MYR', ID: 'IDR', PH: 'PHP', NG: 'NGN',
+  DE: 'EUR', FR: 'EUR', IT: 'EUR', ES: 'EUR', NL: 'EUR', BE: 'EUR',
+  AT: 'EUR', PT: 'EUR', GR: 'EUR', IE: 'EUR', FI: 'EUR',
+  JP: 'JPY', CN: 'CNY', KR: 'KRW', TH: 'THB', SG: 'SGD', HK: 'HKD',
+  BR: 'BRL', MX: 'MXN', ZA: 'ZAR', SE: 'SEK', NO: 'NOK', DK: 'DKK',
+  CH: 'CHF', PL: 'PLN', RU: 'RUB',
+}
+
+function detectCountryFromRequest(req) {
+  const h = req.headers['cf-ipcountry'] || req.headers['x-vercel-ip-country'] || req.headers['x-country-code'] || ''
+  return (h && h !== 'XX') ? h.toUpperCase() : null
+}
+
 async function getPayMobAuthToken() {
   const response = await fetch('https://accept.paymob.com/api/auth/tokens', {
     method: 'POST',
@@ -23,7 +78,7 @@ async function getPayMobAuthToken() {
   return data.token
 }
 
-async function createPayMobOrder(authToken, amount, merchantOrderId) {
+async function createPayMobOrder(authToken, amountEGP, merchantOrderId) {
   const response = await fetch('https://accept.paymob.com/api/ecommerce/orders', {
     method: 'POST',
     headers: {
@@ -33,8 +88,8 @@ async function createPayMobOrder(authToken, amount, merchantOrderId) {
     body: JSON.stringify({
       auth_token: authToken,
       delivery_needed: false,
-      amount_cents: Math.round(amount * 100),
-      currency: 'SAR',
+      amount_cents: Math.round(amountEGP * 100),
+      currency: 'EGP',
       merchant_order_id: merchantOrderId,
       items: [],
     }),
@@ -43,17 +98,17 @@ async function createPayMobOrder(authToken, amount, merchantOrderId) {
   return response.json()
 }
 
-async function createPaymentKey(authToken, orderId, amount, billingData) {
+async function createPaymentKey(authToken, orderId, amountEGP, billingData) {
   const response = await fetch('https://accept.paymob.com/api/acceptance/payment_keys', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       auth_token: authToken,
-      amount_cents: Math.round(amount * 100),
+      amount_cents: Math.round(amountEGP * 100),
       expiration: 3600,
       order_id: orderId,
       billing_data: billingData,
-      currency: 'SAR',
+      currency: 'EGP',
       integration_id: parseInt(PAYMOB_INTEGRATION_ID, 10),
     }),
   })
@@ -127,13 +182,14 @@ router.post('/initiate', async (req, res) => {
 
     const authToken = await getPayMobAuthToken()
     const merchantOrderId = `sallim-${card._id}-${Date.now()}`
-    const orderResponse = await createPayMobOrder(authToken, card.price, merchantOrderId)
+    const { amountEGP, rate: exchangeRate } = await convertSarToEgp(card.price)
+    const orderResponse = await createPayMobOrder(authToken, amountEGP, merchantOrderId)
 
     if (!orderResponse?.id) {
       return res.status(500).json({ success: false, message: 'فشل إنشاء الطلب لدى مزود الدفع' })
     }
 
-    const paymentKey = await createPaymentKey(authToken, orderResponse.id, card.price, {
+    const paymentKey = await createPaymentKey(authToken, orderResponse.id, amountEGP, {
       first_name: customerName.trim().split(' ')[0],
       last_name: customerName.trim().split(' ').slice(1).join(' ') || '-',
       email: customerEmail || 'no-email@sallim.local',
@@ -162,6 +218,9 @@ router.post('/initiate', async (req, res) => {
       customerPhone,
       customerEmail,
       amount: Number(card.price),
+      currency: 'SAR',
+      amountEGP,
+      exchangeRate,
     })
 
     res.json({
@@ -316,6 +375,29 @@ router.get('/failed', async (req, res) => {
     success: false,
     message: 'فشلت عملية الدفع. يرجى المحاولة مرة أخرى.',
   })
+})
+
+// Live exchange rates for frontend — detects visitor country
+router.get('/exchange-rate', async (req, res) => {
+  try {
+    const rates = await getExchangeRates()
+    const country = (req.query.country || detectCountryFromRequest(req) || 'SA').toUpperCase()
+    const visitorCurrency = COUNTRY_CURRENCY[country] || 'USD'
+    const visitorRate = rates[visitorCurrency] || rates.USD || 1
+    const egpRate = rates.EGP || 13.16
+
+    res.json({
+      success: true,
+      country,
+      visitorCurrency,
+      visitorRate,
+      egpRate,
+      updatedAt: new Date(cacheTimestamp || Date.now()).toISOString(),
+      source: 'open.er-api.com',
+    })
+  } catch {
+    res.status(500).json({ success: false })
+  }
 })
 
 export default router
