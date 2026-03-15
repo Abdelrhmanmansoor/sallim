@@ -478,7 +478,7 @@ router.post('/paypal/create', async (req, res) => {
       description = 'تصميم خاص'
     } else if (product === 'template' || product === 'card') {
       const sarAmount = Number(req.body?.amount)
-      if (!Number.isFinite(sarAmount) || sarAmount < 1 || sarAmount > 500) {
+      if (!Number.isFinite(sarAmount) || sarAmount < 0.5 || sarAmount > 500) {
         return res.status(400).json({ success: false, error: 'سعر غير صالح.' })
       }
       amount = Math.ceil(sarAmount * SAR_TO_USD * 100) / 100
