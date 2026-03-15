@@ -384,10 +384,10 @@ export default function LandingPage() {
         >
           {/* Desktop Banner */}
           <picture>
-            <source media="(min-width: 769px)" srcSet="/images/banner-desktop.png" />
-            <source media="(max-width: 768px)" srcSet="/images/banner-mobile.png" />
+            <source media="(min-width: 769px)" srcSet="/images/hero/Eid_celebration_in_saudi_courtyard_f34876dbfb.jpeg" />
+            <source media="(max-width: 768px)" srcSet="/images/hero/Saudi_family_celebrating_eid_8186e62448.jpeg" />
             <img
-              src="/images/banner-desktop.png"
+              src="/images/hero/Eid_celebration_in_saudi_courtyard_f34876dbfb.jpeg"
               alt="عيد مبارك"
               style={{
                 position: 'absolute',
