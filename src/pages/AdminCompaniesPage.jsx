@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Building2, Search, ArrowRight, RefreshCw } from 'lucide-react'
 
-const API = import.meta.env.VITE_API_URL
+const API = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '')
 
 export default function AdminCompaniesPage() {
   const navigate = useNavigate()

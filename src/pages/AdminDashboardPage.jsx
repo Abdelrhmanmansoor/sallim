@@ -6,7 +6,7 @@ import {
   Users, ShoppingBag, RefreshCw, BarChart2, Shield, Download, Percent
 } from 'lucide-react'
 
-const API = import.meta.env.VITE_API_URL
+const API = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '')
 
 export default function AdminDashboardPage() {
   const navigate = useNavigate()

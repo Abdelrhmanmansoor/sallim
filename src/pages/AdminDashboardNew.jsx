@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { io } from 'socket.io-client'
+
+const API = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '')
 import { 
   LayoutDashboard, 
   Users, 
@@ -84,7 +86,7 @@ export default function AdminDashboardNew() {
 
     // Initialize Socket.io
     const token = localStorage.getItem('token')
-    const socketInstance = io(import.meta.env.VITE_API_URL, {
+    const socketInstance = io(API, {
       auth: { token }
     })
 
@@ -118,11 +120,11 @@ export default function AdminDashboardNew() {
 
       // Load all data in parallel
       const [statsRes, activitiesRes, cardsRes, salesRes, revenueRes] = await Promise.all([
-        fetch(`${import.meta.env.VITE_API_URL}/api/v1/analytics/realtime`, { headers }),
-        fetch(`${import.meta.env.VITE_API_URL}/api/v1/analytics/activity?limit=20`, { headers }),
-        fetch(`${import.meta.env.VITE_API_URL}/api/v1/analytics/cards`, { headers }),
-        fetch(`${import.meta.env.VITE_API_URL}/api/v1/analytics/sales?page=1&limit=10`, { headers }),
-        fetch(`${import.meta.env.VITE_API_URL}/api/v1/analytics/revenue?period=month`, { headers })
+        fetch(`${API}/api/v1/analytics/realtime`, { headers }),
+        fetch(`${API}/api/v1/analytics/activity?limit=20`, { headers }),
+        fetch(`${API}/api/v1/analytics/cards`, { headers }),
+        fetch(`${API}/api/v1/analytics/sales?page=1&limit=10`, { headers }),
+        fetch(`${API}/api/v1/analytics/revenue?period=month`, { headers })
       ])
 
       const [statsData, activitiesData, cardsData, salesData, revenueData] = await Promise.all([
@@ -165,7 +167,7 @@ export default function AdminDashboardNew() {
   const handleToggleCard = async (cardId, enabled) => {
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/analytics/cards/${cardId}`, {
+      const response = await fetch(`${API}/api/v1/analytics/cards/${cardId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -190,7 +192,7 @@ export default function AdminDashboardNew() {
   const handleUpdateCard = async (cardId, updates) => {
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/analytics/cards/${cardId}`, {
+      const response = await fetch(`${API}/api/v1/analytics/cards/${cardId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

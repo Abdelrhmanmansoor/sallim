@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Key, Plus, Search, ArrowRight, RefreshCw, Copy, Check, Link2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-const API = import.meta.env.VITE_API_URL
+const API = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '')
 const CLIENT = import.meta.env.VITE_CLIENT_URL || 'https://www.sallim.co'
 
 export default function AdminInviteCodesPage() {

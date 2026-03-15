@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
 
 const checkoutBenefits = [
   'الوصول الفوري بعد إتمام الدفع',

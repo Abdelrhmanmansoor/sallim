@@ -216,7 +216,7 @@ function BrandPanel() {
 
 /* ─────────── Config Panel ─── */
 function ConfigPanel() {
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+  const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
 
   return (
     <div className="max-w-2xl space-y-8">

@@ -46,7 +46,7 @@ export const CompanyProvider = ({ children }) => {
 
     const activate = async (email, code, password) => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/v1/company/activate`, {
+            const response = await fetch(`${(import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')}/api/v1/company/activate`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -71,7 +71,7 @@ export const CompanyProvider = ({ children }) => {
 
     const loginCompany = async (email, password) => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/v1/company/login`, {
+            const response = await fetch(`${(import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')}/api/v1/company/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
