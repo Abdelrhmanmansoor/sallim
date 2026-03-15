@@ -223,7 +223,7 @@ export default function CheckoutPageNew() {
                     placeholder="اكتب الاسم الكامل"
                     className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 pr-12 text-sm text-slate-900 outline-none transition focus:border-amber-400 focus:bg-white focus:ring-4 focus:ring-amber-100"
                   />
-                  <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                  <User className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                 </div>
               </label>
 
@@ -238,7 +238,7 @@ export default function CheckoutPageNew() {
                     className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 pr-12 text-left text-sm text-slate-900 outline-none transition focus:border-amber-400 focus:bg-white focus:ring-4 focus:ring-amber-100"
                     dir="ltr"
                   />
-                  <Phone className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                  <Phone className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                 </div>
               </label>
 
@@ -253,7 +253,7 @@ export default function CheckoutPageNew() {
                     className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 pr-12 text-left text-sm text-slate-900 outline-none transition focus:border-amber-400 focus:bg-white focus:ring-4 focus:ring-amber-100"
                     dir="ltr"
                   />
-                  <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                  <Mail className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                 </div>
               </label>
 
@@ -276,6 +276,22 @@ export default function CheckoutPageNew() {
                 {submitting ? 'جاري تجهيز الدفع...' : `ادفع الآن ${cardData?.price || 0} ر.س`}
               </button>
             </form>
+
+            {/* Trust Badges - Salla-inspired */}
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-6 rounded-2xl border border-slate-100 bg-slate-50 px-5 py-4">
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <ShieldCheck className="h-5 w-5 text-emerald-500" />
+                <span>دفع آمن 100%</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <Lock className="h-5 w-5 text-amber-500" />
+                <span>تشفير SSL</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <Sparkles className="h-5 w-5 text-blue-500" />
+                <span>تفعيل فوري</span>
+              </div>
+            </div>
           </section>
 
           <aside className="rounded-[28px] border border-slate-200 bg-[#0f172a] p-6 text-white shadow-[0_24px_70px_rgba(15,23,42,0.16)]">

@@ -323,15 +323,15 @@ function EditorPageInner() {
   const [payPalError, setPayPalError] = useState('')
 
   // Handle URL template parameter - select template from landing page
+  const urlTemplateId = searchParams.get('template')
   useEffect(() => {
-    const templateId = searchParams.get('template')
-    if (templateId) {
-      const numericTemplateId = Number(templateId)
-      const id = Number.isNaN(numericTemplateId) ? templateId : numericTemplateId
+    if (urlTemplateId) {
+      const numericTemplateId = Number(urlTemplateId)
+      const id = Number.isNaN(numericTemplateId) ? urlTemplateId : numericTemplateId
       store.setTemplate(id)
       setMode('ready')
     }
-  }, [searchParams, store])
+  }, [urlTemplateId, store])
 
   // Load custom templates
   useEffect(() => {
@@ -829,9 +829,6 @@ function EditorPageInner() {
   }, [isCompanyUnlocked])
 
   useEffect(() => {
-  }, [isCompanyUnlocked, mode])
-
-  useEffect(() => {
     if (!purchaseOrderId) {
       setActivePersonalOrder(null)
       autoDownloadAttemptedRef.current = false
@@ -1063,17 +1060,18 @@ function EditorPageInner() {
     }
   }, [buildPersonalSnapshot, currentTemplate?.id, normalizeBatchNames, store])
 
-  useEffect(() => {
-    const token = searchParams.get('token')
-    if (!token) return
+  const paypalToken = searchParams.get('token')
+  const paypalFlag = searchParams.get('paypal')
 
-    const paypalFlag = searchParams.get('paypal')
+  useEffect(() => {
+    if (!paypalToken) return
+
     let cancelled = false
     async function finalize() {
       try {
         setProcessingPayPal(true)
         setPayPalError('')
-        const capture = await capturePayPalOrder(token)
+        const capture = await capturePayPalOrder(paypalToken)
         const captureId = capture.data?.captureId
         if (!captureId) throw new Error('تعذر تأكيد الدفع.')
 
@@ -1091,7 +1089,7 @@ function EditorPageInner() {
         setActiveBatchOrder({
           status: 'paid',
           paymentProvider: 'paypal',
-          paypalOrderId: token,
+          paypalOrderId: paypalToken,
           paypalCaptureId: captureId,
         })
 
@@ -1121,10 +1119,9 @@ function EditorPageInner() {
 
     finalize()
     return () => { cancelled = true }
-  }, [navigate, searchParams, store])
+  }, [navigate, paypalToken, store])
 
   useEffect(() => {
-    const paypalFlag = searchParams.get('paypal')
     if (paypalFlag !== '0') return
     const returnPath = localStorage.getItem(PAYPAL_RETURN_PATH_KEY) || '/editor'
     try {
@@ -1132,7 +1129,7 @@ function EditorPageInner() {
       localStorage.removeItem(PAYPAL_RETURN_PATH_KEY)
     } catch { }
     navigate(returnPath || '/editor', { replace: true })
-  }, [navigate, searchParams])
+  }, [navigate, paypalFlag])
 
   const setBatchNameAtIndex = useCallback((index, value) => {
     const names = (store.batchNames || []).slice()
@@ -1414,8 +1411,9 @@ function EditorPageInner() {
     personalDownloadRef.current = handlePersonalDownload
   }, [handlePersonalDownload])
 
+  const autodownloadParam = searchParams.get('autodownload')
   useEffect(() => {
-    if (searchParams.get('autodownload') !== '1') return
+    if (autodownloadParam !== '1') return
     if (!activePersonalOrder?.orderId || activePersonalOrder.status !== 'paid') return
     if (!stageRef.current || !currentTemplate) return
     if (mode === 'ready' && !bgLoaded) return
@@ -1427,7 +1425,7 @@ function EditorPageInner() {
     }, 250)
 
     return () => window.clearTimeout(timer)
-  }, [activePersonalOrder, bgLoaded, currentTemplate, handlePersonalDownload, mode, searchParams])
+  }, [activePersonalOrder, bgLoaded, currentTemplate, handlePersonalDownload, mode, autodownloadParam])
 
   const getCanvasDataURL = useCallback(() => {
     if (!stageRef.current) return null

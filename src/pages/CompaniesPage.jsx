@@ -14,7 +14,7 @@ export default function CompaniesPage() {
   }, [])
 
   return (
-    <div style={{ fontFamily: "'Tajawal', sans-serif" }}>
+    <div dir="rtl" style={{ fontFamily: "'Tajawal', sans-serif" }}>
       {/* HERO - Same style as CompanyLoginPage */}
       <section style={{ background: '#171717', padding: 0 }}>
         <div

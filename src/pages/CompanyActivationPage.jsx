@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate, Link } from 'react-router-dom'
-import { Building2, ArrowLeft, CheckCircle2, AlertCircle, Key } from 'lucide-react'
+import { Building2, ArrowRight, CheckCircle2, AlertCircle, Key } from 'lucide-react'
 import { useCompany } from '../context/CompanyContext'
 
 export default function CompanyActivationPage() {
@@ -53,7 +53,7 @@ export default function CompanyActivationPage() {
     }
 
     return (
-        <div style={{ fontFamily: "'Tajawal', sans-serif" }}>
+        <div dir="rtl" style={{ fontFamily: "'Tajawal', sans-serif" }}>
             {/* HERO - Same style as LandingPage */}
             <section
                 style={{
@@ -108,7 +108,7 @@ export default function CompanyActivationPage() {
                                     e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
                                 }}
                             >
-                                <ArrowLeft size={16} />
+                                <ArrowRight size={16} />
                                 العودة للرئيسية
                             </button>
                         </div>

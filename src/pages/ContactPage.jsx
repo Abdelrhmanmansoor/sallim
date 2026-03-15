@@ -27,7 +27,7 @@ export default function ContactPage() {
     }
 
     return (
-        <div style={{ fontFamily: "'Tajawal', sans-serif" }}>
+        <div dir="rtl" style={{ fontFamily: "'Tajawal', sans-serif" }}>
             {/* Hero */}
             <section style={{ background: 'linear-gradient(180deg, #070d1a, #0c1929, #111f36)', paddingTop: '140px', paddingBottom: '60px', textAlign: 'center' }}>
                 <div style={{ maxWidth: '600px', margin: '0 auto', padding: '0 24px' }}>

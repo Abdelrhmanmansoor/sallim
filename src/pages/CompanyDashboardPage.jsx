@@ -19,7 +19,7 @@ export default function CompanyDashboardPage() {
     }
 
     return (
-        <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <div dir="rtl" className="py-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
 
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50 rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100 mb-8">

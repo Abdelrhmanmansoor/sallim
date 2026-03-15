@@ -130,7 +130,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div style={{ fontFamily: "'Tajawal', sans-serif" }}>
+    <div dir="rtl" style={{ fontFamily: "'Tajawal', sans-serif" }}>
 
       {/* LUXURY POPUP */}
       {showPopup && (
@@ -1190,6 +1190,69 @@ export default function LandingPage() {
                     {faq.a}
                   </p>
                 )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TRUST & SOCIAL PROOF - Salla-inspired */}
+      <section style={{ padding: '80px 0', background: '#fafafa', borderTop: '1px solid #f0f0f0' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 24px' }}>
+          {/* Stats Row */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: '24px',
+            marginBottom: '48px',
+          }}>
+            {[
+              { num: '+5,000', label: 'بطاقة تم إنشاؤها', icon: '🎨' },
+              { num: '+50', label: 'شركة تثق بنا', icon: '🏢' },
+              { num: '99%', label: 'رضا العملاء', icon: '⭐' },
+              { num: '24/7', label: 'دعم فني متواصل', icon: '💬' },
+            ].map((stat, i) => (
+              <div key={i} style={{
+                textAlign: 'center',
+                padding: '28px 16px',
+                background: '#fff',
+                borderRadius: '16px',
+                border: '1px solid #e5e5e5',
+              }}>
+                <div style={{ fontSize: '28px', marginBottom: '8px' }}>{stat.icon}</div>
+                <div style={{ fontSize: '28px', fontWeight: 800, color: '#171717', marginBottom: '4px' }}>{stat.num}</div>
+                <div style={{ fontSize: '14px', color: '#737373' }}>{stat.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Trust Badges */}
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: '16px',
+          }}>
+            {[
+              { icon: '🔒', text: 'دفع آمن ومشفّر' },
+              { icon: '🇸🇦', text: 'منتج سعودي' },
+              { icon: '✅', text: 'تفعيل فوري' },
+              { icon: '🛡️', text: 'خصوصية محمية' },
+            ].map((badge, i) => (
+              <div key={i} style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                background: '#fff',
+                borderRadius: '100px',
+                border: '1px solid #e5e5e5',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: '#525252',
+              }}>
+                <span style={{ fontSize: '16px' }}>{badge.icon}</span>
+                {badge.text}
               </div>
             ))}
           </div>

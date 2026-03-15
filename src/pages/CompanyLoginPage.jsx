@@ -44,7 +44,7 @@ export default function CompanyLoginPage() {
   }
 
   return (
-    <div style={{ fontFamily: "'Tajawal', sans-serif" }}>
+    <div dir="rtl" style={{ fontFamily: "'Tajawal', sans-serif" }}>
       {/* HERO - Same style as LandingPage */}
       <section
         style={{
