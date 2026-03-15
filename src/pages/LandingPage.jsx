@@ -34,6 +34,7 @@ export default function LandingPage() {
   const [showPopup, setShowPopup] = useState(false)
   const [popupCountdown, setPopupCountdown] = useState(8)
   const [playingAudio, setPlayingAudio] = useState(null)
+  const [templateTab, setTemplateTab] = useState('free') // 'free' | 'paid'
 
   const audioSamples = [
     { id: 1, label: 'نموذج صوتي 1', file: '/SOUND/ssstwitter.com_1773546744734.mp3' },
@@ -658,76 +659,108 @@ export default function LandingPage() {
       {/* OCCASION CATEGORIES SLIDER */}
       <OccasionSlider />
 
-      {/* PRODUCT SHOWCASE - EXPERT SLIDER DESIGN */}
-      <section style={{ padding: '100px 0', background: '#f8fafc', overflow: 'hidden' }}>
+      {/* PRODUCT SHOWCASE — Tabbed Free / Paid */}
+      <section style={{ padding: '72px 0 80px', background: '#f8fafc', overflow: 'hidden' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 24px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-            
-            <h2 style={{ 
-              fontSize: 'clamp(32px, 5vw, 44px)', 
-              fontWeight: 900, 
-              color: '#0f172a', 
-              marginBottom: '16px',
-              letterSpacing: '-0.02em'
-            }}>
+
+          {/* Title */}
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <h2 style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 900, color: '#0f172a', marginBottom: '10px', letterSpacing: '-0.02em' }}>
               صمم تهنئتك
             </h2>
-            <p style={{ fontSize: '17px', color: '#64748b', maxWidth: '600px', margin: '0 auto', lineHeight: 1.6 }}>
-              جميع هذه القوالب متاحة للاستخدام مجانًا، ابدأ في تخصيص تصميمك المفضل الآن
+            <p style={{ fontSize: '15px', color: '#64748b', maxWidth: '500px', margin: '0 auto', lineHeight: 1.6 }}>
+              اختر من بين قوالب مجانية مباشرة أو قوالب مميزة باحترافية عالية
             </p>
           </div>
-          
-          {/* PRODUCT SLIDER */}
-          <div 
-            className="flex gap-6 overflow-x-auto pb-12 snap-x snap-mandatory scrollbar-hide"
-            style={{ 
-              paddingRight: 'min(5vw, 60px)', 
-              paddingLeft: 'min(5vw, 60px)',
-              marginRight: 'calc(-1 * min(5vw, 60px))',
-              marginLeft: 'calc(-1 * min(5vw, 60px))'
+
+          {/* Tab Switcher */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '40px' }}>
+            <div style={{ display: 'inline-flex', background: '#e2e8f0', borderRadius: '14px', padding: '4px', gap: '4px' }}>
+              <button
+                onClick={() => setTemplateTab('free')}
+                style={{
+                  padding: '10px 28px', borderRadius: '11px', border: 'none', cursor: 'pointer',
+                  fontFamily: "'Tajawal', sans-serif", fontWeight: 700, fontSize: '15px',
+                  background: templateTab === 'free' ? '#10b981' : 'transparent',
+                  color: templateTab === 'free' ? '#fff' : '#64748b',
+                  transition: 'all 0.2s', boxShadow: templateTab === 'free' ? '0 2px 12px rgba(16,185,129,0.3)' : 'none'
+                }}>
+                مجانية
+              </button>
+              <button
+                onClick={() => setTemplateTab('paid')}
+                style={{
+                  padding: '10px 28px', borderRadius: '11px', border: 'none', cursor: 'pointer',
+                  fontFamily: "'Tajawal', sans-serif", fontWeight: 700, fontSize: '15px',
+                  background: templateTab === 'paid' ? '#f59e0b' : 'transparent',
+                  color: templateTab === 'paid' ? '#fff' : '#64748b',
+                  transition: 'all 0.2s', boxShadow: templateTab === 'paid' ? '0 2px 12px rgba(245,158,11,0.3)' : 'none'
+                }}>
+                مدفوعة
+              </button>
+            </div>
+          </div>
+
+          {/* Tab Description */}
+          {templateTab === 'free' ? (
+            <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#ecfdf5', color: '#059669', padding: '6px 16px', borderRadius: '100px', fontSize: '13px', fontWeight: 700 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                تحميل مجاني — بدون علامة مائية — بدون قيود
+              </span>
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fffbeb', color: '#d97706', padding: '6px 16px', borderRadius: '100px', fontSize: '13px', fontWeight: 700 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                قوالب احترافية مميزة — جودة عالية — دعم مخصص
+              </span>
+            </div>
+          )}
+
+          {/* Cards Slider */}
+          <div
+            className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide"
+            style={{
+              paddingRight: 'min(5vw, 48px)',
+              paddingLeft: 'min(5vw, 48px)',
+              marginRight: 'calc(-1 * min(5vw, 48px))',
+              marginLeft: 'calc(-1 * min(5vw, 48px))',
             }}
           >
-            {[
-              { id: "10", name: "تصميم الخط الديواني الملكي", img: "/templates/جاهزة/10.png", badge: "الأكثر طلباً", original: 49 },
-              { id: "11", name: "بطاقة العيد العصرية", img: "/templates/جاهزة/11.png", badge: "جديد", original: 59 },
-              { id: "14", name: "نموذج التجريد الإسلامي", img: "/templates/جاهزة/15.png", original: 45 },
-              { id: "114", name: "باترن السدو الفاخر", img: "/templates/مصمم/Artboard 12.png", badge: "حصري" },
-              { id: "13", name: "تهنئة الزخرفة الكلاسيكية", img: "/templates/جاهزة/14.png", original: 29 },
-              { id: "16", name: "بطاقة الخط العربي الفاخر", img: "/templates/جاهزة/17.png", badge: "Premium", original: 75 },
-              { id: "105", name: "ثيم الواحة الهادئة", img: "/templates/مصمم/18.png", original: 29 },
-              { id: "3", name: "تصميم اللؤلؤة العربية", img: "/templates/جاهزة/6.png", badge: "مجاني لفترة محدودة" },
-            ].map((p, idx) => (
-              <div 
-                key={idx} 
-                className="flex-none w-[280px] sm:w-[320px] snap-center first:mr-0"
-              >
-                <ProductCard 
-                  id={p.id} 
-                  name={p.name} 
-                  image={p.img} 
-                  price={0} 
-                  originalPrice={p.original || 0} 
-                  rating={4.9 + (Math.random() * 0.1)}
+            {(templateTab === 'free' ? [
+              { id: "3",   name: "تصميم اللؤلؤة العربية",    img: "/templates/جاهزة/6.png",            badge: "مجاني" },
+              { id: "114", name: "باترن السدو الفاخر",       img: "/templates/مصمم/Artboard 12.png",   badge: "مجاني" },
+            ] : [
+              { id: "10",  name: "تصميم الخط الديواني الملكي", img: "/templates/جاهزة/10.png",  price: 49,  badge: "الأكثر طلباً" },
+              { id: "11",  name: "بطاقة العيد العصرية",        img: "/templates/جاهزة/11.png",  price: 59,  badge: "جديد" },
+              { id: "14",  name: "نموذج التجريد الإسلامي",     img: "/templates/جاهزة/15.png",  price: 45 },
+              { id: "13",  name: "تهنئة الزخرفة الكلاسيكية",  img: "/templates/جاهزة/14.png",  price: 29 },
+              { id: "16",  name: "بطاقة الخط العربي الفاخر",  img: "/templates/جاهزة/17.png",  price: 75,  badge: "Premium" },
+              { id: "105", name: "ثيم الواحة الهادئة",         img: "/templates/مصمم/18.png",   price: 29 },
+            ]).map((p, idx) => (
+              <div key={idx} className="flex-none w-[260px] sm:w-[300px] snap-center">
+                <ProductCard
+                  id={p.id}
+                  name={p.name}
+                  image={p.img}
+                  price={p.price || 0}
+                  originalPrice={0}
+                  rating={4.9 + (idx * 0.02)}
                   badges={p.badge ? [p.badge] : []}
                 />
               </div>
             ))}
           </div>
-          
-          {/* Scroll Indicators / Help */}
+
           <div className="flex justify-center gap-2 mt-4 text-gray-400 sm:hidden">
             <span className="text-xs font-bold">اسحب لليمين لرؤية المزيد</span>
           </div>
         </div>
-        
+
         <style>{`
-          .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-          }
-          .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-          }
+          .scrollbar-hide::-webkit-scrollbar { display: none; }
+          .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         `}</style>
       </section>
 
@@ -957,152 +990,6 @@ export default function LandingPage() {
                 <p style={{ fontSize: '14px', color: '#737373' }}>{s.desc}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* TEMPLATES PREVIEW */}
-      <section style={{ padding: '100px 0', background: '#fff' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <span style={{ fontSize: '12px', fontWeight: 600, color: '#a3a3a3', letterSpacing: '0.1em' }}>القوالب</span>
-            <h2 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 700, color: '#171717', marginTop: '12px' }}>
-              قوالب جاهزة للتخصيص
-            </h2>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px', marginBottom: '40px' }}>
-            {previewTemplates.length > 0 ? (
-              previewTemplates.map((template) => (
-                <Link
-                  to={`/editor?template=${template._id}`}
-                  key={template._id}
-                  style={{
-                    display: 'block',
-                    aspectRatio: '1',
-                    borderRadius: '16px',
-                    overflow: 'hidden',
-                    background: '#f5f5f5',
-                    transition: 'all 200ms ease',
-                    position: 'relative'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-4px)'
-                    e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.1)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.boxShadow = 'none'
-                  }}
-                >
-                  <img
-                    src={template.imageUrl}
-                    alt={template.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={(e) => (e.target.style.display = 'none')}
-                  />
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    padding: '12px',
-                    background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-                    color: '#fff',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    textAlign: 'center'
-                  }}>
-                    {template.name}
-                  </div>
-                </Link>
-              ))
-            ) : (
-              // Fallback templates while loading or if none exist
-              [
-                { id: 1, image: '/templates/جاهزة/3.png', name: 'تصميم ١' },
-                { id: 2, image: '/templates/جاهزة/5.png', name: 'تصميم ٢' },
-                { id: 3, image: '/templates/جاهزة/6.png', name: 'تصميم ٣' },
-                { id: 4, image: '/templates/جاهزة/7.png', name: 'تصميم ٤' },
-                { id: 5, image: '/templates/جاهزة/8.png', name: 'تصميم ٥' },
-                { id: 6, image: '/templates/جاهزة/9.png', name: 'تصميم ٦' },
-                { id: 7, image: '/templates/جاهزة/10.png', name: 'تصميم ٧' },
-                { id: 8, image: '/templates/جاهزة/11.png', name: 'تصميم ٨' },
-                { id: 9, image: '/templates/جاهزة/13.png', name: 'تصميم ٩' },
-                { id: 10, image: '/templates/جاهزة/14.png', name: 'تصميم ١٠' },
-                { id: 11, image: '/templates/جاهزة/15.png', name: 'تصميم ١١' },
-                { id: 12, image: '/templates/جاهزة/16.png', name: 'تصميم ١٢' },
-                { id: 13, image: '/templates/جاهزة/17.png', name: 'تصميم ١٣' },
-                { id: 14, image: '/templates/جاهزة/Artboard 1.png', name: 'تصميم ١٤' },
-                { id: 15, image: '/templates/جاهزة/Artboard 2.png', name: 'تصميم ١٥' },
-                { id: 16, image: '/templates/جاهزة/Artboard 4.png', name: 'تصميم ١٦' },
-              ].map((template) => (
-                <Link
-                  to={`/editor?template=${template.id}`}
-                  key={template.id}
-                  style={{
-                    display: 'block',
-                    aspectRatio: '1',
-                    borderRadius: '16px',
-                    overflow: 'hidden',
-                    background: '#f5f5f5',
-                    transition: 'all 200ms ease',
-                    position: 'relative'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-4px)'
-                    e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.1)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.boxShadow = 'none'
-                  }}
-                >
-                  <img
-                    src={template.image}
-                    alt={template.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={(e) => (e.target.style.display = 'none')}
-                  />
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    padding: '12px',
-                    background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-                    color: '#fff',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    textAlign: 'center'
-                  }}>
-                    {template.name}
-                  </div>
-                </Link>
-              ))
-            )}
-          </div>
-
-          <div style={{ textAlign: 'center' }}>
-            <Link
-              to="/editor"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '12px 24px',
-                background: '#171717',
-                color: '#fff',
-                fontSize: '14px',
-                fontWeight: 600,
-                borderRadius: '10px',
-                textDecoration: 'none',
-                transition: 'all 200ms ease',
-              }}
-            >
-              عرض جميع القوالب
-              <ArrowLeft size={16} />
-            </Link>
           </div>
         </div>
       </section>

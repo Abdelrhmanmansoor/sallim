@@ -1,4 +1,4 @@
-import { ShoppingBag, Star } from 'lucide-react';
+import { Star, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const ProductCard = ({
@@ -14,7 +14,11 @@ const ProductCard = ({
   const isFree = price === 0;
 
   const handleClick = () => {
-    navigate(`/editor?template=${id}`);
+    if (isFree) {
+      navigate(`/editor?template=${id}`);
+    } else {
+      navigate(`/checkout?product=template&templateId=${id}&price=${price}&name=${encodeURIComponent(name)}`);
+    }
   };
 
   return (
@@ -30,11 +34,24 @@ const ProductCard = ({
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
 
+        {/* Paid overlay hint */}
+        {!isFree && (
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center">
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 rounded-full p-3">
+              <Lock size={20} className="text-amber-600" />
+            </div>
+          </div>
+        )}
+
         {/* Badges */}
         <div className="absolute top-3 right-3 z-10 flex flex-col items-end gap-1.5">
-          {isFree && (
+          {isFree ? (
             <span className="rounded-lg bg-emerald-500 px-2.5 py-1 text-[11px] font-bold text-white">
               مجاني
+            </span>
+          ) : (
+            <span className="rounded-lg bg-amber-500 px-2.5 py-1 text-[11px] font-bold text-white">
+              {price} ر.س
             </span>
           )}
           {badges.map((badge, idx) => (
@@ -54,6 +71,9 @@ const ProductCard = ({
         <div className="mb-2 flex items-center gap-1">
           <Star size={12} className="fill-amber-400 text-amber-400" />
           <span className="text-xs font-bold text-slate-600">{rating.toFixed(1)}</span>
+          {!isFree && (
+            <span className="mr-auto text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">مدفوع</span>
+          )}
         </div>
 
         {/* Name */}
@@ -65,26 +85,23 @@ const ProductCard = ({
         <div className="mt-auto">
           <div className="mb-3 flex items-baseline gap-2">
             {isFree ? (
-              <span className="text-lg font-extrabold text-emerald-600">مجاني</span>
+              <span className="text-lg font-extrabold text-emerald-600">مجاني تماماً</span>
             ) : (
               <>
                 <span className="text-lg font-extrabold text-slate-900">{price}</span>
                 <span className="text-xs font-bold text-slate-400">ر.س</span>
               </>
             )}
-            {originalPrice > price && (
-              <span className="text-xs text-slate-400 line-through">{originalPrice} ر.س</span>
-            )}
           </div>
 
           <button
             type="button"
             className="w-full rounded-xl py-3.5 text-base font-extrabold text-white transition"
-            style={{ background: '#f59e0b', letterSpacing: '0.01em' }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#d97706' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = '#f59e0b' }}
+            style={{ background: isFree ? '#f59e0b' : '#0f172a', letterSpacing: '0.01em' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = isFree ? '#d97706' : '#1e293b' }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = isFree ? '#f59e0b' : '#0f172a' }}
           >
-            ابدأ التصميم
+            {isFree ? 'ابدأ التصميم' : 'اشترِ الآن'}
           </button>
         </div>
       </div>
