@@ -486,19 +486,11 @@ router.post('/paypal/create', async (req, res) => {
       return res.status(400).json({ success: false, error: 'نوع المنتج غير صالح.' })
     }
 
-    const returnUrl = product === 'batch'
-      ? `${CLIENT_URL}/editor?paypal=1`
-      : `${CLIENT_URL}/checkout?status=success&paypal=1`
-    const cancelUrl = product === 'batch'
-      ? `${CLIENT_URL}/editor?paypal=0`
-      : `${CLIENT_URL}/checkout?status=failed&paypal=0`
-
+    // Smart Buttons popup flow doesn't need return/cancel URLs
     const order = await createPayPalOrder({
       amount,
       currency,
       description,
-      returnUrl,
-      cancelUrl,
     })
 
     pendingPayPalOrders.set(order.id, {
@@ -531,16 +523,18 @@ router.post('/paypal/create', async (req, res) => {
       },
     })
   } catch (error) {
-    console.error('PayPal create error:', error?.message, error?.details || '')
+    console.error('PayPal create error:', error?.message, JSON.stringify(error?.details || ''))
     if (error?.code === 'PAYPAL_CONFIG_MISSING') {
       return res.status(500).json({ success: false, error: 'إعدادات بايبال غير مكتملة على السيرفر.' })
     }
-    const detail = error?.details?.error_description || error?.details?.message || error?.message || ''
+    const issues = error?.details?.details || error?.details?.issues || []
+    const detail = issues?.[0]?.description || error?.details?.error_description || error?.details?.message || error?.message || ''
     res.status(500).json({
       success: false,
       error: 'تعذر بدء عملية الدفع.',
       detail: detail,
       paypalError: error?.details?.name || error?.details?.error || '',
+      issues: issues,
     })
   }
 })

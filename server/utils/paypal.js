@@ -75,7 +75,7 @@ export async function createPayPalOrder({ amount, currency = 'SAR', description,
   const purchaseUnit = {
     amount: {
       currency_code: currency,
-      value: String(amount),
+      value: Number(amount).toFixed(2),
     },
   }
   if (description) purchaseUnit.description = description
