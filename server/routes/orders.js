@@ -531,11 +531,17 @@ router.post('/paypal/create', async (req, res) => {
       },
     })
   } catch (error) {
-    console.error('PayPal create error:', error)
+    console.error('PayPal create error:', error?.message, error?.details || '')
     if (error?.code === 'PAYPAL_CONFIG_MISSING') {
       return res.status(500).json({ success: false, error: 'إعدادات بايبال غير مكتملة على السيرفر.' })
     }
-    res.status(500).json({ success: false, error: 'تعذر بدء عملية الدفع.' })
+    const detail = error?.details?.error_description || error?.details?.message || error?.message || ''
+    res.status(500).json({
+      success: false,
+      error: 'تعذر بدء عملية الدفع.',
+      detail: detail,
+      paypalError: error?.details?.name || error?.details?.error || '',
+    })
   }
 })
 

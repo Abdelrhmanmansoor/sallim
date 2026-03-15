@@ -1,8 +1,13 @@
-const PAYPAL_ENV = process.env.PAYPAL_ENV || 'sandbox'
-const PAYPAL_BASE_URL = process.env.PAYPAL_BASE_URL || (PAYPAL_ENV === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com')
-
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || ''
 const PAYPAL_SECRET = process.env.PAYPAL_SECRET || ''
+
+// Auto-detect environment from client ID prefix if PAYPAL_ENV not explicitly set
+// Live keys start with 'A', sandbox keys start with 'A' too but sandbox ones typically
+// come from sandbox.paypal.com. Best to rely on explicit env var.
+const PAYPAL_ENV = process.env.PAYPAL_ENV || 'live'
+const PAYPAL_BASE_URL = process.env.PAYPAL_BASE_URL || (PAYPAL_ENV === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com')
+
+console.log(`[PayPal] ENV=${PAYPAL_ENV}, BASE_URL=${PAYPAL_BASE_URL}, CLIENT_ID=${PAYPAL_CLIENT_ID ? PAYPAL_CLIENT_ID.slice(0, 8) + '...' : 'MISSING'}, SECRET=${PAYPAL_SECRET ? '***set***' : 'MISSING'}`)
 
 let cachedToken = null
 let cachedTokenExpiresAt = 0
@@ -33,7 +38,8 @@ async function getAccessToken() {
 
   const data = await res.json().catch(() => ({}))
   if (!res.ok) {
-    const err = new Error(data?.message || 'PayPal token error')
+    console.error(`[PayPal] Token error ${res.status}:`, JSON.stringify(data))
+    const err = new Error(data?.error_description || data?.message || `PayPal token error (${res.status})`)
     err.details = data
     throw err
   }
@@ -55,7 +61,9 @@ async function paypalRequest(path, options = {}) {
   })
   const data = await res.json().catch(() => ({}))
   if (!res.ok) {
-    const err = new Error(data?.message || 'PayPal request failed')
+    const errMsg = data?.message || data?.error_description || `PayPal request failed (${res.status})`
+    console.error(`[PayPal] API error ${res.status}:`, JSON.stringify(data))
+    const err = new Error(errMsg)
     err.details = data
     err.status = res.status
     throw err

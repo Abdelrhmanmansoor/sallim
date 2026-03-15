@@ -325,7 +325,11 @@ export default function CheckoutPageNew() {
             }),
           })
           const data = await res.json()
-          if (!res.ok || !data.success) throw new Error(data.error || 'فشل إنشاء طلب الدفع')
+          if (!res.ok || !data.success) {
+            const msg = data.detail || data.error || 'فشل إنشاء طلب الدفع'
+            console.error('PayPal create error:', data)
+            throw new Error(msg)
+          }
           return data.data.orderId
         },
         onApprove: async (data) => {
