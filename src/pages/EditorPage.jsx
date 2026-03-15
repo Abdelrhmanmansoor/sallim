@@ -130,6 +130,9 @@ const PREVIEW_NOTICE_KEY = 'sallim_preview_notice_seen'
 const PAYMENT_WARNING_KEY = 'sallim_payment_warning_seen'
 const PERSONAL_CHECKOUT_KEY = 'sallim_personal_checkout'
 
+// Template IDs that are free (no payment required)
+const FREE_TEMPLATE_IDS = new Set([3, '3', 114, '114'])
+
 /* أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯ Custom Hook: Load Image أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯ */
 function useImage(src) {
   const [image, setImage] = useState(null)
@@ -330,8 +333,8 @@ function EditorPageInner() {
       const id = Number.isNaN(numericTemplateId) ? urlTemplateId : numericTemplateId
       useEditorStore.getState().setTemplate(id)
       setMode('ready')
-      // Free templates bypass payment protection
-      if (searchParams.get('free') === '1') {
+      // Free templates bypass payment protection (from URL or by ID)
+      if (searchParams.get('free') === '1' || FREE_TEMPLATE_IDS.has(id)) {
         setTemporarilyUnlocked(true)
       }
     }
@@ -583,6 +586,9 @@ function EditorPageInner() {
       
       // Safely set template
       store.setTemplate(template.id)
+
+      // Update free/paid unlock status based on template
+      setTemporarilyUnlocked(FREE_TEMPLATE_IDS.has(template.id))
       
       // If in ready mode, set default colors from template
       if (mode === 'ready' && template.textColor) {
@@ -593,7 +599,6 @@ function EditorPageInner() {
     } catch (error) {
       console.error('Error in handleTemplateSelect:', error)
       toast.error('حدث خطأ أثناء اختيار القالب')
-      // Don't let error propagate to error boundary
     }
   }, [store, mode])
 
@@ -2185,7 +2190,9 @@ function EditorPageInner() {
               ) : finalReadyTemplates.length === 0 ? (
                 <div style={{ padding: '20px 0', width: '100%', textAlign: 'center', color: '#888', fontSize: 14 }}>لا توجد تصاميم متاحة حالياً.</div>
               ) : (
-                finalReadyTemplates.map((t) => (
+                finalReadyTemplates.map((t) => {
+                  const isFreeT = FREE_TEMPLATE_IDS.has(t.id)
+                  return (
                   <button
                     key={t.id}
                     onClick={() => handleTemplateSelect(t)}
@@ -2208,13 +2215,22 @@ function EditorPageInner() {
                     }}
                   >
                     <img src={t.image} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none' }} />
+                    <div style={{
+                      position: 'absolute', top: 6, left: 6, padding: '2px 7px', borderRadius: 6,
+                      background: isFreeT ? '#059669' : 'rgba(15,23,42,0.75)',
+                      color: '#fff', fontSize: 9, fontWeight: 800, fontFamily: ds.font,
+                      backdropFilter: 'blur(4px)'
+                    }}>
+                      {isFreeT ? 'مجاني' : 'مدفوع'}
+                    </div>
                     {store.selectedTemplate === t.id && (
                       <div style={{ position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: '50%', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <BsCheck2 size={16} />
                       </div>
                     )}
                   </button>
-                ))
+                  )
+                })
               )}
             </div>
 
