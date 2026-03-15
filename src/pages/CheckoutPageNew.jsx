@@ -336,7 +336,7 @@ export default function CheckoutPageNew() {
                 <div className="co-trust-row">
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><IconLock /> دفع مشفر</span>
                   <span>منتج سعودي</span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><IconShield /> تفعيل فوري</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><IconShield /> التسليم في نفس اليوم</span>
                 </div>
               </div>
             )}
@@ -423,7 +423,7 @@ export default function CheckoutPageNew() {
                 <p className="co-product-desc">{cardData?.description || 'يُفعَّل فور نجاح الدفع'}</p>
 
                 {/* Benefits */}
-                {['تفعيل فوري بعد إتمام الدفع', 'بدون علامة مائية على التصميم', 'دعم فني في حال واجهتك مشكلة', 'دفع مشفر وآمن بالكامل'].map((b) => (
+                {['التسليم في نفس اليوم بعد إتمام الدفع', 'بدون علامة مائية على التصميم', 'دعم فني في حال واجهتك مشكلة', 'دفع مشفر وآمن بالكامل'].map((b) => (
                   <div key={b} className="co-benefit">
                     <div className="co-benefit-icon"><IconCheck /></div>
                     <span>{b}</span>

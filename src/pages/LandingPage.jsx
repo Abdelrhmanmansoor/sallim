@@ -1290,7 +1290,7 @@ export default function LandingPage() {
             {[
               { icon: '🔒', text: 'دفع آمن ومشفّر' },
               { icon: '🇸🇦', text: 'منتج سعودي' },
-              { icon: '✅', text: 'تفعيل فوري' },
+              { icon: '✅', text: 'التسليم في نفس اليوم' },
               { icon: '🛡️', text: 'خصوصية محمية' },
             ].map((badge, i) => (
               <div key={i} style={{
