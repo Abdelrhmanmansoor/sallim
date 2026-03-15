@@ -61,6 +61,15 @@ const injectCheckoutCSS = (() => {
       .co-benefit-icon svg { width: 12px; height: 12px; color: var(--co-success); }
       .co-methods { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px; border-top: 1px solid var(--co-border); }
       .co-methods span { font-size: 11px; font-weight: 700; color: var(--co-muted); background: #f3f4f6; padding: 4px 10px; border-radius: 6px; }
+      .co-pay-tabs { display: flex; gap: 10px; margin-bottom: 18px; }
+      .co-pay-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 12px; border: 2px solid var(--co-border); border-radius: 12px; background: #fff; cursor: pointer; transition: all .2s; position: relative; }
+      .co-pay-tab:hover { border-color: #d1d5db; background: #fafafa; }
+      .co-pay-tab.co-pay-active { border-color: var(--co-brand); background: #fffdf5; box-shadow: 0 0 0 3px rgba(184,134,11,.08); }
+      .co-pay-tab-check { position: absolute; top: 8px; right: 8px; width: 20px; height: 20px; border-radius: 50%; background: var(--co-brand); display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(.6); transition: all .2s; }
+      .co-pay-tab.co-pay-active .co-pay-tab-check { opacity: 1; transform: scale(1); }
+      .co-pay-tab-logos { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; }
+      .co-pay-tab-label { font-size: 12px; font-weight: 700; color: var(--co-text); }
+      .co-pay-tab-sub { font-size: 10px; color: var(--co-muted); font-weight: 500; }
       .co-total-row { display: flex; align-items: center; justify-content: between; padding: 14px 22px; background: #f9fafb; border-top: 1px solid var(--co-border); }
       .co-total-label { flex: 1; font-size: 14px; font-weight: 800; }
       .co-total-value { font-size: 18px; font-weight: 900; display: flex; align-items: center; gap: 4px; }
@@ -86,6 +95,13 @@ const IconPhone = () => <svg viewBox="0 0 20 20" fill="currentColor" style={{wid
 const IconMail = () => <svg viewBox="0 0 20 20" fill="currentColor" style={{width:14,height:14}}><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
 const IconGift = () => <svg viewBox="0 0 20 20" fill="currentColor" style={{width:14,height:14}}><path fillRule="evenodd" d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 110 4h-5V9a1 1 0 10-2 0v1H4a2 2 0 110-4h1.17C5.06 5.687 5 5.35 5 5zm4 1V5a1 1 0 10-1 1h1zm2 0a1 1 0 10-1-1v1h1zm-6 7l.001-.12a1 1 0 01.98-.88H9v5H5a2 2 0 01-2-2v-2zm6 2.997V12h4.02a1 1 0 01.98.88L15 13v2a2 2 0 01-2 2h-2v-.003z" clipRule="evenodd"/></svg>
 
+/* ── Payment brand logos (inline SVG) ── */
+const LogoVisa = ({ size = 32 }) => <svg width={size} height={size * 0.64} viewBox="0 0 750 471" xmlns="http://www.w3.org/2000/svg"><path d="M278.2 334.2l39-233.4h62.3l-39 233.4h-62.3zm246.8-227.6c-12.3-4.8-31.6-9.9-55.8-9.9-61.5 0-104.8 32-105.2 77.8-.4 33.9 30.9 52.8 54.5 64.1 24.3 11.5 32.4 18.9 32.3 29.2-.2 15.8-19.4 23-37.3 23-24.9 0-38.1-3.6-58.6-12.4l-8-3.8-8.7 52.6c14.6 6.6 41.5 12.3 69.4 12.6 65.4 0 107.9-31.6 108.4-80.6.2-26.8-16.3-47.3-52.2-64.1-21.7-10.9-35-18.2-34.9-29.2 0-9.8 11.3-20.3 35.6-20.3 20.3-.3 35 4.3 46.5 9.1l5.6 2.7 8.4-50.8zm161.6-5.8h-48.1c-14.9 0-26 4.2-32.6 19.7l-92.3 215.7h65.3s10.7-29 13.1-35.3l79.7.1c1.9 8.2 7.6 35.2 7.6 35.2h57.7l-50.4-235.4zM627.5 282c5.2-13.6 24.9-66.2 24.9-66.2-.4.6 5.1-13.7 8.3-22.6l4.2 20.4s12 56.6 14.5 68.4h-51.9z" fill="#1a1f71"/><path d="M232.9 100.8l-61 159.5-6.5-32.6c-11.3-37.7-46.6-78.6-86.1-99.1l55.7 205.5 65.8-.1 97.9-233.3h-65.8z" fill="#1a1f71"/><path d="M131.9 100.8H33.5l-.8 4.7c78 19.5 129.6 66.6 151 123.1L162.3 121c-3.7-14.8-14.5-19.7-30.4-20.2z" fill="#f7a600"/></svg>
+const LogoMastercard = ({ size = 32 }) => <svg width={size} height={size * 0.62} viewBox="0 0 131.4 86.9" xmlns="http://www.w3.org/2000/svg"><circle cx="43.4" cy="43.4" r="43.4" fill="#eb001b"/><circle cx="87.9" cy="43.4" r="43.4" fill="#f79e1b"/><path d="M65.7 11c12 9.4 19.7 24 19.7 40.4S77.7 76.4 65.7 86a53.2 53.2 0 010-75z" fill="#ff5f00"/></svg>
+const LogoMada = ({ size = 38 }) => <svg width={size} height={size * 0.6} viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="120" rx="12" fill="#fff" stroke="#e0e0e0" strokeWidth="1"/><text x="100" y="66" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="900" fontSize="36" fill="#004d71">mada</text></svg>
+const LogoApplePay = ({ size = 38 }) => <svg width={size} height={size * 0.42} viewBox="0 0 165 70" xmlns="http://www.w3.org/2000/svg"><path d="M28.8 8.7c-2 2.4-5.2 4.3-8.4 4-0.4-3.2 1.1-6.6 3-8.7C25.5 1.5 28.9-0.2 31.7 0c0.3 3.3-0.9 6.5-2.9 8.7zm2.9 4.5c-4.7-0.3-8.6 2.6-10.8 2.6-2.2 0-5.6-2.5-9.2-2.4C6.8 13.5 2.3 16.4.9 21c-2.9 9.3.8 23.1 5.9 30.7 2.3 3.7 5.4 8 9.2 7.8 3.7-0.1 5.1-2.4 9.5-2.4 4.5 0 5.7 2.4 9.5 2.3 4-0.1 6.6-3.8 8.9-7.5 2.8-4.3 3.9-8.4 4-8.6-0.1-0.1-7.7-3-7.7-11.7 0-7.3 5.9-10.8 6.2-11-3.4-5-8.7-5.6-10.6-5.7v0.3z" fill="#000"/><path d="M66.3 4.7C75.7 4.7 82.3 11.2 82.3 20.5 82.3 29.9 75.6 36.5 66 36.5H56.6V53.2H49.6V4.7H66.3zm-9.7 25.5h7.8c6.6 0 10.4-3.6 10.4-9.6S71 11.1 64.4 11.1H56.6V30.2zM84.2 42.1c0-6.5 5-10.6 14-11.1l10.3-0.6v-2.9c0-4.2-2.8-6.6-7.5-6.6-4.4 0-7.2 2-7.8 5.1H86.6C87 20.8 92.5 16.5 100 16.5c7.8 0 13.4 4.3 13.4 10.8V53.2h-6.5V47.4h-0.2c-1.9 3.8-6.2 6.3-10.6 6.3C89.5 53.7 84.2 49.1 84.2 42.1zM108.5 38.9V36l-9.3 0.6c-4.7 0.3-7.3 2.3-7.3 5.5 0 3.2 2.7 5.3 6.9 5.3 5.5 0 9.7-3.7 9.7-8.5zM119 68.1V61.8c0.5 0.1 1.8 0.1 2.4 0.1 3.5 0 5.3-1.5 6.5-5.2 0-0.1 0.7-2.3 0.7-2.3L116.9 17h7.4L133 46.8h0.2L141.9 17h7.2L136.7 55.6c-3.2 9-6.9 11.9-14.7 11.9C121.2 67.5 119.5 67.4 119 68.1z" fill="#000"/></svg>
+const LogoPayPal = ({ size = 32 }) => <svg width={size} height={size * 0.78} viewBox="0 0 101 120" xmlns="http://www.w3.org/2000/svg"><path d="M88.4 23.9c2.5 5.8 1.5 12.7-1.5 18.3-5.3 10-17.5 14.6-28.8 14.6h-3.3c-2 0-3.7 1.4-4 3.4l-3.4 21.6-.9 6.1c-.3 1.7 1 3.3 2.7 3.3h18.4c1.7 0 3.2-1.2 3.5-2.9l.1-.7 2.8-17.5.2-.9c.3-1.7 1.8-2.9 3.5-2.9h2.2c14.2 0 25.3-5.8 28.6-22.5 1.4-7 .7-12.8-2.9-16.9-1.1-1.3-2.4-2.3-4-3.1z" fill="#009cde"/><path d="M82.1 21.4c-1-.3-2-.5-3-.7s-2.1-.3-3.3-.4c-3.8-.4-7.9-.1-12.4-.1H38.7c-.9 0-1.7.2-2.4.7-1.3.8-2.2 2.2-2.4 3.8l-6.7 42.3-.2 1.1c.3-2 2-3.4 4-3.4h8.3c16.4 0 29.2-6.7 32.9-25.9.1-.6.2-1.1.3-1.7 1.1-5.8.7-9.8-1.4-13-.6-.8-1.4-1.5-2.3-2.1-.4-.2-.8-.4-1.2-.6z" fill="#012169"/><path d="M33.6 24.7c.2-1.6 1.1-2.9 2.4-3.8.7-.4 1.5-.7 2.4-.7h24.7c2.9 0 5.6.2 8.1.5 1.2.2 2.3.4 3.3.6s2 .5 3 .7c.4.2.8.3 1.2.5 2.7 1.3 4.6 3.2 5.8 5.8-2.5-16.2-15.7-21.7-32.3-21.7H24.4c-2 0-3.7 1.4-4 3.4L10 71.8c-.3 1.9 1.2 3.7 3.2 3.7h23.1l5.8-36.8 1.5-14z" fill="#003087"/></svg>
+
 export default function CheckoutPageNew() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -110,6 +126,7 @@ export default function CheckoutPageNew() {
   const [step, setStep] = useState(0) // 0 = form, 1 = review
   const [errors, setErrors] = useState({})
   const [paypalReady, setPaypalReady] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState('card') // 'card' | 'paypal'
   const paypalContainerRef = useRef(null)
   const paypalButtonsRef = useRef(null)
   const [formData, setFormData] = useState({
@@ -277,9 +294,9 @@ export default function CheckoutPageNew() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEidSong, isCustomDesign, formData, templateId, cardId])
 
-  // Render PayPal Smart Buttons when SDK ready and on review step
+  // Render PayPal Smart Buttons when SDK ready, on review step, and paypal selected
   useEffect(() => {
-    if (!paypalReady || step !== 1 || !paypalContainerRef.current || !price) return
+    if (!paypalReady || step !== 1 || paymentMethod !== 'paypal' || !paypalContainerRef.current || !price) return
     // Destroy previous buttons if any
     if (paypalButtonsRef.current) {
       try { paypalButtonsRef.current.close() } catch (_) { /* ignore */ }
@@ -346,7 +363,7 @@ export default function CheckoutPageNew() {
       console.error('PayPal render error:', err)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paypalReady, step, price])
+  }, [paypalReady, step, price, paymentMethod])
 
   /* ── Verifying payment spinner ── */
   if (submitting && status === 'success') {
@@ -482,48 +499,86 @@ export default function CheckoutPageNew() {
                   </div>
                 </div>
 
-                {/* Actions */}
-                <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
-                  <button className="co-btn co-btn-outline" style={{ flex: 1 }} onClick={() => setStep(0)}>تعديل</button>
-                  <button className="co-btn co-btn-primary" style={{ flex: 2 }} onClick={handleSubmit} disabled={submitting || loadingCard}>
-                    {submitting ? <span className="co-spinner" /> : (
-                      <>
-                        <IconLock />
-                        <span>ادفع الآن</span>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>{price} <SAR size={12} color="#fff" /></span>
-                      </>
-                    )}
-                  </button>
+                {/* ── Payment Method Selector ── */}
+                <h3 style={{ fontSize: 14, fontWeight: 800, margin: '0 0 12px', color: '#374151' }}>اختر طريقة الدفع</h3>
+
+                <div className="co-pay-tabs">
+                  {/* PayPal Tab */}
+                  {PAYPAL_CLIENT_ID && (
+                    <div className={`co-pay-tab${paymentMethod === 'paypal' ? ' co-pay-active' : ''}`} onClick={() => setPaymentMethod('paypal')}>
+                      <div className="co-pay-tab-check"><svg viewBox="0 0 20 20" fill="#fff" style={{width:11,height:11}}><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg></div>
+                      <div className="co-pay-tab-logos">
+                        <LogoPayPal size={36} />
+                      </div>
+                      <span className="co-pay-tab-label">PayPal</span>
+                      <span className="co-pay-tab-sub">Visa / Mastercard / PayPal</span>
+                    </div>
+                  )}
+
+                  {/* Card Tab (PayMob) */}
+                  <div className={`co-pay-tab${paymentMethod === 'card' ? ' co-pay-active' : ''}`} onClick={() => setPaymentMethod('card')}>
+                    <div className="co-pay-tab-check"><svg viewBox="0 0 20 20" fill="#fff" style={{width:11,height:11}}><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg></div>
+                    <div className="co-pay-tab-logos">
+                      <LogoMada size={38} />
+                      <LogoVisa size={30} />
+                      <LogoMastercard size={28} />
+                      <LogoApplePay size={34} />
+                    </div>
+                    <span className="co-pay-tab-label">بطاقة بنكية</span>
+                    <span className="co-pay-tab-sub">مدى / Visa / Mastercard / Apple Pay</span>
+                  </div>
                 </div>
 
-                <p style={{ textAlign: 'center', fontSize: 11, color: '#9ca3af', margin: 0, lineHeight: 1.6 }}>
-                  ستنتقل لبوابة الدفع المشفرة لإتمام العملية بأمان
-                </p>
+                {/* ── PayPal Warning ── */}
+                {paymentMethod === 'paypal' && PAYPAL_CLIENT_ID && (
+                  <div style={{ padding: '10px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, fontSize: 11, color: '#991b1b', lineHeight: 1.8, textAlign: 'center', marginBottom: 14 }}>
+                    PayPal لا يدعم بطاقات مدى -- استخدم Visa او Mastercard او رصيد حسابك في PayPal
+                  </div>
+                )}
 
-                {/* PayPal Section */}
-                {PAYPAL_CLIENT_ID && (
-                  <>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '18px 0 14px' }}>
-                      <div style={{ flex: 1, height: 1, background: '#e5e7eb' }} />
-                      <span style={{ fontSize: 12, color: '#9ca3af', fontWeight: 600 }}>او ادفع عبر</span>
-                      <div style={{ flex: 1, height: 1, background: '#e5e7eb' }} />
-                    </div>
-
-                    <div style={{ padding: '10px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, fontSize: 11, color: '#991b1b', lineHeight: 1.8, textAlign: 'center', marginBottom: 12 }}>
-                      PayPal لا يدعم بطاقات مدى — استخدم Visa او Mastercard او حسابك في PayPal
-                    </div>
-
-                    <div ref={paypalContainerRef} style={{ minHeight: paypalReady ? 48 : 0 }} />
+                {/* ── PayPal Smart Buttons ── */}
+                {paymentMethod === 'paypal' && PAYPAL_CLIENT_ID && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div ref={paypalContainerRef} style={{ minHeight: paypalReady ? 52 : 0 }} />
                     {!paypalReady && (
-                      <div style={{ textAlign: 'center', padding: '12px 0', fontSize: 12, color: '#9ca3af' }}>
+                      <div style={{ textAlign: 'center', padding: '16px 0', fontSize: 12, color: '#9ca3af' }}>
+                        <span className="co-spinner" style={{ borderTopColor: '#003087', borderColor: 'rgba(0,48,135,.15)', width: 16, height: 16 }} />{' '}
                         جارٍ تحميل PayPal...
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* ── Card Payment Button (PayMob) ── */}
+                {paymentMethod === 'card' && (
+                  <>
+                    <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
+                      <button className="co-btn co-btn-outline" style={{ flex: 1 }} onClick={() => setStep(0)}>تعديل</button>
+                      <button className="co-btn co-btn-primary" style={{ flex: 2 }} onClick={handleSubmit} disabled={submitting || loadingCard}>
+                        {submitting ? <span className="co-spinner" /> : (
+                          <>
+                            <IconLock />
+                            <span>ادفع بالبطاقة</span>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>{price} <SAR size={12} color="#fff" /></span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <p style={{ textAlign: 'center', fontSize: 11, color: '#9ca3af', margin: '0 0 6px', lineHeight: 1.6 }}>
+                      ستنتقل لبوابة الدفع المشفرة لإتمام العملية بأمان
+                    </p>
                   </>
                 )}
 
-                <div style={{ marginTop: 14, padding: '10px 14px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, fontSize: 11, color: '#92400e', lineHeight: 1.8, textAlign: 'center' }}>
-                  قد يظهر المبلغ في إشعار البنك بعملة مختلفة (جنيه مصري أو دولار) — المبلغ الفعلي المسحوب هو نفسه بالريال السعودي بدون أي رسوم إضافية.
+                {/* Back button for PayPal mode */}
+                {paymentMethod === 'paypal' && (
+                  <div style={{ marginBottom: 12 }}>
+                    <button className="co-btn co-btn-outline" onClick={() => setStep(0)}>تعديل البيانات</button>
+                  </div>
+                )}
+
+                <div style={{ marginTop: 10, padding: '10px 14px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, fontSize: 11, color: '#92400e', lineHeight: 1.8, textAlign: 'center' }}>
+                  قد يظهر المبلغ في إشعار البنك بعملة مختلفة (جنيه مصري أو دولار) -- المبلغ الفعلي المسحوب هو نفسه بالريال السعودي بدون أي رسوم إضافية.
                 </div>
               </div>
             )}
@@ -572,8 +627,12 @@ export default function CheckoutPageNew() {
               </div>
 
               {/* Payment methods */}
-              <div className="co-methods">
-                {['مدى', 'Visa', 'Mastercard', 'Apple Pay', ...(PAYPAL_CLIENT_ID ? ['PayPal'] : [])].map((m) => <span key={m}>{m}</span>)}
+              <div className="co-methods" style={{ gap: 6, flexWrap: 'wrap' }}>
+                <LogoMada size={34} />
+                <LogoVisa size={28} />
+                <LogoMastercard size={24} />
+                <LogoApplePay size={32} />
+                {PAYPAL_CLIENT_ID && <LogoPayPal size={28} />}
               </div>
             </div>
           </aside>
