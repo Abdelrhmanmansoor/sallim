@@ -131,7 +131,7 @@ const PAYMENT_WARNING_KEY = 'sallim_payment_warning_seen'
 const PERSONAL_CHECKOUT_KEY = 'sallim_personal_checkout'
 
 // Template IDs that are free (no payment required)
-const FREE_TEMPLATE_IDS = new Set([3, '3', 114, '114'])
+const FREE_TEMPLATE_IDS = new Set([3, '3', 114, '114', 5, '5', 7, '7', 8, '8', 9, '9', 16, '16'])
 
 /* أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯ Custom Hook: Load Image أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯ */
 function useImage(src) {

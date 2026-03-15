@@ -33,9 +33,10 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState(null)
   const [previewTemplates, setPreviewTemplates] = useState([])
   const [showPopup, setShowPopup] = useState(false)
-  const [popupCountdown, setPopupCountdown] = useState(8)
+  const [popupCountdown, setPopupCountdown] = useState(3)
   const [playingAudio, setPlayingAudio] = useState(null)
   const [templateTab, setTemplateTab] = useState('free') // 'free' | 'paid'
+  const [marketingIdx, setMarketingIdx] = useState(0)
 
   const audioSamples = [
     { id: 1, label: 'نموذج صوتي 1', file: '/SOUND/ssstwitter.com_1773546744734.mp3' },
@@ -116,12 +117,12 @@ export default function LandingPage() {
 
 
   useEffect(() => {
-    // Show popup after 3 seconds
+    // Show popup after 1.5 seconds
     const timer = setTimeout(() => {
       setShowPopup(true)
-    }, 3000)
+    }, 1500)
 
-    // Countdown timer for popup
+    // Countdown timer for popup (3s auto-close)
     const countdownInterval = setInterval(() => {
       setPopupCountdown((prev) => {
         if (prev <= 1) {
@@ -137,6 +138,14 @@ export default function LandingPage() {
       clearTimeout(timer)
       clearInterval(countdownInterval)
     }
+  }, [])
+
+  // Rotate marketing messages every 4 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMarketingIdx(prev => (prev + 1) % 2)
+    }, 4000)
+    return () => clearInterval(interval)
   }, [])
 
   const handleClosePopup = () => {
@@ -185,7 +194,7 @@ export default function LandingPage() {
             }}
           >
             {/* Top Gradient Strip */}
-            <div style={{ height: '6px', background: 'linear-gradient(90deg, #f59e0b, #a855f7, #ec4899)' }} />
+            <div style={{ height: '6px', background: 'linear-gradient(90deg, #d4af37, #f5d77a, #d4af37)' }} />
 
             <div style={{ padding: '36px 32px 32px' }}>
               {/* Close Button */}
@@ -217,24 +226,24 @@ export default function LandingPage() {
                 position: 'absolute',
                 top: '20px',
                 left: '20px',
-                background: '#0f172a',
+                background: 'linear-gradient(135deg, #d4af37, #b8860b)',
                 color: '#fff',
                 padding: '5px 12px',
                 borderRadius: '100px',
                 fontSize: '12px',
                 fontWeight: 700,
               }}>
-                {popupCountdown}s
+                ⏱ {popupCountdown}s
               </div>
 
               {/* Icon + Title */}
               <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                <div style={{ width: '56px', height: '56px', margin: '0 auto 16px', borderRadius: '16px', background: 'linear-gradient(135deg, #f59e0b, #d97706)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Sparkles size={28} color="#fff" /></div>
-                <h2 style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a', marginBottom: '8px', lineHeight: 1.4 }}>
-                  عيدك أجمل مع سَلِّم
+                <div style={{ width: '60px', height: '60px', margin: '0 auto 16px', borderRadius: '50%', background: 'linear-gradient(135deg, #d4af37, #f5d77a)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(212,175,55,0.3)' }}><Sparkles size={28} color="#fff" /></div>
+                <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a', marginBottom: '6px', lineHeight: 1.4 }}>
+                  🎉 عيدك أجمل مع سَلِّم
                 </h2>
-                <p style={{ fontSize: '14px', color: '#94a3b8', lineHeight: 1.6 }}>
-                  اختر نوع التهنئة وابدأ فوراً
+                <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6 }}>
+                  ابدأ الآن واصنع تهنئة لا تُنسى
                 </p>
               </div>
 
@@ -371,14 +380,42 @@ export default function LandingPage() {
             justifyContent: 'center',
             position: 'relative',
             overflow: 'hidden',
-            background: 'linear-gradient(135deg, #171717 0%, #262626 100%)',
           }}
         >
+          {/* Desktop Banner */}
+          <picture>
+            <source media="(min-width: 769px)" srcSet="/images/banner-desktop.png" />
+            <source media="(max-width: 768px)" srcSet="/images/banner-mobile.png" />
+            <img
+              src="/images/banner-desktop.png"
+              alt="عيد مبارك"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'center',
+              }}
+            />
+          </picture>
+          {/* Dark overlay for readability */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'linear-gradient(to bottom, rgba(15,15,15,0.55) 0%, rgba(15,15,15,0.7) 50%, rgba(15,15,15,0.85) 100%)',
+            zIndex: 1,
+          }} />
+
           {/* Content */}
           <div
             style={{
               position: 'relative',
-              zIndex: 1,
+              zIndex: 2,
               maxWidth: '800px',
               margin: '0 auto',
               padding: '120px 24px',
@@ -419,11 +456,12 @@ export default function LandingPage() {
                 lineHeight: 1.1,
                 marginBottom: '24px',
                 letterSpacing: '-0.02em',
+                textShadow: '0 2px 20px rgba(0,0,0,0.4)',
               }}
             >
               صمّم بطاقتك
               <br />
-              <span style={{ color: '#a3a3a3' }}>بأناقة واحترافية</span>
+              <span style={{ color: '#f5d77a' }}>بأناقة واحترافية</span>
             </h1>
 
             <p
@@ -732,6 +770,11 @@ export default function LandingPage() {
             {(templateTab === 'free' ? [
               { id: "3",   name: "تصميم اللؤلؤة العربية",    img: "/templates/جاهزة/6.png",            badge: "مجاني" },
               { id: "114", name: "باترن السدو الفاخر",       img: "/templates/مصمم/Artboard 12.png",   badge: "مجاني" },
+              { id: "5",   name: "بطاقة الفانوس الذهبي",     img: "/templates/جاهزة/5.png",            badge: "مجاني" },
+              { id: "7",   name: "تهنئة الهلال المضيء",      img: "/templates/جاهزة/7.png",            badge: "جديد 🎁" },
+              { id: "8",   name: "بطاقة النجمة العربية",     img: "/templates/جاهزة/8.png",            badge: "مجاني" },
+              { id: "9",   name: "تصميم المسجد الأنيق",      img: "/templates/جاهزة/9.png",            badge: "مجاني" },
+              { id: "16",  name: "بطاقة الزخرفة الملكية",    img: "/templates/جاهزة/16.png",           badge: "جديد 🎁" },
             ] : [
               { id: "10",  name: "تصميم الخط الديواني الملكي", img: "/templates/جاهزة/10.png",  price: 10,  badge: "الأكثر طلباً" },
               { id: "11",  name: "بطاقة العيد العصرية",        img: "/templates/جاهزة/11.png",  price: 12,  badge: "جديد" },
@@ -763,6 +806,90 @@ export default function LandingPage() {
           .scrollbar-hide::-webkit-scrollbar { display: none; }
           .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         `}</style>
+      </section>
+
+      {/* ROTATING MARKETING SECTION */}
+      <section style={{ padding: '64px 0', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', overflow: 'hidden' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
+          <div style={{ position: 'relative', minHeight: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {/* For Corporates */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: marketingIdx === 0 ? 1 : 0,
+              transform: marketingIdx === 0 ? 'translateY(0)' : 'translateY(20px)',
+              transition: 'all 0.6s ease',
+            }}>
+              <span style={{ display: 'inline-block', background: 'rgba(168,85,247,0.15)', color: '#c084fc', padding: '6px 18px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, marginBottom: '20px', border: '1px solid rgba(168,85,247,0.2)' }}>
+                🏢 للشركات والمؤسسات
+              </span>
+              <h2 style={{ fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: 900, color: '#fff', lineHeight: 1.3, marginBottom: '16px' }}>
+                عزّز علاقتك بموظفيك وعملائك
+              </h2>
+              <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.8, maxWidth: '560px' }}>
+                أرسل تهنئة مخصصة باسم كل موظف وعميل دفعة واحدة — بهوية شركتك وشعارها — نظام جماعي يوفر وقتك ويترك أثراً مميزاً
+              </p>
+              <Link
+                to="/editor?mode=batch"
+                style={{ marginTop: '24px', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 32px', background: 'linear-gradient(135deg, #a855f7, #7e22ce)', color: '#fff', fontSize: '15px', fontWeight: 700, borderRadius: '14px', textDecoration: 'none', transition: 'all 200ms', boxShadow: '0 4px 20px rgba(168,85,247,0.4)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)' }}
+              >
+                جرّب النظام الجماعي
+              </Link>
+            </div>
+
+            {/* For Individuals */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: marketingIdx === 1 ? 1 : 0,
+              transform: marketingIdx === 1 ? 'translateY(0)' : 'translateY(20px)',
+              transition: 'all 0.6s ease',
+            }}>
+              <span style={{ display: 'inline-block', background: 'rgba(212,175,55,0.15)', color: '#f5d77a', padding: '6px 18px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, marginBottom: '20px', border: '1px solid rgba(212,175,55,0.2)' }}>
+                👨‍👩‍👧‍👦 للأفراد والعائلات
+              </span>
+              <h2 style={{ fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: 900, color: '#fff', lineHeight: 1.3, marginBottom: '16px' }}>
+                اصنع فرحة العيد بلمستك الخاصة
+              </h2>
+              <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.8, maxWidth: '560px' }}>
+                صمّم بطاقة تهنئة فريدة لأحبابك — اختر قالباً أنيقاً، أضف اسمهم، وشاركها فوراً عبر واتساب — مجاناً وبدون تسجيل
+              </p>
+              <Link
+                to="/editor?mode=ready"
+                style={{ marginTop: '24px', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 32px', background: 'linear-gradient(135deg, #d4af37, #b8860b)', color: '#fff', fontSize: '15px', fontWeight: 700, borderRadius: '14px', textDecoration: 'none', transition: 'all 200ms', boxShadow: '0 4px 20px rgba(212,175,55,0.4)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)' }}
+              >
+                ابدأ تصميم بطاقتك
+              </Link>
+            </div>
+          </div>
+
+          {/* Dots indicator */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: '16px' }}>
+            {[0, 1].map(i => (
+              <button key={i} onClick={() => setMarketingIdx(i)} style={{
+                width: marketingIdx === i ? 24 : 8,
+                height: 8,
+                borderRadius: 100,
+                border: 'none',
+                cursor: 'pointer',
+                background: marketingIdx === i ? '#d4af37' : 'rgba(255,255,255,0.2)',
+                transition: 'all 0.3s',
+              }} />
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* EID SONG — Premium Product Card */}
