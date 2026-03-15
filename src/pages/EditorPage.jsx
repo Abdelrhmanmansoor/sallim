@@ -2724,7 +2724,7 @@ function EditorPageInner() {
               ) : allTemplates.length === 0 ? (
                 <div style={{ padding: '20px 0', width: '100%', textAlign: 'center', color: '#888', fontSize: 14 }}>لا توجد تصاميم متاحة حالياً.</div>
               ) : (
-                allTemplates.filter(t => !t.image?.includes('ط·ع¾ط·آµط¸â€¦ط¸ظ¹ط¸â€¦ ط¸â€‍ط·آ±ط¸ظ¾ط·آ¹ ط·آµط¸ث†ط·آ±ط·آ©')).map((t) => (
+                allTemplates.filter(t => !t.image?.includes('تصميم لرفع صورة')).map((t) => (
                   <button
                     key={t.id}
                     onClick={() => handleTemplateSelect(t)}
@@ -3604,16 +3604,19 @@ function EditorPageInner() {
           </div>
         </div>
 
-        {/* Upload Button */}
-        <label style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%',
-          padding: '16px', background: '#f8f8f8', border: '2px dashed #ddd', borderRadius: 14,
-          cursor: 'pointer', marginBottom: 20, transition: 'all 200ms', fontFamily: ds.font
-        }}>
-          <input type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={handleTemplateUpload} />
-          <BsPlusLg size={16} />
-          <span style={{ fontSize: 14, fontWeight: 600 }}>رفع صور جديدة</span>
-        </label>
+        {/* Upload Button - Paid Feature (35 SAR) */}
+        <div
+          onClick={() => navigate('/checkout?product=custom-design&price=35&name=' + encodeURIComponent('رفع تصميم خاص'))}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%',
+            padding: '16px', background: 'linear-gradient(135deg, #f9f6ef, #fdf8ee)', border: '2px dashed #d4af37', borderRadius: 14,
+            cursor: 'pointer', marginBottom: 20, transition: 'all 200ms', fontFamily: ds.font, position: 'relative'
+          }}
+        >
+          <BsPlusLg size={16} color="#b8860b" />
+          <span style={{ fontSize: 14, fontWeight: 600, color: '#b8860b' }}>رفع تصميم خاص</span>
+          <span style={{ fontSize: 12, fontWeight: 800, color: '#fff', background: '#b8860b', padding: '3px 10px', borderRadius: 6 }}>35 ر.س</span>
+        </div>
 
         {/* Templates Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
@@ -4042,14 +4045,14 @@ function EditorPageInner() {
             <HiOutlineColorSwatch size={20} />
           </div>
           <div>
-            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>ط·آ§ط¸â€‍ط·ع¾ط¸â€ ط·آ³ط¸ظ¹ط¸â€ڑ</h3>
-            <p style={{ margin: 0, fontSize: 12, color: '#888' }}>ط·آ§ط¸â€‍ط·آ®ط·آ· ط¸ث†ط·آ§ط¸â€‍ط·آ£ط¸â€‍ط¸ث†ط·آ§ط¸â€  ط¸ث†ط·آ§ط¸â€‍ط·ع¾ط·آ£ط·آ«ط¸ظ¹ط·آ±ط·آ§ط·ع¾</p>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>التنسيق</h3>
+            <p style={{ margin: 0, fontSize: 12, color: '#888' }}>الخط والألوان والتأثيرات</p>
           </div>
         </div>
 
         {/* Font Selection */}
         <div style={{ marginBottom: 24 }}>
-          <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 10 }}>ط·آ§ط¸â€‍ط·آ®ط·آ·</label>
+          <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 10 }}>الخط</label>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {fonts.map(f => (
               <button key={f.id} onClick={() => store.setFont(f.id)} style={{
@@ -4066,22 +4069,22 @@ function EditorPageInner() {
 
         {/* Text Colors */}
         <div style={{ marginBottom: 24, borderTop: '1px solid #eee', paddingTop: 20 }}>
-          <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 14 }}>ط·آ£ط¸â€‍ط¸ث†ط·آ§ط¸â€  ط·آ§ط¸â€‍ط¸â€ ط·آµط¸ث†ط·آµ</label>
+          <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 14 }}>ألوان النصوص</label>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <ColorPicker value={store.textColor} onChange={store.setTextColor} label="ط·آ§ط¸â€‍ط·آ±ط·آ¦ط¸ظ¹ط·آ³ط¸ظ¹" />
-            <ColorPicker value={store.subTextColor} onChange={store.setSubTextColor} label="ط·آ§ط¸â€‍ط¸ظ¾ط·آ±ط·آ¹ط¸ظ¹" />
-            <ColorPicker value={store.recipientColor} onChange={store.setRecipientColor} label="ط·آ§ط¸â€‍ط¸â€¦ط·آ³ط·ع¾ط¸â€‍ط¸ع¯ط¸â€¦" />
-            <ColorPicker value={store.senderColor} onChange={store.setSenderColor} label="ط·آ§ط¸â€‍ط¸â€¦ط¸عˆط·آ±ط·آ³ط¸ع¯ط¸â€‍" />
+            <ColorPicker value={store.textColor} onChange={store.setTextColor} label="الرئيسي" />
+            <ColorPicker value={store.subTextColor} onChange={store.setSubTextColor} label="الفرعي" />
+            <ColorPicker value={store.recipientColor} onChange={store.setRecipientColor} label="المستلم" />
+            <ColorPicker value={store.senderColor} onChange={store.setSenderColor} label="المرسل" />
           </div>
         </div>
 
         {/* Effects */}
         <div style={{ borderTop: '1px solid #eee', paddingTop: 20 }}>
-          <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 14 }}>ط·آ§ط¸â€‍ط·ع¾ط·آ£ط·آ«ط¸ظ¹ط·آ±ط·آ§ط·ع¾</label>
+          <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 14 }}>التأثيرات</label>
 
           {/* Shadow Toggle */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 14, background: '#f8f8f8', borderRadius: 12, marginBottom: 10 }}>
-            <span style={{ fontSize: 13, fontWeight: 600 }}>ط·آ¸ط¸â€‍ ط·آ§ط¸â€‍ط¸â€ ط·آµ</span>
+            <span style={{ fontSize: 13, fontWeight: 600 }}>ظل النص</span>
             <button onClick={() => store.setTextShadow(!store.textShadow)} style={{
               width: 48, height: 28, borderRadius: 14, border: 'none', cursor: 'pointer',
               background: store.textShadow ? '#000' : '#ddd', position: 'relative', transition: 'all 200ms'
@@ -4092,7 +4095,7 @@ function EditorPageInner() {
 
           {/* Stroke Toggle */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 14, background: '#f8f8f8', borderRadius: 12, marginBottom: 10 }}>
-            <span style={{ fontSize: 13, fontWeight: 600 }}>ط·آ­ط·آ¯ط¸ث†ط·آ¯ ط·آ§ط¸â€‍ط¸â€ ط·آµ</span>
+            <span style={{ fontSize: 13, fontWeight: 600 }}>حدود النص</span>
             <button onClick={() => store.setTextStroke(!store.textStroke)} style={{
               width: 48, height: 28, borderRadius: 14, border: 'none', cursor: 'pointer',
               background: store.textStroke ? '#000' : '#ddd', position: 'relative', transition: 'all 200ms'
@@ -4104,18 +4107,18 @@ function EditorPageInner() {
           {store.textStroke && (
             <div style={{ padding: 14, background: '#f8f8f8', borderRadius: 12, marginBottom: 10, animation: 'fadeUp 200ms ease' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                <span style={{ fontSize: 13, fontWeight: 600 }}>ط·آ³ط¸â€¦ط¸ئ’ ط·آ§ط¸â€‍ط·آ­ط·آ¯ط¸ث†ط·آ¯</span>
+                <span style={{ fontSize: 13, fontWeight: 600 }}>سمك الحدود</span>
                 <span style={{ fontSize: 12, color: '#888' }}>{store.textStrokeWidth}px</span>
               </div>
               <input type="range" min={0.5} max={5} step={0.5} value={store.textStrokeWidth} onChange={(e) => store.setTextStrokeWidth(Number(e.target.value))} style={{ width: '100%', marginBottom: 12 }} />
-              <ColorPicker value={store.textStrokeColor} onChange={store.setTextStrokeColor} label="ط·آ§ط¸â€‍ط¸â€‍ط¸ث†ط¸â€ " />
+              <ColorPicker value={store.textStrokeColor} onChange={store.setTextStrokeColor} label="اللون" />
             </div>
           )}
 
           {/* Overlay */}
           <div style={{ padding: 14, background: '#f8f8f8', borderRadius: 12 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-              <span style={{ fontSize: 13, fontWeight: 600 }}>ط·آ·ط·آ¨ط¸â€ڑط·آ© ط¸â€‍ط¸ث†ط¸â€ ط¸ظ¹ط·آ©</span>
+              <span style={{ fontSize: 13, fontWeight: 600 }}>طبقة لونية</span>
               <span style={{ fontSize: 12, color: '#888' }}>{Math.round(store.overlayOpacity * 100)}%</span>
             </div>
             <input type="range" min={0} max={0.8} step={0.05} value={store.overlayOpacity} onChange={(e) => store.setOverlayOpacity(Number(e.target.value))} style={{ width: '100%', marginBottom: 12 }} />
