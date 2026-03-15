@@ -63,22 +63,27 @@ async function paypalRequest(path, options = {}) {
   return data
 }
 
-export async function createPayPalOrder({ amount, currency = 'SAR', returnUrl, cancelUrl }) {
+export async function createPayPalOrder({ amount, currency = 'SAR', description, returnUrl, cancelUrl }) {
+  const purchaseUnit = {
+    amount: {
+      currency_code: currency,
+      value: String(amount),
+    },
+  }
+  if (description) purchaseUnit.description = description
+
   const body = {
     intent: 'CAPTURE',
-    purchase_units: [
-      {
-        amount: {
-          currency_code: currency,
-          value: String(amount),
-        },
-      },
-    ],
-    application_context: {
+    purchase_units: [purchaseUnit],
+  }
+
+  // Only add application_context for redirect flow (not needed for Smart Buttons popup)
+  if (returnUrl || cancelUrl) {
+    body.application_context = {
       return_url: returnUrl,
       cancel_url: cancelUrl,
       user_action: 'PAY_NOW',
-    },
+    }
   }
 
   const data = await paypalRequest('/v2/checkout/orders', {

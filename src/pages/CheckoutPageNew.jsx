@@ -1,9 +1,10 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import SAR from '../components/SAR'
 
 const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
+const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID || ''
 
 /* ── inject checkout styles once ── */
 const injectCheckoutCSS = (() => {
@@ -108,6 +109,9 @@ export default function CheckoutPageNew() {
   const [cardData, setCardData] = useState(null)
   const [step, setStep] = useState(0) // 0 = form, 1 = review
   const [errors, setErrors] = useState({})
+  const [paypalReady, setPaypalReady] = useState(false)
+  const paypalContainerRef = useRef(null)
+  const paypalButtonsRef = useRef(null)
   const [formData, setFormData] = useState({
     customerName: '',
     customerPhone: '',
@@ -116,6 +120,21 @@ export default function CheckoutPageNew() {
   })
 
   useEffect(() => { injectCheckoutCSS() }, [])
+
+  // Load PayPal JS SDK
+  useEffect(() => {
+    if (!PAYPAL_CLIENT_ID) return
+    if (window.paypal) { setPaypalReady(true); return }
+    const existing = document.getElementById('paypal-sdk-script')
+    if (existing) { existing.addEventListener('load', () => setPaypalReady(true)); return }
+    const s = document.createElement('script')
+    s.id = 'paypal-sdk-script'
+    s.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=SAR&locale=ar_SA&intent=capture`
+    s.async = true
+    s.onload = () => setPaypalReady(true)
+    s.onerror = () => console.error('Failed to load PayPal SDK')
+    document.head.appendChild(s)
+  }, [])
 
   useEffect(() => {
     if (status === 'success' && orderId) {
@@ -239,6 +258,95 @@ export default function CheckoutPageNew() {
   }
 
   const price = cardData?.price || 0
+
+  // Post-PayPal-payment handler
+  const handlePayPalSuccess = useCallback((captureData) => {
+    toast.success('تم الدفع بنجاح عبر PayPal')
+    if (isEidSong || isCustomDesign) {
+      const msg = isEidSong
+        ? `تم دفع أغنية العيد باسم: ${formData.recipientName}\nPayPal Order: ${captureData.orderId}`
+        : `تم دفع تصميم خاص\nالاسم: ${formData.customerName}\nPayPal Order: ${captureData.orderId}`
+      window.location.href = `https://wa.me/966559955339?text=${encodeURIComponent(msg)}`
+    } else if (captureData.cardId) {
+      navigate(`/editor?cardId=${captureData.cardId}&purchase=${captureData.captureId}&autodownload=1`, { replace: true })
+    } else if (captureData.templateId || templateId) {
+      navigate(`/editor?template=${captureData.templateId || templateId}&purchase=${captureData.captureId}&autodownload=1`, { replace: true })
+    } else {
+      navigate('/', { replace: true })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEidSong, isCustomDesign, formData, templateId, cardId])
+
+  // Render PayPal Smart Buttons when SDK ready and on review step
+  useEffect(() => {
+    if (!paypalReady || step !== 1 || !paypalContainerRef.current || !price) return
+    // Destroy previous buttons if any
+    if (paypalButtonsRef.current) {
+      try { paypalButtonsRef.current.close() } catch (_) { /* ignore */ }
+      paypalButtonsRef.current = null
+      if (paypalContainerRef.current) paypalContainerRef.current.innerHTML = ''
+    }
+    try {
+      const buttons = window.paypal.Buttons({
+        style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 48 },
+        createOrder: async () => {
+          const sessionId = localStorage.getItem('sessionId') || crypto.randomUUID()
+          localStorage.setItem('sessionId', sessionId)
+          const token = localStorage.getItem('token')
+          const res = await fetch(`${apiBase}/api/v1/orders/paypal/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+            body: JSON.stringify({
+              product: isEidSong ? 'eid-song' : isCustomDesign ? 'custom-design' : isTemplate ? 'template' : 'card',
+              amount: price,
+              currency: 'SAR',
+              cardId,
+              templateId,
+              sessionId,
+              description: cardData?.name,
+              ...formData,
+            }),
+          })
+          const data = await res.json()
+          if (!res.ok || !data.success) throw new Error(data.error || 'فشل إنشاء طلب الدفع')
+          return data.data.orderId
+        },
+        onApprove: async (data) => {
+          try {
+            setSubmitting(true)
+            const token = localStorage.getItem('token')
+            const res = await fetch(`${apiBase}/api/v1/orders/paypal/capture`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+              body: JSON.stringify({ orderId: data.orderID }),
+            })
+            const result = await res.json()
+            if (!res.ok || !result.success) throw new Error(result.error || 'فشل تأكيد الدفع')
+            handlePayPalSuccess(result.data)
+          } catch (err) {
+            console.error('PayPal capture error:', err)
+            toast.error(err.message || 'فشل تأكيد الدفع')
+          } finally {
+            setSubmitting(false)
+          }
+        },
+        onError: (err) => {
+          console.error('PayPal error:', err)
+          toast.error('حدث خطأ في بوابة PayPal')
+        },
+        onCancel: () => {
+          toast('تم إلغاء عملية الدفع')
+        },
+      })
+      if (buttons.isEligible()) {
+        buttons.render(paypalContainerRef.current)
+        paypalButtonsRef.current = buttons
+      }
+    } catch (err) {
+      console.error('PayPal render error:', err)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paypalReady, step, price])
 
   /* ── Verifying payment spinner ── */
   if (submitting && status === 'success') {
@@ -391,6 +499,29 @@ export default function CheckoutPageNew() {
                 <p style={{ textAlign: 'center', fontSize: 11, color: '#9ca3af', margin: 0, lineHeight: 1.6 }}>
                   ستنتقل لبوابة الدفع المشفرة لإتمام العملية بأمان
                 </p>
+
+                {/* PayPal Section */}
+                {PAYPAL_CLIENT_ID && (
+                  <>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '18px 0 14px' }}>
+                      <div style={{ flex: 1, height: 1, background: '#e5e7eb' }} />
+                      <span style={{ fontSize: 12, color: '#9ca3af', fontWeight: 600 }}>او ادفع عبر</span>
+                      <div style={{ flex: 1, height: 1, background: '#e5e7eb' }} />
+                    </div>
+
+                    <div style={{ padding: '10px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, fontSize: 11, color: '#991b1b', lineHeight: 1.8, textAlign: 'center', marginBottom: 12 }}>
+                      PayPal لا يدعم بطاقات مدى — استخدم Visa او Mastercard او حسابك في PayPal
+                    </div>
+
+                    <div ref={paypalContainerRef} style={{ minHeight: paypalReady ? 48 : 0 }} />
+                    {!paypalReady && (
+                      <div style={{ textAlign: 'center', padding: '12px 0', fontSize: 12, color: '#9ca3af' }}>
+                        جارٍ تحميل PayPal...
+                      </div>
+                    )}
+                  </>
+                )}
+
                 <div style={{ marginTop: 14, padding: '10px 14px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, fontSize: 11, color: '#92400e', lineHeight: 1.8, textAlign: 'center' }}>
                   قد يظهر المبلغ في إشعار البنك بعملة مختلفة (جنيه مصري أو دولار) — المبلغ الفعلي المسحوب هو نفسه بالريال السعودي بدون أي رسوم إضافية.
                 </div>
@@ -442,7 +573,7 @@ export default function CheckoutPageNew() {
 
               {/* Payment methods */}
               <div className="co-methods">
-                {['مدى', 'Visa', 'Mastercard', 'Apple Pay'].map((m) => <span key={m}>{m}</span>)}
+                {['مدى', 'Visa', 'Mastercard', 'Apple Pay', ...(PAYPAL_CLIENT_ID ? ['PayPal'] : [])].map((m) => <span key={m}>{m}</span>)}
               </div>
             </div>
           </aside>

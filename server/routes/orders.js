@@ -447,29 +447,79 @@ router.post('/batch/checkout', async (req, res) => {
   }
 })
 
+// In-memory store for pending PayPal orders (verified on capture)
+const pendingPayPalOrders = new Map()
+setInterval(() => {
+  const now = Date.now()
+  for (const [id, d] of pendingPayPalOrders) {
+    if (now - d.createdAt > 3600000) pendingPayPalOrders.delete(id)
+  }
+}, 1800000)
+
 router.post('/paypal/create', async (req, res) => {
   try {
     const product = normalizeText(req.body?.product || 'batch', 40).toLowerCase()
-    if (product !== 'batch') {
-      return res.status(400).json({ success: false, error: 'طلب غير صالح.' })
+    const reqCurrency = normalizeText(req.body?.currency || 'SAR', 5).toUpperCase()
+
+    let amount, currency, description
+
+    if (product === 'batch') {
+      amount = BATCH_PAYPAL_AMOUNT
+      currency = BATCH_PAYPAL_CURRENCY
+      description = 'بطاقات تهنئة جماعية'
+    } else if (product === 'eid-song') {
+      amount = 50
+      currency = reqCurrency
+      description = 'أغنية العيد'
+    } else if (product === 'custom-design') {
+      amount = 35
+      currency = reqCurrency
+      description = 'تصميم خاص'
+    } else if (product === 'template' || product === 'card') {
+      amount = Number(req.body?.amount)
+      if (!Number.isFinite(amount) || amount < 1 || amount > 500) {
+        return res.status(400).json({ success: false, error: 'سعر غير صالح.' })
+      }
+      currency = reqCurrency
+      description = normalizeText(req.body?.description || 'قالب مميز', 80)
+    } else {
+      return res.status(400).json({ success: false, error: 'نوع المنتج غير صالح.' })
     }
 
-    const returnUrl = `${CLIENT_URL}/editor?paypal=1`
-    const cancelUrl = `${CLIENT_URL}/editor?paypal=0`
+    const returnUrl = product === 'batch'
+      ? `${CLIENT_URL}/editor?paypal=1`
+      : `${CLIENT_URL}/checkout?status=success&paypal=1`
+    const cancelUrl = product === 'batch'
+      ? `${CLIENT_URL}/editor?paypal=0`
+      : `${CLIENT_URL}/checkout?status=failed&paypal=0`
 
     const order = await createPayPalOrder({
-      amount: BATCH_PAYPAL_AMOUNT,
-      currency: BATCH_PAYPAL_CURRENCY,
+      amount,
+      currency,
+      description,
       returnUrl,
       cancelUrl,
+    })
+
+    pendingPayPalOrders.set(order.id, {
+      product,
+      amount,
+      currency,
+      customerName: normalizeText(req.body?.customerName, 120),
+      customerPhone: normalizeText(req.body?.customerPhone, 20),
+      customerEmail: normalizeText(req.body?.customerEmail, 120),
+      cardId: normalizeText(req.body?.cardId, 80),
+      sessionId: normalizeText(req.body?.sessionId, 80),
+      templateId: normalizeText(req.body?.templateId, 80),
+      createdAt: Date.now(),
     })
 
     await logEvent(req, {
       userType: 'customer',
       action: 'attempt',
       entity: 'payment',
-      description: 'إنشاء طلب دفع بايبال',
-      metadata: { provider: 'paypal', orderId: order.id, amount: BATCH_PAYPAL_AMOUNT, currency: BATCH_PAYPAL_CURRENCY },
+      description: `إنشاء طلب دفع بايبال — ${product}`,
+      metadata: { provider: 'paypal', orderId: order.id, product, amount, currency },
       success: true,
     })
 
@@ -494,21 +544,37 @@ router.post('/paypal/capture', async (req, res) => {
     const orderId = normalizeText(req.body?.orderId, 120)
     if (!orderId) return res.status(400).json({ success: false, error: 'معرّف الدفع غير صحيح.' })
 
+    const pending = pendingPayPalOrders.get(orderId)
+    if (!pending) {
+      return res.status(404).json({ success: false, error: 'طلب الدفع غير موجود أو منتهي الصلاحية.' })
+    }
+
     const result = await capturePayPalOrder(orderId)
     const ok = result.captureId && result.captureStatus === 'COMPLETED'
     if (!ok) return res.status(402).json({ success: false, error: 'الدفع غير مكتمل.' })
 
     const paidAmount = Number(result.amountValue || 0)
-    if (!Number.isFinite(paidAmount) || Math.abs(paidAmount - BATCH_PAYPAL_AMOUNT) > 0.01 || String(result.currencyCode || '').toUpperCase() !== BATCH_PAYPAL_CURRENCY) {
+    if (!Number.isFinite(paidAmount) || Math.abs(paidAmount - pending.amount) > 0.01) {
       return res.status(402).json({ success: false, error: 'قيمة الدفع غير صحيحة.' })
     }
+
+    pendingPayPalOrders.delete(orderId)
 
     await logEvent(req, {
       userType: 'customer',
       action: 'purchase',
       entity: 'payment',
-      description: 'تأكيد دفع بايبال',
-      metadata: { provider: 'paypal', orderId, captureId: result.captureId, status: result.captureStatus },
+      description: `تأكيد دفع بايبال — ${pending.product}`,
+      metadata: {
+        provider: 'paypal',
+        orderId,
+        captureId: result.captureId,
+        status: result.captureStatus,
+        product: pending.product,
+        amount: paidAmount,
+        currency: result.currencyCode,
+        customerName: pending.customerName,
+      },
       success: true,
     })
 
@@ -520,6 +586,9 @@ router.post('/paypal/capture', async (req, res) => {
         captureStatus: result.captureStatus,
         amount: result.amountValue,
         currency: result.currencyCode,
+        product: pending.product,
+        cardId: pending.cardId,
+        templateId: pending.templateId,
       },
     })
   } catch (error) {
