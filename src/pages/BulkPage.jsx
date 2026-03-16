@@ -1,9 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { templates as localTemplates, designerOnlyTemplates, fonts } from '../data/templates'
 import { useCurrency } from '../utils/useCurrency'
 import toast, { Toaster } from 'react-hot-toast'
-import html2canvas from 'html2canvas'
 
 const WA = '201007835547'
 const FONT = "'Tajawal', sans-serif"
@@ -170,26 +169,36 @@ export default function BulkPage() {
   const [customCount, setCustomCount] = useState(30)
   const [expandedPkg, setExpandedPkg] = useState(null)
   const [trialCount, setTrialCount] = useState(getTrialCount())
+  
   const nameRef = useRef(null)
   const editorRef = useRef(null)
 
+  // Inject CSS once on mount
   useEffect(() => {
     injectCss(MARQUEE_CSS)
   }, [])
 
-  const isTrialExhausted = trialCount >= MAX_FREE_TRIALS
+  // Check if trials exhausted
+  const isTrialExhausted = useMemo(() => trialCount >= MAX_FREE_TRIALS, [trialCount])
 
-  const handleSelectTemplate = (tmpl) => {
+  // Template selection handler
+  const handleSelectTemplate = useCallback((tmpl) => {
     if (isTrialExhausted) {
       toast.error('انتهت المحاولات المجانية — اشترِ باقة للمتابعة')
       return
     }
     setSelectedTmpl(tmpl)
     setTimeout(() => editorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150)
-  }
+  }, [isTrialExhausted])
 
-  const fmtForeign = (sar) => isForeign ? ` (${convertFromSAR(sar)} ${currency})` : ''
-  const customPrice = Math.round(calcCustom(customCount))
+  // Format foreign currency
+  const fmtForeign = useCallback((sar) => 
+    isForeign ? ` (${convertFromSAR(sar)} ${currency})` : '', 
+    [isForeign, convertFromSAR, currency]
+  )
+  
+  // Calculate custom price
+  const customPrice = useMemo(() => Math.round(calcCustom(customCount)), [customCount])
 
   return (
     <div dir="rtl" style={{ minHeight: '100vh', background: '#fafafa', fontFamily: FONT, color: '#111827', overflowX: 'hidden' }}>
@@ -969,81 +978,122 @@ function FullEditor({ template, initialName, onClose, onNameChange, onDownloadSu
   const [logoPos, setLogoPos] = useState({ x: 50, y: 15 })
   const [downloading, setDownloading] = useState(false)
   const [downloaded, setDownloaded] = useState(false)
-  const [imgDimensions, setImgDimensions] = useState({ width: 1080, height: 1920 })
+  
   const previewRef = useRef(null)
+  const canvasRef = useRef(null)
   const logoInputRef = useRef(null)
-  const imgRef = useRef(null)
 
+  // Sync name with parent
   useEffect(() => {
     setCardName(initialName || '')
   }, [initialName])
 
-  // تحديد أبعاد الصورة الأصلية
-  useEffect(() => {
-    if (template.image && imgRef.current) {
-      const img = new Image()
-      img.onload = () => {
-        setImgDimensions({ width: img.naturalWidth, height: img.naturalHeight })
-      }
-      img.src = template.image
-    }
-  }, [template.image])
-
-  const handleNameChange = (val) => {
+  // Name change handler
+  const handleNameChange = useCallback((val) => {
     setCardName(val)
     onNameChange?.(val)
-  }
+  }, [onNameChange])
 
-  const handleLogoUpload = (e) => {
+  // Logo upload handler
+  const handleLogoUpload = useCallback((e) => {
     const file = e.target.files?.[0]
     if (file) {
       const reader = new FileReader()
       reader.onload = (ev) => setLogo(ev.target?.result)
       reader.readAsDataURL(file)
     }
-  }
+  }, [])
 
-  const handleDownload = useCallback(async () => {
-    if (!previewRef.current || !cardName.trim()) {
+  // Download handler with Canvas API
+  const handleDownload = useCallback(() => {
+    const canvas = canvasRef.current
+    if (!canvas || !cardName.trim()) {
       toast.error('أدخل الاسم أولاً')
       return
     }
+    
     setDownloading(true)
     
-    try {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    
+    img.onload = () => {
       // استخدم الأبعاد الأصلية للصورة
-      const canvas = await html2canvas(previewRef.current, {
-        useCORS: true,
-        allowTaint: true,
-        scale: 2,
-        logging: false,
-        backgroundColor: null,
-        width: imgDimensions.width,
-        height: imgDimensions.height,
-      })
-      
-      const link = document.createElement('a')
-      link.download = `سلّم-${cardName}.png`
-      link.href = canvas.toDataURL('image/png', 1.0)
-      link.click()
-      
-      setDownloaded(true)
-      onDownloadSuccess?.()
-      toast.success('تم تحميل البطاقة بنجاح')
-    } catch (err) {
-      console.error('Error downloading:', err)
-      toast.error('حدث خطأ أثناء التحميل')
-    } finally {
-      setDownloading(false)
-    }
-  }, [cardName, imgDimensions, onDownloadSuccess])
+      canvas.width = img.naturalWidth
+      canvas.height = img.naturalHeight
+      const ctx = canvas.getContext('2d')
 
-  const presetGreetings = [
+      // ارسم الخلفية
+      ctx.drawImage(img, 0, 0)
+
+      // ارسم اللوجو إذا موجود
+      if (logo) {
+        const logoImg = new Image()
+        logoImg.onload = () => {
+          const logoW = (logoSize / 100) * canvas.width
+          const logoH = logoW
+          const logoX = (canvas.width - logoW) / 2
+          const logoY = (logoPos.y / 100) * canvas.height
+          ctx.drawImage(logoImg, logoX, logoY, logoW, logoH)
+          
+          drawTexts()
+        }
+        logoImg.src = logo
+      } else {
+        drawTexts()
+      }
+
+      function drawTexts() {
+        // إعداد الظل
+        if (textShadow) {
+          ctx.shadowColor = 'rgba(0,0,0,0.6)'
+          ctx.shadowBlur = 15
+        }
+
+        // نص التهنئة
+        if (showGreeting && greetingText.trim()) {
+          const greetSize = Math.round(canvas.width * (greetingSize / 360))
+          ctx.font = `700 ${greetSize}px ${fontFamily.family}, 'Cairo', 'Amiri', sans-serif`
+          ctx.textAlign = 'center'
+          ctx.fillStyle = textColor
+          ctx.fillText(greetingText, canvas.width / 2, (greetingPos.y / 100) * canvas.height)
+        }
+
+        // الاسم
+        const nameSize = Math.round(canvas.width * (fontSize / 360))
+        ctx.font = `800 ${nameSize}px ${fontFamily.family}, 'Cairo', 'Amiri', sans-serif`
+        ctx.textAlign = 'center'
+        ctx.fillStyle = textColor
+        ctx.fillText(cardName, canvas.width / 2, (textPos.y / 100) * canvas.height)
+
+        // التحميل
+        const link = document.createElement('a')
+        link.download = `سلّم-${cardName}.png`
+        link.href = canvas.toDataURL('image/png', 1.0)
+        link.click()
+
+        setDownloaded(true)
+        setDownloading(false)
+        onDownloadSuccess?.()
+        toast.success('تم تحميل البطاقة بنجاح')
+      }
+    }
+    
+    img.onerror = () => {
+      setDownloading(false)
+      toast.error('حدث خطأ في تحميل الصورة')
+    }
+    
+    img.src = template.image
+  }, [cardName, template.image, logo, logoSize, logoPos, showGreeting, greetingText, greetingSize, greetingPos, textColor, fontFamily, textShadow, textPos, fontSize, onDownloadSuccess])
+
+  // Preset greetings
+  const presetGreetings = useMemo(() => [
     'عيد مبارك',
     'كل عام وأنتم بخير',
     'تقبل الله طاعتكم',
     'عساكم من عواده',
-  ]
+  ], [])
 
   return (
     <div style={{ 
@@ -1336,11 +1386,10 @@ function FullEditor({ template, initialName, onClose, onNameChange, onDownloadSu
             ref={previewRef}
             style={{
               position: 'relative',
-              width: imgDimensions.width,
-              height: imgDimensions.height,
-              maxWidth: '100%',
-              maxHeight: '70vh',
+              width: '100%',
+              maxWidth: 360,
               margin: '0 auto',
+              aspectRatio: '9/16',
               borderRadius: 16,
               overflow: 'hidden',
               background: '#1a1a2e',
@@ -1349,7 +1398,6 @@ function FullEditor({ template, initialName, onClose, onNameChange, onDownloadSu
           >
             {template.image && (
               <img
-                ref={imgRef}
                 src={template.image}
                 alt={template.name}
                 crossOrigin="anonymous"
@@ -1422,6 +1470,8 @@ function FullEditor({ template, initialName, onClose, onNameChange, onDownloadSu
           <div style={{ fontSize: 10, color: '#d1d5db', textAlign: 'center', marginTop: 8 }}>
             منصة سلّم | sallim.co
           </div>
+          {/* Canvas مخفي للتصدير */}
+          <canvas ref={canvasRef} style={{ display: 'none' }} />
         </div>
       </div>
     </div>
