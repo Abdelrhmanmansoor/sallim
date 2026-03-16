@@ -2042,65 +2042,49 @@ function EditorPageInner() {
           }}>
             <BsPencilFill size={14} /> مصمم
           </button>
-          <button onClick={() => {
-            if (isPersonalDesignLocked && mode !== 'batch') return
-            setMode('batch')
-          }} style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: 'clamp(10px, 2.6vw, 12px) clamp(12px, 4.6vw, 24px)',
-            borderRadius: 12,
-            border: mode === 'batch' ? 'none' : '2px solid #a855f7',
-            cursor: 'pointer',
-            fontSize: 'clamp(12px, 3.2vw, 14px)',
-            fontWeight: 700,
-            fontFamily: ds.font,
-            whiteSpace: 'nowrap',
-            flex: '1 1 140px',
-            justifyContent: 'center',
-            background: mode === 'batch' ? 'linear-gradient(135deg, #a855f7, #7e22ce)' : 'transparent',
-            color: mode === 'batch' ? '#fff' : '#a855f7',
-            transition: 'all 200ms'
-          }}>
-            <BsPeople size={16} /> جماعي
-          </button>
         </div>
 
-        {mode === 'batch' && (
-          <div style={{
-            width: '100%',
-            maxWidth: 520,
-            background: '#f8fafc',
-            border: '1px solid #e2e8f0',
-            borderRadius: 14,
-            padding: '12px 14px',
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: 10,
-          }}>
+        {/* Bulk Sending CTA - visible in ready/designer modes */}
+        {mode !== 'batch' && (
+          <div
+            onClick={() => window.location.href = '/bulk'}
+            style={{
+              width: '100%',
+              maxWidth: 520,
+              background: 'linear-gradient(135deg, #f5f3ff, #ede9fe)',
+              border: '2px solid #c4b5fd',
+              borderRadius: 14,
+              padding: '14px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              cursor: 'pointer',
+              transition: 'all 200ms',
+              marginTop: 6,
+            }}
+          >
             <div style={{
-              width: 34,
-              height: 34,
+              width: 38,
+              height: 38,
               borderRadius: 12,
-              background: '#0f172a',
+              background: 'linear-gradient(135deg, #a855f7, #7e22ce)',
               color: '#fff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flex: '0 0 auto',
-              marginTop: 2,
             }}>
-              <BsPeople size={16} />
+              <BsPeople size={18} />
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 900, color: '#0f172a', marginBottom: 4, fontFamily: ds.font }}>
-                الإرسال الجماعي في ثواني
+              <div style={{ fontSize: 13, fontWeight: 900, color: '#5b21b6', marginBottom: 2, fontFamily: ds.font }}>
+                تريد ترسل لمجموعة كبيرة؟
               </div>
-              <div style={{ fontSize: 12, color: '#334155', lineHeight: 1.8, fontFamily: ds.font }}>
-                اكتب الأسماء (حتى {batchMaxRecipients}) → جهّز → حمّل ملف ZIP.
+              <div style={{ fontSize: 11, color: '#7c3aed', lineHeight: 1.6, fontFamily: ds.font }}>
+                نظام الإرسال الجماعي — اكتب الأسماء وحمّل كل البطاقات دفعة واحدة
               </div>
             </div>
+            <BsArrowLeft size={16} color="#7c3aed" />
           </div>
         )}
 
