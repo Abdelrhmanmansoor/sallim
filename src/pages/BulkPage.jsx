@@ -149,6 +149,16 @@ function setCookie(name, value, hours = 24) {
   const exp = new Date(Date.now() + hours * 3600000).toUTCString()
   document.cookie = `${name}=${value};expires=${exp};path=/`
 }
+function getTrialCount() {
+  const count = getCookie('sallim_trial_count')
+  return count ? parseInt(count) : 0
+}
+function incrementTrialCount() {
+  const current = getTrialCount()
+  setCookie('sallim_trial_count', String(current + 1), 168) // 7 days
+  return current + 1
+}
+const MAX_FREE_TRIALS = 2
 
 /* ═══════════════════════════════════════════════════
    MAIN COMPONENT
@@ -157,39 +167,24 @@ export default function BulkPage() {
   const { isForeign, convertFromSAR, currency, flag } = useCurrency()
   const [name, setName] = useState('')
   const [selectedTmpl, setSelectedTmpl] = useState(null)
-  const [showEditor, setShowEditor] = useState(false)
   const [customCount, setCustomCount] = useState(30)
   const [expandedPkg, setExpandedPkg] = useState(null)
+  const [trialCount, setTrialCount] = useState(getTrialCount())
   const nameRef = useRef(null)
-  const trialRef = useRef(null)
   const editorRef = useRef(null)
 
   useEffect(() => {
     injectCss(MARQUEE_CSS)
   }, [])
 
+  const isTrialExhausted = trialCount >= MAX_FREE_TRIALS
+
   const handleSelectTemplate = (tmpl) => {
-    if (getCookie('sallim_trial_used')) {
-      toast.error('استخدمت التجربة المجانية — اشترِ باقة للمتابعة')
+    if (isTrialExhausted) {
+      toast.error('انتهت المحاولات المجانية — اشترِ باقة للمتابعة')
       return
     }
     setSelectedTmpl(tmpl)
-    setShowEditor(false)
-    setTimeout(() => nameRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150)
-    setTimeout(() => nameRef.current?.focus(), 300)
-  }
-
-  const handleActivateEditor = () => {
-    if (!name.trim()) {
-      toast.error('اكتب اسمك أولاً')
-      nameRef.current?.focus()
-      return
-    }
-    if (!selectedTmpl) {
-      toast.error('اختر تصميم أولاً')
-      return
-    }
-    setShowEditor(true)
     setTimeout(() => editorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150)
   }
 
@@ -216,7 +211,7 @@ export default function BulkPage() {
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a
-              href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى أطلب باقة بطاقات تهنئة من سلّم 🎉')}`}
+              href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى أطلب باقة بطاقات تهنئة من سلّم')}`}
               target="_blank" rel="noopener noreferrer"
               style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '16px 36px', background: ORANGE, color: '#fff', borderRadius: 12, fontSize: 16, fontWeight: 800, textDecoration: 'none', boxShadow: '0 6px 20px rgba(234,88,12,0.3)', fontFamily: FONT }}
             >
@@ -244,19 +239,18 @@ export default function BulkPage() {
       <section style={{ padding: 'clamp(56px,8vw,80px) 24px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{ 
-            display: 'inline-flex', alignItems: 'center', gap: 8, 
-            background: 'linear-gradient(135deg, #f3f0ff 0%, #ede9fe 100%)', 
-            borderRadius: 25, padding: '8px 20px', marginBottom: 16,
-            border: '1px solid #e9d5ff'
+            display: 'inline-flex', alignItems: 'center', gap: 10, 
+            background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)', 
+            borderRadius: 30, padding: '10px 24px', marginBottom: 20,
+            border: '1px solid #2d2d44'
           }}>
-            <span style={{ fontSize: 20 }}>✨</span>
-            <span style={{ fontSize: 14, color: PURPLE, fontWeight: 700 }}>جرّب مجاناً — بدون تسجيل</span>
+            <span style={{ fontSize: 14, color: '#a78bfa', fontWeight: 700 }}>جرّب مجاناً — {MAX_FREE_TRIALS - trialCount} محاولة متبقية</span>
           </div>
           <h2 style={{ fontSize: 'clamp(24px,5vw,38px)', fontWeight: 900, color: '#111827', marginBottom: 12 }}>
             اختر التصميم الذي يعجبك
           </h2>
           <p style={{ fontSize: 16, color: '#6b7280', maxWidth: 480, margin: '0 auto' }}>
-            اختر من بين أكثر من 30 تصميم احترافي، ثم أدخل اسمك وحرر بطاقتك
+            اختر من بين أكثر من 30 تصميم احترافي
           </p>
         </div>
 
@@ -273,105 +267,66 @@ export default function BulkPage() {
               template={t}
               selected={selectedTmpl?.id === t.id}
               onSelect={() => handleSelectTemplate(t)}
-              disabled={!!getCookie('sallim_trial_used') && selectedTmpl?.id !== t.id}
+              disabled={isTrialExhausted && selectedTmpl?.id !== t.id}
               index={idx}
             />
           ))}
         </div>
 
-        {/* قسم إدخال الاسم - يظهر بعد اختيار التصميم */}
-        {selectedTmpl && (
-          <div style={{
-            background: 'linear-gradient(135deg, #faf5ff 0%, #f3f0ff 100%)',
-            borderRadius: 24,
-            padding: 'clamp(24px,4vw,40px)',
-            border: '2px solid #e9d5ff',
-            marginBottom: 32,
-            animation: 'fadeInUp 0.5s ease-out'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 24 }}>
-              <div style={{ 
-                width: 60, height: 80, borderRadius: 10, overflow: 'hidden', 
-                boxShadow: '0 4px 12px rgba(124,58,237,0.2)',
-                border: '2px solid #7c3aed'
-              }}>
-                <img src={selectedTmpl.image} alt={selectedTmpl.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 13, color: '#9ca3af', marginBottom: 4 }}>التصميم المختار</div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: '#111827' }}>{selectedTmpl.name}</div>
-              </div>
-            </div>
-
-            <div style={{ maxWidth: 500, margin: '0 auto' }}>
-              <label style={{ display: 'block', fontSize: 14, fontWeight: 700, color: '#374151', marginBottom: 10, textAlign: 'center' }}>
-                الآن أدخل اسمك على البطاقة
-              </label>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <input
-                  ref={nameRef}
-                  type="text" 
-                  value={name} 
-                  onChange={e => setName(e.target.value)}
-                  placeholder="مثال: محمد العتيبي" 
-                  dir="rtl"
-                  style={{ 
-                    flex: 1, padding: '16px 20px', 
-                    background: '#fff', 
-                    border: '2px solid #e5e7eb', 
-                    borderRadius: 14, 
-                    fontSize: 16, 
-                    fontFamily: FONT, 
-                    color: '#111827', 
-                    outline: 'none', 
-                    transition: 'all 0.3s',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-                  }}
-                  onFocus={e => {
-                    e.currentTarget.style.borderColor = PURPLE
-                    e.currentTarget.style.boxShadow = '0 0 0 4px rgba(124,58,237,0.1)'
-                  }}
-                  onBlur={e => {
-                    e.currentTarget.style.borderColor = '#e5e7eb'
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)'
-                  }}
-                  onKeyDown={e => e.key === 'Enter' && handleActivateEditor()}
-                />
-                <button 
-                  onClick={handleActivateEditor} 
-                  style={{ 
-                    padding: '16px 28px', 
-                    background: `linear-gradient(135deg, ${PURPLE} 0%, #a855f7 100%)`,
-                    color: '#fff', 
-                    border: 'none', 
-                    borderRadius: 14, 
-                    fontSize: 15, 
-                    fontWeight: 800, 
-                    cursor: 'pointer', 
-                    fontFamily: FONT, 
-                    whiteSpace: 'nowrap',
-                    boxShadow: '0 4px 16px rgba(124,58,237,0.3)',
-                    transition: 'all 0.3s'
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-                  onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
-                >
-                  🎨 تفعيل المحرر
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* المحرر الكامل - يفتح في نفس الصفحة */}
-        {showEditor && selectedTmpl && (
+        {/* المحرر الكامل - يفتح مباشرة بعد اختيار التصميم */}
+        {selectedTmpl && !isTrialExhausted && (
           <div ref={editorRef} style={{ animation: 'slideInScale 0.5s ease-out' }}>
             <FullEditor
               template={selectedTmpl}
               initialName={name}
-              onClose={() => { setShowEditor(false) }}
               onNameChange={setName}
+              onClose={() => setSelectedTmpl(null)}
+              onDownloadSuccess={() => {
+                const newCount = incrementTrialCount()
+                setTrialCount(newCount)
+                if (newCount >= MAX_FREE_TRIALS) {
+                  toast.success('انتهت المحاولات المجانية — اشترِ باقة للمزيد')
+                }
+              }}
+              remainingTrials={MAX_FREE_TRIALS - trialCount}
             />
+          </div>
+        )}
+
+        {/* رسالة انتهاء المحاولات */}
+        {isTrialExhausted && (
+          <div style={{
+            background: '#fff',
+            borderRadius: 20,
+            padding: 40,
+            textAlign: 'center',
+            border: '1px solid #e5e7eb',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.06)'
+          }}>
+            <div style={{ 
+              width: 56, height: 56, borderRadius: '50%', 
+              background: '#fee2e2', display: 'flex', 
+              alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 20px', fontSize: 24, color: '#dc2626'
+            }}>!</div>
+            <h3 style={{ fontSize: 20, fontWeight: 800, color: '#111827', marginBottom: 10 }}>
+              انتهت المحاولات المجانية
+            </h3>
+            <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 24, lineHeight: 1.6 }}>
+              استمتعت بمحاولتين مجانيتين.<br />اشترِ باقة للحصول على المزيد من البطاقات.
+            </p>
+            <a
+              href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى باقة بطاقات من سلّم')}`}
+              target="_blank" rel="noopener noreferrer"
+              style={{ 
+                display: 'inline-block', 
+                padding: '14px 32px', background: PURPLE, color: '#fff', 
+                borderRadius: 10, fontSize: 15, fontWeight: 700, 
+                textDecoration: 'none', fontFamily: FONT 
+              }}
+            >
+              اطلب باقة الآن
+            </a>
           </div>
         )}
       </section>
@@ -420,7 +375,7 @@ export default function BulkPage() {
           {/* CTA below features */}
           <div style={{ marginTop: 48, textAlign: 'center' }}>
             <a
-              href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى أطلب باقة بطاقات تهنئة من سلّم 🎉')}`}
+              href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى أطلب باقة بطاقات تهنئة من سلّم')}`}
               target="_blank" rel="noopener noreferrer"
               style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '16px 40px', background: ORANGE, color: '#fff', borderRadius: 12, fontSize: 16, fontWeight: 800, textDecoration: 'none', boxShadow: '0 6px 20px rgba(234,88,12,0.3)', fontFamily: FONT }}
             >
@@ -599,8 +554,8 @@ function TemplateStrip({ templates }) {
             transform: i % 3 === 1 ? 'scale(0.92) translateY(4px)' : i % 3 === 2 ? 'scale(0.96) translateY(-3px)' : 'scale(1)',
             transition: 'transform 0.2s',
           }}>
-            {t.imageUrl
-              ? <img src={t.imageUrl} alt={t.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            {t.image
+              ? <img src={t.image} alt={t.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#a78bfa', padding: 6, textAlign: 'center' }}>{t.name}</div>
             }
           </div>
@@ -630,8 +585,8 @@ function TemplateTile({ t, name, selected, onSelect, disabled }) {
       onMouseLeave={e => { e.currentTarget.style.boxShadow = selected ? `0 0 0 3px ${PURPLE}22` : '0 1px 4px rgba(0,0,0,0.04)' }}
     >
       <div style={{ position: 'relative', aspectRatio: '9/16', overflow: 'hidden', background: '#f9fafb' }}>
-        {t.imageUrl
-          ? <img src={t.imageUrl} alt={t.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        {t.image
+          ? <img src={t.image} alt={t.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#9ca3af', padding: 8, textAlign: 'center' }}>{t.name}</div>
         }
         {name.trim() && (
@@ -684,7 +639,7 @@ function InlineMiniEditor({ template, initialName, onClose }) {
       link.click()
       setCookie('sallim_trial_used', '1', 24)
       setDownloaded(true)
-      toast.success('تم تحميل البطاقة! 🎉')
+      toast.success('تم تحميل البطاقة بنجاح')
     } catch (err) {
       toast.error('حدث خطأ أثناء التحميل')
     } finally {
@@ -779,9 +734,9 @@ function InlineMiniEditor({ template, initialName, onClose }) {
               margin: '0 auto',
             }}
           >
-            {template.imageUrl && (
+            {template.image && (
               <img
-                src={template.imageUrl}
+                src={template.image}
                 alt={template.name}
                 crossOrigin="anonymous"
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
@@ -857,7 +812,7 @@ function EnhancedTemplateStrip({ templates, onSelect, selectedId }) {
           fontSize: 13, fontWeight: 700, color: '#a78bfa', 
           letterSpacing: '0.1em', textTransform: 'uppercase'
         }}>
-          ✨ اختر من التصاميم الفاخرة ✨
+          اختر من التصاميم الفاخرة
         </span>
       </div>
       
@@ -960,7 +915,7 @@ function TemplateCard({ template, selected, onSelect, disabled, index }) {
             padding: '3px 8px', borderRadius: 20,
             boxShadow: '0 2px 8px rgba(124,58,237,0.4)'
           }}>
-            حصري ✨
+            حصري
           </div>
         )}
         
@@ -996,26 +951,29 @@ function TemplateCard({ template, selected, onSelect, disabled, index }) {
 }
 
 /* ════════════════════════════════════
-   FULL EDITOR - محرر كامل المزايا
+   FULL EDITOR - محرر فخم كامل المزايا
 ════════════════════════════════════ */
-function FullEditor({ template, initialName, onClose, onNameChange }) {
-  const [cardName, setCardName] = useState(initialName)
+function FullEditor({ template, initialName, onClose, onNameChange, onDownloadSuccess, remainingTrials }) {
+  const [cardName, setCardName] = useState(initialName || '')
   const [textColor, setTextColor] = useState(template.textColor || '#ffffff')
-  const [fontSize, setFontSize] = useState(26)
+  const [fontSize, setFontSize] = useState(28)
   const [fontFamily, setFontFamily] = useState(fonts[0])
-  const [textPos, setTextPos] = useState({ x: 50, y: 80 })
-  const [textShadow, setTextShadow] = useState(true)
-  const [greetingText, setGreetingText] = useState('عيد مبارك')
-  const [showGreeting, setShowGreeting] = useState(true)
+  const [textPos, setTextPos] = useState({ x: 50, y: 82 })
+  const [textShadow, setTextShadow] = useState(false)
+  const [greetingText, setGreetingText] = useState('')
+  const [showGreeting, setShowGreeting] = useState(false)
   const [greetingSize, setGreetingSize] = useState(18)
-  const [greetingPos, setGreetingPos] = useState({ y: 70 })
+  const [greetingPos, setGreetingPos] = useState({ y: 72 })
+  const [logo, setLogo] = useState(null)
+  const [logoSize, setLogoSize] = useState(60)
+  const [logoPos, setLogoPos] = useState({ x: 50, y: 15 })
   const [downloading, setDownloading] = useState(false)
   const [downloaded, setDownloaded] = useState(false)
   const previewRef = useRef(null)
+  const logoInputRef = useRef(null)
 
-  // Sync name with parent
   useEffect(() => {
-    setCardName(initialName)
+    setCardName(initialName || '')
   }, [initialName])
 
   const handleNameChange = (val) => {
@@ -1023,8 +981,20 @@ function FullEditor({ template, initialName, onClose, onNameChange }) {
     onNameChange?.(val)
   }
 
+  const handleLogoUpload = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (ev) => setLogo(ev.target?.result)
+      reader.readAsDataURL(file)
+    }
+  }
+
   const handleDownload = useCallback(async () => {
-    if (!previewRef.current) return
+    if (!previewRef.current || !cardName.trim()) {
+      toast.error('أدخل الاسم أولاً')
+      return
+    }
     setDownloading(true)
     try {
       const canvas = await html2canvas(previewRef.current, {
@@ -1032,156 +1002,147 @@ function FullEditor({ template, initialName, onClose, onNameChange }) {
         allowTaint: true,
         scale: 3,
         logging: false,
+        width: 1080,
+        height: 1920,
       })
       const link = document.createElement('a')
-      link.download = `سلّم-${cardName || 'بطاقة'}.png`
-      link.href = canvas.toDataURL('image/png')
+      link.download = `سلّم-${cardName}.png`
+      link.href = canvas.toDataURL('image/png', 1.0)
       link.click()
-      setCookie('sallim_trial_used', '1', 24)
       setDownloaded(true)
-      toast.success('تم تحميل البطاقة بجودة عالية! 🎉')
+      onDownloadSuccess?.()
+      toast.success('تم تحميل البطاقة بنجاح')
     } catch (err) {
       toast.error('حدث خطأ أثناء التحميل')
     } finally {
       setDownloading(false)
     }
-  }, [cardName])
+  }, [cardName, onDownloadSuccess])
 
   const presetGreetings = [
     'عيد مبارك',
     'كل عام وأنتم بخير',
     'تقبل الله طاعتكم',
     'عساكم من عواده',
-    'ينعاد عليكم بالصحة',
   ]
 
   return (
     <div style={{ 
-      background: 'linear-gradient(135deg, #faf5ff 0%, #f3f0ff 100%)', 
-      border: `3px solid ${PURPLE}`, 
-      borderRadius: 24, 
-      padding: 'clamp(24px,4vw,40px)', 
-      boxShadow: '0 20px 60px rgba(124,58,237,0.15)'
+      background: '#fff', 
+      border: '1px solid #e5e7eb', 
+      borderRadius: 20, 
+      padding: 'clamp(20px,4vw,36px)', 
+      boxShadow: '0 8px 40px rgba(0,0,0,0.08)'
     }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ fontSize: 32 }}>🎨</div>
-          <div>
-            <h3 style={{ fontSize: 20, fontWeight: 900, color: '#111827', margin: 0 }}>محرر البطاقة الكامل</h3>
-            <p style={{ fontSize: 13, color: '#6b7280', margin: '4px 0 0' }}>خصص بطاقتك بكل التفاصيل</p>
-          </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, paddingBottom: 20, borderBottom: '1px solid #f3f4f6' }}>
+        <div>
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: '#111827', margin: 0 }}>تحرير البطاقة</h3>
+          <p style={{ fontSize: 13, color: '#9ca3af', margin: '4px 0 0' }}>{template.name}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ 
-            fontSize: 12, color: GREEN, background: '#f0fdf4', 
-            padding: '6px 14px', borderRadius: 20, border: '1px solid #bbf7d0',
-            fontWeight: 700
-          }}>
-            🎁 تجربة مجانية
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {remainingTrials > 0 && (
+            <span style={{ 
+              fontSize: 12, color: '#6b7280', background: '#f9fafb', 
+              padding: '6px 14px', borderRadius: 8, border: '1px solid #e5e7eb',
+              fontWeight: 600
+            }}>
+              {remainingTrials} محاولة متبقية
+            </span>
+          )}
           <button 
             onClick={onClose} 
             style={{ 
-              background: '#f3f4f6', border: 'none', borderRadius: 10, 
-              width: 36, height: 36, cursor: 'pointer', fontSize: 18, color: '#6b7280',
-              display: 'flex', alignItems: 'center', justifyContent: 'center'
+              background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, 
+              width: 32, height: 32, cursor: 'pointer', fontSize: 14, color: '#6b7280',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: 'all 0.2s'
             }}
+            onMouseEnter={e => e.currentTarget.style.background = '#f3f4f6'}
+            onMouseLeave={e => e.currentTarget.style.background = '#f9fafb'}
           >✕</button>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 32, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: 28, alignItems: 'start' }}>
         {/* Controls Panel */}
-        <div style={{ display: 'grid', gap: 20 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           
-          {/* Name Section */}
-          <div style={{ background: '#fff', borderRadius: 16, padding: '20px', border: '1px solid #e5e7eb' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 700, color: '#374151', marginBottom: 12 }}>
-              <span style={{ fontSize: 18 }}>👤</span> الاسم على البطاقة
+          {/* الاسم */}
+          <div style={{ background: '#fafafa', borderRadius: 12, padding: 16, border: '1px solid #f0f0f0' }}>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 10 }}>
+              الاسم على البطاقة
             </label>
             <input
               value={cardName} 
               onChange={e => handleNameChange(e.target.value)}
               dir="rtl" 
-              placeholder="اكتب الاسم هنا..."
+              placeholder="أدخل الاسم..."
               style={{ 
-                width: '100%', padding: '14px 16px', 
-                border: '2px solid #e5e7eb', borderRadius: 12, 
-                fontSize: 16, fontFamily: FONT, color: '#111827', 
+                width: '100%', padding: '12px 14px', 
+                border: '1px solid #e5e7eb', borderRadius: 10, 
+                fontSize: 15, fontFamily: FONT, color: '#111827', 
                 outline: 'none', boxSizing: 'border-box',
-                transition: 'all 0.3s'
+                transition: 'border-color 0.2s'
               }}
-              onFocus={e => {
-                e.currentTarget.style.borderColor = PURPLE
-                e.currentTarget.style.boxShadow = '0 0 0 4px rgba(124,58,237,0.1)'
-              }}
-              onBlur={e => {
-                e.currentTarget.style.borderColor = '#e5e7eb'
-                e.currentTarget.style.boxShadow = 'none'
-              }}
+              onFocus={e => e.currentTarget.style.borderColor = PURPLE}
+              onBlur={e => e.currentTarget.style.borderColor = '#e5e7eb'}
             />
           </div>
 
-          {/* Text Styling */}
-          <div style={{ background: '#fff', borderRadius: 16, padding: '20px', border: '1px solid #e5e7eb' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 700, color: '#374151', marginBottom: 16 }}>
-              <span style={{ fontSize: 18 }}>🎨</span> تنسيق النص
+          {/* تنسيق النص */}
+          <div style={{ background: '#fafafa', borderRadius: 12, padding: 16, border: '1px solid #f0f0f0' }}>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 12 }}>
+              تنسيق النص
             </label>
             
-            {/* Color */}
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8 }}>لون النص</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            {/* لون النص */}
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 6 }}>اللون</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                 <input 
-                  type="color" 
-                  value={textColor} 
-                  onChange={e => setTextColor(e.target.value)}
-                  style={{ width: 44, height: 44, borderRadius: 10, border: '2px solid #e5e7eb', cursor: 'pointer', padding: 2 }} 
+                  type="color" value={textColor} onChange={e => setTextColor(e.target.value)}
+                  style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid #e5e7eb', cursor: 'pointer', padding: 2 }} 
                 />
-                <div style={{ display: 'flex', gap: 6 }}>
-                  {['#ffffff', '#000000', '#ffd700', '#7c3aed', '#ea580c', '#059669'].map(c => (
-                    <button 
-                      key={c} 
-                      onClick={() => setTextColor(c)}
-                      style={{ 
-                        width: 30, height: 30, borderRadius: 8, background: c, 
-                        border: textColor === c ? `3px solid ${PURPLE}` : '2px solid #e5e7eb', 
-                        cursor: 'pointer', padding: 0,
-                        boxShadow: textColor === c ? '0 2px 8px rgba(124,58,237,0.3)' : 'none'
-                      }} 
-                    />
-                  ))}
-                </div>
+                {['#ffffff', '#000000', '#ffd700', '#7c3aed', '#ea580c'].map(c => (
+                  <button 
+                    key={c} onClick={() => setTextColor(c)}
+                    style={{ 
+                      width: 28, height: 28, borderRadius: 6, background: c, 
+                      border: textColor === c ? `2px solid ${PURPLE}` : '1px solid #d1d5db', 
+                      cursor: 'pointer'
+                    }} 
+                  />
+                ))}
               </div>
             </div>
 
-            {/* Font Size */}
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280', marginBottom: 8 }}>
-                <span>حجم النص</span>
-                <span style={{ fontWeight: 700, color: PURPLE }}>{fontSize}px</span>
+            {/* حجم النص */}
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280', marginBottom: 6 }}>
+                <span>الحجم</span>
+                <span style={{ fontWeight: 600 }}>{fontSize}px</span>
               </div>
               <input 
-                type="range" min={16} max={48} value={fontSize} 
+                type="range" min={18} max={48} value={fontSize} 
                 onChange={e => setFontSize(+e.target.value)}
-                style={{ width: '100%', accentColor: PURPLE, height: 6 }} 
+                style={{ width: '100%', accentColor: PURPLE, height: 4 }} 
               />
             </div>
 
-            {/* Font Family */}
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8 }}>نوع الخط</div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                {fonts.slice(0, 6).map(f => (
+            {/* نوع الخط */}
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 6 }}>الخط</div>
+              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                {fonts.slice(0, 5).map(f => (
                   <button 
-                    key={f.id} 
-                    onClick={() => setFontFamily(f)}
+                    key={f.id} onClick={() => setFontFamily(f)}
                     style={{ 
-                      padding: '8px 12px', borderRadius: 8, 
-                      background: fontFamily.id === f.id ? PURPLE : '#f3f4f6',
+                      padding: '6px 10px', borderRadius: 6, 
+                      background: fontFamily.id === f.id ? PURPLE : '#fff',
                       color: fontFamily.id === f.id ? '#fff' : '#374151',
-                      border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600,
+                      border: fontFamily.id === f.id ? 'none' : '1px solid #e5e7eb',
+                      cursor: 'pointer', fontSize: 11, fontWeight: 600,
                       fontFamily: f.family
                     }}
                   >
@@ -1191,60 +1152,56 @@ function FullEditor({ template, initialName, onClose, onNameChange }) {
               </div>
             </div>
 
-            {/* Text Position */}
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280', marginBottom: 8 }}>
-                <span>موضع الاسم (من الأعلى)</span>
-                <span style={{ fontWeight: 700, color: PURPLE }}>{textPos.y}%</span>
+            {/* موضع النص */}
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280', marginBottom: 6 }}>
+                <span>الموضع من الأعلى</span>
+                <span style={{ fontWeight: 600 }}>{textPos.y}%</span>
               </div>
               <input 
-                type="range" min={10} max={95} value={textPos.y} 
+                type="range" min={15} max={95} value={textPos.y} 
                 onChange={e => setTextPos(p => ({ ...p, y: +e.target.value }))}
-                style={{ width: '100%', accentColor: PURPLE, height: 6 }} 
+                style={{ width: '100%', accentColor: PURPLE, height: 4 }} 
               />
             </div>
 
-            {/* Text Shadow Toggle */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {/* ظل النص */}
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
               <input 
-                type="checkbox" 
-                checked={textShadow} 
-                onChange={e => setTextShadow(e.target.checked)}
-                style={{ width: 18, height: 18, accentColor: PURPLE }}
+                type="checkbox" checked={textShadow} onChange={e => setTextShadow(e.target.checked)}
+                style={{ width: 16, height: 16, accentColor: PURPLE }}
               />
-              <span style={{ fontSize: 13, color: '#374151' }}>ظل النص</span>
-            </div>
+              <span style={{ fontSize: 12, color: '#374151' }}>إضافة ظل للنص</span>
+            </label>
           </div>
 
-          {/* Greeting Text */}
-          <div style={{ background: '#fff', borderRadius: 16, padding: '20px', border: '1px solid #e5e7eb' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 700, color: '#374151' }}>
-                <span style={{ fontSize: 18 }}>💬</span> نص التهنئة
+          {/* نص التهنئة */}
+          <div style={{ background: '#fafafa', borderRadius: 12, padding: 16, border: '1px solid #f0f0f0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+              <label style={{ fontSize: 13, fontWeight: 700, color: '#374151' }}>
+                نص تهنئة إضافي
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
                 <input 
-                  type="checkbox" 
-                  checked={showGreeting} 
-                  onChange={e => setShowGreeting(e.target.checked)}
-                  style={{ width: 16, height: 16, accentColor: PURPLE }}
+                  type="checkbox" checked={showGreeting} onChange={e => setShowGreeting(e.target.checked)}
+                  style={{ width: 14, height: 14, accentColor: PURPLE }}
                 />
-                <span style={{ fontSize: 12, color: '#6b7280' }}>إظهار</span>
+                <span style={{ fontSize: 11, color: '#6b7280' }}>تفعيل</span>
               </label>
             </div>
             
             {showGreeting && (
               <>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 10 }}>
                   {presetGreetings.map(g => (
                     <button 
-                      key={g} 
-                      onClick={() => setGreetingText(g)}
+                      key={g} onClick={() => setGreetingText(g)}
                       style={{ 
-                        padding: '6px 12px', borderRadius: 20, 
-                        background: greetingText === g ? PURPLE : '#f3f4f6',
+                        padding: '5px 10px', borderRadius: 6, 
+                        background: greetingText === g ? PURPLE : '#fff',
                         color: greetingText === g ? '#fff' : '#6b7280',
-                        border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600
+                        border: greetingText === g ? 'none' : '1px solid #e5e7eb',
+                        cursor: 'pointer', fontSize: 11, fontWeight: 600
                       }}
                     >
                       {g}
@@ -1252,94 +1209,100 @@ function FullEditor({ template, initialName, onClose, onNameChange }) {
                   ))}
                 </div>
                 <input
-                  value={greetingText} 
-                  onChange={e => setGreetingText(e.target.value)}
-                  dir="rtl" 
-                  placeholder="أو اكتب نص مخصص..."
+                  value={greetingText} onChange={e => setGreetingText(e.target.value)}
+                  dir="rtl" placeholder="أو اكتب نص مخصص..."
                   style={{ 
-                    width: '100%', padding: '10px 14px', 
-                    border: '1px solid #e5e7eb', borderRadius: 10, 
-                    fontSize: 13, fontFamily: FONT, color: '#111827', 
-                    outline: 'none', boxSizing: 'border-box',
-                    marginBottom: 12
+                    width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', 
+                    borderRadius: 8, fontSize: 13, fontFamily: FONT, color: '#111827', 
+                    outline: 'none', boxSizing: 'border-box', marginBottom: 10
                   }}
                 />
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280', marginBottom: 6 }}>
-                  <span>حجم نص التهنئة</span>
-                  <span style={{ fontWeight: 700, color: PURPLE }}>{greetingSize}px</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#6b7280', marginBottom: 4 }}>
+                  <span>الحجم: {greetingSize}px</span>
+                  <span>الموضع: {greetingPos.y}%</span>
                 </div>
-                <input 
-                  type="range" min={12} max={32} value={greetingSize} 
-                  onChange={e => setGreetingSize(+e.target.value)}
-                  style={{ width: '100%', accentColor: PURPLE, height: 5, marginBottom: 12 }} 
-                />
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280', marginBottom: 6 }}>
-                  <span>موضع التهنئة</span>
-                  <span style={{ fontWeight: 700, color: PURPLE }}>{greetingPos.y}%</span>
-                </div>
-                <input 
-                  type="range" min={10} max={90} value={greetingPos.y} 
-                  onChange={e => setGreetingPos({ y: +e.target.value })}
-                  style={{ width: '100%', accentColor: PURPLE, height: 5 }} 
-                />
+                <input type="range" min={12} max={28} value={greetingSize} onChange={e => setGreetingSize(+e.target.value)}
+                  style={{ width: '100%', accentColor: PURPLE, height: 4, marginBottom: 8 }} />
+                <input type="range" min={10} max={85} value={greetingPos.y} onChange={e => setGreetingPos({ y: +e.target.value })}
+                  style={{ width: '100%', accentColor: PURPLE, height: 4 }} />
               </>
             )}
           </div>
 
-          {/* Download Button */}
+          {/* اللوجو */}
+          <div style={{ background: '#fafafa', borderRadius: 12, padding: 16, border: '1px solid #f0f0f0' }}>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 10 }}>
+              شعار الشركة (اختياري)
+            </label>
+            <input ref={logoInputRef} type="file" accept="image/*" onChange={handleLogoUpload} style={{ display: 'none' }} />
+            {!logo ? (
+              <button
+                onClick={() => logoInputRef.current?.click()}
+                style={{
+                  width: '100%', padding: '12px', background: '#fff', border: '1px dashed #d1d5db',
+                  borderRadius: 8, cursor: 'pointer', fontSize: 13, color: '#6b7280', fontFamily: FONT
+                }}
+              >
+                رفع شعار
+              </button>
+            ) : (
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                  <img src={logo} alt="Logo" style={{ width: 40, height: 40, objectFit: 'contain', borderRadius: 6, border: '1px solid #e5e7eb' }} />
+                  <button onClick={() => setLogo(null)} style={{ padding: '6px 12px', background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: 6, fontSize: 11, cursor: 'pointer' }}>
+                    إزالة
+                  </button>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#6b7280', marginBottom: 4 }}>
+                  <span>الحجم: {logoSize}px</span>
+                  <span>الموضع: {logoPos.y}%</span>
+                </div>
+                <input type="range" min={30} max={120} value={logoSize} onChange={e => setLogoSize(+e.target.value)}
+                  style={{ width: '100%', accentColor: PURPLE, height: 4, marginBottom: 8 }} />
+                <input type="range" min={5} max={40} value={logoPos.y} onChange={e => setLogoPos(p => ({ ...p, y: +e.target.value }))}
+                  style={{ width: '100%', accentColor: PURPLE, height: 4 }} />
+              </div>
+            )}
+          </div>
+
+          {/* زر التحميل */}
           {!downloaded ? (
             <button 
               onClick={handleDownload} 
               disabled={downloading || !cardName.trim()} 
               style={{
-                padding: '18px 24px', 
-                background: downloading ? '#e9d5ff' : `linear-gradient(135deg, ${PURPLE} 0%, #a855f7 100%)`,
-                color: '#fff',
-                border: 'none', borderRadius: 14, fontSize: 17, fontWeight: 900, 
+                padding: '16px 20px', 
+                background: downloading || !cardName.trim() ? '#e5e7eb' : PURPLE,
+                color: downloading || !cardName.trim() ? '#9ca3af' : '#fff',
+                border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800, 
                 cursor: downloading || !cardName.trim() ? 'not-allowed' : 'pointer',
                 fontFamily: FONT, 
-                boxShadow: downloading ? 'none' : '0 6px 24px rgba(124,58,237,0.35)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                transition: 'all 0.3s'
+                transition: 'all 0.2s'
               }}
             >
-              {downloading ? (
-                <>
-                  <div style={{ width: 20, height: 20, border: '3px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-                  جارٍ التحميل...
-                </>
-              ) : (
-                <>
-                  <span style={{ fontSize: 22 }}>⬇️</span>
-                  حمّل البطاقة مجاناً
-                </>
-              )}
+              {downloading ? 'جارٍ التحميل...' : 'تحميل البطاقة'}
             </button>
           ) : (
             <div>
               <div style={{ 
-                padding: '16px 20px', background: '#f0fdf4', 
-                border: '2px solid #86efac', borderRadius: 14, 
-                fontSize: 16, color: '#166534', fontWeight: 800, 
-                textAlign: 'center', marginBottom: 12,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+                padding: '14px 16px', background: '#f0fdf4', 
+                border: '1px solid #bbf7d0', borderRadius: 10, 
+                fontSize: 14, color: '#166534', fontWeight: 700, 
+                textAlign: 'center', marginBottom: 10
               }}>
-                <span style={{ fontSize: 24 }}>🎉</span>
-                تم تحميل البطاقة بنجاح!
+                تم التحميل بنجاح
               </div>
               <a 
-                href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى باقة بطاقات من سلّم 🎉')}`}
+                href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى باقة بطاقات من سلّم')}`}
                 target="_blank" rel="noopener noreferrer"
                 style={{ 
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                  padding: '16px 20px', background: ORANGE, color: '#fff', 
-                  border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 800, 
-                  textDecoration: 'none', fontFamily: FONT,
-                  boxShadow: '0 4px 16px rgba(234,88,12,0.3)'
+                  display: 'block', textAlign: 'center',
+                  padding: '14px 16px', background: ORANGE, color: '#fff', 
+                  border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, 
+                  textDecoration: 'none', fontFamily: FONT
                 }}
               >
-                <span style={{ fontSize: 20 }}>🛒</span>
-                اشترِ باقة — اطلب الآن
+                اطلب باقة للمزيد
               </a>
             </div>
           )}
@@ -1347,22 +1310,21 @@ function FullEditor({ template, initialName, onClose, onNameChange }) {
 
         {/* Preview Panel */}
         <div style={{ position: 'sticky', top: 20 }}>
-          <div style={{ 
-            fontSize: 13, color: '#6b7280', textAlign: 'center', marginBottom: 12, 
-            fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 
-          }}>
-            <span style={{ fontSize: 16 }}>👁️</span> معاينة مباشرة
+          <div style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', marginBottom: 10, fontWeight: 600 }}>
+            المعاينة
           </div>
           <div
             ref={previewRef}
             style={{
               position: 'relative',
+              width: '100%',
+              maxWidth: 320,
+              margin: '0 auto',
               aspectRatio: '9/16',
-              borderRadius: 20,
+              borderRadius: 16,
               overflow: 'hidden',
-              background: '#f0eaff',
-              border: '3px solid #e9d5ff',
-              boxShadow: '0 10px 40px rgba(124,58,237,0.2)',
+              background: '#1a1a2e',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
             }}
           >
             {template.image && (
@@ -1370,8 +1332,26 @@ function FullEditor({ template, initialName, onClose, onNameChange }) {
                 src={template.image}
                 alt={template.name}
                 crossOrigin="anonymous"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                style={{ 
+                  position: 'absolute',
+                  top: 0, left: 0,
+                  width: '100%', 
+                  height: '100%', 
+                  objectFit: 'cover'
+                }}
               />
+            )}
+            
+            {/* Logo */}
+            {logo && (
+              <div style={{
+                position: 'absolute',
+                left: '50%', transform: 'translateX(-50%)',
+                top: `${logoPos.y}%`,
+                pointerEvents: 'none',
+              }}>
+                <img src={logo} alt="Logo" style={{ width: logoSize, height: 'auto', maxHeight: logoSize, objectFit: 'contain' }} />
+              </div>
             )}
             
             {/* Greeting Text */}
@@ -1381,15 +1361,15 @@ function FullEditor({ template, initialName, onClose, onNameChange }) {
                 left: 0, right: 0,
                 top: `${greetingPos.y}%`,
                 textAlign: 'center',
-                padding: '4px 16px',
+                padding: '0 16px',
                 pointerEvents: 'none',
               }}>
                 <span style={{
-                  fontSize: `${greetingSize}px`,
+                  fontSize: greetingSize,
                   fontWeight: 700,
                   color: textColor,
                   fontFamily: fontFamily.family,
-                  textShadow: textShadow ? '0 2px 8px rgba(0,0,0,0.5)' : 'none',
+                  textShadow: textShadow ? '0 2px 6px rgba(0,0,0,0.5)' : 'none',
                   display: 'block',
                   lineHeight: 1.4,
                 }}>{greetingText}</span>
@@ -1403,23 +1383,22 @@ function FullEditor({ template, initialName, onClose, onNameChange }) {
                 left: 0, right: 0,
                 top: `${textPos.y}%`,
                 textAlign: 'center',
-                padding: '4px 16px',
+                padding: '0 16px',
                 pointerEvents: 'none',
               }}>
                 <span style={{
-                  fontSize: `${fontSize}px`,
-                  fontWeight: 900,
+                  fontSize: fontSize,
+                  fontWeight: 800,
                   color: textColor,
                   fontFamily: fontFamily.family,
-                  textShadow: textShadow ? '0 2px 10px rgba(0,0,0,0.6)' : 'none',
+                  textShadow: textShadow ? '0 2px 8px rgba(0,0,0,0.5)' : 'none',
                   display: 'block',
                   lineHeight: 1.3,
-                  letterSpacing: '0.02em'
                 }}>{cardName}</span>
               </div>
             )}
           </div>
-          <div style={{ fontSize: 11, color: '#d1d5db', textAlign: 'center', marginTop: 10 }}>
+          <div style={{ fontSize: 10, color: '#d1d5db', textAlign: 'center', marginTop: 8 }}>
             منصة سلّم | sallim.co
           </div>
         </div>
