@@ -969,12 +969,25 @@ function FullEditor({ template, initialName, onClose, onNameChange, onDownloadSu
   const [logoPos, setLogoPos] = useState({ x: 50, y: 15 })
   const [downloading, setDownloading] = useState(false)
   const [downloaded, setDownloaded] = useState(false)
+  const [imgDimensions, setImgDimensions] = useState({ width: 1080, height: 1920 })
   const previewRef = useRef(null)
   const logoInputRef = useRef(null)
+  const imgRef = useRef(null)
 
   useEffect(() => {
     setCardName(initialName || '')
   }, [initialName])
+
+  // تحديد أبعاد الصورة الأصلية
+  useEffect(() => {
+    if (template.image && imgRef.current) {
+      const img = new Image()
+      img.onload = () => {
+        setImgDimensions({ width: img.naturalWidth, height: img.naturalHeight })
+      }
+      img.src = template.image
+    }
+  }, [template.image])
 
   const handleNameChange = (val) => {
     setCardName(val)
@@ -998,13 +1011,15 @@ function FullEditor({ template, initialName, onClose, onNameChange, onDownloadSu
     setDownloading(true)
     
     try {
-      // استخدم scale عالي للحصول على جودة أفضل
+      // استخدم الأبعاد الأصلية للصورة
       const canvas = await html2canvas(previewRef.current, {
         useCORS: true,
         allowTaint: true,
-        scale: 4,
+        scale: 2,
         logging: false,
-        backgroundColor: '#1a1a2e',
+        backgroundColor: null,
+        width: imgDimensions.width,
+        height: imgDimensions.height,
       })
       
       const link = document.createElement('a')
@@ -1021,7 +1036,7 @@ function FullEditor({ template, initialName, onClose, onNameChange, onDownloadSu
     } finally {
       setDownloading(false)
     }
-  }, [cardName, onDownloadSuccess])
+  }, [cardName, imgDimensions, onDownloadSuccess])
 
   const presetGreetings = [
     'عيد مبارك',
@@ -1321,10 +1336,11 @@ function FullEditor({ template, initialName, onClose, onNameChange, onDownloadSu
             ref={previewRef}
             style={{
               position: 'relative',
-              width: '100%',
-              maxWidth: 360,
+              width: imgDimensions.width,
+              height: imgDimensions.height,
+              maxWidth: '100%',
+              maxHeight: '70vh',
               margin: '0 auto',
-              aspectRatio: '9/16',
               borderRadius: 16,
               overflow: 'hidden',
               background: '#1a1a2e',
@@ -1333,6 +1349,7 @@ function FullEditor({ template, initialName, onClose, onNameChange, onDownloadSu
           >
             {template.image && (
               <img
+                ref={imgRef}
                 src={template.image}
                 alt={template.name}
                 crossOrigin="anonymous"
