@@ -991,33 +991,59 @@ function FullEditor({ template, initialName, onClose, onNameChange, onDownloadSu
   }
 
   const handleDownload = useCallback(async () => {
-    if (!previewRef.current || !cardName.trim()) {
+    if (!cardName.trim()) {
       toast.error('أدخل الاسم أولاً')
       return
     }
     setDownloading(true)
+    
+    // إنشاء عنصر مؤقت بالحجم الكامل للتصدير
+    const exportElement = document.createElement('div')
+    exportElement.style.position = 'fixed'
+    exportElement.style.left = '-9999px'
+    exportElement.style.width = '1080px'
+    exportElement.style.height = '1920px'
+    exportElement.style.overflow = 'hidden'
+    
+    exportElement.innerHTML = `
+      <div style="position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #1a1a2e;">
+        ${template.image ? `<img src="${template.image}" crossorigin="anonymous" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" />` : ''}
+        ${logo ? `<div style="position: absolute; left: 50%; transform: translateX(-50%); top: ${logoPos.y}%; pointer-events: none;"><img src="${logo}" style="width: ${logoSize * 3}px; height: auto; max-height: ${logoSize * 3}px; object-fit: contain;" /></div>` : ''}
+        ${showGreeting && greetingText.trim() ? `<div style="position: absolute; left: 0; right: 0; top: ${greetingPos.y}%; text-align: center; padding: 0 48px; pointer-events: none;"><span style="font-size: ${greetingSize * 3}px; font-weight: 700; color: ${textColor}; font-family: ${fontFamily.family}; text-shadow: ${textShadow ? '0 6px 18px rgba(0,0,0,0.5)' : 'none'}; display: block; line-height: 1.4;">${greetingText}</span></div>` : ''}
+        <div style="position: absolute; left: 0; right: 0; top: ${textPos.y}%; text-align: center; padding: 0 48px; pointer-events: none;"><span style="font-size: ${fontSize * 3}px; font-weight: 800; color: ${textColor}; font-family: ${fontFamily.family}; text-shadow: ${textShadow ? '0 6px 24px rgba(0,0,0,0.5)' : 'none'}; display: block; line-height: 1.3;">${cardName}</span></div>
+      </div>
+    `
+    document.body.appendChild(exportElement)
+    
     try {
-      const canvas = await html2canvas(previewRef.current, {
+      // انتظر تحميل الصور
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      const canvas = await html2canvas(exportElement.firstChild, {
         useCORS: true,
         allowTaint: true,
-        scale: 3,
+        scale: 1,
         logging: false,
         width: 1080,
         height: 1920,
       })
+      
       const link = document.createElement('a')
       link.download = `سلّم-${cardName}.png`
       link.href = canvas.toDataURL('image/png', 1.0)
       link.click()
+      
       setDownloaded(true)
       onDownloadSuccess?.()
       toast.success('تم تحميل البطاقة بنجاح')
     } catch (err) {
+      console.error('Error downloading:', err)
       toast.error('حدث خطأ أثناء التحميل')
     } finally {
+      document.body.removeChild(exportElement)
       setDownloading(false)
     }
-  }, [cardName, onDownloadSuccess])
+  }, [cardName, template.image, logo, logoSize, logoPos, showGreeting, greetingText, greetingSize, greetingPos, textColor, fontFamily, textShadow, textPos, fontSize, onDownloadSuccess])
 
   const presetGreetings = [
     'عيد مبارك',
