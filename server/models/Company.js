@@ -31,6 +31,10 @@ const companySchema = new mongoose.Schema({
         type: String,
         default: '',
     },
+    primaryColor: {
+        type: String,
+        default: '#7c3aed',
+    },
     status: {
         type: String,
         enum: ['pending', 'active', 'suspended'],

@@ -1,13 +1,23 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCompany } from '../context/CompanyContext'
 import { updateCompanyProfile, getTemplates } from '../utils/api'
 import { useEditorStore } from '../store'
 import toast, { Toaster } from 'react-hot-toast'
-import JSZip from 'jszip'
 
-const WHATSAPP_NUMBER = '201007835547'
-const ds = { font: "'Tajawal', sans-serif" }
+const WA = '201007835547'
+const f = { font: "'Tajawal', sans-serif" }
+const C = {
+    bg: '#f5f7fa',
+    card: '#ffffff',
+    border: '#e2e8f0',
+    text: '#0f172a',
+    muted: '#64748b',
+    accent: '#7c3aed',
+    green: '#059669',
+    red: '#dc2626',
+    yellow: '#d97706',
+}
 
 export default function CompanyDashboardPage() {
     const { company, token, logout, isAuthenticated, updateCompanyData } = useCompany()
@@ -15,27 +25,24 @@ export default function CompanyDashboardPage() {
     const [activeView, setActiveView] = useState('home')
     const [showWelcome, setShowWelcome] = useState(false)
 
-    // Check for first visit after activation
     useEffect(() => {
         if (isAuthenticated && company) {
-            const welcomed = sessionStorage.getItem(`sallim_company_welcomed_${company._id || company.id}`)
-            if (!welcomed) {
-                setShowWelcome(true)
-            }
+            const key = `sallim_welcomed_${company._id || company.id}`
+            if (!sessionStorage.getItem(key)) setShowWelcome(true)
         }
     }, [isAuthenticated, company])
 
     const dismissWelcome = () => {
         setShowWelcome(false)
-        sessionStorage.setItem(`sallim_company_welcomed_${company?._id || company?.id}`, '1')
+        sessionStorage.setItem(`sallim_welcomed_${company?._id || company?.id}`, '1')
     }
 
     if (!isAuthenticated || !company) {
         return (
-            <div style={{ minHeight: '100vh', background: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: ds.font, direction: 'rtl' }}>
+            <div style={{ minHeight: '100vh', background: C.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: f.font, direction: 'rtl' }}>
                 <div style={{ textAlign: 'center' }}>
-                    <p style={{ color: '#94a3b8', marginBottom: 20, fontSize: 16 }}>يجب تسجيل الدخول كشركة للوصول لهذه الصفحة</p>
-                    <Link to="/company-login" style={{ display: 'inline-block', padding: '14px 32px', background: '#fff', color: '#0f172a', borderRadius: 14, textDecoration: 'none', fontWeight: 800, fontSize: 15 }}>
+                    <p style={{ color: C.muted, marginBottom: 20, fontSize: 16 }}>يجب تسجيل الدخول كشركة للوصول لهذه الصفحة</p>
+                    <Link to="/company-login" style={{ display: 'inline-block', padding: '14px 32px', background: C.accent, color: '#fff', borderRadius: 12, textDecoration: 'none', fontWeight: 700, fontSize: 15 }}>
                         تسجيل الدخول
                     </Link>
                 </div>
@@ -43,160 +50,136 @@ export default function CompanyDashboardPage() {
         )
     }
 
-    const totalCredits = company.subscription?.totalCredits || company.totalCredits || 100
-    const usedCredits = company.subscription?.usedCredits || company.usedCredits || 0
+    // ── Credit calculation: use server fields cardsLimit / cardsUsed ──
+    const totalCredits = company.cardsLimit || company.totalCredits || 0
+    const usedCredits = company.cardsUsed || company.usedCredits || 0
     const remaining = Math.max(0, totalCredits - usedCredits)
     const usagePercent = totalCredits > 0 ? Math.round((usedCredits / totalCredits) * 100) : 0
-    const isDepleted = remaining <= 0
+    const isDepleted = remaining <= 0 && totalCredits > 0
     const isLow = usagePercent >= 80 && !isDepleted
 
+    const TABS = [
+        { id: 'home', label: 'الرئيسية' },
+        { id: 'cards', label: 'أنشئ بطاقات' },
+        { id: 'link', label: 'رابط الموظفين' },
+        { id: 'settings', label: 'الهوية' },
+    ]
+
     return (
-        <div style={{ minHeight: '100vh', background: '#0f172a', fontFamily: ds.font, direction: 'rtl' }}>
+        <div style={{ minHeight: '100vh', background: C.bg, fontFamily: f.font, direction: 'rtl' }}>
             <Toaster position="top-center" />
 
-            {/* Welcome Modal */}
+            {/* ── Welcome Modal ── */}
             {showWelcome && (
-                <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', padding: 24 }}>
-                    <div style={{ background: '#1e293b', borderRadius: 28, padding: 'clamp(32px, 5vw, 48px)', maxWidth: 480, width: '100%', textAlign: 'center', border: '1px solid rgba(255,255,255,0.08)' }}>
-                        <div style={{ width: 80, height: 80, borderRadius: 24, background: 'rgba(16,185,129,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
-                            <span style={{ fontSize: 40 }}>🎉</span>
+                <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(6px)', padding: 24 }}>
+                    <div style={{ background: C.card, borderRadius: 24, padding: 'clamp(32px,5vw,48px)', maxWidth: 440, width: '100%', textAlign: 'center', border: `1px solid ${C.border}`, boxShadow: '0 24px 48px rgba(0,0,0,0.12)' }}>
+                        <div style={{ width: 64, height: 64, borderRadius: 20, background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', border: '1px solid #bbf7d0' }}>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                         </div>
-                        <h2 style={{ fontSize: 'clamp(22px, 4vw, 30px)', fontWeight: 900, color: '#fff', marginBottom: 12 }}>
-                            أهلاً بك في منصة سلّم للمؤسسات
-                        </h2>
-                        <p style={{ fontSize: 16, color: '#94a3b8', lineHeight: 1.8, marginBottom: 8 }}>
-                            باقتك المفعّلة:
-                        </p>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 14, padding: '12px 28px', marginBottom: 32 }}>
-                            <span style={{ fontSize: 32, fontWeight: 900, color: '#10b981' }}>{totalCredits}</span>
-                            <span style={{ fontSize: 15, color: '#6ee7b7', fontWeight: 700 }}>بطاقة متاحة</span>
+                        <h2 style={{ fontSize: 24, fontWeight: 800, color: C.text, marginBottom: 10 }}>أهلاً بك في بورتال الشركات</h2>
+                        <p style={{ fontSize: 15, color: C.muted, marginBottom: 8 }}>باقتك المفعّلة</p>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 14, padding: '14px 28px', marginBottom: 28 }}>
+                            <span style={{ fontSize: 36, fontWeight: 900, color: C.green }}>{totalCredits}</span>
+                            <span style={{ fontSize: 14, color: '#166534', fontWeight: 700 }}>بطاقة متاحة</span>
                         </div>
                         <br />
-                        <button onClick={dismissWelcome} style={{
-                            padding: '16px 48px', background: '#fff', color: '#0f172a', border: 'none', borderRadius: 16,
-                            fontSize: 17, fontWeight: 900, cursor: 'pointer', fontFamily: ds.font, transition: 'all 0.2s',
-                        }}>
+                        <button onClick={dismissWelcome} style={{ padding: '14px 44px', background: C.accent, color: '#fff', border: 'none', borderRadius: 14, fontSize: 16, fontWeight: 800, cursor: 'pointer', fontFamily: f.font }}>
                             ابدأ الآن
                         </button>
                     </div>
                 </div>
             )}
 
-            {/* Header with Credit Counter */}
-            <header style={{ background: '#1e293b', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '20px 24px', position: 'sticky', top: 0, zIndex: 50 }}>
+            {/* ── Header ── */}
+            <header style={{ background: C.card, borderBottom: `1px solid ${C.border}`, padding: '16px 24px', position: 'sticky', top: 0, zIndex: 50 }}>
                 <div style={{ maxWidth: 900, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                        <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                        <div style={{ width: 44, height: 44, borderRadius: 12, background: '#f1f5f9', border: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                             {company.logoUrl
                                 ? <img src={company.logoUrl} style={{ width: '100%', height: '100%', objectFit: 'contain' }} alt="" />
-                                : <span style={{ fontSize: 20 }}>🏢</span>
+                                : <span style={{ fontSize: 22, fontWeight: 900, color: C.accent }}>{(company.name || 'ش')[0]}</span>
                             }
                         </div>
                         <div>
-                            <h1 style={{ fontSize: 18, fontWeight: 800, color: '#fff', margin: 0 }}>{company.name}</h1>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-                                <div style={{ width: 7, height: 7, borderRadius: '50%', background: isDepleted ? '#ef4444' : '#10b981' }} />
-                                <span style={{ fontSize: 12, color: '#64748b' }}>{isDepleted ? 'الرصيد نفد' : 'حساب نشط'}</span>
-                            </div>
+                            <div style={{ fontSize: 11, color: C.muted, fontWeight: 600 }}>بورتال الشركات</div>
+                            <h1 style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: 0 }}>{company.name || 'شركتك'}</h1>
                         </div>
                     </div>
 
-                    {/* Credit Badge */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+                        {/* Credit Badge */}
                         <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: 28, fontWeight: 900, color: isDepleted ? '#ef4444' : isLow ? '#f59e0b' : '#10b981' }}>
+                            <div style={{ fontSize: 26, fontWeight: 900, color: isDepleted ? C.red : isLow ? C.yellow : C.green, lineHeight: 1 }}>
                                 {remaining}
                             </div>
-                            <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>بطاقة متبقية</div>
+                            <div style={{ fontSize: 11, color: C.muted, fontWeight: 600 }}>بطاقة متبقية</div>
                         </div>
-                        <button onClick={logout} style={{
-                            padding: '8px 16px', background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)',
-                            borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: ds.font,
-                        }}>
+                        <button onClick={logout} style={{ padding: '8px 16px', background: '#fef2f2', color: C.red, border: `1px solid #fecaca`, borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: f.font }}>
                             خروج
                         </button>
                     </div>
                 </div>
 
                 {/* Progress Bar */}
-                <div style={{ maxWidth: 900, margin: '14px auto 0' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                        <span style={{ fontSize: 11, color: '#64748b' }}>{usedCredits} بطاقة مستخدمة من أصل {totalCredits}</span>
-                        <span style={{ fontSize: 11, color: isDepleted ? '#ef4444' : isLow ? '#f59e0b' : '#64748b', fontWeight: 700 }}>{usagePercent}%</span>
+                <div style={{ maxWidth: 900, margin: '12px auto 0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                        <span style={{ fontSize: 11, color: C.muted }}>{usedCredits} مستخدمة من {totalCredits}</span>
+                        <span style={{ fontSize: 11, color: isDepleted ? C.red : isLow ? C.yellow : C.muted, fontWeight: 700 }}>{usagePercent}%</span>
                     </div>
-                    <div style={{ height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 100, overflow: 'hidden' }}>
-                        <div style={{
-                            height: '100%', borderRadius: 100, transition: 'width 0.6s ease',
-                            width: `${Math.min(usagePercent, 100)}%`,
-                            background: isDepleted ? '#ef4444' : isLow ? 'linear-gradient(90deg, #f59e0b, #ef4444)' : 'linear-gradient(90deg, #10b981, #059669)',
-                        }} />
+                    <div style={{ height: 5, background: '#f1f5f9', borderRadius: 100, overflow: 'hidden' }}>
+                        <div style={{ height: '100%', borderRadius: 100, width: `${Math.min(usagePercent, 100)}%`, transition: 'width 0.6s', background: isDepleted ? C.red : isLow ? C.yellow : C.green }} />
                     </div>
                 </div>
             </header>
 
-            {/* Low Credit Warning */}
+            {/* ── Alerts ── */}
             {isLow && !isDepleted && (
                 <div style={{ maxWidth: 900, margin: '16px auto 0', padding: '0 24px' }}>
-                    <div style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 14, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <span style={{ fontSize: 20 }}>⚠️</span>
+                    <div style={{ background: '#fffbeb', border: `1px solid #fde68a`, borderRadius: 12, padding: '12px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
                         <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 13, fontWeight: 800, color: '#fbbf24' }}>رصيدك على وشك النفاد</div>
-                            <div style={{ fontSize: 12, color: '#fcd34d' }}>تبقى {remaining} بطاقة فقط. تواصل معنا لتجديد الباقة.</div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: C.yellow }}>رصيدك على وشك النفاد — تبقى {remaining} بطاقة</div>
                         </div>
-                        <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('مرحباً، أرغب بتجديد باقة شركتي في منصة سلّم')}`}
-                            target="_blank" rel="noopener noreferrer"
-                            style={{ padding: '8px 18px', background: '#25D366', color: '#fff', borderRadius: 10, fontSize: 12, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                            تجديد عبر واتساب
+                        <a href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أرغب بتجديد باقة شركتي في سلّم')}`} target="_blank" rel="noopener noreferrer"
+                            style={{ padding: '8px 16px', background: '#25D366', color: '#fff', borderRadius: 8, fontSize: 12, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                            تجديد
                         </a>
                     </div>
                 </div>
             )}
-
-            {/* Depleted Warning */}
             {isDepleted && (
                 <div style={{ maxWidth: 900, margin: '16px auto 0', padding: '0 24px' }}>
-                    <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: 20 }}>🚫</span>
+                    <div style={{ background: '#fef2f2', border: `1px solid #fecaca`, borderRadius: 12, padding: '12px 18px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
                         <div style={{ flex: '1 1 200px' }}>
-                            <div style={{ fontSize: 14, fontWeight: 800, color: '#fca5a5' }}>نفد رصيد البطاقات</div>
-                            <div style={{ fontSize: 12, color: '#fda4af' }}>تواصل معنا لتجديد الباقة والاستمرار في إرسال البطاقات</div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: C.red }}>نفد رصيد البطاقات — تواصل معنا لتجديد الباقة</div>
                         </div>
-                        <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('مرحباً، نفد رصيد شركتي وأرغب بتجديد الباقة')}`}
-                            target="_blank" rel="noopener noreferrer"
-                            style={{ padding: '12px 24px', background: '#25D366', color: '#fff', borderRadius: 12, fontSize: 14, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                            تواصل معنا عبر واتساب
+                        <a href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، نفد رصيد شركتي في سلّم')}`} target="_blank" rel="noopener noreferrer"
+                            style={{ padding: '8px 16px', background: '#25D366', color: '#fff', borderRadius: 8, fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>
+                            تواصل معنا
                         </a>
                     </div>
                 </div>
             )}
 
-            {/* Navigation Tabs */}
-            <div style={{ maxWidth: 900, margin: '24px auto 0', padding: '0 24px' }}>
-                <div style={{ display: 'flex', gap: 6, background: 'rgba(255,255,255,0.04)', borderRadius: 14, padding: 4 }}>
-                    {[
-                        { id: 'home', label: 'الرئيسية', icon: '🏠' },
-                        { id: 'cards', label: 'أنشئ بطاقات', icon: '🎴' },
-                        { id: 'link', label: 'رابط الموظفين', icon: '🔗' },
-                        { id: 'settings', label: 'الهوية', icon: '⚙️' },
-                    ].map(tab => (
+            {/* ── Tabs ── */}
+            <div style={{ maxWidth: 900, margin: '20px auto 0', padding: '0 24px' }}>
+                <div style={{ display: 'flex', gap: 2, background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 4 }}>
+                    {TABS.map(tab => (
                         <button key={tab.id} onClick={() => setActiveView(tab.id)} style={{
-                            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                            padding: '12px 8px', borderRadius: 11, border: 'none', cursor: 'pointer',
-                            fontFamily: ds.font, fontSize: 13, fontWeight: 700,
-                            background: activeView === tab.id ? 'rgba(255,255,255,0.1)' : 'transparent',
-                            color: activeView === tab.id ? '#fff' : '#64748b',
+                            flex: 1, padding: '10px 8px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                            fontFamily: f.font, fontSize: 13, fontWeight: 700,
+                            background: activeView === tab.id ? C.accent : 'transparent',
+                            color: activeView === tab.id ? '#fff' : C.muted,
                             transition: 'all 0.2s',
                         }}>
-                            <span style={{ fontSize: 16 }}>{tab.icon}</span>
-                            <span className="hidden sm:inline">{tab.label}</span>
+                            {tab.label}
                         </button>
                     ))}
                 </div>
             </div>
 
-            {/* Content */}
+            {/* ── Content ── */}
             <div style={{ maxWidth: 900, margin: '24px auto', padding: '0 24px 60px' }}>
-                {activeView === 'home' && <HomeView isDepleted={isDepleted} setActiveView={setActiveView} company={company} />}
+                {activeView === 'home' && <HomeView isDepleted={isDepleted} setActiveView={setActiveView} company={company} remaining={remaining} totalCredits={totalCredits} />}
                 {activeView === 'cards' && <BatchCardsView company={company} token={token} isDepleted={isDepleted} remaining={remaining} />}
                 {activeView === 'link' && <EmployeeLinkView company={company} token={token} isDepleted={isDepleted} />}
                 {activeView === 'settings' && <BrandingSettings company={company} token={token} updateCompanyData={updateCompanyData} />}
@@ -206,270 +189,224 @@ export default function CompanyDashboardPage() {
 }
 
 /* ════════════ HOME VIEW ════════════ */
-function HomeView({ isDepleted, setActiveView, company }) {
+function HomeView({ isDepleted, setActiveView, company, remaining, totalCredits }) {
     return (
         <div style={{ display: 'grid', gap: 20 }}>
-            {/* Card 1: Create Cards */}
+            {/* Stats row */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
+                {[
+                    { label: 'إجمالي الرصيد', value: totalCredits },
+                    { label: 'متبقي', value: remaining, highlight: true },
+                    { label: 'المستخدم', value: Math.max(0, totalCredits - remaining) },
+                ].map(s => (
+                    <div key={s.label} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: '18px 16px', textAlign: 'center' }}>
+                        <div style={{ fontSize: 28, fontWeight: 900, color: s.highlight ? C.accent : C.text }}>{s.value}</div>
+                        <div style={{ fontSize: 12, color: C.muted, marginTop: 4, fontWeight: 600 }}>{s.label}</div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Action cards */}
             <button onClick={() => !isDepleted && setActiveView('cards')} style={{
-                background: isDepleted ? '#1e293b' : 'linear-gradient(135deg, #1e293b, #334155)',
-                border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, padding: 'clamp(28px, 5vw, 40px)',
-                textAlign: 'right', cursor: isDepleted ? 'not-allowed' : 'pointer', fontFamily: ds.font,
-                opacity: isDepleted ? 0.5 : 1, transition: 'all 0.3s',
+                background: C.card, border: `1px solid ${C.border}`, borderRadius: 20,
+                padding: 'clamp(22px,4vw,32px)', textAlign: 'right',
+                cursor: isDepleted ? 'not-allowed' : 'pointer', fontFamily: f.font,
+                opacity: isDepleted ? 0.5 : 1, transition: 'box-shadow 0.2s',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
-                    <div style={{ width: 56, height: 56, borderRadius: 18, background: 'rgba(16,185,129,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: 28 }}>🎴</span>
-                    </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div>
-                        <h3 style={{ fontSize: 22, fontWeight: 900, color: '#fff', margin: '0 0 4px' }}>أنشئ بطاقات الآن</h3>
-                        <p style={{ fontSize: 14, color: '#94a3b8', margin: 0 }}>ارفع أسماء الموظفين → اختر القالب → حمّل ZIP</p>
+                        <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: '0 0 6px' }}>أنشئ بطاقات الآن</h3>
+                        <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>ارفع أسماء الموظفين، اختر القالب، وحمّل الكل دفعة واحدة</p>
                     </div>
-                </div>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', background: isDepleted ? '#334155' : '#10b981', color: '#fff', borderRadius: 12, fontSize: 15, fontWeight: 800 }}>
-                    {isDepleted ? 'الرصيد نفد' : 'ابدأ التصميم الجماعي'}
+                    <div style={{ padding: '10px 20px', background: isDepleted ? '#f1f5f9' : C.green, color: isDepleted ? C.muted : '#fff', borderRadius: 10, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', marginRight: 16 }}>
+                        {isDepleted ? 'نفد الرصيد' : 'ابدأ'}
+                    </div>
                 </div>
             </button>
 
-            {/* Card 2: Employee Link */}
             <button onClick={() => !isDepleted && setActiveView('link')} style={{
-                background: isDepleted ? '#1e293b' : 'linear-gradient(135deg, #1e293b, #334155)',
-                border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, padding: 'clamp(28px, 5vw, 40px)',
-                textAlign: 'right', cursor: isDepleted ? 'not-allowed' : 'pointer', fontFamily: ds.font,
-                opacity: isDepleted ? 0.5 : 1, transition: 'all 0.3s',
+                background: C.card, border: `1px solid ${C.border}`, borderRadius: 20,
+                padding: 'clamp(22px,4vw,32px)', textAlign: 'right',
+                cursor: isDepleted ? 'not-allowed' : 'pointer', fontFamily: f.font,
+                opacity: isDepleted ? 0.5 : 1, transition: 'box-shadow 0.2s',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
-                    <div style={{ width: 56, height: 56, borderRadius: 18, background: 'rgba(99,102,241,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: 28 }}>🔗</span>
-                    </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div>
-                        <h3 style={{ fontSize: 22, fontWeight: 900, color: '#fff', margin: '0 0 4px' }}>رابط موظفيك</h3>
-                        <p style={{ fontSize: 14, color: '#94a3b8', margin: 0 }}>أنشئ رابط مناسبة وشاركه — كل موظف يكتب اسمه ويحمّل بطاقته</p>
+                        <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, margin: '0 0 6px' }}>رابط موظفيك</h3>
+                        <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>أنشئ رابط مناسبة — كل موظف يكتب اسمه ويحمّل بطاقته بنفسه</p>
                     </div>
-                </div>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', background: isDepleted ? '#334155' : '#6366f1', color: '#fff', borderRadius: 12, fontSize: 15, fontWeight: 800 }}>
-                    {isDepleted ? 'الرصيد نفد' : 'أنشئ رابط مناسبة'}
+                    <div style={{ padding: '10px 20px', background: isDepleted ? '#f1f5f9' : C.accent, color: isDepleted ? C.muted : '#fff', borderRadius: 10, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', marginRight: 16 }}>
+                        {isDepleted ? 'نفد الرصيد' : 'أنشئ رابط'}
+                    </div>
                 </div>
             </button>
         </div>
     )
 }
 
-/* ════════════ BATCH CARDS VIEW (Stepper) ════════════ */
+/* ════════════ BATCH CARDS VIEW ════════════ */
 function BatchCardsView({ company, token, isDepleted, remaining }) {
     const [step, setStep] = useState(1)
     const [names, setNames] = useState([])
     const [nameInput, setNameInput] = useState('')
     const [selectedTemplate, setSelectedTemplate] = useState(null)
-    const [templates, setTemplates] = useState([])
+    const [publicTemplates, setPublicTemplates] = useState([])
+    const [companyTemplates, setCompanyTemplates] = useState([])
     const [isLoadingTemplates, setIsLoadingTemplates] = useState(true)
-    const [generating, setGenerating] = useState(false)
-    const [progress, setProgress] = useState(0)
-    const [zipReady, setZipReady] = useState(false)
-    const [zipUrl, setZipUrl] = useState(null)
 
     useEffect(() => {
-        getTemplates().then(res => {
-            if (res.success && res.data) setTemplates(res.data)
-        }).catch(() => {}).finally(() => setIsLoadingTemplates(false))
-    }, [])
+        getTemplates()
+            .then(res => {
+                if (res.success && res.data) {
+                    setPublicTemplates(res.data)
+                    // Company-specific templates stored on the company object
+                    if (company.customTemplates?.length) setCompanyTemplates(company.customTemplates)
+                }
+            })
+            .catch(() => {})
+            .finally(() => setIsLoadingTemplates(false))
+    }, [company])
 
     const handleFileUpload = (e) => {
         const file = e.target.files?.[0]
         if (!file) return
         const reader = new FileReader()
         reader.onload = (ev) => {
-            const parsed = ev.target.result.split(/[\n,;]+/).map(n => n.trim()).filter(n => n.length > 0)
-            setNames(parsed)
-            setNameInput(parsed.join('\n'))
+            const parsed = ev.target.result.split(/[\n,;]+/).map(n => n.trim()).filter(Boolean)
+            setNames(parsed); setNameInput(parsed.join('\n'))
             toast.success(`تم رصد ${parsed.length} اسم`)
         }
         reader.readAsText(file)
         e.target.value = ''
     }
 
-    const handleTextChange = (val) => {
-        setNameInput(val)
-        const parsed = val.split('\n').map(n => n.trim()).filter(n => n.length > 0)
-        setNames(parsed)
-    }
-
     const overLimit = names.length > remaining
 
     const handleGenerate = () => {
-        // Navigate to editor with batch mode and pre-loaded data
         const store = useEditorStore.getState()
         store.setBatchNames(names)
-        if (selectedTemplate) store.setTemplate(selectedTemplate.id)
+        if (selectedTemplate) store.setTemplate(selectedTemplate.id || selectedTemplate._id)
         window.location.href = `/editor?mode=batch&company=1`
     }
 
-    const stepperItems = [
-        { num: 1, label: 'الأسماء' },
-        { num: 2, label: 'القالب' },
-        { num: 3, label: 'التوليد' },
-    ]
+    const STEPS = [{ n: 1, l: 'الأسماء' }, { n: 2, l: 'القالب' }, { n: 3, l: 'التوليد' }]
+
+    const cardStyle = { background: C.card, border: `1px solid ${C.border}`, borderRadius: 20, padding: 'clamp(22px,4vw,32px)' }
+    const inputStyle = { width: '100%', padding: '12px 16px', fontSize: 14, fontFamily: f.font, background: '#f8fafc', border: `1px solid ${C.border}`, borderRadius: 12, color: C.text, outline: 'none', boxSizing: 'border-box' }
+    const btnStyle = (active) => ({ padding: '12px 28px', background: active ? C.accent : '#f1f5f9', color: active ? '#fff' : C.muted, border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: active ? 'pointer' : 'not-allowed', fontFamily: f.font })
 
     return (
         <div>
             {/* Stepper */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 32 }}>
-                {stepperItems.map((s, i) => (
-                    <div key={s.num} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div onClick={() => s.num <= step && setStep(s.num)} style={{
-                            display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px',
-                            borderRadius: 12, cursor: s.num <= step ? 'pointer' : 'default',
-                            background: step === s.num ? 'rgba(255,255,255,0.1)' : 'transparent',
-                            border: `1px solid ${step >= s.num ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)'}`,
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 28 }}>
+                {STEPS.map((s, i) => (
+                    <div key={s.n} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div onClick={() => s.n <= step && setStep(s.n)} style={{
+                            display: 'flex', alignItems: 'center', gap: 8, padding: '8px 18px', borderRadius: 10,
+                            cursor: s.n <= step ? 'pointer' : 'default',
+                            background: step === s.n ? C.accent : step > s.n ? '#f0fdf4' : '#f8fafc',
+                            border: `1px solid ${step === s.n ? C.accent : step > s.n ? '#bbf7d0' : C.border}`,
                         }}>
-                            <div style={{
-                                width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: 13, fontWeight: 900,
-                                background: step >= s.num ? '#10b981' : 'rgba(255,255,255,0.06)',
-                                color: step >= s.num ? '#fff' : '#64748b',
-                            }}>{step > s.num ? '✓' : s.num}</div>
-                            <span style={{ fontSize: 13, fontWeight: 700, color: step >= s.num ? '#fff' : '#64748b' }}>{s.label}</span>
+                            <div style={{ width: 22, height: 22, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, background: step >= s.n ? (step === s.n ? 'rgba(255,255,255,0.2)' : C.green) : '#e2e8f0', color: step >= s.n ? '#fff' : C.muted }}>
+                                {step > s.n ? '✓' : s.n}
+                            </div>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: step === s.n ? '#fff' : step > s.n ? C.green : C.muted }}>{s.l}</span>
                         </div>
-                        {i < stepperItems.length - 1 && <div style={{ width: 24, height: 2, background: 'rgba(255,255,255,0.08)', borderRadius: 1 }} />}
+                        {i < STEPS.length - 1 && <div style={{ width: 20, height: 2, background: C.border, borderRadius: 1 }} />}
                     </div>
                 ))}
             </div>
 
             {/* Step 1: Names */}
             {step === 1 && (
-                <div style={{ background: '#1e293b', borderRadius: 24, padding: 'clamp(24px, 4vw, 36px)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                    <h3 style={{ fontSize: 20, fontWeight: 900, color: '#fff', marginBottom: 20 }}>أدخل أسماء المستلمين</h3>
-
-                    {/* File Upload */}
-                    <label style={{
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%',
-                        padding: 18, background: 'rgba(255,255,255,0.04)', border: '2px dashed rgba(255,255,255,0.1)',
-                        borderRadius: 16, cursor: 'pointer', marginBottom: 20, color: '#94a3b8', fontSize: 14, fontWeight: 700,
-                    }}>
-                        <input type="file" accept=".txt,.csv,.xlsx" style={{ display: 'none' }} onChange={handleFileUpload} />
-                        <span style={{ fontSize: 20 }}>📄</span>
-                        ارفع ملف CSV أو Excel (drag & drop)
+                <div style={cardStyle}>
+                    <h3 style={{ fontSize: 17, fontWeight: 800, color: C.text, marginBottom: 18 }}>أدخل أسماء المستلمين</h3>
+                    <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%', padding: 16, background: '#f8fafc', border: `2px dashed ${C.border}`, borderRadius: 14, cursor: 'pointer', marginBottom: 16, color: C.muted, fontSize: 13, fontWeight: 700, boxSizing: 'border-box' }}>
+                        <input type="file" accept=".txt,.csv" style={{ display: 'none' }} onChange={handleFileUpload} />
+                        ارفع ملف CSV أو TXT
                     </label>
-
-                    <div style={{ marginBottom: 12, fontSize: 13, color: '#64748b', fontWeight: 600 }}>أو اكتب الأسماء يدوياً (كل اسم في سطر)</div>
-                    <textarea
-                        dir="rtl" rows={8}
-                        placeholder={'محمد\nأحمد\nفاطمة\nنوره'}
-                        value={nameInput}
-                        onChange={(e) => handleTextChange(e.target.value)}
-                        style={{
-                            width: '100%', padding: 16, fontSize: 15, fontFamily: ds.font,
-                            background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
-                            borderRadius: 14, color: '#fff', resize: 'vertical', outline: 'none',
-                            minHeight: 180, lineHeight: 2,
-                        }}
-                    />
-
-                    {/* Count */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 }}>
-                        <div style={{
-                            padding: '8px 18px', borderRadius: 10,
-                            background: overLimit ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)',
-                            color: overLimit ? '#fca5a5' : '#6ee7b7',
-                            fontSize: 13, fontWeight: 800,
-                        }}>
-                            {names.length > 0 ? `تم رصد ${names.length} اسم` : 'لم يتم إدخال أسماء'}
+                    <div style={{ marginBottom: 8, fontSize: 12, color: C.muted, fontWeight: 600 }}>أو اكتب الأسماء يدوياً (كل اسم في سطر)</div>
+                    <textarea dir="rtl" rows={7} placeholder={'محمد\nأحمد\nفاطمة'} value={nameInput} onChange={e => { setNameInput(e.target.value); setNames(e.target.value.split('\n').map(n => n.trim()).filter(Boolean)) }}
+                        style={{ ...inputStyle, resize: 'vertical', minHeight: 160, lineHeight: 2 }} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14 }}>
+                        <span style={{ fontSize: 13, color: overLimit ? C.red : C.green, fontWeight: 700 }}>
+                            {names.length > 0 ? `${names.length} اسم` : 'لم يُدخل أسماء بعد'}
                             {overLimit && ` — يتجاوز الرصيد (${remaining})`}
-                        </div>
-                        <button
-                            onClick={() => names.length > 0 && !overLimit && setStep(2)}
-                            disabled={names.length === 0 || overLimit}
-                            style={{
-                                padding: '12px 28px', background: names.length > 0 && !overLimit ? '#10b981' : '#334155',
-                                color: '#fff', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800,
-                                cursor: names.length > 0 && !overLimit ? 'pointer' : 'not-allowed', fontFamily: ds.font,
-                            }}
-                        >
-                            التالي ←
-                        </button>
+                        </span>
+                        <button onClick={() => names.length > 0 && !overLimit && setStep(2)} style={btnStyle(names.length > 0 && !overLimit)}>التالي</button>
                     </div>
                 </div>
             )}
 
-            {/* Step 2: Template Selection */}
+            {/* Step 2: Template */}
             {step === 2 && (
-                <div style={{ background: '#1e293b', borderRadius: 24, padding: 'clamp(24px, 4vw, 36px)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                    <h3 style={{ fontSize: 20, fontWeight: 900, color: '#fff', marginBottom: 20 }}>اختر القالب</h3>
-
+                <div style={cardStyle}>
+                    <h3 style={{ fontSize: 17, fontWeight: 800, color: C.text, marginBottom: 18 }}>اختر القالب</h3>
                     {isLoadingTemplates ? (
-                        <div style={{ textAlign: 'center', padding: 40, color: '#64748b' }}>جارٍ تحميل القوالب...</div>
+                        <div style={{ textAlign: 'center', padding: 40, color: C.muted }}>جارٍ تحميل القوالب...</div>
                     ) : (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 14, marginBottom: 24 }}>
-                            {templates.map(t => (
-                                <button key={t.id} onClick={() => setSelectedTemplate(t)} style={{
-                                    position: 'relative', aspectRatio: '9/16', borderRadius: 16, overflow: 'hidden',
-                                    border: selectedTemplate?.id === t.id ? '3px solid #10b981' : '2px solid rgba(255,255,255,0.08)',
-                                    cursor: 'pointer', padding: 0, background: '#0f172a', transition: 'all 0.2s',
-                                    transform: selectedTemplate?.id === t.id ? 'scale(1.03)' : 'scale(1)',
-                                }}>
-                                    <img src={t.image} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => e.target.style.display = 'none'} />
-                                    {selectedTemplate?.id === t.id && (
-                                        <div style={{ position: 'absolute', top: 8, right: 8, width: 28, height: 28, borderRadius: '50%', background: '#10b981', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 900 }}>✓</div>
-                                    )}
-                                </button>
-                            ))}
-                        </div>
+                        <>
+                            {/* Company templates */}
+                            {companyTemplates.length > 0 && (
+                                <div style={{ marginBottom: 24 }}>
+                                    <div style={{ fontSize: 13, fontWeight: 700, color: C.accent, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <span style={{ width: 8, height: 8, borderRadius: '50%', background: C.accent, display: 'inline-block' }} />
+                                        قوالب خاصة بشركتك
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(120px,1fr))', gap: 10 }}>
+                                        {companyTemplates.map(t => (
+                                            <TemplateTile key={t.id || t._id} t={t} selected={selectedTemplate?.id === (t.id || t._id)} onSelect={setSelectedTemplate} />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            {/* Public templates */}
+                            <div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: C.muted, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: C.muted, display: 'inline-block' }} />
+                                    قوالب عامة
+                                </div>
+                                {publicTemplates.length === 0 ? (
+                                    <div style={{ textAlign: 'center', padding: 32, color: C.muted, background: '#f8fafc', borderRadius: 14, border: `1px dashed ${C.border}` }}>
+                                        لا توجد قوالب متاحة حالياً
+                                    </div>
+                                ) : (
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(120px,1fr))', gap: 10 }}>
+                                        {publicTemplates.map(t => (
+                                            <TemplateTile key={t.id || t._id} t={t} selected={selectedTemplate?.id === (t.id || t._id) || selectedTemplate?._id === (t.id || t._id)} onSelect={setSelectedTemplate} />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </>
                     )}
-
-                    {/* Preview */}
                     {selectedTemplate && (
-                        <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                            <div style={{ fontSize: 13, color: '#64748b', marginBottom: 8 }}>معاينة بالاسم الأول: <strong style={{ color: '#fff' }}>{names[0]}</strong></div>
+                        <div style={{ marginTop: 16, padding: '10px 16px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, fontSize: 13, color: '#166534', fontWeight: 700 }}>
+                            تم اختيار: {selectedTemplate.name} — معاينة بـ "{names[0]}"
                         </div>
                     )}
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-                        <button onClick={() => setStep(1)} style={{ padding: '12px 24px', background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: ds.font }}>
-                            → السابق
-                        </button>
-                        <button
-                            onClick={() => selectedTemplate && setStep(3)}
-                            disabled={!selectedTemplate}
-                            style={{
-                                padding: '12px 28px', background: selectedTemplate ? '#10b981' : '#334155',
-                                color: '#fff', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800,
-                                cursor: selectedTemplate ? 'pointer' : 'not-allowed', fontFamily: ds.font,
-                            }}
-                        >
-                            التالي ←
-                        </button>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20, gap: 12 }}>
+                        <button onClick={() => setStep(1)} style={btnStyle(true)}>السابق</button>
+                        <button onClick={() => selectedTemplate && setStep(3)} style={btnStyle(!!selectedTemplate)}>التالي</button>
                     </div>
                 </div>
             )}
 
             {/* Step 3: Generate */}
             {step === 3 && (
-                <div style={{ background: '#1e293b', borderRadius: 24, padding: 'clamp(24px, 4vw, 36px)', border: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }}>
-                    <h3 style={{ fontSize: 20, fontWeight: 900, color: '#fff', marginBottom: 8 }}>جاهز للتوليد</h3>
-                    <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 32 }}>
-                        {names.length} بطاقة بقالب "{selectedTemplate?.name || 'مختار'}"
+                <div style={{ ...cardStyle, textAlign: 'center' }}>
+                    <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, marginBottom: 6 }}>جاهز للتوليد</h3>
+                    <p style={{ fontSize: 14, color: C.muted, marginBottom: 32 }}>
+                        {names.length} بطاقة — قالب: {selectedTemplate?.name || 'مختار'}
                     </p>
-
-                    <button onClick={handleGenerate} disabled={generating} style={{
-                        padding: '18px 48px', background: generating ? '#334155' : 'linear-gradient(135deg, #10b981, #059669)',
-                        color: '#fff', border: 'none', borderRadius: 16, fontSize: 18, fontWeight: 900,
-                        cursor: generating ? 'not-allowed' : 'pointer', fontFamily: ds.font,
-                        boxShadow: generating ? 'none' : '0 8px 24px rgba(16,185,129,0.3)',
-                    }}>
-                        {generating ? 'جارٍ التوليد...' : `ولّد ${names.length} بطاقة`}
+                    <button onClick={handleGenerate} style={{ padding: '16px 44px', background: C.green, color: '#fff', border: 'none', borderRadius: 14, fontSize: 17, fontWeight: 900, cursor: 'pointer', fontFamily: f.font, boxShadow: '0 6px 20px rgba(5,150,105,0.25)' }}>
+                        ولّد {names.length} بطاقة
                     </button>
-
-                    {generating && (
-                        <div style={{ marginTop: 28 }}>
-                            <div style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 100, overflow: 'hidden', maxWidth: 400, margin: '0 auto' }}>
-                                <div style={{ height: '100%', background: '#10b981', borderRadius: 100, transition: 'width 0.3s', width: `${progress}%` }} />
-                            </div>
-                            <p style={{ fontSize: 13, color: '#64748b', marginTop: 10 }}>{progress}%</p>
-                        </div>
-                    )}
-
-                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
-                        <button onClick={() => setStep(2)} style={{ padding: '10px 20px', background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: ds.font }}>
-                            → العودة لاختيار القالب
+                    <div style={{ marginTop: 20 }}>
+                        <button onClick={() => setStep(2)} style={{ padding: '10px 20px', background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 10, fontSize: 13, cursor: 'pointer', fontFamily: f.font }}>
+                            العودة لاختيار القالب
                         </button>
                     </div>
                 </div>
@@ -478,91 +415,202 @@ function BatchCardsView({ company, token, isDepleted, remaining }) {
     )
 }
 
+function TemplateTile({ t, selected, onSelect }) {
+    return (
+        <button onClick={() => onSelect(t)} style={{
+            position: 'relative', aspectRatio: '9/16', borderRadius: 12, overflow: 'hidden',
+            border: selected ? `3px solid ${C.accent}` : `2px solid ${C.border}`,
+            cursor: 'pointer', padding: 0, background: '#f8fafc', transition: 'all 0.2s',
+            transform: selected ? 'scale(1.03)' : 'scale(1)',
+        }}>
+            {t.image
+                ? <img src={t.image} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none' }} />
+                : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: C.muted, padding: 8, textAlign: 'center' }}>{t.name}</div>
+            }
+            {selected && (
+                <div style={{ position: 'absolute', top: 6, right: 6, width: 22, height: 22, borderRadius: '50%', background: C.accent, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 900 }}>✓</div>
+            )}
+        </button>
+    )
+}
+
 /* ════════════ EMPLOYEE LINK VIEW ════════════ */
 function EmployeeLinkView({ company, token, isDepleted }) {
     const [occasionName, setOccasionName] = useState('')
+    const [greetingText, setGreetingText] = useState('')
     const [expiryDate, setExpiryDate] = useState('')
+    const [selectedTemplate, setSelectedTemplate] = useState(null)
+    const [templates, setTemplates] = useState([])
+    const [step, setStep] = useState(1) // 1=form, 2=generated
     const [generatedLink, setGeneratedLink] = useState('')
     const [copied, setCopied] = useState(false)
+    // Individual links
+    const [showIndividual, setShowIndividual] = useState(false)
+    const [employeeNames, setEmployeeNames] = useState('')
+    const [individualLinks, setIndividualLinks] = useState([])
+    const [allCopied, setAllCopied] = useState(false)
 
-    const companySlug = company.slug || company.name?.toLowerCase().replace(/\s+/g, '-') || 'company'
+    useEffect(() => {
+        getTemplates().then(res => { if (res.success && res.data) setTemplates(res.data) }).catch(() => {})
+    }, [])
+
+    const companySlug = company.slug || 'company'
 
     const handleCreateLink = () => {
-        if (!occasionName.trim()) {
-            toast.error('اكتب اسم المناسبة')
-            return
-        }
-        // Generate a link (in production this would call the API)
+        if (!occasionName.trim()) { toast.error('اكتب اسم المناسبة'); return }
+        if (!selectedTemplate) { toast.error('اختر قالباً للموظفين'); return }
         const linkId = Math.random().toString(36).substring(2, 8)
-        const link = `${window.location.origin}/greet/${companySlug}/${linkId}`
+        const params = new URLSearchParams({ tmpl: selectedTemplate.id || selectedTemplate._id, ...(greetingText.trim() ? { msg: greetingText.trim() } : {}) })
+        const link = `${window.location.origin}/greet/${companySlug}/${linkId}?${params}`
         setGeneratedLink(link)
-        toast.success('تم إنشاء الرابط بنجاح')
+        setStep(2)
+        toast.success('تم إنشاء الرابط')
     }
 
-    const handleCopy = () => {
-        navigator.clipboard.writeText(generatedLink)
-        setCopied(true)
-        setTimeout(() => setCopied(false), 2000)
+    const handleGenerateIndividual = () => {
+        const names = employeeNames.split('\n').map(n => n.trim()).filter(Boolean)
+        if (!names.length) { toast.error('أدخل أسماء الموظفين'); return }
+        if (!selectedTemplate) { toast.error('اختر قالباً أولاً'); return }
+        const linkId = Math.random().toString(36).substring(2, 8)
+        const links = names.map(name => ({
+            name,
+            url: `${window.location.origin}/greet/${companySlug}/${linkId}?for=${encodeURIComponent(name)}&tmpl=${selectedTemplate.id || selectedTemplate._id}`,
+        }))
+        setIndividualLinks(links)
     }
+
+    const handleCopyAll = () => {
+        const text = individualLinks.map(l => `${l.name}: ${l.url}`).join('\n')
+        navigator.clipboard.writeText(text)
+        setAllCopied(true)
+        setTimeout(() => setAllCopied(false), 2000)
+        toast.success('تم نسخ كل الروابط')
+    }
+
+    const inputStyle = { width: '100%', padding: '12px 16px', fontSize: 14, fontFamily: f.font, background: '#f8fafc', border: `1px solid ${C.border}`, borderRadius: 12, color: C.text, outline: 'none', boxSizing: 'border-box' }
+    const cardStyle = { background: C.card, border: `1px solid ${C.border}`, borderRadius: 20, padding: 'clamp(22px,4vw,32px)' }
 
     return (
-        <div style={{ background: '#1e293b', borderRadius: 24, padding: 'clamp(24px, 4vw, 36px)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <h3 style={{ fontSize: 20, fontWeight: 900, color: '#fff', marginBottom: 8 }}>إنشاء رابط مناسبة للموظفين</h3>
-            <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 28, lineHeight: 1.8 }}>
-                أنشئ رابط خاص وشاركه مع موظفيك — كل واحد يكتب اسمه ويحمّل بطاقته. كل بطاقة تُحسب من رصيد شركتك.
-            </p>
+        <div style={{ display: 'grid', gap: 20 }}>
+            {step === 1 ? (
+                <div style={cardStyle}>
+                    <h3 style={{ fontSize: 17, fontWeight: 800, color: C.text, marginBottom: 6 }}>إنشاء رابط مناسبة للموظفين</h3>
+                    <p style={{ fontSize: 13, color: C.muted, marginBottom: 24, lineHeight: 1.8 }}>
+                        رابط خاص يشاركه كل موظف — كتابة الاسم وتحميل البطاقة. كل بطاقة تُحسب من رصيدك.
+                    </p>
 
-            {!generatedLink ? (
-                <div style={{ display: 'grid', gap: 18 }}>
-                    <div>
-                        <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#cbd5e1', marginBottom: 8 }}>اسم المناسبة</label>
-                        <input type="text" value={occasionName} onChange={(e) => setOccasionName(e.target.value)}
-                            placeholder="مثال: عيد الفطر 2026" dir="rtl"
-                            style={{ width: '100%', padding: '14px 18px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, color: '#fff', fontSize: 15, fontFamily: ds.font, outline: 'none' }}
-                        />
+                    <div style={{ display: 'grid', gap: 16 }}>
+                        <div>
+                            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 6 }}>اسم المناسبة *</label>
+                            <input value={occasionName} onChange={e => setOccasionName(e.target.value)} placeholder="مثال: عيد الفطر 2026" dir="rtl" style={inputStyle} />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 6 }}>نص التهنئة من الشركة (اختياري)</label>
+                            <textarea value={greetingText} onChange={e => setGreetingText(e.target.value)} placeholder="تهنئكم شركة ... بمناسبة ..." dir="rtl" rows={3}
+                                style={{ ...inputStyle, resize: 'vertical' }} />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 6 }}>تاريخ انتهاء الرابط (اختياري)</label>
+                            <input type="date" value={expiryDate} onChange={e => setExpiryDate(e.target.value)} style={inputStyle} />
+                        </div>
+
+                        {/* Template selector - single choice */}
+                        <div>
+                            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 10 }}>اختر قالب للموظفين *</label>
+                            {templates.length === 0
+                                ? <div style={{ padding: 16, textAlign: 'center', color: C.muted, fontSize: 13 }}>جارٍ التحميل...</div>
+                                : <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(90px,1fr))', gap: 8, maxHeight: 260, overflowY: 'auto' }}>
+                                    {templates.map(t => <TemplateTile key={t.id || t._id} t={t} selected={selectedTemplate?.id === (t.id || t._id) || selectedTemplate?._id === (t.id || t._id)} onSelect={setSelectedTemplate} />)}
+                                </div>
+                            }
+                            {selectedTemplate && <div style={{ marginTop: 8, fontSize: 12, color: C.green, fontWeight: 700 }}>تم اختيار: {selectedTemplate.name}</div>}
+                        </div>
+
+                        <button onClick={handleCreateLink} disabled={isDepleted} style={{
+                            padding: '14px 28px', background: isDepleted ? '#f1f5f9' : C.accent, color: isDepleted ? C.muted : '#fff',
+                            border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800, cursor: isDepleted ? 'not-allowed' : 'pointer', fontFamily: f.font,
+                        }}>
+                            أنشئ الرابط العام
+                        </button>
                     </div>
-                    <div>
-                        <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#cbd5e1', marginBottom: 8 }}>تاريخ انتهاء الرابط</label>
-                        <input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)}
-                            style={{ width: '100%', padding: '14px 18px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, color: '#fff', fontSize: 15, fontFamily: ds.font, outline: 'none' }}
-                        />
-                    </div>
-                    <button onClick={handleCreateLink} disabled={isDepleted} style={{
-                        padding: '16px 32px', background: isDepleted ? '#334155' : '#6366f1', color: '#fff',
-                        border: 'none', borderRadius: 14, fontSize: 16, fontWeight: 900, cursor: isDepleted ? 'not-allowed' : 'pointer', fontFamily: ds.font,
-                    }}>
-                        أنشئ الرابط
-                    </button>
                 </div>
             ) : (
-                <div>
-                    {/* Generated Link */}
-                    <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 16, padding: 20, marginBottom: 20, textAlign: 'center' }}>
-                        <div style={{ fontSize: 12, color: '#6ee7b7', marginBottom: 8, fontWeight: 700 }}>رابط المناسبة الخاص بشركتك</div>
-                        <div style={{ fontSize: 15, color: '#fff', fontWeight: 800, wordBreak: 'break-all', direction: 'ltr', background: 'rgba(0,0,0,0.2)', padding: '12px 16px', borderRadius: 10, marginBottom: 16 }}>
+                <div style={cardStyle}>
+                    <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 14, padding: 20, marginBottom: 20, textAlign: 'center' }}>
+                        <div style={{ fontSize: 12, color: '#166534', fontWeight: 700, marginBottom: 8 }}>رابط مناسبة {occasionName}</div>
+                        <div style={{ fontSize: 14, color: C.text, fontWeight: 700, wordBreak: 'break-all', direction: 'ltr', background: '#fff', padding: '10px 14px', borderRadius: 10, marginBottom: 14, border: `1px solid ${C.border}` }}>
                             {generatedLink}
                         </div>
                         <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
-                            <button onClick={handleCopy} style={{
-                                padding: '12px 24px', background: copied ? '#10b981' : '#fff', color: copied ? '#fff' : '#0f172a',
-                                border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: ds.font,
-                            }}>
-                                {copied ? '✓ تم النسخ!' : '📋 نسخ الرابط'}
+                            <button onClick={() => { navigator.clipboard.writeText(generatedLink); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
+                                style={{ padding: '10px 20px', background: copied ? C.green : C.accent, color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: f.font }}>
+                                {copied ? 'تم النسخ' : 'نسخ الرابط'}
                             </button>
-                            <a href={`https://wa.me/?text=${encodeURIComponent(`🎉 بطاقة تهنئة من ${company.name}\n\nافتح الرابط واكتب اسمك:\n${generatedLink}`)}`}
+                            <a href={`https://wa.me/?text=${encodeURIComponent(`${greetingText || `بطاقة تهنئة من ${company.name}`}\n\nافتح الرابط واكتب اسمك:\n${generatedLink}`)}`}
                                 target="_blank" rel="noopener noreferrer"
-                                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', background: '#25D366', color: '#fff', borderRadius: 12, fontSize: 14, fontWeight: 800, textDecoration: 'none' }}>
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: '#25D366', color: '#fff', borderRadius: 10, fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
                                 شارك على واتساب
                             </a>
                         </div>
                     </div>
-
-                    <button onClick={() => { setGeneratedLink(''); setOccasionName(''); setExpiryDate('') }}
-                        style={{ padding: '10px 20px', background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: ds.font }}>
+                    <button onClick={() => { setStep(1); setGeneratedLink(''); setIndividualLinks([]) }}
+                        style={{ padding: '10px 20px', background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 10, fontSize: 13, cursor: 'pointer', fontFamily: f.font }}>
                         إنشاء رابط جديد
                     </button>
                 </div>
             )}
+
+            {/* ── Individual Employee Links ── */}
+            <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 20, padding: 'clamp(22px,4vw,32px)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <h3 style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: 0 }}>روابط فردية لكل موظف</h3>
+                    <button onClick={() => setShowIndividual(v => !v)} style={{ padding: '6px 14px', background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8, fontSize: 12, cursor: 'pointer', fontFamily: f.font }}>
+                        {showIndividual ? 'إخفاء' : 'إظهار'}
+                    </button>
+                </div>
+                <p style={{ fontSize: 13, color: C.muted, marginBottom: showIndividual ? 18 : 0, lineHeight: 1.8 }}>
+                    كل موظف يحصل على رابطه الخاص مع اسمه مُعبّأ مسبقاً
+                </p>
+                {showIndividual && (
+                    <>
+                        {!selectedTemplate && <div style={{ padding: '10px 14px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, fontSize: 13, color: C.yellow, fontWeight: 700, marginBottom: 14 }}>اختر قالباً في قسم إنشاء الرابط أعلى أولاً</div>}
+                        <div style={{ marginBottom: 12 }}>
+                            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 6 }}>أسماء الموظفين (كل اسم في سطر)</label>
+                            <textarea value={employeeNames} onChange={e => setEmployeeNames(e.target.value)} placeholder={'محمد العمري\nفاطمة السعيد\nأحمد الزهراني'} rows={6} dir="rtl"
+                                style={{ width: '100%', padding: '12px 16px', fontSize: 14, fontFamily: f.font, background: '#f8fafc', border: `1px solid ${C.border}`, borderRadius: 12, color: C.text, outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} />
+                        </div>
+                        <button onClick={handleGenerateIndividual} style={{ padding: '12px 24px', background: C.accent, color: '#fff', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: f.font, marginBottom: 16 }}>
+                            توليد روابط فردية
+                        </button>
+                        {individualLinks.length > 0 && (
+                            <div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                                    <span style={{ fontSize: 13, fontWeight: 700, color: C.green }}>{individualLinks.length} رابط جاهز</span>
+                                    <button onClick={handleCopyAll} style={{ padding: '8px 16px', background: allCopied ? C.green : '#f1f5f9', color: allCopied ? '#fff' : C.muted, border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: f.font }}>
+                                        {allCopied ? 'تم النسخ' : 'نسخ الكل'}
+                                    </button>
+                                </div>
+                                <div style={{ display: 'grid', gap: 8, maxHeight: 320, overflowY: 'auto' }}>
+                                    {individualLinks.map((l, i) => (
+                                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: '#f8fafc', borderRadius: 10, border: `1px solid ${C.border}` }}>
+                                            <span style={{ fontSize: 13, fontWeight: 700, color: C.text, flex: '0 0 120px' }}>{l.name}</span>
+                                            <span style={{ fontSize: 11, color: C.muted, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', direction: 'ltr' }}>{l.url}</span>
+                                            <button onClick={() => navigator.clipboard.writeText(l.url).then(() => toast.success('تم النسخ'))}
+                                                style={{ padding: '4px 10px', background: C.accent, color: '#fff', border: 'none', borderRadius: 6, fontSize: 11, cursor: 'pointer', fontFamily: f.font, flexShrink: 0 }}>
+                                                نسخ
+                                            </button>
+                                            <a href={`https://wa.me/?text=${encodeURIComponent(`${l.url}`)}`} target="_blank" rel="noopener noreferrer"
+                                                style={{ padding: '4px 10px', background: '#25D366', color: '#fff', borderRadius: 6, fontSize: 11, textDecoration: 'none', fontWeight: 700, flexShrink: 0 }}>
+                                                واتساب
+                                            </a>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
         </div>
     )
 }
@@ -570,95 +618,116 @@ function EmployeeLinkView({ company, token, isDepleted }) {
 /* ════════════ BRANDING SETTINGS ════════════ */
 function BrandingSettings({ company, token, updateCompanyData }) {
     const [logo, setLogo] = useState(company.logoUrl || '')
-    const [isUploading, setIsUploading] = useState(false)
-    const [primaryColor, setPrimaryColor] = useState(company.primaryColor || '#6366f1')
+    const [logoFile, setLogoFile] = useState(null)
+    const [logoPreview, setLogoPreview] = useState(company.logoUrl || '')
+    const [primaryColor, setPrimaryColor] = useState(company.primaryColor || '#7c3aed')
+    const [companyName, setCompanyName] = useState(company.name || '')
+    const [isSaving, setIsSaving] = useState(false)
 
-    const handleLogoUpload = async (e) => {
+    const handleLogoSelect = (e) => {
         const file = e.target.files?.[0]
         if (!file) return
         if (!file.type.startsWith('image/')) { toast.error('يرجى رفع صورة فقط'); return }
         if (file.size > 5 * 1024 * 1024) { toast.error('الحد الأقصى 5MB'); return }
+        setLogoFile(file)
+        setLogoPreview(URL.createObjectURL(file))
+    }
 
+    const handleSave = async () => {
+        setIsSaving(true)
         try {
-            setIsUploading(true)
             const formData = new FormData()
-            formData.append('logo', file)
+            if (logoFile) formData.append('logo', logoFile)
+            formData.append('primaryColor', primaryColor)
+            if (companyName.trim()) formData.append('companyName', companyName.trim())
+
             const response = await updateCompanyProfile(token, formData)
             if (response.success && response.data) {
-                setLogo(response.data.logoUrl)
-                updateCompanyData(response.data)
-                toast.success('تم تحديث الشعار')
+                setLogo(response.data.logoUrl || logo)
+                setLogoFile(null)
+                updateCompanyData({ ...response.data, primaryColor, name: companyName })
+                toast.success('تم حفظ التغييرات بنجاح')
             }
         } catch (error) {
-            toast.error(error.message || 'حدث خطأ')
+            toast.error(error.message || 'حدث خطأ أثناء الحفظ')
         } finally {
-            setIsUploading(false)
+            setIsSaving(false)
         }
     }
 
-    return (
-        <div style={{ background: '#1e293b', borderRadius: 24, padding: 'clamp(24px, 4vw, 36px)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <h3 style={{ fontSize: 20, fontWeight: 900, color: '#fff', marginBottom: 8 }}>إعدادات هوية الشركة</h3>
-            <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 28 }}>التغييرات تنعكس على كل البطاقات الجديدة</p>
+    const inputStyle = { width: '100%', padding: '12px 16px', fontSize: 14, fontFamily: f.font, background: '#f8fafc', border: `1px solid ${C.border}`, borderRadius: 12, color: C.text, outline: 'none', boxSizing: 'border-box' }
 
-            <div style={{ display: 'grid', gap: 28, maxWidth: 480 }}>
-                {/* Logo Upload */}
+    return (
+        <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 20, padding: 'clamp(22px,4vw,32px)' }}>
+            <h3 style={{ fontSize: 17, fontWeight: 800, color: C.text, marginBottom: 4 }}>إعدادات هوية الشركة</h3>
+            <p style={{ fontSize: 13, color: C.muted, marginBottom: 28 }}>التغييرات تنعكس على كل البطاقات الجديدة</p>
+
+            <div style={{ display: 'grid', gap: 24, maxWidth: 480 }}>
+                {/* Name */}
                 <div>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#cbd5e1', marginBottom: 12 }}>شعار الشركة</label>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                        <div style={{
-                            width: 80, height: 80, borderRadius: 20,
-                            background: 'rgba(255,255,255,0.04)', border: '2px dashed rgba(255,255,255,0.1)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
-                        }}>
-                            {logo ? <img src={logo} style={{ width: '100%', height: '100%', objectFit: 'contain' }} alt="Logo" />
-                                : <span style={{ fontSize: 28, opacity: 0.3 }}>🏢</span>}
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 6 }}>اسم الشركة</label>
+                    <input value={companyName} onChange={e => setCompanyName(e.target.value)} dir="rtl" style={inputStyle} />
+                </div>
+
+                {/* Logo */}
+                <div>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 10 }}>شعار الشركة</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                        <div style={{ width: 72, height: 72, borderRadius: 16, background: '#f8fafc', border: `2px dashed ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+                            {logoPreview
+                                ? <img src={logoPreview} style={{ width: '100%', height: '100%', objectFit: 'contain' }} alt="" />
+                                : <span style={{ fontSize: 12, color: C.muted, textAlign: 'center', padding: 4 }}>لا يوجد شعار</span>
+                            }
                         </div>
-                        <label style={{
-                            display: 'inline-flex', alignItems: 'center', gap: 8,
-                            padding: '10px 20px', background: 'rgba(255,255,255,0.08)', color: '#e2e8f0',
-                            borderRadius: 12, fontSize: 13, fontWeight: 700, cursor: isUploading ? 'not-allowed' : 'pointer',
-                            opacity: isUploading ? 0.5 : 1,
-                        }}>
-                            <input type="file" accept="image/*" onChange={handleLogoUpload} style={{ display: 'none' }} disabled={isUploading} />
-                            {isUploading ? '⏳ جاري الرفع...' : '📷 تغيير الشعار'}
+                        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: '#f1f5f9', color: C.text, borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                            <input type="file" accept="image/*" onChange={handleLogoSelect} style={{ display: 'none' }} />
+                            اختر صورة
                         </label>
+                        {logoPreview && (
+                            <button onClick={() => { setLogoPreview(''); setLogoFile(null) }} style={{ padding: '10px 16px', background: '#fef2f2', color: C.red, border: 'none', borderRadius: 10, fontSize: 12, cursor: 'pointer', fontFamily: f.font }}>
+                                حذف
+                            </button>
+                        )}
                     </div>
                 </div>
 
-                {/* Color Picker */}
+                {/* Color */}
                 <div>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#cbd5e1', marginBottom: 12 }}>اللون الرئيسي</label>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 10 }}>اللون الرئيسي</label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <input type="color" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)}
-                            style={{ width: 48, height: 48, borderRadius: 12, border: '2px solid rgba(255,255,255,0.1)', cursor: 'pointer', background: 'transparent' }}
-                        />
-                        <span style={{ fontSize: 14, color: '#94a3b8', fontFamily: 'monospace', direction: 'ltr' }}>{primaryColor}</span>
+                        <input type="color" value={primaryColor} onChange={e => setPrimaryColor(e.target.value)}
+                            style={{ width: 48, height: 48, borderRadius: 12, border: `1px solid ${C.border}`, cursor: 'pointer', padding: 2 }} />
+                        <span style={{ fontSize: 14, color: C.muted, fontFamily: 'monospace', direction: 'ltr' }}>{primaryColor}</span>
+                        {/* Color presets */}
+                        <div style={{ display: 'flex', gap: 8 }}>
+                            {['#7c3aed', '#059669', '#2563eb', '#dc2626', '#d97706', '#0f172a'].map(c => (
+                                <button key={c} onClick={() => setPrimaryColor(c)} style={{ width: 28, height: 28, borderRadius: 8, background: c, border: primaryColor === c ? `3px solid ${C.text}` : '2px solid transparent', cursor: 'pointer', padding: 0 }} />
+                            ))}
+                        </div>
                     </div>
                 </div>
 
                 {/* Preview */}
                 <div>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#cbd5e1', marginBottom: 12 }}>معاينة</label>
-                    <div style={{
-                        background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 24,
-                        border: `2px solid ${primaryColor}30`, textAlign: 'center',
-                    }}>
-                        {logo && <img src={logo} style={{ width: 48, height: 48, objectFit: 'contain', margin: '0 auto 12px', display: 'block' }} alt="" />}
-                        <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', marginBottom: 4 }}>{company.name}</div>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 10 }}>معاينة</label>
+                    <div style={{ background: '#f8fafc', borderRadius: 14, padding: 20, border: `2px solid ${primaryColor}30`, textAlign: 'center' }}>
+                        {logoPreview && <img src={logoPreview} style={{ width: 44, height: 44, objectFit: 'contain', margin: '0 auto 10px', display: 'block' }} alt="" />}
+                        <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 4 }}>{companyName}</div>
                         <div style={{ fontSize: 12, color: primaryColor, fontWeight: 700 }}>بطاقة تهنئة نموذجية</div>
                     </div>
                 </div>
 
                 {/* Save */}
-                <button style={{
-                    padding: '14px 32px', background: primaryColor, color: '#fff', border: 'none',
-                    borderRadius: 14, fontSize: 15, fontWeight: 900, cursor: 'pointer', fontFamily: ds.font,
+                <button onClick={handleSave} disabled={isSaving} style={{
+                    padding: '14px 32px', background: isSaving ? '#f1f5f9' : primaryColor, color: isSaving ? C.muted : '#fff', border: 'none',
+                    borderRadius: 14, fontSize: 15, fontWeight: 900, cursor: isSaving ? 'not-allowed' : 'pointer', fontFamily: f.font,
                 }}>
-                    حفظ التغييرات
+                    {isSaving ? 'جارٍ الحفظ...' : 'حفظ التغييرات'}
                 </button>
             </div>
         </div>
     )
 }
+
+
 

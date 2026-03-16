@@ -379,10 +379,12 @@ router.put('/profile', protectCompanyRoute, upload.single('logo'), async (req, r
             req.company.logoUrl = logoUrl
         }
 
-        // You can also allow updating other profile fields here via req.body
-        if (req.body.name) {
-            // For now, let's say only admin can change names. Or we can allow it.
-            // req.company.name = req.body.name 
+        // Allow updating profile fields from body
+        if (req.body.companyName && req.body.companyName.trim()) {
+            req.company.name = req.body.companyName.trim()
+        }
+        if (req.body.primaryColor) {
+            req.company.primaryColor = req.body.primaryColor
         }
 
         await req.company.save()

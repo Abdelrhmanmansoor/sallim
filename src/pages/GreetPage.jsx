@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { getTemplates } from '../utils/api'
 import toast, { Toaster } from 'react-hot-toast'
 
@@ -7,7 +7,10 @@ const ds = { font: "'Tajawal', sans-serif" }
 
 export default function GreetPage() {
     const { slug, occasionId } = useParams()
-    const [name, setName] = useState('')
+    const [searchParams] = useSearchParams()
+    const prefilledName = searchParams.get('for') || ''
+    const tmplId = searchParams.get('tmpl') || ''
+    const [name, setName] = useState(prefilledName)
     const [generated, setGenerated] = useState(false)
     const [loading, setLoading] = useState(false)
 
@@ -18,7 +21,7 @@ export default function GreetPage() {
         }
         setLoading(true)
         // Navigate to editor with employee greet mode
-        window.location.href = `/editor?mode=ready&greet=1&name=${encodeURIComponent(name.trim())}&slug=${slug}&occasion=${occasionId || ''}`
+        window.location.href = `/editor?mode=ready&greet=1&name=${encodeURIComponent(name.trim())}&slug=${slug}&occasion=${occasionId || ''}${tmplId ? `&tmpl=${tmplId}` : ''}`
     }
 
     return (
