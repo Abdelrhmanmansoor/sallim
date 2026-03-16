@@ -38,6 +38,7 @@ import AdminInviteCodesPage from './pages/AdminInviteCodesPage'
 import AdminTemplatesPage from './pages/AdminTemplatesPage'
 import BatchAccessPage from './pages/BatchAccessPage'
 import BulkPage from './pages/BulkPage'
+import GreetPage from './pages/GreetPage'
 import AboutPage from './pages/AboutPage'
 import PricingPage from './pages/PricingPage'
 import DeliveryPage from './pages/DeliveryPage'
@@ -82,8 +83,8 @@ export default function App() {
   // Define isBusiness - assuming it's false for free version
   const isBusiness = false
 
-  const hideNavbar = pathname === '/editor'
-  const hideFooter = pathname === '/editor'
+  const hideNavbar = pathname === '/editor' || pathname === '/company/dashboard' || pathname.startsWith('/greet/')
+  const hideFooter = pathname === '/editor' || pathname === '/company/dashboard' || pathname.startsWith('/greet/')
   const noNavPadding = hideNavbar || pathname === '/'
 
   return (
@@ -112,6 +113,8 @@ export default function App() {
           <Route path="/company-activation" element={<CompanyActivationPage />} />
           <Route path="/company-login" element={<CompanyLoginPage />} />
           <Route path="/company/dashboard" element={<CompanyDashboardPage />} />
+          <Route path="/greet/:slug" element={<GreetPage />} />
+          <Route path="/greet/:slug/:occasionId" element={<GreetPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/eid/:username" element={<PublicDiwaniyaPage />} />
