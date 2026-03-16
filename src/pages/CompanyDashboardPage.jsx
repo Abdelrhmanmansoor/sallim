@@ -20,7 +20,7 @@ const C = {
 }
 
 export default function CompanyDashboardPage() {
-    const { company, token, logout, isAuthenticated, updateCompanyData } = useCompany()
+    const { company, token, logout, isAuthenticated, loading, updateCompanyData } = useCompany()
     const navigate = useNavigate()
     const [activeView, setActiveView] = useState('home')
     const [showWelcome, setShowWelcome] = useState(false)
@@ -35,6 +35,16 @@ export default function CompanyDashboardPage() {
     const dismissWelcome = () => {
         setShowWelcome(false)
         sessionStorage.setItem(`sallim_welcomed_${company?._id || company?.id}`, '1')
+    }
+
+    // Wait for context to finish loading from localStorage
+    if (loading) {
+        return (
+            <div style={{ minHeight: '100vh', background: C.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: f.font }}>
+                <div style={{ width: 40, height: 40, border: `3px solid ${C.accent}`, borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            </div>
+        )
     }
 
     if (!isAuthenticated || !company) {

@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Building2, ArrowLeft, Mail, Lock } from 'lucide-react'
+import { useCompany } from '../context/CompanyContext'
+
+const FONT = "'Tajawal', sans-serif"
 
 export default function CompanyLoginPage() {
   const navigate = useNavigate()
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  })
+  const { login } = useCompany()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -15,450 +16,94 @@ export default function CompanyLoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-
     try {
-      // TODO: Implement actual API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Store mock user data
-      localStorage.setItem('user', JSON.stringify({
-        name: 'شركة تجريبية',
-        email: formData.email,
-        role: 'company',
-      }))
-      localStorage.setItem('token', 'mock-company-token')
-      
-      navigate('/company/dashboard')
-    } catch (err) {
-      setError('فشل تسجيل الدخول. يرجى التحقق من بياناتك.')
+      const result = await login(email.trim(), password)
+      if (result.success) {
+        navigate('/company/dashboard')
+      } else {
+        setError(result.error || 'البريد أو كلمة المرور غير صحيحة')
+      }
     } finally {
       setLoading(false)
     }
   }
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    })
+  const inp = {
+    width: '100%', padding: '13px 16px', background: '#f8fafc',
+    border: '1.5px solid #e2e8f0', borderRadius: 12, color: '#111827',
+    fontSize: 14, fontFamily: FONT, outline: 'none', boxSizing: 'border-box',
+    transition: 'border-color 0.2s',
   }
 
   return (
-    <div dir="rtl" style={{ fontFamily: "'Tajawal', sans-serif" }}>
-      {/* HERO - Same style as LandingPage */}
-      <section
-        style={{
-          background: '#171717',
-          padding: 0,
-        }}
-      >
-        <div
-          style={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-            overflow: 'hidden',
-            background: 'linear-gradient(135deg, #171717 0%, #262626 100%)',
-          }}
-        >
-          {/* Content */}
-          <div
-            style={{
-              position: 'relative',
-              zIndex: 1,
-              maxWidth: '480px',
-              margin: '0 auto',
-              padding: '120px 24px',
-              textAlign: 'center',
-            }}
-          >
-            {/* Back Button */}
-            <div style={{ textAlign: 'right', marginBottom: '32px' }}>
-              <button
-                onClick={() => navigate('/')}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '8px 16px',
-                  background: 'rgba(255,255,255,0.05)',
-                  color: '#fff',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  borderRadius: '10px',
-                  border: '1px solid rgba(255,255,255,0.05)',
-                  cursor: 'pointer',
-                  transition: 'all 200ms ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.1)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
-                }}
-              >
-                <ArrowLeft size={16} />
-                العودة للرئيسية
-              </button>
+    <div dir="rtl" style={{ minHeight: '100vh', background: '#f5f7fa', fontFamily: FONT, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div style={{ width: '100%', maxWidth: 420 }}>
+        {/* Logo / brand */}
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ width: 60, height: 60, borderRadius: 18, background: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 6px 20px rgba(124,58,237,0.25)' }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><rect x="2" y="7" width="20" height="14" rx="2"/><polyline points="16 3 12 7 8 3"/></svg>
+          </div>
+          <h1 style={{ fontSize: 26, fontWeight: 800, color: '#111827', margin: '0 0 6px' }}>بورتال الشركات</h1>
+          <p style={{ fontSize: 14, color: '#6b7280', margin: 0 }}>سجّل دخولك للوصول إلى لوحة التحكم</p>
+        </div>
+
+        {/* Card */}
+        <div style={{ background: '#fff', borderRadius: 20, padding: 'clamp(24px,5vw,36px)', border: '1px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+          {error && (
+            <div style={{ padding: '12px 16px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, marginBottom: 20, fontSize: 14, color: '#b91c1c', fontWeight: 600 }}>
+              {error}
             </div>
+          )}
 
-            {/* Icon */}
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '80px',
-                height: '80px',
-                background: 'rgba(255,255,255,0.05)',
-                borderRadius: '20px',
-                marginBottom: '32px',
-                border: '1px solid rgba(255,255,255,0.05)',
-              }}
-            >
-              <Building2 size={36} color="#fff" />
+          <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 18 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 7 }}>البريد الإلكتروني</label>
+              <input
+                type="email" value={email} onChange={e => setEmail(e.target.value)}
+                required placeholder="example@company.com" dir="ltr"
+                style={inp}
+                onFocus={e => e.currentTarget.style.borderColor = '#7c3aed'}
+                onBlur={e => e.currentTarget.style.borderColor = '#e2e8f0'}
+              />
             </div>
-
-            {/* Title */}
-            <h1
-              style={{
-                fontSize: 'clamp(32px, 5vw, 48px)',
-                fontWeight: 700,
-                color: '#fff',
-                lineHeight: 1.2,
-                marginBottom: '12px',
-                letterSpacing: '-0.02em',
-              }}
-            >
-              دخول المؤسسات
-            </h1>
-
-            {/* Subtitle */}
-            <p
-              style={{
-                fontSize: '16px',
-                color: 'rgba(255,255,255,0.5)',
-                marginBottom: '48px',
-                lineHeight: 1.6,
-              }}
-            >
-              سجل دخول لاستخدام نظام سَلِّم للمؤسسات
-            </p>
-
-            {/* Form Card */}
-            <div
-              style={{
-                padding: '32px',
-                background: '#262626',
-                borderRadius: '20px',
-                border: '1px solid ' + (error ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.05)'),
-                textAlign: 'right',
-              }}
-            >
-              {/* Error Message */}
-              {error && (
-                <div
-                  style={{
-                    padding: '16px 20px',
-                    background: 'rgba(239,68,68,0.1)',
-                    borderRadius: '12px',
-                    marginBottom: '24px',
-                    border: '1px solid rgba(239,68,68,0.2)',
-                  }}
-                >
-                  <p style={{ fontSize: '14px', color: '#fca5a5', margin: 0, lineHeight: 1.6 }}>
-                    {error}
-                  </p>
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit}>
-                {/* Email */}
-                <div style={{ marginBottom: '20px' }}>
-                  <label
-                    htmlFor="email"
-                    style={{
-                      display: 'block',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      color: '#a3a3a3',
-                      marginBottom: '8px',
-                    }}
-                  >
-                    البريد الإلكتروني
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <Mail
-                      size={18}
-                      color="#737373"
-                      style={{
-                        position: 'absolute',
-                        right: '16px',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                      }}
-                    />
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      placeholder="example@company.com"
-                      dir="ltr"
-                      style={{
-                        width: '100%',
-                        padding: '14px 48px 14px 16px',
-                        background: '#171717',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '12px',
-                        color: '#fff',
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'all 200ms ease',
-                      }}
-                      onFocus={(e) => {
-                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'
-                      }}
-                      onBlur={(e) => {
-                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* Password */}
-                <div style={{ marginBottom: '24px' }}>
-                  <label
-                    htmlFor="password"
-                    style={{
-                      display: 'block',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      color: '#a3a3a3',
-                      marginBottom: '8px',
-                    }}
-                  >
-                    كلمة المرور
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <Lock
-                      size={18}
-                      color="#737373"
-                      style={{
-                        position: 'absolute',
-                        right: '16px',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                      }}
-                    />
-                    <input
-                      type="password"
-                      id="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      required
-                      placeholder="•••••••••"
-                      style={{
-                        width: '100%',
-                        padding: '14px 48px 14px 16px',
-                        background: '#171717',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '12px',
-                        color: '#fff',
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'all 200ms ease',
-                      }}
-                      onFocus={(e) => {
-                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'
-                      }}
-                      onBlur={(e) => {
-                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* Forgot Password */}
-                <div style={{ textAlign: 'left', marginBottom: '24px' }}>
-                  <Link
-                    to="/forgot-password"
-                    style={{
-                      fontSize: '13px',
-                      color: '#a3a3a3',
-                      textDecoration: 'none',
-                      fontWeight: 500,
-                    }}
-                  >
-                    نسيت كلمة المرور؟
-                  </Link>
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{
-                    width: '100%',
-                    padding: '14px 28px',
-                    background: '#fff',
-                    color: '#171717',
-                    fontSize: '15px',
-                    fontWeight: 600,
-                    borderRadius: '12px',
-                    border: 'none',
-                    cursor: loading ? 'not-allowed' : 'pointer',
-                    transition: 'all 200ms ease',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!loading) {
-                      e.currentTarget.style.transform = 'translateY(-2px)'
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!loading) {
-                      e.currentTarget.style.transform = 'translateY(0)'
-                    }
-                  }}
-                >
-                  {loading ? (
-                    <>
-                      <div style={{
-                        width: '16px',
-                        height: '16px',
-                        border: '2px solid rgba(23,23,23,0.1)',
-                        borderTopColor: '#171717',
-                        borderRadius: '50%',
-                        animation: 'spin 0.8s linear infinite',
-                      }} />
-                      <style>{`
-                        @keyframes spin {
-                          to { transform: rotate(360deg); }
-                        }
-                      `}</style>
-                      جاري تسجيل الدخول...
-                    </>
-                  ) : (
-                    <>
-                      تسجيل الدخول
-                      <ArrowLeft size={18} />
-                    </>
-                  )}
-                </button>
-              </form>
-
-              {/* Divider */}
-              <div
-                style={{
-                  marginTop: '32px',
-                  paddingTop: '32px',
-                  borderTop: '1px solid rgba(255,255,255,0.05)',
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: '14px',
-                    color: 'rgba(255,255,255,0.5)',
-                    marginBottom: '20px',
-                    textAlign: 'center',
-                  }}
-                >
-                  ليس لديك حساب مؤسسي؟
-                </p>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <Link
-                    to="/company-activation"
-                    style={{
-                      width: '100%',
-                      padding: '14px 28px',
-                      background: 'rgba(255,255,255,0.05)',
-                      color: '#fff',
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      borderRadius: '12px',
-                      textDecoration: 'none',
-                      textAlign: 'center',
-                      transition: 'all 200ms ease',
-                      border: '1px solid rgba(255,255,255,0.05)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.1)'
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'
-                    }}
-                  >
-                    تفعيل كود الاشتراك
-                  </Link>
-
-                  <a
-                    href="mailto:support@sallim.co"
-                    style={{
-                      width: '100%',
-                      padding: '14px 28px',
-                      background: 'rgba(255,255,255,0.05)',
-                      color: '#fff',
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      borderRadius: '12px',
-                      textDecoration: 'none',
-                      textAlign: 'center',
-                      transition: 'all 200ms ease',
-                      border: '1px solid rgba(255,255,255,0.05)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.1)'
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'
-                    }}
-                  >
-                    طلب كود الاشتراك
-                  </a>
-                </div>
-              </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 7 }}>كلمة المرور</label>
+              <input
+                type="password" value={password} onChange={e => setPassword(e.target.value)}
+                required placeholder="••••••••"
+                style={inp}
+                onFocus={e => e.currentTarget.style.borderColor = '#7c3aed'}
+                onBlur={e => e.currentTarget.style.borderColor = '#e2e8f0'}
+              />
             </div>
+            <button type="submit" disabled={loading} style={{
+              padding: '14px', background: loading ? '#e9d5ff' : '#7c3aed', color: '#fff',
+              border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800,
+              cursor: loading ? 'not-allowed' : 'pointer', fontFamily: FONT,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            }}>
+              {loading && <span style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite' }} />}
+              {loading ? 'جارٍ تسجيل الدخول...' : 'تسجيل الدخول'}
+            </button>
+          </form>
 
-            {/* Help Text */}
-            <div style={{ marginTop: '32px' }}>
-              <p
-                style={{
-                  fontSize: '13px',
-                  color: 'rgba(255,255,255,0.4)',
-                  marginBottom: '8px',
-                }}
-              >
-                تحتاج مساعدة؟ تواصل مع فريق الدعم
-              </p>
-              <a
-                href="mailto:support@sallim.co"
-                style={{
-                  fontSize: '14px',
-                  color: '#fff',
-                  textDecoration: 'none',
-                  fontWeight: 500,
-                }}
-              >
-                support@sallim.co
-              </a>
-            </div>
+          <div style={{ marginTop: 24, paddingTop: 24, borderTop: '1px solid #f0f4f8', display: 'grid', gap: 10 }}>
+            <p style={{ fontSize: 13, color: '#6b7280', textAlign: 'center', margin: '0 0 4px' }}>ليس لديك حساب بعد؟</p>
+            <Link to="/company-activation" style={{ display: 'block', padding: '12px', background: '#f5f3ff', color: '#7c3aed', borderRadius: 12, textAlign: 'center', textDecoration: 'none', fontSize: 14, fontWeight: 700, border: '1px solid #e9d5ff' }}>
+              تفعيل كود الاشتراك
+            </Link>
+            <Link to="/companies" style={{ display: 'block', padding: '12px', background: '#f9fafb', color: '#374151', borderRadius: 12, textAlign: 'center', textDecoration: 'none', fontSize: 13, fontWeight: 600, border: '1px solid #e5e7eb' }}>
+              اطلع على الباقات
+            </Link>
           </div>
         </div>
-      </section>
+
+        <p style={{ textAlign: 'center', marginTop: 20, fontSize: 12, color: '#9ca3af' }}>
+          مشكلة في الدخول؟{' '}
+          <a href="https://wa.me/201007835547" target="_blank" rel="noopener noreferrer" style={{ color: '#7c3aed', fontWeight: 700, textDecoration: 'none' }}>تواصل معنا</a>
+        </p>
+      </div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   )
 }

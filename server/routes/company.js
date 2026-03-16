@@ -37,6 +37,8 @@ const generateStrongPassword = () => crypto.randomBytes(12).toString('base64url'
 router.post('/activate', activationLimiter, async (req, res) => {
   try {
     const code = String(req.body?.code || '').trim()
+    const userEmail = String(req.body?.email || '').trim().toLowerCase()
+    const userPassword = String(req.body?.password || '').trim()
 
     if (!code) {
       return res.status(400).json({ success: false, error: 'كود التفعيل مطلوب' })
@@ -55,22 +57,23 @@ router.post('/activate', activationLimiter, async (req, res) => {
       return res.status(400).json({ success: false, error: 'كود التفعيل غير صحيح أو مستخدم' })
     }
 
-    // Generate unique slug/email pair
+    // Use user-provided email if valid, otherwise generate
     let slug = generateSlug()
-    let email = generateEmail(slug)
+    let email = userEmail && userEmail.includes('@') ? userEmail : generateEmail(slug)
+    const password = userPassword && userPassword.length >= 6 ? userPassword : generateStrongPassword()
+
+    // Check email uniqueness
+    const existingEmail = await Company.findOne({ email })
+    if (existingEmail) {
+      return res.status(400).json({ success: false, error: 'هذا البريد الإلكتروني مستخدم بالفعل. جرّب بريد آخر أو سجّل دخول.' })
+    }
+    // Check slug uniqueness
     for (let i = 0; i < 5; i++) {
-      const exists = await Company.findOne({ $or: [{ slug }, { email }] })
+      const exists = await Company.findOne({ slug })
       if (!exists) break
       slug = generateSlug()
-      email = generateEmail(slug)
     }
 
-    const collision = await Company.findOne({ $or: [{ slug }, { email }] })
-    if (collision) {
-      return res.status(500).json({ success: false, error: 'تعذر إنشاء حساب الآن، حاول مرة أخرى.' })
-    }
-
-    const password = generateStrongPassword()
     const now = new Date()
     const expiresAt = new Date(now)
     expiresAt.setFullYear(expiresAt.getFullYear() + 1)
@@ -128,9 +131,14 @@ router.post('/activate', activationLimiter, async (req, res) => {
         login: { email, password },
         company: {
           id: company._id,
+          name: company.name,
+          email: company.email,
           slug: company.slug,
+          logoUrl: company.logoUrl,
+          primaryColor: company.primaryColor,
           cardsLimit: company.cardsLimit,
           cardsUsed: company.cardsUsed,
+          features: company.features,
           subscriptionActive: company.subscription?.isActive,
           link: `${process.env.CLIENT_URL || ''}/c/${company.slug}?utm=company`
         }
@@ -181,8 +189,13 @@ router.post('/login', loginLimiter, async (req, res) => {
                     id: company._id,
                     name: company.name,
                     email: company.email,
+                    slug: company.slug,
                     logoUrl: company.logoUrl,
-                    features: company.features
+                    primaryColor: company.primaryColor,
+                    cardsLimit: company.cardsLimit,
+                    cardsUsed: company.cardsUsed,
+                    features: company.features,
+                    subscriptionActive: company.subscription?.isActive,
                 }
             }
         })
