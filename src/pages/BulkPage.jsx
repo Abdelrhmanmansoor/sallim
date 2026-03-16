@@ -178,6 +178,13 @@ export default function BulkPage() {
     injectCss(MARQUEE_CSS)
   }, [])
 
+  // Track VIEW_CONTENT for Snapchat Pixel
+  useEffect(() => {
+    if (typeof snaptr !== 'undefined') {
+      snaptr('track', 'VIEW_CONTENT')
+    }
+  }, [])
+
   // Check if trials exhausted
   const isTrialExhausted = useMemo(() => trialCount >= MAX_FREE_TRIALS, [trialCount])
 
@@ -222,6 +229,11 @@ export default function BulkPage() {
             <a
               href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى أطلب باقة بطاقات تهنئة من سلّم')}`}
               target="_blank" rel="noopener noreferrer"
+              onClick={() => {
+                if (typeof snaptr !== 'undefined') {
+                  snaptr('track', 'CUSTOM_EVENT_1')
+                }
+              }}
               style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '16px 36px', background: ORANGE, color: '#fff', borderRadius: 12, fontSize: 16, fontWeight: 800, textDecoration: 'none', boxShadow: '0 6px 20px rgba(234,88,12,0.3)', fontFamily: FONT }}
             >
               اطلب الآن
@@ -327,6 +339,11 @@ export default function BulkPage() {
             <a
               href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى باقة بطاقات من سلّم')}`}
               target="_blank" rel="noopener noreferrer"
+              onClick={() => {
+                if (typeof snaptr !== 'undefined') {
+                  snaptr('track', 'CUSTOM_EVENT_1')
+                }
+              }}
               style={{ 
                 display: 'inline-block', 
                 padding: '14px 32px', background: PURPLE, color: '#fff', 
@@ -386,6 +403,11 @@ export default function BulkPage() {
             <a
               href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى أطلب باقة بطاقات تهنئة من سلّم')}`}
               target="_blank" rel="noopener noreferrer"
+              onClick={() => {
+                if (typeof snaptr !== 'undefined') {
+                  snaptr('track', 'CUSTOM_EVENT_1')
+                }
+              }}
               style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '16px 40px', background: ORANGE, color: '#fff', borderRadius: 12, fontSize: 16, fontWeight: 800, textDecoration: 'none', boxShadow: '0 6px 20px rgba(234,88,12,0.3)', fontFamily: FONT }}
             >
               اطلب الآن عبر واتساب
@@ -459,6 +481,11 @@ export default function BulkPage() {
                 <a
                   href={`https://wa.me/${WA}?text=${encodeURIComponent(`مرحباً، أبغى باقة ${expandedPkg.count} بطاقة (${expandedPkg.price} ر.س) من سلّم`)}`}
                   target="_blank" rel="noopener noreferrer"
+                  onClick={() => {
+                    if (typeof snaptr !== 'undefined') {
+                      snaptr('track', 'CUSTOM_EVENT_1')
+                    }
+                  }}
                   style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '13px 28px', background: ORANGE, color: '#fff', borderRadius: 10, textDecoration: 'none', fontSize: 14, fontWeight: 700 }}
                 >
                   اطلب الآن — واتساب
@@ -495,6 +522,11 @@ export default function BulkPage() {
             <a
               href={`https://wa.me/${WA}?text=${encodeURIComponent(`مرحباً، أبغى باقة مخصصة ${customCount} بطاقة (${customPrice} ر.س) من سلّم`)}`}
               target="_blank" rel="noopener noreferrer"
+              onClick={() => {
+                if (typeof snaptr !== 'undefined') {
+                  snaptr('track', 'CUSTOM_EVENT_1')
+                }
+              }}
               style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 32px', background: ORANGE, color: '#fff', borderRadius: 10, textDecoration: 'none', fontSize: 14, fontWeight: 800, fontFamily: FONT, boxShadow: '0 4px 14px rgba(234,88,12,0.25)' }}
             >
               اطلب هذه الباقة
@@ -519,6 +551,11 @@ export default function BulkPage() {
             <a
               href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى أعرف عن باقات الشركات في سلّم')}`}
               target="_blank" rel="noopener noreferrer"
+              onClick={() => {
+                if (typeof snaptr !== 'undefined') {
+                  snaptr('track', 'CUSTOM_EVENT_1')
+                }
+              }}
               style={{ padding: '14px 32px', background: ORANGE, color: '#fff', borderRadius: 12, textDecoration: 'none', fontSize: 15, fontWeight: 700 }}
             >
               تواصل معنا
@@ -720,6 +757,11 @@ function InlineMiniEditor({ template, initialName, onClose }) {
               </div>
               <a href={`https://wa.me/${WA}?text=${encodeURIComponent(`مرحباً، أبغى باقة بطاقات من سلّم`)}`}
                 target="_blank" rel="noopener noreferrer"
+                onClick={() => {
+                  if (typeof snaptr !== 'undefined') {
+                    snaptr('track', 'CUSTOM_EVENT_1')
+                  }
+                }}
                 style={{ display: 'block', padding: '12px 16px', background: ORANGE, color: '#fff', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 800, textAlign: 'center', textDecoration: 'none', fontFamily: FONT }}>
                 اشترِ باقة — اطلب الآن
               </a>
@@ -1364,6 +1406,11 @@ function FullEditor({ template, initialName, onClose, onNameChange, onDownloadSu
               <a 
                 href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى باقة بطاقات من سلّم')}`}
                 target="_blank" rel="noopener noreferrer"
+                onClick={() => {
+                  if (typeof snaptr !== 'undefined') {
+                    snaptr('track', 'CUSTOM_EVENT_1')
+                  }
+                }}
                 style={{ 
                   display: 'block', textAlign: 'center',
                   padding: '14px 16px', background: ORANGE, color: '#fff', 

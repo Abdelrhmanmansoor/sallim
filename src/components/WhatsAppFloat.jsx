@@ -42,6 +42,9 @@ export default function WhatsAppFloat() {
   }, [dismissed, isDesktop])
 
   const handleWhatsAppClick = () => {
+    if (typeof snaptr !== 'undefined') {
+      snaptr('track', 'CUSTOM_EVENT_1')
+    }
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
     window.open(url, '_blank')
   }

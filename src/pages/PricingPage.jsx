@@ -170,7 +170,9 @@ export default function PricingPage() {
                                     </li>
                                 ))}
                             </ul>
-                            <a href="https://wa.me/966597009498?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A8%D8%A7%D9%82%D8%A9%20%D8%A7%D9%84%D9%85%D8%A4%D8%B3%D8%B3%D9%8A%D8%A9" target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', padding: '14px', fontSize: '15px', fontWeight: 700, color: '#d4af37', background: '#fff', borderRadius: '12px', textAlign: 'center', textDecoration: 'none', transition: 'all 200ms ease' }}
+                            <a href="https://wa.me/966597009498?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A8%D8%A7%D9%82%D8%A9%20%D8%A7%D9%84%D9%85%D8%A4%D8%B3%D8%B3%D9%8A%D8%A9" target="_blank" rel="noopener noreferrer" 
+                                onClick={() => { if (typeof snaptr !== 'undefined') { snaptr('track', 'CUSTOM_EVENT_1') } }}
+                                style={{ display: 'block', width: '100%', padding: '14px', fontSize: '15px', fontWeight: 700, color: '#d4af37', background: '#fff', borderRadius: '12px', textAlign: 'center', textDecoration: 'none', transition: 'all 200ms ease' }}
                                 onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.2)' }}
                                 onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
                             >تواصل معنا عبر واتساب</a>
@@ -204,7 +206,9 @@ export default function PricingPage() {
                                     </li>
                                 ))}
                             </ul>
-                            <a href="https://wa.me/966597009498?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A8%D8%A7%D9%82%D8%A9%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%D8%A9" target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', padding: '14px', fontSize: '15px', fontWeight: 700, color: '#fff', background: 'linear-gradient(135deg, #6366f1, #4338ca)', borderRadius: '12px', textAlign: 'center', textDecoration: 'none', transition: 'all 200ms ease' }}
+                            <a href="https://wa.me/966597009498?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A8%D8%A7%D9%82%D8%A9%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%D8%A9" target="_blank" rel="noopener noreferrer" 
+                                onClick={() => { if (typeof snaptr !== 'undefined') { snaptr('track', 'CUSTOM_EVENT_1') } }}
+                                style={{ display: 'block', width: '100%', padding: '14px', fontSize: '15px', fontWeight: 700, color: '#fff', background: 'linear-gradient(135deg, #6366f1, #4338ca)', borderRadius: '12px', textAlign: 'center', textDecoration: 'none', transition: 'all 200ms ease' }}
                                 onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(99,102,241,0.3)' }}
                                 onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
                             >طلب عرض سعر</a>

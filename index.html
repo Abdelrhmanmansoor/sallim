@@ -245,6 +245,19 @@
   <!-- Preload Critical Resources -->
   <link rel="preload" href="/fonts/Cairo-Bold.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/fonts/Amiri-Regular.woff2" as="font" type="font/woff2" crossorigin />
+
+  <!-- Snapchat Pixel -->
+  <script>
+    (function(e,t,n){if(e.snaptr)return;
+    var a=e.snaptr=function(){a.handleRequest?
+    a.handleRequest.apply(a,arguments):a.queue.push(arguments)};
+    a.queue=[];var s='script';r=t.createElement(s);r.async=!0;
+    r.src=n;var u=t.getElementsByTagName(s)[0];
+    u.parentNode.insertBefore(r,u);
+    })(window,document,'https://sc-static.net/scevent.min.js');
+    snaptr('init', '6c610ae5-2e88-486e-84df-f666e389ff26');
+    snaptr('track', 'PAGE_VIEW');
+  </script>
 </head>
 
 <body class="bg-white text-[#0f172a] overflow-x-hidden">

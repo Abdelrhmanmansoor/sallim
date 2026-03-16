@@ -188,6 +188,9 @@ export default function LandingPage() {
   }
 
   const handleWhatsAppLink = (message) => {
+    if (typeof snaptr !== 'undefined') {
+      snaptr('track', 'CUSTOM_EVENT_1')
+    }
     const phoneNumber = '201007835547'
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')
@@ -815,9 +818,10 @@ export default function LandingPage() {
 
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 <a
-                  href={`https://wa.me/201007835547?text=${encodeURIComponent('مرحباً، أرغب بالاستفسار عن باقات الشركات لبطاقات التهنئة 🏢')}`}
+                  href={`https://wa.me/201007835547?text=${encodeURIComponent('مرحباً، أرغب بالاستفسار عن باقات الشركات لبطاقات التهنئة')}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => { if (typeof snaptr !== 'undefined') { snaptr('track', 'CUSTOM_EVENT_1') } }}
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 10,
                     padding: '16px 32px', background: '#25D366', color: '#fff',
@@ -1741,6 +1745,7 @@ export default function LandingPage() {
                 href="https://wa.me/201007835547?text=مرحباً، أريد الاستفسار عن الشراكة"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => { if (typeof snaptr !== 'undefined') { snaptr('track', 'CUSTOM_EVENT_1') } }}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
