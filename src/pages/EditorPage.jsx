@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { Stage, Layer, Rect, Text, Image as KonvaImage, Group, Circle } from 'react-konva'
 import { useEditorStore, useCompanyStore } from '../store'
 import { templates as staticTemplates, fonts, designerOnlyTemplates as staticDesignerTemplates } from '../data/templates'
@@ -268,6 +268,8 @@ function EditorPageInner() {
   const logProtectedActionRef = useRef(() => { })
   const pendingPersonalPurchaseRef = useRef(null)
   const [searchParams] = useSearchParams()
+  const location = useLocation()
+  const isTrial = !!(location.state?.isTrial)
 
   // API Templates State
   const [fetchedTemplates, setFetchedTemplates] = useState([])
@@ -340,6 +342,14 @@ function EditorPageInner() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlTemplateId])
+
+  // Apply prefilledName from navigation state (trial mode)
+  useEffect(() => {
+    if (location.state?.prefilledName) {
+      setReadyName(location.state.prefilledName)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Load custom templates
   useEffect(() => {
@@ -1452,6 +1462,11 @@ function EditorPageInner() {
 
   const handleExportPNG = useCallback(async () => {
     if (!stageRef.current) return
+    // In trial mode, redirect to buy instead of downloading
+    if (isTrial) {
+      navigate('/bulk')
+      return
+    }
     const { isCompanyUnlocked: compUnlocked, personalOrderStatus, temporarilyUnlocked: freeUnlocked } = protectionStateRef.current
     if (!compUnlocked && !freeUnlocked) {
       if (personalOrderStatus === 'paid') {
@@ -1969,7 +1984,28 @@ function EditorPageInner() {
         </div>
       )}
 
-      {/* أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯ Header أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯ */}
+      {/* Trial Banner */}
+      {isTrial && (
+        <div style={{
+          background: '#fef9c3', borderBottom: '1px solid #fde047',
+          padding: '10px 20px', display: 'flex', alignItems: 'center',
+          justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
+          fontFamily: ds.font, direction: 'rtl',
+        }}>
+          <span style={{ fontSize: 13, color: '#713f12', fontWeight: 600 }}>
+            وضع التجربة — لتحميل بطاقتك اشترِ باقة
+          </span>
+          <button
+            onClick={() => navigate('/bulk')}
+            style={{
+              padding: '7px 18px', background: '#7c3aed', color: '#fff', border: 'none',
+              borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: ds.font,
+            }}
+          >اشترِ الآن</button>
+        </div>
+      )}
+
+      {/* ••• Header ••• */}
       <div style={{
         background: '#fff', borderBottom: '1px solid #eee',
         padding: '16px',
