@@ -1,270 +1,208 @@
-import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Building2, ArrowRight, Mail, Phone } from 'lucide-react'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const WHATSAPP_NUMBER = '201007835547'
-const ds = { font: "'Tajawal', sans-serif" }
+const SITE_URL = 'https://www.sallim.co'
 
-const features = [
-  { icon: '🎴', title: 'محرر جماعي ذكي', desc: 'ارفع أسماء الموظفين CSV أو Excel → اختر القالب → حمّل ZIP دفعة واحدة' },
-  { icon: '🔗', title: 'رابط موظفين ذكي', desc: 'أنشئ رابط مناسبة وشاركه — كل موظف يكتب اسمه ويحمّل بطاقته بنفسه' },
-  { icon: '🎨', title: 'هوية بصرية مخصصة', desc: 'لوجو شركتك + ألوان مخصصة على كل بطاقة — معاينة فورية' },
-  { icon: '📊', title: 'عداد رصيد مباشر', desc: 'تتبّع استهلاكك لحظة بلحظة مع تنبيهات تلقائية قبل النفاد' },
-]
-
-const packages = [
-  { name: 'صغيرة', cards: 50, color: '#10b981' },
-  { name: 'متوسطة', cards: 200, color: '#6366f1', popular: true },
-  { name: 'كبيرة', cards: 500, color: '#f59e0b' },
-  { name: 'مخصصة', cards: null, color: '#ec4899' },
+const stats = [
+  { number: '+500', label: 'بطاقة يومياً' },
+  { number: '3', label: 'دقائق متوسط التوليد' },
+  { number: '+50', label: 'قالب احترافي' },
 ]
 
 const steps = [
-  { num: '1', icon: '💬', title: 'تواصل معنا', desc: 'أرسل لنا عبر واتساب أو البريد واختر الباقة المناسبة' },
-  { num: '2', icon: '✅', title: 'فعّل حسابك', desc: 'تستلم كود تفعيل وتنشئ حسابك في ثوانٍ' },
-  { num: '3', icon: '🚀', title: 'ابدأ مباشرة', desc: 'ارفع الأسماء أو أنشئ رابط موظفين وحمّل البطاقات' },
+  { n: '01', title: 'تواصل وفعّل حسابك', desc: 'تواصل معنا، نحدد الباقة المناسبة، ونرسل لك كود التفعيل فوراً' },
+  { n: '02', title: 'ارفع أسماء موظفيك', desc: 'ارفع ملف CSV أو Excel بأسماء الموظفين أو اكتبها يدوياً' },
+  { n: '03', title: 'حمّل البطاقات جاهزة', desc: 'اختر القالب واضغط "ولّد الكل" — ملف ZIP جاهز في ثوانٍ' },
+]
+
+const features = [
+  { title: 'هوية بصرية كاملة', desc: 'ألوانك وشعارك على كل بطاقة — معاينة فورية قبل التوليد' },
+  { title: 'رفع جماعي فوري', desc: 'CSV أو Excel بأي عدد من الأسماء — بدون حد أقصى' },
+  { title: 'رابط ذكي للموظفين', desc: 'يجيب كل موظف بطاقته بنفسه من خلال رابط المناسبة' },
+  { title: 'تحكم كامل', desc: 'داشبورد مخصص، عداد رصيد، وسجل استخدام شامل' },
 ]
 
 export default function CompaniesPage() {
   const navigate = useNavigate()
-  const [user, setUser] = useState(null)
+  const [activationCode, setActivationCode] = useState('')
 
-  useEffect(() => {
-    const userData = localStorage.getItem('user')
-    if (userData) setUser(JSON.parse(userData))
-  }, [])
-
-  const btnHover = (e, bg) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 8px 24px ${bg}40` }
-  const btnLeave = (e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }
+  const handleActivate = () => {
+    if (activationCode.trim()) {
+      navigate(`/company-activation?code=${encodeURIComponent(activationCode.trim())}`)
+    } else {
+      navigate('/company-activation')
+    }
+  }
 
   return (
-    <div dir="rtl" style={{ fontFamily: ds.font, background: '#0f172a', minHeight: '100vh' }}>
+    <div dir="rtl" style={{ fontFamily: 'Arial, sans-serif', background: '#0a0a0f', minHeight: '100vh', color: '#e2e8f0' }}>
 
-      {/* ════════ HERO ════════ */}
-      <section style={{ padding: 'clamp(80px, 12vw, 140px) 24px 60px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.08) 0%, transparent 60%)' }} />
-        <div style={{ position: 'relative', maxWidth: 640, margin: '0 auto' }}>
-          {/* Back */}
-          <div style={{ textAlign: 'right', marginBottom: 32 }}>
-            <button onClick={() => navigate('/')} style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px',
-              background: 'rgba(255,255,255,0.05)', color: '#94a3b8', fontSize: 13, fontWeight: 600,
-              borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer',
-            }}>
-              <ArrowRight size={16} /> العودة للرئيسية
-            </button>
-          </div>
+      {/* NAV */}
+      <nav style={{
+        padding: '20px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        borderBottom: '1px solid #1a1a2e', position: 'sticky', top: 0, background: '#0a0a0f', zIndex: 50,
+      }}>
+        <a href="/" style={{ fontSize: 20, fontWeight: 700, color: '#fff', textDecoration: 'none', letterSpacing: 1 }}>سَلِّم</a>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button onClick={() => navigate('/company-login')} style={{
+            padding: '9px 20px', background: 'transparent', color: '#94a3b8', border: '1px solid #2d2d3d',
+            borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Arial, sans-serif',
+          }}>دخول</button>
+          <button onClick={() => navigate('/company-activation')} style={{
+            padding: '9px 20px', background: '#7c3aed', color: '#fff', border: 'none',
+            borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Arial, sans-serif',
+          }}>تفعيل الحساب</button>
+        </div>
+      </nav>
 
-          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 80, height: 80, background: 'rgba(99,102,241,0.1)', borderRadius: 24, marginBottom: 28, border: '1px solid rgba(99,102,241,0.15)' }}>
-            <Building2 size={36} color="#818cf8" />
-          </div>
+      {/* HERO */}
+      <section style={{ padding: 'clamp(80px, 12vw, 140px) 32px clamp(60px, 8vw, 100px)', maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
+        <div style={{
+          display: 'inline-block', fontSize: 11, fontWeight: 700, letterSpacing: 3,
+          color: '#6366f1', textTransform: 'uppercase', marginBottom: 24,
+          border: '1px solid #6366f120', borderRadius: 4, padding: '6px 16px',
+        }}>حلول المؤسسات</div>
 
-          <h1 style={{ fontSize: 'clamp(30px, 5vw, 48px)', fontWeight: 900, color: '#fff', lineHeight: 1.2, marginBottom: 12 }}>
-            منصة سَلِّم
-            <span style={{ display: 'block', fontSize: '0.7em', color: '#818cf8', marginTop: 8, fontWeight: 700 }}>
-              حلول بطاقات التهنئة للمؤسسات
-            </span>
-          </h1>
-          <p style={{ fontSize: 16, color: '#94a3b8', lineHeight: 1.8, marginBottom: 40, maxWidth: 480, margin: '0 auto 40px' }}>
-            نظام متكامل لإنشاء وإرسال بطاقات التهنئة لموظفيك بهوية شركتك — محرر جماعي، رابط ذكي للموظفين، وعداد رصيد لحظي.
-          </p>
+        <h1 style={{
+          fontSize: 'clamp(28px, 5vw, 52px)', fontWeight: 700, color: '#ffffff',
+          lineHeight: 1.25, marginBottom: 20, letterSpacing: '-0.02em',
+        }}>
+          بطاقات تهنئة احترافية
+          <br />
+          <span style={{ color: '#94a3b8', fontWeight: 400 }}>لفريقك</span>
+        </h1>
 
-          {/* Hero CTA */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 360, margin: '0 auto' }}>
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('مرحباً، أرغب بالاشتراك في باقة المؤسسات في منصة سلّم')}`}
-              target="_blank" rel="noopener noreferrer"
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                padding: '16px 28px', background: '#25D366', color: '#fff', fontSize: 16, fontWeight: 800,
-                borderRadius: 14, textDecoration: 'none', transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => btnHover(e, '#25D366')} onMouseLeave={btnLeave}
-            >
-              اطلب باقتك الآن عبر واتساب 💬
-            </a>
+        <p style={{ fontSize: 'clamp(15px, 2vw, 18px)', color: '#64748b', lineHeight: 1.8, maxWidth: 520, margin: '0 auto 40px' }}>
+          أرسل بطاقة مخصصة لكل موظف — دفعة واحدة، في دقائق
+        </p>
 
-            {user?.role === 'admin' ? (
-              <Link to="/admin/dashboard" style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                padding: '14px 28px', background: '#fff', color: '#0f172a', fontSize: 15, fontWeight: 700,
-                borderRadius: 14, textDecoration: 'none', transition: 'all 0.2s',
-              }} onMouseEnter={(e) => btnHover(e, '#fff')} onMouseLeave={btnLeave}>
-                لوحة التحكم <ArrowRight size={18} />
-              </Link>
-            ) : (
-              <div style={{ display: 'flex', gap: 10 }}>
-                <button onClick={() => navigate('/company-login')} style={{
-                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  padding: '14px 16px', background: '#fff', color: '#0f172a', fontSize: 14, fontWeight: 700,
-                  borderRadius: 12, border: 'none', cursor: 'pointer', transition: 'all 0.2s',
-                }} onMouseEnter={(e) => btnHover(e, '#fff')} onMouseLeave={btnLeave}>
-                  دخول المؤسسات
-                </button>
-                <Link to="/company-activation" style={{
-                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  padding: '14px 16px', background: 'rgba(255,255,255,0.06)', color: '#e2e8f0', fontSize: 14, fontWeight: 700,
-                  borderRadius: 12, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.08)', transition: 'all 0.2s',
-                }}>
-                  تفعيل كود الاشتراك
-                </Link>
-              </div>
-            )}
-          </div>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <a
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('مرحباً، أرغب بالاشتراك في نظام المؤسسات في منصة سلّم')}`}
+            target="_blank" rel="noopener noreferrer"
+            style={{
+              padding: '14px 32px', background: '#7c3aed', color: '#fff', fontSize: 15, fontWeight: 600,
+              borderRadius: 8, textDecoration: 'none',
+            }}
+          >ابدأ الآن — تواصل معنا</a>
+          <button onClick={() => navigate('/company-activation')} style={{
+            padding: '14px 32px', background: 'transparent', color: '#e2e8f0', fontSize: 15, fontWeight: 600,
+            borderRadius: 8, border: '1px solid #2d2d3d', cursor: 'pointer', fontFamily: 'Arial, sans-serif',
+          }}>لدي كود تفعيل</button>
         </div>
       </section>
 
-      {/* ════════ FEATURES ════════ */}
-      <section style={{ padding: '60px 24px', maxWidth: 900, margin: '0 auto' }}>
-        <h2 style={{ fontSize: 'clamp(22px, 4vw, 30px)', fontWeight: 900, color: '#fff', textAlign: 'center', marginBottom: 12 }}>
-          كل ما تحتاجه شركتك
-        </h2>
-        <p style={{ fontSize: 15, color: '#64748b', textAlign: 'center', marginBottom: 40 }}>
-          ميزات مصممة خصيصاً لتسهيل تهنئة الموظفين في كل المناسبات
-        </p>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-          {features.map((f, i) => (
+      {/* STATS */}
+      <section style={{ padding: '0 32px 80px', maxWidth: 900, margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+          {stats.map((s, i) => (
             <div key={i} style={{
-              background: '#1e293b', borderRadius: 20, padding: 'clamp(24px, 3vw, 32px)',
-              border: '1px solid rgba(255,255,255,0.06)', transition: 'all 0.3s',
+              background: '#111118', border: '1px solid #1e1e2e', borderRadius: 12,
+              padding: 'clamp(24px, 4vw, 36px) 20px', textAlign: 'center',
             }}>
-              <div style={{ width: 52, height: 52, borderRadius: 16, background: 'rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, fontSize: 26 }}>
-                {f.icon}
-              </div>
-              <h3 style={{ fontSize: 17, fontWeight: 800, color: '#fff', marginBottom: 8 }}>{f.title}</h3>
-              <p style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.8, margin: 0 }}>{f.desc}</p>
+              <div style={{ fontSize: 'clamp(28px, 5vw, 44px)', fontWeight: 700, color: '#fff', letterSpacing: '-0.02em' }}>{s.number}</div>
+              <div style={{ fontSize: 13, color: '#64748b', marginTop: 8, fontWeight: 500 }}>{s.label}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ════════ PACKAGES ════════ */}
-      <section style={{ padding: '60px 24px', maxWidth: 900, margin: '0 auto' }}>
-        <h2 style={{ fontSize: 'clamp(22px, 4vw, 30px)', fontWeight: 900, color: '#fff', textAlign: 'center', marginBottom: 12 }}>
-          باقات مرنة لكل حجم
-        </h2>
-        <p style={{ fontSize: 15, color: '#64748b', textAlign: 'center', marginBottom: 40 }}>
-          اختر الباقة المناسبة — أو اطلب باقة مخصصة بعدد بطاقاتك
-        </p>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14 }}>
-          {packages.map((pkg, i) => (
-            <div key={i} style={{
-              background: pkg.popular ? 'linear-gradient(135deg, #1e293b, #334155)' : '#1e293b',
-              borderRadius: 20, padding: 28, textAlign: 'center', position: 'relative',
-              border: pkg.popular ? `2px solid ${pkg.color}40` : '1px solid rgba(255,255,255,0.06)',
-              transition: 'all 0.3s',
-            }}>
-              {pkg.popular && (
-                <div style={{
-                  position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)',
-                  background: pkg.color, color: '#fff', fontSize: 11, fontWeight: 800,
-                  padding: '4px 14px', borderRadius: 20,
-                }}>الأكثر طلباً</div>
-              )}
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#94a3b8', marginBottom: 8 }}>{pkg.name}</div>
-              <div style={{ fontSize: pkg.cards ? 36 : 24, fontWeight: 900, color: pkg.color, marginBottom: 4 }}>
-                {pkg.cards ? pkg.cards : '∞'}
-              </div>
-              <div style={{ fontSize: 13, color: '#64748b', fontWeight: 600 }}>
-                {pkg.cards ? 'بطاقة' : 'حدد العدد'}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <p style={{ fontSize: 13, color: '#475569', textAlign: 'center', marginTop: 20, lineHeight: 1.8 }}>
-          الأسعار حسب الباقة والمتطلبات — تواصل معنا للحصول على عرض سعر مخصص
-        </p>
-      </section>
-
-      {/* ════════ HOW IT WORKS ════════ */}
-      <section style={{ padding: '60px 24px', maxWidth: 700, margin: '0 auto' }}>
-        <h2 style={{ fontSize: 'clamp(22px, 4vw, 30px)', fontWeight: 900, color: '#fff', textAlign: 'center', marginBottom: 40 }}>
-          كيف تبدأ؟
-        </h2>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-          {steps.map((s, i) => (
-            <div key={i} style={{ display: 'flex', gap: 20, position: 'relative' }}>
-              {/* Connector line */}
-              {i < steps.length - 1 && (
-                <div style={{ position: 'absolute', right: 23, top: 56, width: 2, height: 'calc(100% - 16px)', background: 'rgba(255,255,255,0.06)' }} />
-              )}
-              <div style={{
-                width: 48, height: 48, borderRadius: 16, flexShrink: 0,
-                background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.15)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
+      {/* HOW IT WORKS */}
+      <section style={{ padding: 'clamp(60px, 8vw, 100px) 32px', borderTop: '1px solid #1a1a2e' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <div style={{ marginBottom: 56, textAlign: 'center' }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, color: '#6366f1', textTransform: 'uppercase', marginBottom: 12 }}>كيف يعمل</p>
+            <h2 style={{ fontSize: 'clamp(22px, 4vw, 36px)', fontWeight: 700, color: '#fff', margin: 0 }}>ثلاث خطوات وتنتهي</h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 0 }}>
+            {steps.map((s, i) => (
+              <div key={i} style={{
+                padding: '28px 24px',
+                borderLeft: i < steps.length - 1 ? '1px solid #1e1e2e' : 'none',
               }}>
-                {s.icon}
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#6366f1', letterSpacing: 2, marginBottom: 16 }}>{s.n}</div>
+                <div style={{ width: 32, height: 1, background: '#2d2d3d', marginBottom: 20 }} />
+                <h3 style={{ fontSize: 16, fontWeight: 600, color: '#e2e8f0', margin: '0 0 10px' }}>{s.title}</h3>
+                <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.8, margin: 0 }}>{s.desc}</p>
               </div>
-              <div style={{ paddingBottom: i < steps.length - 1 ? 32 : 0 }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: '#6366f1', marginBottom: 4 }}>الخطوة {s.num}</div>
-                <h3 style={{ fontSize: 17, fontWeight: 800, color: '#fff', marginBottom: 6 }}>{s.title}</h3>
-                <p style={{ fontSize: 14, color: '#94a3b8', lineHeight: 1.7, margin: 0 }}>{s.desc}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ════════ CTA FOOTER ════════ */}
-      <section style={{ padding: '60px 24px 80px', maxWidth: 520, margin: '0 auto', textAlign: 'center' }}>
-        <div style={{ background: 'linear-gradient(135deg, #1e293b, #334155)', borderRadius: 28, padding: 'clamp(32px, 5vw, 48px)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <h2 style={{ fontSize: 'clamp(20px, 4vw, 26px)', fontWeight: 900, color: '#fff', marginBottom: 12 }}>
-            جاهز تبدأ مع فريقك؟
-          </h2>
-          <p style={{ fontSize: 14, color: '#94a3b8', lineHeight: 1.8, marginBottom: 32 }}>
-            تواصل معنا الآن واحصل على كود التفعيل خلال دقائق
-          </p>
+      {/* FEATURES */}
+      <section style={{ padding: 'clamp(60px, 8vw, 100px) 32px', borderTop: '1px solid #1a1a2e' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <div style={{ marginBottom: 56, textAlign: 'center' }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, color: '#6366f1', textTransform: 'uppercase', marginBottom: 12 }}>المزايا</p>
+            <h2 style={{ fontSize: 'clamp(22px, 4vw, 36px)', fontWeight: 700, color: '#fff', margin: 0 }}>كل ما تحتاجه في مكان واحد</h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 0, border: '1px solid #1e1e2e', borderRadius: 12, overflow: 'hidden' }}>
+            {features.map((f, i) => (
+              <div key={i} style={{
+                background: '#0d0d15', padding: 'clamp(24px, 4vw, 36px)',
+                borderBottom: i < 2 ? '1px solid #1e1e2e' : 'none',
+                borderLeft: i % 2 === 0 ? '1px solid #1e1e2e' : 'none',
+              }}>
+                <div style={{ width: 24, height: 1, background: '#7c3aed', marginBottom: 20 }} />
+                <h3 style={{ fontSize: 16, fontWeight: 600, color: '#e2e8f0', margin: '0 0 10px' }}>{f.title}</h3>
+                <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.8, margin: 0 }}>{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('مرحباً، أرغب بالاشتراك في باقة المؤسسات في منصة سلّم')}`}
-              target="_blank" rel="noopener noreferrer"
+      {/* CTA */}
+      <section style={{ padding: 'clamp(60px, 8vw, 100px) 32px', borderTop: '1px solid #1a1a2e' }}>
+        <div style={{ maxWidth: 540, margin: '0 auto', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 'clamp(24px, 4vw, 40px)', fontWeight: 700, color: '#fff', marginBottom: 12 }}>جاهز تبدأ؟</h2>
+          <p style={{ fontSize: 15, color: '#64748b', lineHeight: 1.8, marginBottom: 40 }}>تواصل معنا وهنفعّل حسابك خلال ساعات</p>
+
+          <a
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('مرحباً، أرغب بالاشتراك في نظام المؤسسات في منصة سلّم')}`}
+            target="_blank" rel="noopener noreferrer"
+            style={{
+              display: 'inline-block', padding: '15px 40px', background: '#166534',
+              color: '#fff', fontSize: 15, fontWeight: 600, borderRadius: 8,
+              textDecoration: 'none', marginBottom: 28,
+            }}
+          >تواصل عبر واتساب</a>
+
+          <p style={{ fontSize: 13, color: '#475569', marginBottom: 20 }}>أو أدخل كود التفعيل إذا كان لديك واحد</p>
+
+          <div style={{ display: 'flex', gap: 10, maxWidth: 360, margin: '0 auto' }}>
+            <input
+              type="text"
+              value={activationCode}
+              onChange={e => setActivationCode(e.target.value)}
+              placeholder="XXXX-XXXX"
+              dir="ltr"
               style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                padding: '16px 28px', background: '#25D366', color: '#fff', fontSize: 16, fontWeight: 800,
-                borderRadius: 14, textDecoration: 'none', transition: 'all 0.2s',
+                flex: 1, padding: '12px 16px', background: '#111118', border: '1px solid #2d2d3d',
+                borderRadius: 8, color: '#fff', fontSize: 14, fontFamily: 'monospace',
+                outline: 'none', textAlign: 'center', letterSpacing: 2,
               }}
-              onMouseEnter={(e) => btnHover(e, '#25D366')} onMouseLeave={btnLeave}
-            >
-              تواصل عبر واتساب 💬
-            </a>
-
-            <a href="mailto:support@sallim.co" style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-              padding: '14px 28px', background: 'rgba(255,255,255,0.06)', color: '#e2e8f0', fontSize: 14, fontWeight: 700,
-              borderRadius: 12, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.08)',
-            }}>
-              <Mail size={16} /> أو راسلنا على support@sallim.co
-            </a>
-          </div>
-
-          {/* Divider */}
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', margin: '28px 0 20px' }} />
-
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-            <button onClick={() => navigate('/company-login')} style={{
-              padding: '10px 20px', background: 'rgba(255,255,255,0.06)', color: '#94a3b8', fontSize: 13, fontWeight: 700,
-              borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer', fontFamily: ds.font,
-            }}>
-              دخول المؤسسات
-            </button>
-            <Link to="/company-activation" style={{
-              padding: '10px 20px', background: 'rgba(255,255,255,0.06)', color: '#94a3b8', fontSize: 13, fontWeight: 700,
-              borderRadius: 10, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.06)',
-            }}>
-              تفعيل كود الاشتراك
-            </Link>
+              onFocus={e => e.currentTarget.style.borderColor = '#6366f1'}
+              onBlur={e => e.currentTarget.style.borderColor = '#2d2d3d'}
+              onKeyDown={e => e.key === 'Enter' && handleActivate()}
+            />
+            <button onClick={handleActivate} style={{
+              padding: '12px 20px', background: '#7c3aed', color: '#fff', border: 'none',
+              borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'Arial, sans-serif',
+              whiteSpace: 'nowrap',
+            }}>فعّل</button>
           </div>
         </div>
-
-        <p style={{ fontSize: 12, color: '#334155', marginTop: 24 }}>
-          منصة سلّم — sallim.co
-        </p>
       </section>
+
+      {/* FOOTER */}
+      <footer style={{ padding: '24px 32px', borderTop: '1px solid #1a1a2e', textAlign: 'center' }}>
+        <p style={{ fontSize: 12, color: '#334155', margin: 0 }}>
+          منصة سلّم — <a href={SITE_URL} style={{ color: '#475569', textDecoration: 'none' }}>sallim.co</a>
+        </p>
+      </footer>
     </div>
   )
 }
