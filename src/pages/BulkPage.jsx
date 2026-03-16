@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { getTemplates } from '../utils/api'
+import { templates as localTemplates, designerOnlyTemplates, fonts } from '../data/templates'
 import { useCurrency } from '../utils/useCurrency'
 import toast, { Toaster } from 'react-hot-toast'
 import html2canvas from 'html2canvas'
@@ -11,20 +11,24 @@ const PURPLE = '#7c3aed'
 const ORANGE = '#ea580c'
 const GREEN = '#059669'
 
-/* ─── Packages ─────────────────────────────────── */
+// دمج كل القوالب معاً
+const ALL_TEMPLATES = [...localTemplates, ...designerOnlyTemplates]
+
+/* ─── Packages — أسعار تنافسية للسوق السعودي والخليجي ─────────────────────────────────── */
 const PACKAGES = [
   { id: 'free',  count: 1,   price: 0,   label: 'تجريبية',   desc: 'بطاقة واحدة مجاناً', free: true },
-  { id: 'p5',    count: 5,   price: 29,  perCard: 5.8,  label: '5 بطاقات' },
-  { id: 'p10',   count: 10,  price: 49,  perCard: 4.9,  label: '10 بطاقات', popular: true },
-  { id: 'p20',   count: 20,  price: 79,  perCard: 3.95, label: '20 بطاقة' },
-  { id: 'p50',   count: 50,  price: 149, perCard: 2.98, label: '50 بطاقة' },
+  { id: 'p10',   count: 10,  price: 99,   perCard: 9.9,  label: '10 بطاقات' },
+  { id: 'p25',   count: 25,  price: 199,  perCard: 7.96, label: '25 بطاقة', popular: true },
+  { id: 'p50',   count: 50,  price: 349,  perCard: 6.98, label: '50 بطاقة' },
+  { id: 'p100',  count: 100, price: 599,  perCard: 5.99, label: '100 بطاقة' },
 ]
 function calcCustom(n) {
-  if (n <= 20)  return n * 4
-  if (n <= 50)  return n * 3.5
-  if (n <= 100) return n * 3
-  if (n <= 200) return n * 2.5
-  return n * 2
+  if (n <= 25)  return n * 8
+  if (n <= 50)  return n * 7
+  if (n <= 100) return n * 6
+  if (n <= 250) return n * 5
+  if (n <= 500) return n * 4
+  return n * 3.5
 }
 
 /* ─── Features copy ─────────────────────────────── */
@@ -71,19 +75,62 @@ const FEATURES = [
   },
 ]
 
-/* ─── Marquee strip (css injected once) ─────────── */
+/* ─── Enhanced Animation CSS ─────────────────────────────── */
 const MARQUEE_CSS = `
 @keyframes marquee-rtl {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
+@keyframes float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-10px) scale(1.02); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(124, 58, 237, 0.3), 0 0 40px rgba(124, 58, 237, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(124, 58, 237, 0.5), 0 0 60px rgba(124, 58, 237, 0.2); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInScale {
+  from { opacity: 0; transform: scale(0.8) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
 .sallim-marquee-inner {
   display: flex;
-  gap: 14px;
-  animation: marquee-rtl 28s linear infinite;
+  gap: 20px;
+  animation: marquee-rtl 35s linear infinite;
   will-change: transform;
 }
 .sallim-marquee-inner:hover { animation-play-state: paused; }
+.template-card-hover {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.template-card-hover:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 20px 40px rgba(124, 58, 237, 0.25);
+}
+.glow-border {
+  position: relative;
+}
+.glow-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #7c3aed, #a855f7, #7c3aed);
+  background-size: 200% 200%;
+  animation: shimmer 3s linear infinite;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.glow-border:hover::before { opacity: 1; }
 `
 
 function injectCss(css) {
@@ -108,32 +155,18 @@ function setCookie(name, value, hours = 24) {
 ═══════════════════════════════════════════════════ */
 export default function BulkPage() {
   const { isForeign, convertFromSAR, currency, flag } = useCurrency()
-  const [templates, setTemplates] = useState([])
-  const [loadingTemplates, setLoadingTemplates] = useState(true)
   const [name, setName] = useState('')
-  const [showTemplates, setShowTemplates] = useState(false)
   const [selectedTmpl, setSelectedTmpl] = useState(null)
   const [showEditor, setShowEditor] = useState(false)
   const [customCount, setCustomCount] = useState(30)
   const [expandedPkg, setExpandedPkg] = useState(null)
   const nameRef = useRef(null)
   const trialRef = useRef(null)
-  const templateRef = useRef(null)
+  const editorRef = useRef(null)
 
   useEffect(() => {
     injectCss(MARQUEE_CSS)
-    getTemplates()
-      .then(r => { if (r.success && r.data) setTemplates(r.data) })
-      .catch(() => {})
-      .finally(() => setLoadingTemplates(false))
   }, [])
-
-  const handleShowTemplates = () => {
-    if (!name.trim()) { toast.error('اكتب اسمك أولاً'); nameRef.current?.focus(); return }
-    setShowTemplates(true)
-    setShowEditor(false)
-    setTimeout(() => templateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150)
-  }
 
   const handleSelectTemplate = (tmpl) => {
     if (getCookie('sallim_trial_used')) {
@@ -141,8 +174,23 @@ export default function BulkPage() {
       return
     }
     setSelectedTmpl(tmpl)
+    setShowEditor(false)
+    setTimeout(() => nameRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150)
+    setTimeout(() => nameRef.current?.focus(), 300)
+  }
+
+  const handleActivateEditor = () => {
+    if (!name.trim()) {
+      toast.error('اكتب اسمك أولاً')
+      nameRef.current?.focus()
+      return
+    }
+    if (!selectedTmpl) {
+      toast.error('اختر تصميم أولاً')
+      return
+    }
     setShowEditor(true)
-    setTimeout(() => trialRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150)
+    setTimeout(() => editorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150)
   }
 
   const fmtForeign = (sar) => isForeign ? ` (${convertFromSAR(sar)} ${currency})` : ''
@@ -189,67 +237,140 @@ export default function BulkPage() {
         </div>
       </section>
 
-      {/* ═══════ ANIMATED THEME STRIP ═══════ */}
-      <TemplateStrip templates={templates} />
+      {/* ═══════ ANIMATED THEME STRIP - فخم ومتحرك ═══════ */}
+      <EnhancedTemplateStrip templates={ALL_TEMPLATES} onSelect={handleSelectTemplate} selectedId={selectedTmpl?.id} />
 
-      {/* ═══════ FREE TRIAL ═══════ */}
-      <section style={{ padding: 'clamp(56px,8vw,80px) 24px', maxWidth: 720, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <h2 style={{ fontSize: 'clamp(22px,4vw,32px)', fontWeight: 800, color: '#111827', marginBottom: 10 }}>جرّب الآن — بدون تسجيل</h2>
-          <p style={{ fontSize: 15, color: '#6b7280', maxWidth: 420, margin: '0 auto' }}>اكتب اسمك، اختار قالبك، وحمّل بطاقتك. مجاناً لمرة واحدة.</p>
+      {/* ═══════ اختر التصميم أولاً ═══════ */}
+      <section style={{ padding: 'clamp(56px,8vw,80px) 24px', maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <div style={{ 
+            display: 'inline-flex', alignItems: 'center', gap: 8, 
+            background: 'linear-gradient(135deg, #f3f0ff 0%, #ede9fe 100%)', 
+            borderRadius: 25, padding: '8px 20px', marginBottom: 16,
+            border: '1px solid #e9d5ff'
+          }}>
+            <span style={{ fontSize: 20 }}>✨</span>
+            <span style={{ fontSize: 14, color: PURPLE, fontWeight: 700 }}>جرّب مجاناً — بدون تسجيل</span>
+          </div>
+          <h2 style={{ fontSize: 'clamp(24px,5vw,38px)', fontWeight: 900, color: '#111827', marginBottom: 12 }}>
+            اختر التصميم الذي يعجبك
+          </h2>
+          <p style={{ fontSize: 16, color: '#6b7280', maxWidth: 480, margin: '0 auto' }}>
+            اختر من بين أكثر من 30 تصميم احترافي، ثم أدخل اسمك وحرر بطاقتك
+          </p>
         </div>
 
-        <div style={{ display: 'flex', gap: 10, maxWidth: 520, margin: '0 auto 12px' }}>
-          <input
-            ref={nameRef}
-            type="text" value={name} onChange={e => setName(e.target.value)}
-            placeholder="اكتب اسمك هنا..." dir="rtl"
-            style={{ flex: 1, padding: '15px 18px', background: '#fff', border: '2px solid #e5e7eb', borderRadius: 12, fontSize: 15, fontFamily: FONT, color: '#111827', outline: 'none', transition: 'border-color 0.2s' }}
-            onFocus={e => e.currentTarget.style.borderColor = PURPLE}
-            onBlur={e => e.currentTarget.style.borderColor = '#e5e7eb'}
-            onKeyDown={e => e.key === 'Enter' && handleShowTemplates()}
-          />
-          <button onClick={handleShowTemplates} style={{ padding: '15px 22px', background: PURPLE, color: '#fff', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: FONT, whiteSpace: 'nowrap' }}>
-            اعرض القوالب
-          </button>
+        {/* شبكة التصاميم */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', 
+          gap: 16,
+          marginBottom: 40 
+        }}>
+          {ALL_TEMPLATES.map((t, idx) => (
+            <TemplateCard
+              key={t.id}
+              template={t}
+              selected={selectedTmpl?.id === t.id}
+              onSelect={() => handleSelectTemplate(t)}
+              disabled={!!getCookie('sallim_trial_used') && selectedTmpl?.id !== t.id}
+              index={idx}
+            />
+          ))}
         </div>
 
-        {/* Template grid */}
-        {showTemplates && (
-          <div ref={templateRef} style={{ marginTop: 36 }}>
-            {loadingTemplates ? (
-              <div style={{ textAlign: 'center', padding: 48, color: '#9ca3af' }}>
-                <div style={{ width: 40, height: 40, border: `3px solid ${PURPLE}`, borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
-                جارٍ تحميل القوالب...
+        {/* قسم إدخال الاسم - يظهر بعد اختيار التصميم */}
+        {selectedTmpl && (
+          <div style={{
+            background: 'linear-gradient(135deg, #faf5ff 0%, #f3f0ff 100%)',
+            borderRadius: 24,
+            padding: 'clamp(24px,4vw,40px)',
+            border: '2px solid #e9d5ff',
+            marginBottom: 32,
+            animation: 'fadeInUp 0.5s ease-out'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 24 }}>
+              <div style={{ 
+                width: 60, height: 80, borderRadius: 10, overflow: 'hidden', 
+                boxShadow: '0 4px 12px rgba(124,58,237,0.2)',
+                border: '2px solid #7c3aed'
+              }}>
+                <img src={selectedTmpl.image} alt={selectedTmpl.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
-            ) : templates.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: 40, color: '#9ca3af', background: '#f9fafb', borderRadius: 14, border: '1px dashed #e5e7eb' }}>
-                لا توجد قوالب متاحة حالياً
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 13, color: '#9ca3af', marginBottom: 4 }}>التصميم المختار</div>
+                <div style={{ fontSize: 17, fontWeight: 800, color: '#111827' }}>{selectedTmpl.name}</div>
               </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 14 }}>
-                {templates.map(t => (
-                  <TemplateTile
-                    key={t._id}
-                    t={t}
-                    name={name}
-                    selected={selectedTmpl?._id === t._id}
-                    onSelect={handleSelectTemplate}
-                    disabled={!!getCookie('sallim_trial_used') && selectedTmpl?._id !== t._id}
-                  />
-                ))}
+            </div>
+
+            <div style={{ maxWidth: 500, margin: '0 auto' }}>
+              <label style={{ display: 'block', fontSize: 14, fontWeight: 700, color: '#374151', marginBottom: 10, textAlign: 'center' }}>
+                الآن أدخل اسمك على البطاقة
+              </label>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <input
+                  ref={nameRef}
+                  type="text" 
+                  value={name} 
+                  onChange={e => setName(e.target.value)}
+                  placeholder="مثال: محمد العتيبي" 
+                  dir="rtl"
+                  style={{ 
+                    flex: 1, padding: '16px 20px', 
+                    background: '#fff', 
+                    border: '2px solid #e5e7eb', 
+                    borderRadius: 14, 
+                    fontSize: 16, 
+                    fontFamily: FONT, 
+                    color: '#111827', 
+                    outline: 'none', 
+                    transition: 'all 0.3s',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                  }}
+                  onFocus={e => {
+                    e.currentTarget.style.borderColor = PURPLE
+                    e.currentTarget.style.boxShadow = '0 0 0 4px rgba(124,58,237,0.1)'
+                  }}
+                  onBlur={e => {
+                    e.currentTarget.style.borderColor = '#e5e7eb'
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)'
+                  }}
+                  onKeyDown={e => e.key === 'Enter' && handleActivateEditor()}
+                />
+                <button 
+                  onClick={handleActivateEditor} 
+                  style={{ 
+                    padding: '16px 28px', 
+                    background: `linear-gradient(135deg, ${PURPLE} 0%, #a855f7 100%)`,
+                    color: '#fff', 
+                    border: 'none', 
+                    borderRadius: 14, 
+                    fontSize: 15, 
+                    fontWeight: 800, 
+                    cursor: 'pointer', 
+                    fontFamily: FONT, 
+                    whiteSpace: 'nowrap',
+                    boxShadow: '0 4px 16px rgba(124,58,237,0.3)',
+                    transition: 'all 0.3s'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+                  onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+                >
+                  🎨 تفعيل المحرر
+                </button>
               </div>
-            )}
+            </div>
           </div>
         )}
 
-        {/* Inline Mini Editor */}
+        {/* المحرر الكامل - يفتح في نفس الصفحة */}
         {showEditor && selectedTmpl && (
-          <div ref={trialRef} style={{ marginTop: 40 }}>
-            <InlineMiniEditor
+          <div ref={editorRef} style={{ animation: 'slideInScale 0.5s ease-out' }}>
+            <FullEditor
               template={selectedTmpl}
               initialName={name}
-              onClose={() => { setShowEditor(false); setSelectedTmpl(null) }}
+              onClose={() => { setShowEditor(false) }}
+              onNameChange={setName}
             />
           </div>
         )}
@@ -688,6 +809,619 @@ function InlineMiniEditor({ template, initialName, onClose }) {
             )}
           </div>
           <div style={{ fontSize: 10, color: '#d1d5db', textAlign: 'center', marginTop: 6 }}>منصة سلّم | sallim.co</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ════════════════════════════════════
+   ENHANCED TEMPLATE STRIP - شريط متحرك فخم
+════════════════════════════════════ */
+function EnhancedTemplateStrip({ templates, onSelect, selectedId }) {
+  if (!templates.length) return null
+  const tripled = [...templates, ...templates, ...templates]
+  
+  return (
+    <div style={{ 
+      overflow: 'hidden', 
+      padding: '0', 
+      background: 'linear-gradient(180deg, #0f0a1a 0%, #1a0f2e 50%, #0f0a1a 100%)',
+      borderTop: '1px solid #2d1f4e', 
+      borderBottom: '1px solid #2d1f4e', 
+      position: 'relative'
+    }}>
+      {/* Gradient overlays */}
+      <div style={{ 
+        position: 'absolute', right: 0, top: 0, bottom: 0, width: 120, 
+        background: 'linear-gradient(to left, #0f0a1a, transparent)', 
+        zIndex: 3, pointerEvents: 'none' 
+      }} />
+      <div style={{ 
+        position: 'absolute', left: 0, top: 0, bottom: 0, width: 120, 
+        background: 'linear-gradient(to right, #0f0a1a, transparent)', 
+        zIndex: 3, pointerEvents: 'none' 
+      }} />
+      
+      {/* Glow effect */}
+      <div style={{
+        position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+        width: '60%', height: '100%',
+        background: 'radial-gradient(ellipse at center, rgba(124,58,237,0.15) 0%, transparent 70%)',
+        pointerEvents: 'none', zIndex: 1
+      }} />
+      
+      {/* Title */}
+      <div style={{ textAlign: 'center', padding: '24px 0 8px', position: 'relative', zIndex: 2 }}>
+        <span style={{ 
+          fontSize: 13, fontWeight: 700, color: '#a78bfa', 
+          letterSpacing: '0.1em', textTransform: 'uppercase'
+        }}>
+          ✨ اختر من التصاميم الفاخرة ✨
+        </span>
+      </div>
+      
+      {/* Marquee */}
+      <div className="sallim-marquee-inner" style={{ padding: '16px 0 28px', position: 'relative', zIndex: 2 }}>
+        {tripled.map((t, i) => {
+          const isSelected = selectedId === t.id
+          const variation = i % 5
+          const scale = variation === 0 ? 1.05 : variation === 2 ? 0.92 : variation === 4 ? 0.98 : 1
+          const yOffset = variation === 1 ? 8 : variation === 3 ? -6 : 0
+          
+          return (
+            <div 
+              key={`${t.id}-${i}`} 
+              onClick={() => onSelect(t)}
+              style={{
+                flexShrink: 0,
+                width: 100,
+                height: 160,
+                borderRadius: 16,
+                overflow: 'hidden',
+                background: 'linear-gradient(135deg, #1e1433 0%, #2d1f4e 100%)',
+                border: isSelected ? '2px solid #a855f7' : '1px solid #3d2a6e',
+                boxShadow: isSelected 
+                  ? '0 0 30px rgba(168,85,247,0.5), 0 0 60px rgba(168,85,247,0.2)' 
+                  : '0 4px 20px rgba(0,0,0,0.4)',
+                transform: `scale(${scale}) translateY(${yOffset}px)`,
+                transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                cursor: 'pointer',
+                animation: isSelected ? 'pulse-glow 2s ease-in-out infinite' : 'none'
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = `scale(1.1) translateY(-5px)`
+                e.currentTarget.style.boxShadow = '0 10px 40px rgba(124,58,237,0.4)'
+                e.currentTarget.style.zIndex = '10'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = `scale(${scale}) translateY(${yOffset}px)`
+                e.currentTarget.style.boxShadow = isSelected 
+                  ? '0 0 30px rgba(168,85,247,0.5)' 
+                  : '0 4px 20px rgba(0,0,0,0.4)'
+                e.currentTarget.style.zIndex = '1'
+              }}
+            >
+              {t.image
+                ? <img src={t.image} alt={t.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#a78bfa', padding: 6, textAlign: 'center' }}>{t.name}</div>
+              }
+              {isSelected && (
+                <div style={{
+                  position: 'absolute', inset: 0, 
+                  background: 'linear-gradient(0deg, rgba(124,58,237,0.4) 0%, transparent 50%)',
+                  display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: 8
+                }}>
+                  <span style={{ fontSize: 18 }}>✓</span>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+/* ════════════════════════════════════
+   TEMPLATE CARD - بطاقة تصميم مع أنيميشن
+════════════════════════════════════ */
+function TemplateCard({ template, selected, onSelect, disabled, index }) {
+  const delay = index * 0.05
+  
+  return (
+    <div
+      onClick={() => !disabled && onSelect()}
+      className="template-card-hover glow-border"
+      style={{
+        background: '#fff', 
+        borderRadius: 16, 
+        overflow: 'hidden',
+        border: selected ? `3px solid ${PURPLE}` : '1px solid #e5e7eb',
+        boxShadow: selected ? `0 0 0 4px ${PURPLE}22, 0 8px 25px rgba(124,58,237,0.2)` : '0 2px 8px rgba(0,0,0,0.06)',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.5 : 1,
+        transform: selected ? 'scale(1.02)' : 'none',
+        animation: `fadeInUp 0.5s ease-out ${delay}s both`
+      }}
+    >
+      <div style={{ position: 'relative', aspectRatio: '9/16', overflow: 'hidden', background: '#f9fafb' }}>
+        {template.image
+          ? <img src={template.image} alt={template.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s' }} />
+          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#9ca3af', padding: 8, textAlign: 'center' }}>{template.name}</div>
+        }
+        
+        {/* Exclusive badge */}
+        {template.exclusive && (
+          <div style={{
+            position: 'absolute', top: 8, right: 8,
+            background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+            color: '#fff', fontSize: 9, fontWeight: 800,
+            padding: '3px 8px', borderRadius: 20,
+            boxShadow: '0 2px 8px rgba(124,58,237,0.4)'
+          }}>
+            حصري ✨
+          </div>
+        )}
+        
+        {/* Selected indicator */}
+        {selected && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(0deg, rgba(124,58,237,0.3) 0%, transparent 60%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}>
+            <div style={{
+              width: 50, height: 50, borderRadius: '50%',
+              background: PURPLE, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 24, color: '#fff', fontWeight: 900,
+              boxShadow: '0 4px 20px rgba(124,58,237,0.5)'
+            }}>✓</div>
+          </div>
+        )}
+      </div>
+      
+      <div style={{ padding: '10px 12px', background: selected ? '#faf5ff' : '#fff' }}>
+        <p style={{ 
+          fontSize: 11, color: selected ? PURPLE : '#6b7280', 
+          margin: 0, fontWeight: 700, 
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          textAlign: 'center'
+        }}>
+          {template.name}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+/* ════════════════════════════════════
+   FULL EDITOR - محرر كامل المزايا
+════════════════════════════════════ */
+function FullEditor({ template, initialName, onClose, onNameChange }) {
+  const [cardName, setCardName] = useState(initialName)
+  const [textColor, setTextColor] = useState(template.textColor || '#ffffff')
+  const [fontSize, setFontSize] = useState(26)
+  const [fontFamily, setFontFamily] = useState(fonts[0])
+  const [textPos, setTextPos] = useState({ x: 50, y: 80 })
+  const [textShadow, setTextShadow] = useState(true)
+  const [greetingText, setGreetingText] = useState('عيد مبارك')
+  const [showGreeting, setShowGreeting] = useState(true)
+  const [greetingSize, setGreetingSize] = useState(18)
+  const [greetingPos, setGreetingPos] = useState({ y: 70 })
+  const [downloading, setDownloading] = useState(false)
+  const [downloaded, setDownloaded] = useState(false)
+  const previewRef = useRef(null)
+
+  // Sync name with parent
+  useEffect(() => {
+    setCardName(initialName)
+  }, [initialName])
+
+  const handleNameChange = (val) => {
+    setCardName(val)
+    onNameChange?.(val)
+  }
+
+  const handleDownload = useCallback(async () => {
+    if (!previewRef.current) return
+    setDownloading(true)
+    try {
+      const canvas = await html2canvas(previewRef.current, {
+        useCORS: true,
+        allowTaint: true,
+        scale: 3,
+        logging: false,
+      })
+      const link = document.createElement('a')
+      link.download = `سلّم-${cardName || 'بطاقة'}.png`
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+      setCookie('sallim_trial_used', '1', 24)
+      setDownloaded(true)
+      toast.success('تم تحميل البطاقة بجودة عالية! 🎉')
+    } catch (err) {
+      toast.error('حدث خطأ أثناء التحميل')
+    } finally {
+      setDownloading(false)
+    }
+  }, [cardName])
+
+  const presetGreetings = [
+    'عيد مبارك',
+    'كل عام وأنتم بخير',
+    'تقبل الله طاعتكم',
+    'عساكم من عواده',
+    'ينعاد عليكم بالصحة',
+  ]
+
+  return (
+    <div style={{ 
+      background: 'linear-gradient(135deg, #faf5ff 0%, #f3f0ff 100%)', 
+      border: `3px solid ${PURPLE}`, 
+      borderRadius: 24, 
+      padding: 'clamp(24px,4vw,40px)', 
+      boxShadow: '0 20px 60px rgba(124,58,237,0.15)'
+    }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ fontSize: 32 }}>🎨</div>
+          <div>
+            <h3 style={{ fontSize: 20, fontWeight: 900, color: '#111827', margin: 0 }}>محرر البطاقة الكامل</h3>
+            <p style={{ fontSize: 13, color: '#6b7280', margin: '4px 0 0' }}>خصص بطاقتك بكل التفاصيل</p>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ 
+            fontSize: 12, color: GREEN, background: '#f0fdf4', 
+            padding: '6px 14px', borderRadius: 20, border: '1px solid #bbf7d0',
+            fontWeight: 700
+          }}>
+            🎁 تجربة مجانية
+          </span>
+          <button 
+            onClick={onClose} 
+            style={{ 
+              background: '#f3f4f6', border: 'none', borderRadius: 10, 
+              width: 36, height: 36, cursor: 'pointer', fontSize: 18, color: '#6b7280',
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}
+          >✕</button>
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 32, alignItems: 'start' }}>
+        {/* Controls Panel */}
+        <div style={{ display: 'grid', gap: 20 }}>
+          
+          {/* Name Section */}
+          <div style={{ background: '#fff', borderRadius: 16, padding: '20px', border: '1px solid #e5e7eb' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 700, color: '#374151', marginBottom: 12 }}>
+              <span style={{ fontSize: 18 }}>👤</span> الاسم على البطاقة
+            </label>
+            <input
+              value={cardName} 
+              onChange={e => handleNameChange(e.target.value)}
+              dir="rtl" 
+              placeholder="اكتب الاسم هنا..."
+              style={{ 
+                width: '100%', padding: '14px 16px', 
+                border: '2px solid #e5e7eb', borderRadius: 12, 
+                fontSize: 16, fontFamily: FONT, color: '#111827', 
+                outline: 'none', boxSizing: 'border-box',
+                transition: 'all 0.3s'
+              }}
+              onFocus={e => {
+                e.currentTarget.style.borderColor = PURPLE
+                e.currentTarget.style.boxShadow = '0 0 0 4px rgba(124,58,237,0.1)'
+              }}
+              onBlur={e => {
+                e.currentTarget.style.borderColor = '#e5e7eb'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
+            />
+          </div>
+
+          {/* Text Styling */}
+          <div style={{ background: '#fff', borderRadius: 16, padding: '20px', border: '1px solid #e5e7eb' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 700, color: '#374151', marginBottom: 16 }}>
+              <span style={{ fontSize: 18 }}>🎨</span> تنسيق النص
+            </label>
+            
+            {/* Color */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8 }}>لون النص</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <input 
+                  type="color" 
+                  value={textColor} 
+                  onChange={e => setTextColor(e.target.value)}
+                  style={{ width: 44, height: 44, borderRadius: 10, border: '2px solid #e5e7eb', cursor: 'pointer', padding: 2 }} 
+                />
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {['#ffffff', '#000000', '#ffd700', '#7c3aed', '#ea580c', '#059669'].map(c => (
+                    <button 
+                      key={c} 
+                      onClick={() => setTextColor(c)}
+                      style={{ 
+                        width: 30, height: 30, borderRadius: 8, background: c, 
+                        border: textColor === c ? `3px solid ${PURPLE}` : '2px solid #e5e7eb', 
+                        cursor: 'pointer', padding: 0,
+                        boxShadow: textColor === c ? '0 2px 8px rgba(124,58,237,0.3)' : 'none'
+                      }} 
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Font Size */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280', marginBottom: 8 }}>
+                <span>حجم النص</span>
+                <span style={{ fontWeight: 700, color: PURPLE }}>{fontSize}px</span>
+              </div>
+              <input 
+                type="range" min={16} max={48} value={fontSize} 
+                onChange={e => setFontSize(+e.target.value)}
+                style={{ width: '100%', accentColor: PURPLE, height: 6 }} 
+              />
+            </div>
+
+            {/* Font Family */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8 }}>نوع الخط</div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {fonts.slice(0, 6).map(f => (
+                  <button 
+                    key={f.id} 
+                    onClick={() => setFontFamily(f)}
+                    style={{ 
+                      padding: '8px 12px', borderRadius: 8, 
+                      background: fontFamily.id === f.id ? PURPLE : '#f3f4f6',
+                      color: fontFamily.id === f.id ? '#fff' : '#374151',
+                      border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600,
+                      fontFamily: f.family
+                    }}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Text Position */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280', marginBottom: 8 }}>
+                <span>موضع الاسم (من الأعلى)</span>
+                <span style={{ fontWeight: 700, color: PURPLE }}>{textPos.y}%</span>
+              </div>
+              <input 
+                type="range" min={10} max={95} value={textPos.y} 
+                onChange={e => setTextPos(p => ({ ...p, y: +e.target.value }))}
+                style={{ width: '100%', accentColor: PURPLE, height: 6 }} 
+              />
+            </div>
+
+            {/* Text Shadow Toggle */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <input 
+                type="checkbox" 
+                checked={textShadow} 
+                onChange={e => setTextShadow(e.target.checked)}
+                style={{ width: 18, height: 18, accentColor: PURPLE }}
+              />
+              <span style={{ fontSize: 13, color: '#374151' }}>ظل النص</span>
+            </div>
+          </div>
+
+          {/* Greeting Text */}
+          <div style={{ background: '#fff', borderRadius: 16, padding: '20px', border: '1px solid #e5e7eb' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 700, color: '#374151' }}>
+                <span style={{ fontSize: 18 }}>💬</span> نص التهنئة
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={showGreeting} 
+                  onChange={e => setShowGreeting(e.target.checked)}
+                  style={{ width: 16, height: 16, accentColor: PURPLE }}
+                />
+                <span style={{ fontSize: 12, color: '#6b7280' }}>إظهار</span>
+              </label>
+            </div>
+            
+            {showGreeting && (
+              <>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+                  {presetGreetings.map(g => (
+                    <button 
+                      key={g} 
+                      onClick={() => setGreetingText(g)}
+                      style={{ 
+                        padding: '6px 12px', borderRadius: 20, 
+                        background: greetingText === g ? PURPLE : '#f3f4f6',
+                        color: greetingText === g ? '#fff' : '#6b7280',
+                        border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600
+                      }}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+                <input
+                  value={greetingText} 
+                  onChange={e => setGreetingText(e.target.value)}
+                  dir="rtl" 
+                  placeholder="أو اكتب نص مخصص..."
+                  style={{ 
+                    width: '100%', padding: '10px 14px', 
+                    border: '1px solid #e5e7eb', borderRadius: 10, 
+                    fontSize: 13, fontFamily: FONT, color: '#111827', 
+                    outline: 'none', boxSizing: 'border-box',
+                    marginBottom: 12
+                  }}
+                />
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280', marginBottom: 6 }}>
+                  <span>حجم نص التهنئة</span>
+                  <span style={{ fontWeight: 700, color: PURPLE }}>{greetingSize}px</span>
+                </div>
+                <input 
+                  type="range" min={12} max={32} value={greetingSize} 
+                  onChange={e => setGreetingSize(+e.target.value)}
+                  style={{ width: '100%', accentColor: PURPLE, height: 5, marginBottom: 12 }} 
+                />
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280', marginBottom: 6 }}>
+                  <span>موضع التهنئة</span>
+                  <span style={{ fontWeight: 700, color: PURPLE }}>{greetingPos.y}%</span>
+                </div>
+                <input 
+                  type="range" min={10} max={90} value={greetingPos.y} 
+                  onChange={e => setGreetingPos({ y: +e.target.value })}
+                  style={{ width: '100%', accentColor: PURPLE, height: 5 }} 
+                />
+              </>
+            )}
+          </div>
+
+          {/* Download Button */}
+          {!downloaded ? (
+            <button 
+              onClick={handleDownload} 
+              disabled={downloading || !cardName.trim()} 
+              style={{
+                padding: '18px 24px', 
+                background: downloading ? '#e9d5ff' : `linear-gradient(135deg, ${PURPLE} 0%, #a855f7 100%)`,
+                color: '#fff',
+                border: 'none', borderRadius: 14, fontSize: 17, fontWeight: 900, 
+                cursor: downloading || !cardName.trim() ? 'not-allowed' : 'pointer',
+                fontFamily: FONT, 
+                boxShadow: downloading ? 'none' : '0 6px 24px rgba(124,58,237,0.35)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                transition: 'all 0.3s'
+              }}
+            >
+              {downloading ? (
+                <>
+                  <div style={{ width: 20, height: 20, border: '3px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                  جارٍ التحميل...
+                </>
+              ) : (
+                <>
+                  <span style={{ fontSize: 22 }}>⬇️</span>
+                  حمّل البطاقة مجاناً
+                </>
+              )}
+            </button>
+          ) : (
+            <div>
+              <div style={{ 
+                padding: '16px 20px', background: '#f0fdf4', 
+                border: '2px solid #86efac', borderRadius: 14, 
+                fontSize: 16, color: '#166534', fontWeight: 800, 
+                textAlign: 'center', marginBottom: 12,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+              }}>
+                <span style={{ fontSize: 24 }}>🎉</span>
+                تم تحميل البطاقة بنجاح!
+              </div>
+              <a 
+                href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى باقة بطاقات من سلّم 🎉')}`}
+                target="_blank" rel="noopener noreferrer"
+                style={{ 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                  padding: '16px 20px', background: ORANGE, color: '#fff', 
+                  border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 800, 
+                  textDecoration: 'none', fontFamily: FONT,
+                  boxShadow: '0 4px 16px rgba(234,88,12,0.3)'
+                }}
+              >
+                <span style={{ fontSize: 20 }}>🛒</span>
+                اشترِ باقة — اطلب الآن
+              </a>
+            </div>
+          )}
+        </div>
+
+        {/* Preview Panel */}
+        <div style={{ position: 'sticky', top: 20 }}>
+          <div style={{ 
+            fontSize: 13, color: '#6b7280', textAlign: 'center', marginBottom: 12, 
+            fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 
+          }}>
+            <span style={{ fontSize: 16 }}>👁️</span> معاينة مباشرة
+          </div>
+          <div
+            ref={previewRef}
+            style={{
+              position: 'relative',
+              aspectRatio: '9/16',
+              borderRadius: 20,
+              overflow: 'hidden',
+              background: '#f0eaff',
+              border: '3px solid #e9d5ff',
+              boxShadow: '0 10px 40px rgba(124,58,237,0.2)',
+            }}
+          >
+            {template.image && (
+              <img
+                src={template.image}
+                alt={template.name}
+                crossOrigin="anonymous"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+            )}
+            
+            {/* Greeting Text */}
+            {showGreeting && greetingText.trim() && (
+              <div style={{
+                position: 'absolute',
+                left: 0, right: 0,
+                top: `${greetingPos.y}%`,
+                textAlign: 'center',
+                padding: '4px 16px',
+                pointerEvents: 'none',
+              }}>
+                <span style={{
+                  fontSize: `${greetingSize}px`,
+                  fontWeight: 700,
+                  color: textColor,
+                  fontFamily: fontFamily.family,
+                  textShadow: textShadow ? '0 2px 8px rgba(0,0,0,0.5)' : 'none',
+                  display: 'block',
+                  lineHeight: 1.4,
+                }}>{greetingText}</span>
+              </div>
+            )}
+            
+            {/* Name Text */}
+            {cardName.trim() && (
+              <div style={{
+                position: 'absolute',
+                left: 0, right: 0,
+                top: `${textPos.y}%`,
+                textAlign: 'center',
+                padding: '4px 16px',
+                pointerEvents: 'none',
+              }}>
+                <span style={{
+                  fontSize: `${fontSize}px`,
+                  fontWeight: 900,
+                  color: textColor,
+                  fontFamily: fontFamily.family,
+                  textShadow: textShadow ? '0 2px 10px rgba(0,0,0,0.6)' : 'none',
+                  display: 'block',
+                  lineHeight: 1.3,
+                  letterSpacing: '0.02em'
+                }}>{cardName}</span>
+              </div>
+            )}
+          </div>
+          <div style={{ fontSize: 11, color: '#d1d5db', textAlign: 'center', marginTop: 10 }}>
+            منصة سلّم | sallim.co
+          </div>
         </div>
       </div>
     </div>

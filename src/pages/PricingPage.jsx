@@ -65,7 +65,7 @@ export default function PricingPage() {
                             >ابدأ مجاناً</a>
                         </div>
 
-                        {/* Starter — 79 SAR one-time */}
+                        {/* Starter — 149 SAR one-time */}
                         <div style={{ 
                             background: '#fff', 
                             padding: '40px 32px', 
@@ -73,33 +73,33 @@ export default function PricingPage() {
                             border: '2px solid #f0f0f0',
                             transition: 'all 300ms ease',
                         }}
-                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#d4af37'; e.currentTarget.style.transform = 'translateY(-4px)' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0ea5e9'; e.currentTarget.style.transform = 'translateY(-4px)' }}
                         onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#f0f0f0'; e.currentTarget.style.transform = 'translateY(0)' }}
                         >
                             <div style={{ marginBottom: '24px' }}>
                                 <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#171717', marginBottom: '8px' }}>باقة البداية</h3>
-                                <p style={{ fontSize: '14px', color: '#737373', margin: 0 }}>استخدام لمرة واحدة — حتى 20 اسم</p>
+                                <p style={{ fontSize: '14px', color: '#737373', margin: 0 }}>للاستخدام لمرة واحدة — حتى 50 بطاقة</p>
                             </div>
                             <div style={{ marginBottom: '24px' }}>
-                                <span style={{ fontSize: '48px', fontWeight: 800, color: '#171717' }}>79</span>
+                                <span style={{ fontSize: '48px', fontWeight: 800, color: '#171717' }}>149</span>
                                 <span style={{ fontSize: '16px', color: '#737373' }}> ر.س</span>
-                                <span style={{ fontSize: '13px', color: '#94a3b8', display: 'block', marginTop: '4px' }}>لمرة واحدة فقط</span>
+                                <span style={{ fontSize: '13px', color: '#94a3b8', display: 'block', marginTop: '4px' }}>دفعة واحدة فقط</span>
                             </div>
                             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                {['حتى 20 اسم', 'قوالب جاهزة', 'تخصيص النص واللون', 'مشاركة عبر رابط أو واتساب', 'تنزيل البطاقات كصور'].map((f, i) => (
+                                {['حتى 50 بطاقة', 'جميع القوالب الأساسية (30+)', 'تخصيص الألوان والخطوط', 'بدون علامة مائية', 'مشاركة عبر رابط أو واتساب', 'تنزيل البطاقات بجودة عالية'].map((f, i) => (
                                     <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '15px', color: '#475569' }}>
-                                        {checkIcon('#d4af37')}
+                                        {checkIcon('#0ea5e9')}
                                         {f}
                                     </li>
                                 ))}
                             </ul>
-                            <a href="/editor?mode=batch" style={{ display: 'block', width: '100%', padding: '14px', fontSize: '15px', fontWeight: 600, color: '#171717', background: '#f5f5f5', borderRadius: '12px', textAlign: 'center', textDecoration: 'none', transition: 'all 200ms ease' }}
-                                onMouseEnter={(e) => { e.currentTarget.style.background = '#e5e5e5' }}
-                                onMouseLeave={(e) => { e.currentTarget.style.background = '#f5f5f5' }}
-                            >ابدأ الآن</a>
+                            <a href="/checkout?plan=starter" style={{ display: 'block', width: '100%', padding: '14px', fontSize: '15px', fontWeight: 600, color: '#fff', background: '#0ea5e9', borderRadius: '12px', textAlign: 'center', textDecoration: 'none', transition: 'all 200ms ease' }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = '#0284c7' }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = '#0ea5e9' }}
+                            >اشترِ الآن</a>
                         </div>
 
-                        {/* Business — 199 SAR/year (Popular) */}
+                        {/* Business — 599 SAR/year (Popular) */}
                         <div style={{ 
                             background: 'linear-gradient(135deg, #a855f7, #7e22ce)', 
                             padding: '40px 32px', 
@@ -118,27 +118,27 @@ export default function PricingPage() {
                             </div>
                             <div style={{ marginBottom: '24px', marginTop: '12px' }}>
                                 <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#fff', marginBottom: '8px' }}>باقة الأعمال</h3>
-                                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', margin: 0 }}>استخدام متكرر — حتى 500 رسالة</p>
+                                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', margin: 0 }}>للشركات الصغيرة والمتوسطة — حتى 500 بطاقة</p>
                             </div>
                             <div style={{ marginBottom: '24px' }}>
-                                <span style={{ fontSize: '48px', fontWeight: 800, color: '#fff' }}>199</span>
+                                <span style={{ fontSize: '48px', fontWeight: 800, color: '#fff' }}>599</span>
                                 <span style={{ fontSize: '16px', color: 'rgba(255,255,255,0.8)' }}> ر.س / سنة</span>
                             </div>
                             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                {['حتى 500 رسالة سنوياً', 'كل المواسم والمناسبات', 'شعار الشركة على البطاقات', 'قوالب حصرية', 'جدولة إرسال', 'تقارير وإحصائيات', 'دعم فني أولوية'].map((f, i) => (
+                                {['حتى 500 بطاقة سنوياً', 'جميع المواسم والمناسبات', 'شعار الشركة على البطاقات', 'قوالب حصرية (50+)', 'إرسال جماعي CSV/Excel', 'جدولة الإرسال', 'تقارير وإحصائيات', 'دعم فني أولوية'].map((f, i) => (
                                     <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '15px', color: '#fff' }}>
                                         {checkIconDark('#a855f7')}
                                         {f}
                                     </li>
                                 ))}
                             </ul>
-                            <a href="/editor?mode=batch" style={{ display: 'block', width: '100%', padding: '14px', fontSize: '15px', fontWeight: 700, color: '#a855f7', background: '#fff', borderRadius: '12px', textAlign: 'center', textDecoration: 'none', transition: 'all 200ms ease' }}
+                            <a href="/checkout?plan=business" style={{ display: 'block', width: '100%', padding: '14px', fontSize: '15px', fontWeight: 700, color: '#a855f7', background: '#fff', borderRadius: '12px', textAlign: 'center', textDecoration: 'none', transition: 'all 200ms ease' }}
                                 onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.2)' }}
                                 onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
                             >اشترك الآن</a>
                         </div>
 
-                        {/* Enterprise — 1499 SAR/year */}
+                        {/* Enterprise — 1,999 SAR/year */}
                         <div style={{ 
                             background: 'linear-gradient(135deg, #d4af37, #b8860b)', 
                             padding: '40px 32px', 
@@ -156,14 +156,14 @@ export default function PricingPage() {
                             </div>
                             <div style={{ marginBottom: '24px', marginTop: '12px' }}>
                                 <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#fff', marginBottom: '8px' }}>الباقة المؤسسية</h3>
-                                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.85)', margin: 0 }}>للشركات الكبرى — 10,000 رسالة + أعياد ميلاد</p>
+                                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.85)', margin: 0 }}>للشركات الكبرى — حتى 5,000 بطاقة + أعياد ميلاد</p>
                             </div>
                             <div style={{ marginBottom: '24px' }}>
-                                <span style={{ fontSize: '48px', fontWeight: 800, color: '#fff' }}>1,499</span>
+                                <span style={{ fontSize: '48px', fontWeight: 800, color: '#fff' }}>1,999</span>
                                 <span style={{ fontSize: '16px', color: 'rgba(255,255,255,0.85)' }}> ر.س / سنة</span>
                             </div>
                             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                {['حتى 10,000 رسالة سنوياً', 'كل المواسم + أعياد ميلاد الموظفين', 'مناسبات شخصية (ترقية، زواج...)', 'هوية الشركة كاملة', 'قوالب مخصصة حسب الطلب', 'ربط مع نظام HR', 'جدولة ذكية + إرسال تلقائي', 'تقارير مفصّلة + لوحة تحكم', 'مدير حساب مخصص + دعم VIP'].map((f, i) => (
+                                {['حتى 5,000 بطاقة سنوياً', 'كل المواسم + أعياد ميلاد الموظفين', 'مناسبات شخصية (ترقية، زواج...)', 'هوية الشركة كاملة', 'قوالب مخصصة حسب الطلب', 'ربط مع نظام HR', 'جدولة ذكية + إرسال تلقائي', 'تقارير مفصّلة + لوحة تحكم', 'مدير حساب مخصص + دعم VIP'].map((f, i) => (
                                     <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '15px', color: '#fff' }}>
                                         {checkIconDark('#d4af37')}
                                         {f}
@@ -176,7 +176,7 @@ export default function PricingPage() {
                             >تواصل معنا عبر واتساب</a>
                         </div>
 
-                        {/* Custom — 2500 SAR */}
+                        {/* Custom — 4,999 SAR */}
                         <div style={{ 
                             background: '#fff', 
                             padding: '40px 32px', 
@@ -192,12 +192,12 @@ export default function PricingPage() {
                                 <p style={{ fontSize: '14px', color: '#737373', margin: 0 }}>تصميم وتطوير حسب الطلب بالكامل</p>
                             </div>
                             <div style={{ marginBottom: '24px' }}>
-                                <span style={{ fontSize: '48px', fontWeight: 800, color: '#6366f1' }}>2,500</span>
+                                <span style={{ fontSize: '48px', fontWeight: 800, color: '#6366f1' }}>4,999</span>
                                 <span style={{ fontSize: '16px', color: '#737373' }}> ر.س</span>
-                                <span style={{ fontSize: '13px', color: '#94a3b8', display: 'block', marginTop: '4px' }}>رابط خاص + نظام مخصص</span>
+                                <span style={{ fontSize: '13px', color: '#94a3b8', display: 'block', marginTop: '4px' }}>رابط خاص + نظام مخصص + رسائل غير محدودة</span>
                             </div>
                             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                {['تصميم قوالب حصرية من الصفر', 'رابط خاص باسم شركتك', 'نظام إرسال مخصص بالكامل', 'بدون حد للرسائل', 'هوية بصرية متكاملة', 'دعم تقني دائم', 'تحديثات وتطوير مستمر'].map((f, i) => (
+                                {['رسائل غير محدودة', 'رابط خاص باسم شركتك', 'تصميم قوالب حصرية من الصفر', 'نظام إرسال مخصص بالكامل', 'API للربط مع أنظمتك', 'هوية بصرية متكاملة', 'تدريب فريقك', 'دعم تقني دائم + تحديثات'].map((f, i) => (
                                     <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '15px', color: '#475569' }}>
                                         {checkIcon('#6366f1')}
                                         {f}
@@ -207,7 +207,7 @@ export default function PricingPage() {
                             <a href="https://wa.me/966597009498?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A8%D8%A7%D9%82%D8%A9%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%D8%A9" target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', padding: '14px', fontSize: '15px', fontWeight: 700, color: '#fff', background: 'linear-gradient(135deg, #6366f1, #4338ca)', borderRadius: '12px', textAlign: 'center', textDecoration: 'none', transition: 'all 200ms ease' }}
                                 onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(99,102,241,0.3)' }}
                                 onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
-                            >تواصل معنا عبر واتساب</a>
+                            >طلب عرض سعر</a>
                         </div>
 
                     </div>
