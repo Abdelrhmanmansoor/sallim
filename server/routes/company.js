@@ -2,7 +2,7 @@ import { Router } from 'express'
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 import { nanoid } from 'nanoid'
-import cloudinary from 'cloudinary'
+import { v2 as cloudinaryV2 } from 'cloudinary'
 import Company from '../models/Company.js'
 import CompanyTeam from '../models/CompanyTeam.js'
 import LicenseKey from '../models/LicenseKey.js'
@@ -20,20 +20,17 @@ async function uploadToCloudinary(imageUrl) {
     if (imageUrl.includes('cloudinary.com') || imageUrl.includes('res.cloudinary')) {
       return imageUrl
     }
-    
     // Upload the remote image to Cloudinary
-    const result = await cloudinary.v2.uploader.upload(imageUrl, {
+    const result = await cloudinaryV2.uploader.upload(imageUrl, {
       folder: 'sallim/greet-templates',
       resource_type: 'image',
       quality: 'auto:good',
       fetch_format: 'auto',
     })
-    
     console.log('[Cloudinary] Uploaded:', result.secure_url)
     return result.secure_url
   } catch (error) {
     console.error('[Cloudinary] Upload failed:', error.message)
-    // Return original URL if upload fails
     return imageUrl
   }
 }
