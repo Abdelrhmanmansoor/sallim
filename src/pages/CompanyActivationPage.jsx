@@ -10,7 +10,7 @@ export default function CompanyActivationPage() {
 
     const [formData, setFormData] = useState({
         email: searchParams.get('email') || '',
-        code: '',
+        code: searchParams.get('code') || '',
         password: '',
         confirmPassword: ''
     })
@@ -86,7 +86,7 @@ export default function CompanyActivationPage() {
                         {/* Back Button */}
                         <div style={{ textAlign: 'right', marginBottom: '32px' }}>
                             <button
-                                onClick={() => navigate('/')}
+                                onClick={() => navigate('/companies')}
                                 style={{
                                     display: 'inline-flex',
                                     alignItems: 'center',
@@ -453,8 +453,32 @@ export default function CompanyActivationPage() {
                             )}
                         </div>
 
+                        {/* Already activated? Login */}
+                        <div style={{ marginTop: '24px', padding: '16px 20px', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
+                            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', margin: '0 0 10px' }}>
+                                فعّلت حسابك من قبل؟
+                            </p>
+                            <a
+                                href="/company-login"
+                                style={{
+                                    display: 'inline-block',
+                                    padding: '10px 28px',
+                                    background: 'rgba(124,58,237,0.15)',
+                                    color: '#c4b5fd',
+                                    borderRadius: '10px',
+                                    border: '1px solid rgba(124,58,237,0.35)',
+                                    fontSize: '14px',
+                                    fontWeight: 700,
+                                    textDecoration: 'none',
+                                    letterSpacing: '0.01em',
+                                }}
+                            >
+                                تسجيل الدخول ←
+                            </a>
+                        </div>
+
                         {/* Help Text */}
-                        <div style={{ marginTop: '32px' }}>
+                        <div style={{ marginTop: '24px' }}>
                             <p
                                 style={{
                                     fontSize: '13px',

@@ -154,11 +154,64 @@ export default function CompaniesPage() {
         </div>
       </section>
 
+      {/* PRICING */}
+      <section style={{ padding: 'clamp(60px, 8vw, 100px) 32px', borderTop: '1px solid #1a1a2e' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <div style={{ marginBottom: 56, textAlign: 'center' }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, color: '#6366f1', textTransform: 'uppercase', marginBottom: 12 }}>الأسعار</p>
+            <h2 style={{ fontSize: 'clamp(22px, 4vw, 36px)', fontWeight: 700, color: '#fff', margin: '0 0 12px' }}>اشترِ وابدأ فوراً</h2>
+            <p style={{ fontSize: 14, color: '#64748b', margin: 0 }}>ادفع إلكترونياً ويصلك كود التفعيل تلقائياً خلال ثوانٍ</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+            {[
+              { key: 'starter', name: 'الأساسية', price: 99, limit: '500 بطاقة', features: ['هوية بصرية مخصصة', 'رفع جماعي CSV', 'لوحة تحكم كاملة'], badge: null },
+              { key: 'pro', name: 'الاحترافية', price: 199, limit: '1,500 بطاقة', features: ['كل مزايا الأساسية', 'إحصائيات متقدمة', 'دعم ذو أولوية'], badge: 'الأكثر طلباً' },
+              { key: 'enterprise', name: 'المؤسسية', price: 399, limit: '5,000 بطاقة', features: ['كل مزايا الاحترافية', 'White Label كامل', 'مدير حساب مخصص'], badge: null },
+            ].map((pkg) => (
+              <div key={pkg.key} style={{
+                background: pkg.badge ? '#0d0d18' : '#111118',
+                border: `1px solid ${pkg.badge ? '#4f46e5' : '#1e1e2e'}`,
+                borderRadius: 12, padding: '28px 24px',
+                boxShadow: pkg.badge ? '0 0 0 1px #4f46e520' : 'none',
+                display: 'flex', flexDirection: 'column',
+              }}>
+                {pkg.badge && (
+                  <div style={{ display: 'inline-block', background: '#4f46e5', color: '#fff', fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', borderRadius: 20, padding: '3px 10px', marginBottom: 12, width: 'fit-content' }}>
+                    {pkg.badge}
+                  </div>
+                )}
+                <p style={{ fontSize: 16, fontWeight: 700, color: '#e2e8f0', margin: '0 0 8px' }}>{pkg.name}</p>
+                <p style={{ fontSize: 32, fontWeight: 900, color: '#fff', margin: '0 0 4px' }}>{pkg.price} <span style={{ fontSize: 14, color: '#64748b' }}>ر.س</span></p>
+                <p style={{ fontSize: 12, color: '#475569', margin: '0 0 20px' }}>/ سنة — {pkg.limit}</p>
+                {pkg.features.map((f, i) => (
+                  <p key={i} style={{ fontSize: 13, color: '#94a3b8', margin: '0 0 8px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ color: '#6366f1', fontWeight: 700 }}>✓</span> {f}
+                  </p>
+                ))}
+                <button
+                  onClick={() => navigate(`/company-checkout?package=${pkg.key}`)}
+                  style={{
+                    marginTop: 'auto', paddingTop: 20, paddingBottom: 0, display: 'block',
+                    padding: '12px', background: pkg.badge ? '#4f46e5' : 'transparent',
+                    color: pkg.badge ? '#fff' : '#6366f1',
+                    border: `1px solid ${pkg.badge ? '#4f46e5' : '#2d2d4d'}`,
+                    borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                    fontFamily: 'Arial, sans-serif', width: '100%', marginTop: 20,
+                  }}
+                >
+                  اشترِ الآن →
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section style={{ padding: 'clamp(60px, 8vw, 100px) 32px', borderTop: '1px solid #1a1a2e' }}>
         <div style={{ maxWidth: 540, margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontSize: 'clamp(24px, 4vw, 40px)', fontWeight: 700, color: '#fff', marginBottom: 12 }}>جاهز تبدأ؟</h2>
-          <p style={{ fontSize: 15, color: '#64748b', lineHeight: 1.8, marginBottom: 40 }}>تواصل معنا وهنفعّل حسابك خلال ساعات</p>
+          <h2 style={{ fontSize: 'clamp(24px, 4vw, 40px)', fontWeight: 700, color: '#fff', marginBottom: 12 }}>تحتاج خطة مخصصة؟</h2>
+          <p style={{ fontSize: 15, color: '#64748b', lineHeight: 1.8, marginBottom: 40 }}>تواصل معنا لباقة مؤسسية مخصصة أو لأي استفسار</p>
 
           <a
             href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('مرحباً، أرغب بالاشتراك في نظام المؤسسات في منصة سلّم')}`}
@@ -177,7 +230,7 @@ export default function CompaniesPage() {
               type="text"
               value={activationCode}
               onChange={e => setActivationCode(e.target.value)}
-              placeholder="XXXX-XXXX"
+              placeholder="SALL-XXXX-XXXX"
               dir="ltr"
               style={{
                 flex: 1, padding: '12px 16px', background: '#111118', border: '1px solid #2d2d3d',

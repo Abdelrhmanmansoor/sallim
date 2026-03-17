@@ -92,7 +92,7 @@ export default function LoginPage() {
                             </button>
                             <button
                                 type="button"
-                                onClick={() => setFormData({ ...formData, role: 'company' })}
+                                onClick={() => navigate('/company-login')}
                                 style={{
                                     flex: 1,
                                     padding: '10px 16px',
@@ -106,7 +106,7 @@ export default function LoginPage() {
                                     transition: 'all 200ms ease',
                                 }}
                             >
-                                شركة
+                                شركة ←
                             </button>
                         </div>
                     </div>

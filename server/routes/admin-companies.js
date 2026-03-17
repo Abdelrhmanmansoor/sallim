@@ -5,8 +5,12 @@ import Transaction from '../models/Transaction.js'
 import Card from '../models/Card.js'
 import CardCampaign from '../models/CardCampaign.js'
 import AuditLog from '../models/AuditLog.js'
+import isAdmin from '../middleware/adminAuth.js'
 
 const router = Router()
+
+// Protect all routes in this file
+router.use(isAdmin)
 
 // ═══ Get All Companies ═══
 router.get('/', async (req, res) => {

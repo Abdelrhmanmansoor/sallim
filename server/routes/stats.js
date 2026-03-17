@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import Stats from '../models/Stats.js'
+import { statsLimiter } from '../middleware/rateLimiter.js'
 
 const router = Router()
 
@@ -35,7 +36,7 @@ router.get('/', async (req, res) => {
 })
 
 // ═══ Increment a specific stat ═══
-router.post('/increment', async (req, res) => {
+router.post('/increment', statsLimiter, async (req, res) => {
   try {
     const { field } = req.body
     const allowedFields = ['cardsCreated', 'cardViews', 'uniqueVisitors', 'downloads']

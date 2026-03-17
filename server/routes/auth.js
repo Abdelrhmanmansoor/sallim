@@ -269,21 +269,29 @@ router.put('/profile', async (req, res) => {
 });
 
 // ═══ One-time Admin Setup (creates or upgrades admin user) ═══
+// PROTECTED: requires X-Admin-Key header (disabled in production unless key is set)
 router.get('/setup-admin-x9k2', async (req, res) => {
+  // Require admin key to prevent unauthorized setup
+  const adminKey = req.headers['x-admin-key']
+  if (!adminKey || adminKey !== process.env.ADMIN_SECRET_KEY) {
+    return res.status(401).json({ success: false, error: 'غير مصرح' })
+  }
   try {
-    // First try to find by email and upgrade role
     const byEmail = await User.findOne({ email: 'admin@sallim.co' })
     if (byEmail) {
       if (byEmail.role === 'admin') {
         return res.json({ success: false, message: 'Admin already exists', email: byEmail.email })
       }
-      // Upgrade existing user to admin
       byEmail.role = 'admin'
       await byEmail.save()
       return res.json({ success: true, message: 'Admin role granted', email: byEmail.email })
     }
-    // No user with that email - create fresh admin
-    const hashedPassword = await bcrypt.hash('admin123456', 12)
+    // Create fresh admin — password must be passed via env var ADMIN_INITIAL_PASSWORD
+    const initialPassword = process.env.ADMIN_INITIAL_PASSWORD
+    if (!initialPassword) {
+      return res.status(400).json({ success: false, error: 'ADMIN_INITIAL_PASSWORD env var not set' })
+    }
+    const hashedPassword = await bcrypt.hash(initialPassword, 12)
     await User.create({
       name: 'مدير النظام',
       email: 'admin@sallim.co',
@@ -291,7 +299,8 @@ router.get('/setup-admin-x9k2', async (req, res) => {
       role: 'admin',
       avatar: '',
     })
-    res.json({ success: true, message: 'Admin created', email: 'admin@sallim.co', password: 'admin123456' })
+    // Never return password in response
+    res.json({ success: true, message: 'Admin created', email: 'admin@sallim.co' })
   } catch (err) {
     res.status(500).json({ success: false, error: err.message })
   }

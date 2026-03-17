@@ -3,6 +3,10 @@ import crypto from 'crypto'
 import Analytics from '../models/Analytics.js'
 import Card from '../models/Card.js'
 import CheckoutSession from '../models/CheckoutSession.js'
+import CompanyOrder from '../models/CompanyOrder.js'
+import LicenseKey from '../models/LicenseKey.js'
+import { generateLicenseCode, hashLicenseCode } from './company-checkout.js'
+import { checkoutLimiter } from '../middleware/rateLimiter.js'
 
 const router = express.Router()
 
@@ -147,7 +151,7 @@ async function emitPurchaseActivity(io, session, analyticsEntry) {
   })
 }
 
-router.post('/initiate', async (req, res) => {
+router.post('/initiate', checkoutLimiter, async (req, res) => {
   try {
     if (!PAYMOB_API_KEY || !PAYMOB_INTEGRATION_ID || !PAYMOB_IFRAME_ID) {
       return res.status(500).json({
@@ -252,6 +256,55 @@ router.post('/callback', async (req, res) => {
     const orderId = String(obj?.order?.id || obj?.order || '')
     if (!orderId) {
       return res.status(400).json({ success: false, message: 'Missing order id' })
+    }
+
+    // ── Check if this is a company checkout order (co- prefix) ──
+    const companyOrder = await CompanyOrder.findOne({ paymobOrderId: orderId })
+    if (companyOrder) {
+      const paymentOk = Boolean(obj?.success)
+      const evtType = type || obj?.type || 'TRANSACTION'
+
+      if (!paymentOk || evtType !== 'TRANSACTION') {
+        companyOrder.status = 'failed'
+        await companyOrder.save()
+        return res.json({
+          success: false,
+          redirectUrl: `${CLIENT_URL}/company-checkout?status=failed&paymobOrderId=${orderId}`,
+        })
+      }
+
+      // Idempotency guard
+      if (companyOrder.status === 'completed' && companyOrder.licenseCode) {
+        return res.json({
+          success: true,
+          alreadyProcessed: true,
+          redirectUrl: `${CLIENT_URL}/company-checkout?status=success&paymobOrderId=${orderId}`,
+        })
+      }
+
+      // Generate activation code
+      const plainCode = generateLicenseCode()
+      const codeHash = hashLicenseCode(plainCode)
+
+      const licenseKey = await LicenseKey.create({
+        codeHash,
+        status: 'new',
+        maxRecipients: companyOrder.packageSnapshot?.cardLimit || 500,
+        note: `Auto-generated for company order ${companyOrder._id} — ${companyOrder.companyEmail}`,
+      })
+
+      companyOrder.status = 'completed'
+      companyOrder.licenseCode = plainCode
+      companyOrder.licenseKeyId = licenseKey._id
+      companyOrder.paymobTransactionId = String(obj?.id || obj?.transaction_id || '')
+      await companyOrder.save()
+
+      console.log(`[CompanyCheckout] Payment complete — code generated for ${companyOrder.companyEmail}`)
+
+      return res.json({
+        success: true,
+        redirectUrl: `${CLIENT_URL}/company-checkout?status=success&paymobOrderId=${orderId}`,
+      })
     }
 
     const checkoutSession = await CheckoutSession.findOne({ paymobOrderId: orderId }).populate('cardId')

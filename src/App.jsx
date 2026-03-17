@@ -45,6 +45,7 @@ import DeliveryPage from './pages/DeliveryPage'
 import RefundPage from './pages/RefundPage'
 import ContactPage from './pages/ContactPage'
 import CheckoutPageNew from './pages/CheckoutPageNew'
+import CompanyCheckoutPage from './pages/CompanyCheckoutPage'
 import WeddingInvitationPage from './pages/WeddingInvitationPage'
 
 export default function App() {
@@ -76,6 +77,7 @@ export default function App() {
     '/admin/templates',
     '/admin-x9k2/login',
     '/companies',
+    '/company-checkout',
     '/create-game',
     '/wedding-invitation',
   ].includes(pathname) || pathname.startsWith('/game/') || pathname.startsWith('/eid/') || pathname.startsWith('/diwan/')
@@ -83,8 +85,8 @@ export default function App() {
   // Define isBusiness - assuming it's false for free version
   const isBusiness = false
 
-  const hideNavbar = pathname === '/editor' || pathname === '/company/dashboard' || pathname.startsWith('/greet/')
-  const hideFooter = pathname === '/editor' || pathname === '/company/dashboard' || pathname.startsWith('/greet/')
+  const hideNavbar = pathname === '/editor' || pathname === '/company/dashboard' || pathname.startsWith('/greet/') || pathname === '/company-checkout'
+  const hideFooter = pathname === '/editor' || pathname === '/company/dashboard' || pathname.startsWith('/greet/') || pathname === '/company-checkout'
   const noNavPadding = hideNavbar || pathname === '/'
 
   return (
@@ -135,6 +137,7 @@ export default function App() {
           <Route path="/refund" element={<RefundPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/checkout" element={<CheckoutPageNew />} />
+          <Route path="/company-checkout" element={<CompanyCheckoutPage />} />
           <Route path="/batch-access" element={<BatchAccessPage />} />
           <Route path="/bulk" element={<BulkPage />} />
           <Route path="/wedding-invitation" element={<WeddingInvitationPage />} />

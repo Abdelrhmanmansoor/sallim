@@ -50,3 +50,27 @@ export const employeeLimiter = rateLimit({
   }
 })
 
+// Prevents spamming payment initiation endpoints (Paymob order creation)
+export const checkoutLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: 'تم تجاوز الحد المسموح به لطلبات الدفع، حاول بعد 15 دقيقة.'
+  }
+})
+
+// Prevents stat manipulation via rapid /increment calls
+export const statsLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: 'محاولات متكررة جداً.'
+  }
+})
+

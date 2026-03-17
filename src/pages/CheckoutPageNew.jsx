@@ -180,6 +180,19 @@ export default function CheckoutPageNew() {
   }, [cardId, orderId, status])
 
   const verifySuccessfulPayment = async (currentOrderId) => {
+    // ── Detect company checkout order ──
+    const pendingCo = localStorage.getItem('sallim_co_pending')
+    if (pendingCo) {
+      try {
+        const parsed = JSON.parse(pendingCo)
+        if (parsed.paymobOrderId === currentOrderId) {
+          localStorage.removeItem('sallim_co_pending')
+          navigate(`/company-checkout?status=success&paymobOrderId=${currentOrderId}`, { replace: true })
+          return
+        }
+      } catch (_) { /* ignore */ }
+    }
+
     try {
       setSubmitting(true)
       const response = await fetch(`${apiBase}/api/v1/checkout/success?orderId=${currentOrderId}`)

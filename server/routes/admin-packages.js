@@ -2,8 +2,12 @@ import { Router } from 'express'
 import Package from '../models/Package.js'
 import Company from '../models/Company.js'
 import AuditLog from '../models/AuditLog.js'
+import isAdmin from '../middleware/adminAuth.js'
 
 const router = Router()
+
+// Protect all routes in this file
+router.use(isAdmin)
 
 // ═══ Get All Packages ═══
 router.get('/', async (req, res) => {

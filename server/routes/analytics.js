@@ -1,8 +1,12 @@
 import express from 'express';
 import Analytics from '../models/Analytics.js';
 import Card from '../models/Card.js';
+import isAdmin from '../middleware/adminAuth.js';
 
 const router = express.Router();
+
+// Protect all analytics routes — admin only
+router.use(isAdmin);
 
 // GET /api/analytics/realtime - Real-time stats
 router.get('/realtime', async (req, res) => {

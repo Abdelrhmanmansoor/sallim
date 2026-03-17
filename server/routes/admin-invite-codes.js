@@ -3,8 +3,12 @@ import crypto from 'crypto'
 import InviteCode from '../models/InviteCode.js'
 import User from '../models/User.js'
 import AuditLog from '../models/AuditLog.js'
+import isAdmin from '../middleware/adminAuth.js'
 
 const router = Router()
+
+// Protect all routes in this file
+router.use(isAdmin)
 
 // ═══ Create Invite Code ═══
 router.post('/generate', async (req, res) => {
