@@ -2,6 +2,7 @@ import { Router } from 'express'
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 import { nanoid } from 'nanoid'
+import cloudinary from 'cloudinary'
 import Company from '../models/Company.js'
 import CompanyTeam from '../models/CompanyTeam.js'
 import LicenseKey from '../models/LicenseKey.js'
@@ -11,6 +12,31 @@ import { upload } from '../config/upload.js'
 import { loginLimiter, activationLimiter, employeeLimiter } from '../middleware/rateLimiter.js'
 
 const router = Router()
+
+// Helper: Upload image URL to Cloudinary (for template images)
+async function uploadToCloudinary(imageUrl) {
+  try {
+    // If already a Cloudinary URL, return as-is
+    if (imageUrl.includes('cloudinary.com') || imageUrl.includes('res.cloudinary')) {
+      return imageUrl
+    }
+    
+    // Upload the remote image to Cloudinary
+    const result = await cloudinary.v2.uploader.upload(imageUrl, {
+      folder: 'sallim/greet-templates',
+      resource_type: 'image',
+      quality: 'auto:good',
+      fetch_format: 'auto',
+    })
+    
+    console.log('[Cloudinary] Uploaded:', result.secure_url)
+    return result.secure_url
+  } catch (error) {
+    console.error('[Cloudinary] Upload failed:', error.message)
+    // Return original URL if upload fails
+    return imageUrl
+  }
+}
 
 // JWT Secret - MUST be set in environment variables
 if (!process.env.JWT_SECRET) {
@@ -552,11 +578,15 @@ router.post('/greet-links', protectCompanyRoute, async (req, res) => {
     if (!templateImage) return res.status(400).json({ success: false, error: 'رابط صورة القالب مطلوب' })
 
     // Ensure templateImage is absolute URL (convert relative paths)
-    let finalTemplateImage = templateImage
+    let imageUrl = templateImage
     if (!templateImage.startsWith('http')) {
-      finalTemplateImage = `https://www.sallim.co${templateImage.startsWith('/') ? '' : '/'}${templateImage}`
+      imageUrl = `https://www.sallim.co${templateImage.startsWith('/') ? '' : '/'}${templateImage}`
     }
-    console.log('[greet-links] saving templateImage:', finalTemplateImage)
+    
+    // Upload to Cloudinary for reliable CDN hosting (handles Arabic paths, CORS, etc.)
+    console.log('[greet-links] uploading to Cloudinary:', imageUrl)
+    const finalTemplateImage = await uploadToCloudinary(imageUrl)
+    console.log('[greet-links] final image URL:', finalTemplateImage)
 
     const shortId = nanoid(6)
     const greetLink = await GreetLink.create({
@@ -595,10 +625,20 @@ router.get('/greet-links/:shortId', async (req, res) => {
     // Fetch company branding
     const company = await Company.findById(link.companyId).select('name logoUrl slug').lean()
     
-    // Ensure templateImage is absolute URL (fix old relative paths)
+    // Get template image - if not on Cloudinary, upload it now (lazy migration)
     let templateImage = link.templateImage || ''
-    if (templateImage && !templateImage.startsWith('http')) {
-      templateImage = `https://www.sallim.co${templateImage.startsWith('/') ? '' : '/'}${templateImage}`
+    if (templateImage && !templateImage.includes('cloudinary.com') && !templateImage.includes('res.cloudinary')) {
+      // Convert relative to absolute first
+      if (!templateImage.startsWith('http')) {
+        templateImage = `https://www.sallim.co${templateImage.startsWith('/') ? '' : '/'}${templateImage}`
+      }
+      // Upload to Cloudinary in background (lazy migration)
+      uploadToCloudinary(templateImage).then(cloudinaryUrl => {
+        if (cloudinaryUrl !== templateImage) {
+          // Update the record with Cloudinary URL for future requests
+          GreetLink.findByIdAndUpdate(link._id, { templateImage: cloudinaryUrl }).catch(() => {})
+        }
+      }).catch(() => {})
     }
     console.log('[greet-links GET] returning templateImage:', templateImage)
     
