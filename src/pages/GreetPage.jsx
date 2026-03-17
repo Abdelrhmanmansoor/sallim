@@ -71,8 +71,11 @@ export default function GreetPage() {
                 setParamNameY(d.nameY || 0.65)
                 setParamColor(d.nameColor || '')
                 setTemplateTextColor(d.templateTextColor || '#ffffff')
-                setTemplateImage(d.templateImage || '')
-                setTemplate({ id: d.templateId || 'custom', image: d.templateImage, textColor: d.templateTextColor || '#ffffff' })
+                // Fix relative URLs (e.g. /templates/... stored before absolute-URL fix)
+                const imgUrl = d.templateImage || ''
+                const absImg = imgUrl && !imgUrl.startsWith('http') ? `https://www.sallim.co${imgUrl}` : imgUrl
+                setTemplateImage(absImg)
+                setTemplate({ id: d.templateId || 'custom', image: absImg, textColor: d.templateTextColor || '#ffffff' })
             })
             .catch(() => {})
             .finally(() => setLoading(false))

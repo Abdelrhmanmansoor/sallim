@@ -80,13 +80,13 @@ export default function App() {
     '/company-checkout',
     '/create-game',
     '/wedding-invitation',
-  ].includes(pathname) || pathname.startsWith('/game/') || pathname.startsWith('/eid/') || pathname.startsWith('/diwan/')
+  ].includes(pathname) || pathname.startsWith('/game/') || pathname.startsWith('/eid/') || pathname.startsWith('/diwan/') || pathname.startsWith('/g/')
 
   // Define isBusiness - assuming it's false for free version
   const isBusiness = false
 
-  const hideNavbar = pathname === '/editor' || pathname === '/company/dashboard' || pathname.startsWith('/greet/') || pathname === '/company-checkout'
-  const hideFooter = pathname === '/editor' || pathname === '/company/dashboard' || pathname.startsWith('/greet/') || pathname === '/company-checkout'
+  const hideNavbar = pathname === '/editor' || pathname === '/company/dashboard' || pathname.startsWith('/greet/') || pathname.startsWith('/g/') || pathname === '/company-checkout'
+  const hideFooter = pathname === '/editor' || pathname === '/company/dashboard' || pathname.startsWith('/greet/') || pathname.startsWith('/g/') || pathname === '/company-checkout'
   const noNavPadding = hideNavbar || pathname === '/'
 
   return (
