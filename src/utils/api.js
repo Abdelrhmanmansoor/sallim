@@ -171,6 +171,17 @@ export async function getCompanyDashboard(token) {
 }
 
 /**
+ * Company: Consume batch cards (deduct from balance)
+ */
+export async function consumeBatchCards(token, count) {
+  return apiRequest('/company/consume-batch', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ count })
+  })
+}
+
+/**
  * Company: Get team members
  */
 export async function getCompanyTeam(token) {

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCompany } from '../context/CompanyContext'
-import { updateCompanyProfile, getTemplates } from '../utils/api'
-import { templates as staticTemplates, designerOnlyTemplates } from '../data/templates'
+import { updateCompanyProfile, getTemplates, consumeBatchCards } from '../utils/api'
+import { templates as staticTemplates, designerOnlyTemplates, fonts } from '../data/templates'
 // JSZip loaded dynamically in handleGenerate
 import toast, { Toaster } from 'react-hot-toast'
 
@@ -269,6 +269,11 @@ function BatchCardsView({ company, token, isDepleted, remaining }) {
     const [generating, setGenerating] = useState(false)
     const [progress, setProgress] = useState(0)
     const [downloadReady, setDownloadReady] = useState(null)
+    // Text controls — matching EditorPage
+    const [selectedFont, setSelectedFont] = useState('amiri')
+    const [fontSize, setFontSize] = useState(60)
+    const [nameColor, setNameColor] = useState('')
+    const [nameY, setNameY] = useState(0.65)
 
     useEffect(() => {
         // Merge static templates + designer templates as fallback
@@ -338,18 +343,15 @@ function BatchCardsView({ company, token, isDepleted, remaining }) {
             canvas.height = H
             const ctx = canvas.getContext('2d')
 
-            // Match EditorPage exactly: Amiri font, Y=0.65, fontSize=60 at 1080px
-            const textColor = selectedTemplate.textColor || selectedTemplate.nameColor || '#ffffff'
-            const fontFamily = "'Amiri', 'Cairo', serif"
-            const fontSize = Math.round(60 * (W / 1080))
-            const nameY = 0.65
+            const currentFont = fonts.find(fo => fo.id === selectedFont) || fonts[1]
+            const textColor = nameColor || selectedTemplate.textColor || selectedTemplate.nameColor || '#ffffff'
+            const scaledSize = Math.round(fontSize * (W / 1080))
 
             for (let i = 0; i < names.length; i++) {
                 ctx.clearRect(0, 0, W, H)
                 ctx.drawImage(templateImg, 0, 0, W, H)
 
-                // Recipient name — identical to EditorPage Konva Text
-                ctx.font = `normal ${fontSize}px ${fontFamily}`
+                ctx.font = `normal ${scaledSize}px ${currentFont.family}`
                 ctx.fillStyle = textColor
                 ctx.textAlign = 'center'
                 ctx.textBaseline = 'top'
@@ -359,6 +361,13 @@ function BatchCardsView({ company, token, isDepleted, remaining }) {
                 const blob = await new Promise(r => canvas.toBlob(r, 'image/png'))
                 zip.file(`${names[i].replace(/[\/\\:*?"<>|]/g, '_')}.png`, blob)
                 setProgress(Math.round(((i + 1) / names.length) * 100))
+            }
+
+            // Deduct from balance
+            if (token) {
+                try {
+                    await consumeBatchCards(token, names.length)
+                } catch { /* silent */ }
             }
 
             const zipBlob = await zip.generateAsync({ type: 'blob' })
@@ -475,9 +484,68 @@ function BatchCardsView({ company, token, isDepleted, remaining }) {
                         </>
                     )}
                     {selectedTemplate && (
-                        <div style={{ marginTop: 16, padding: '10px 16px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, fontSize: 13, color: '#166534', fontWeight: 700 }}>
-                            تم اختيار: {selectedTemplate.name} — معاينة بـ "{names[0]}"
-                        </div>
+                        <>
+                            <div style={{ marginTop: 16, padding: '10px 16px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, fontSize: 13, color: '#166534', fontWeight: 700 }}>
+                                تم اختيار: {selectedTemplate.name} — معاينة بـ "{names[0]}"
+                            </div>
+
+                            {/* ── Text Controls ── */}
+                            <div style={{ marginTop: 20, padding: 20, background: '#f8fafc', borderRadius: 14, border: `1px solid ${C.border}` }}>
+                                <h4 style={{ fontSize: 14, fontWeight: 800, color: C.text, marginBottom: 14, margin: '0 0 14px 0' }}>إعدادات النص</h4>
+
+                                {/* Preview card */}
+                                <div style={{ position: 'relative', display: 'inline-block', marginBottom: 18, borderRadius: 12, overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.1)', maxWidth: 180, width: '100%' }}>
+                                    <img src={selectedTemplate.image || selectedTemplate.template} alt="Preview" style={{ width: '100%', display: 'block' }} />
+                                    <div style={{ position: 'absolute', top: `${nameY * 100}%`, left: '50%', transform: 'translate(-50%,-50%)', color: nameColor || selectedTemplate.textColor || '#fff', fontSize: Math.max(10, fontSize * 0.22), fontWeight: 400, fontFamily: (fonts.find(fo => fo.id === selectedFont) || fonts[1]).family, textAlign: 'center', width: '80%', direction: 'rtl' }}>
+                                        {names[0] || 'اسم'}
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'grid', gap: 12 }}>
+                                    {/* Font selector */}
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 6 }}>الخط</label>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                                            {fonts.map(fo => (
+                                                <button key={fo.id} onClick={() => setSelectedFont(fo.id)} style={{
+                                                    padding: '6px 12px', borderRadius: 8, border: selectedFont === fo.id ? `2px solid ${C.accent}` : `1px solid ${C.border}`,
+                                                    background: selectedFont === fo.id ? '#f5f3ff' : '#fff', cursor: 'pointer',
+                                                    fontSize: 12, fontFamily: fo.family, fontWeight: 700, color: C.text,
+                                                }}>{fo.label}</button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Font size */}
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 6 }}>حجم الخط: {fontSize}px</label>
+                                        <input type="range" min={20} max={120} value={fontSize} onChange={e => setFontSize(Number(e.target.value))} style={{ width: '100%' }} />
+                                    </div>
+
+                                    {/* Text color */}
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 6 }}>لون النص</label>
+                                        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                                            {['#ffffff', '#f1c40f', '#e74c3c', '#2ecc71', '#3498db', '#9b59b6', '#1a1a2e', '#b8860b'].map(c => (
+                                                <div key={c} onClick={() => setNameColor(c)} style={{
+                                                    width: 28, height: 28, borderRadius: '50%', background: c, cursor: 'pointer',
+                                                    border: (nameColor || selectedTemplate.textColor || '#ffffff') === c ? '3px solid #7c3aed' : '2px solid #e2e8f0',
+                                                    transition: 'transform 0.15s', transform: (nameColor || selectedTemplate.textColor || '#ffffff') === c ? 'scale(1.15)' : 'scale(1)',
+                                                }} />
+                                            ))}
+                                            <input type="color" value={nameColor || selectedTemplate.textColor || '#ffffff'} onChange={e => setNameColor(e.target.value)}
+                                                style={{ width: 28, height: 28, borderRadius: '50%', cursor: 'pointer', border: 'none', padding: 0 }} />
+                                        </div>
+                                    </div>
+
+                                    {/* Y position */}
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 6 }}>موضع الاسم: {Math.round(nameY * 100)}%</label>
+                                        <input type="range" min={20} max={90} value={Math.round(nameY * 100)} onChange={e => setNameY(Number(e.target.value) / 100)} style={{ width: '100%' }} />
+                                    </div>
+                                </div>
+                            </div>
+                        </>
                     )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20, gap: 12 }}>
                         <button onClick={() => setStep(1)} style={btnStyle(true)}>السابق</button>
@@ -500,7 +568,7 @@ function BatchCardsView({ company, token, isDepleted, remaining }) {
                     {selectedTemplate && (
                         <div style={{ position: 'relative', display: 'inline-block', marginBottom: 24, borderRadius: 14, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', maxWidth: 220 }}>
                             <img src={selectedTemplate.image || selectedTemplate.template} alt="Preview" style={{ width: '100%', display: 'block' }} crossOrigin="anonymous" />
-                            <div style={{ position: 'absolute', top: '65%', left: '50%', transform: 'translate(-50%,-50%)', color: selectedTemplate.textColor || '#fff', fontSize: 18, fontWeight: 400, fontFamily: "'Amiri', serif", textAlign: 'center', width: '80%', direction: 'rtl' }}>
+                            <div style={{ position: 'absolute', top: `${nameY * 100}%`, left: '50%', transform: 'translate(-50%,-50%)', color: nameColor || selectedTemplate.textColor || '#fff', fontSize: Math.max(12, fontSize * 0.26), fontWeight: 400, fontFamily: (fonts.find(fo => fo.id === selectedFont) || fonts[1]).family, textAlign: 'center', width: '80%', direction: 'rtl' }}>
                                 {names[0]}
                             </div>
                         </div>
@@ -580,6 +648,11 @@ function EmployeeLinkView({ company, token, isDepleted }) {
     const [step, setStep] = useState(1) // 1=form, 2=generated
     const [generatedLink, setGeneratedLink] = useState('')
     const [copied, setCopied] = useState(false)
+    // Text settings for employee links
+    const [selectedFont, setSelectedFont] = useState('amiri')
+    const [linkFontSize, setLinkFontSize] = useState(60)
+    const [linkNameColor, setLinkNameColor] = useState('')
+    const [linkNameY, setLinkNameY] = useState(0.65)
     // Individual links
     const [showIndividual, setShowIndividual] = useState(false)
     const [employeeNames, setEmployeeNames] = useState('')
@@ -607,7 +680,12 @@ function EmployeeLinkView({ company, token, isDepleted }) {
         if (!occasionName.trim()) { toast.error('اكتب اسم المناسبة'); return }
         if (!selectedTemplate) { toast.error('اختر قالباً للموظفين'); return }
         const linkId = Math.random().toString(36).substring(2, 8)
-        const params = new URLSearchParams({ tmpl: selectedTemplate.id || selectedTemplate._id, ...(greetingText.trim() ? { msg: greetingText.trim() } : {}) })
+        const params = new URLSearchParams({
+            tmpl: selectedTemplate.id || selectedTemplate._id,
+            ...(greetingText.trim() ? { msg: greetingText.trim() } : {}),
+            font: selectedFont, fs: linkFontSize, y: Math.round(linkNameY * 100),
+            ...(linkNameColor ? { clr: linkNameColor.replace('#', '') } : {}),
+        })
         const link = `${window.location.origin}/greet/${companySlug}/${linkId}?${params}`
         setGeneratedLink(link)
         setStep(2)
@@ -619,9 +697,10 @@ function EmployeeLinkView({ company, token, isDepleted }) {
         if (!names.length) { toast.error('أدخل أسماء الموظفين'); return }
         if (!selectedTemplate) { toast.error('اختر قالباً أولاً'); return }
         const linkId = Math.random().toString(36).substring(2, 8)
+        const textParams = `&font=${selectedFont}&fs=${linkFontSize}&y=${Math.round(linkNameY * 100)}${linkNameColor ? `&clr=${linkNameColor.replace('#', '')}` : ''}`
         const links = names.map(name => ({
             name,
-            url: `${window.location.origin}/greet/${companySlug}/${linkId}?for=${encodeURIComponent(name)}&tmpl=${selectedTemplate.id || selectedTemplate._id}`,
+            url: `${window.location.origin}/greet/${companySlug}/${linkId}?for=${encodeURIComponent(name)}&tmpl=${selectedTemplate.id || selectedTemplate._id}${textParams}`,
         }))
         setIndividualLinks(links)
     }
@@ -672,6 +751,57 @@ function EmployeeLinkView({ company, token, isDepleted }) {
                             }
                             {selectedTemplate && <div style={{ marginTop: 8, fontSize: 12, color: C.green, fontWeight: 700 }}>تم اختيار: {selectedTemplate.name}</div>}
                         </div>
+
+                        {/* ── Text Controls for Employee Links ── */}
+                        {selectedTemplate && (
+                            <div style={{ padding: 16, background: '#f8fafc', borderRadius: 12, border: `1px solid ${C.border}` }}>
+                                <h4 style={{ fontSize: 13, fontWeight: 800, color: C.text, margin: '0 0 12px 0' }}>إعدادات نص البطاقة</h4>
+
+                                <div style={{ position: 'relative', display: 'inline-block', marginBottom: 14, borderRadius: 10, overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.08)', maxWidth: 140 }}>
+                                    <img src={selectedTemplate.image || selectedTemplate.template} alt="" style={{ width: '100%', display: 'block' }} />
+                                    <div style={{ position: 'absolute', top: `${linkNameY * 100}%`, left: '50%', transform: 'translate(-50%,-50%)', color: linkNameColor || selectedTemplate.textColor || '#fff', fontSize: Math.max(8, linkFontSize * 0.18), fontFamily: (fonts.find(fo => fo.id === selectedFont) || fonts[1]).family, textAlign: 'center', width: '80%', direction: 'rtl' }}>
+                                        اسم الموظف
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'grid', gap: 10 }}>
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: C.muted, marginBottom: 4 }}>الخط</label>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                                            {fonts.map(fo => (
+                                                <button key={fo.id} onClick={() => setSelectedFont(fo.id)} style={{
+                                                    padding: '4px 10px', borderRadius: 6, border: selectedFont === fo.id ? `2px solid ${C.accent}` : `1px solid ${C.border}`,
+                                                    background: selectedFont === fo.id ? '#f5f3ff' : '#fff', cursor: 'pointer',
+                                                    fontSize: 11, fontFamily: fo.family, fontWeight: 700, color: C.text,
+                                                }}>{fo.label}</button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: C.muted, marginBottom: 4 }}>حجم: {linkFontSize}</label>
+                                            <input type="range" min={20} max={120} value={linkFontSize} onChange={e => setLinkFontSize(Number(e.target.value))} style={{ width: '100%' }} />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: C.muted, marginBottom: 4 }}>موضع: {Math.round(linkNameY * 100)}%</label>
+                                            <input type="range" min={20} max={90} value={Math.round(linkNameY * 100)} onChange={e => setLinkNameY(Number(e.target.value) / 100)} style={{ width: '100%' }} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: C.muted, marginBottom: 4 }}>لون النص</label>
+                                        <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+                                            {['#ffffff', '#f1c40f', '#e74c3c', '#2ecc71', '#1a1a2e', '#b8860b'].map(c => (
+                                                <div key={c} onClick={() => setLinkNameColor(c)} style={{
+                                                    width: 24, height: 24, borderRadius: '50%', background: c, cursor: 'pointer',
+                                                    border: (linkNameColor || selectedTemplate.textColor || '#ffffff') === c ? '3px solid #7c3aed' : '2px solid #e2e8f0',
+                                                }} />
+                                            ))}
+                                            <input type="color" value={linkNameColor || '#ffffff'} onChange={e => setLinkNameColor(e.target.value)} style={{ width: 24, height: 24, borderRadius: '50%', cursor: 'pointer', border: 'none', padding: 0 }} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         <button onClick={handleCreateLink} disabled={isDepleted} style={{
                             padding: '14px 28px', background: isDepleted ? '#f1f5f9' : C.accent, color: isDepleted ? C.muted : '#fff',

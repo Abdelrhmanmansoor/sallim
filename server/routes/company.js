@@ -519,4 +519,28 @@ router.post('/public/:slug/cards', employeeLimiter, async (req, res) => {
   }
 })
 
+// ═══ Batch consume cards (Company Auth) ═══
+router.post('/consume-batch', protectCompanyRoute, async (req, res) => {
+  try {
+    const count = Math.max(1, Math.min(parseInt(req.body?.count) || 1, 10000))
+    const company = req.company
+
+    if (company.cardsLimit > 0 && company.cardsUsed + count > company.cardsLimit) {
+      return res.status(403).json({ success: false, error: 'الرصيد غير كافٍ' })
+    }
+
+    await Company.findByIdAndUpdate(company._id, {
+      $inc: { cardsUsed: count, 'usage.cardsThisMonth': count, 'stats.downloads': count }
+    })
+
+    const updated = await Company.findById(company._id).select('cardsUsed cardsLimit')
+    res.json({
+      success: true,
+      data: { cardsUsed: updated.cardsUsed, cardsRemaining: Math.max(0, updated.cardsLimit - updated.cardsUsed) }
+    })
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'حدث خطأ' })
+  }
+})
+
 export default router

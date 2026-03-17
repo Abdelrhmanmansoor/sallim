@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { templates as staticTemplates, designerOnlyTemplates } from '../data/templates'
+import { templates as staticTemplates, designerOnlyTemplates, fonts as fontList } from '../data/templates'
 import toast, { Toaster } from 'react-hot-toast'
 
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
@@ -13,6 +13,11 @@ export default function GreetPage() {
     const prefilledName = searchParams.get('for') || ''
     const tmplId = searchParams.get('tmpl') || ''
     const greetingMsg = searchParams.get('msg') || ''
+    // Text settings from company dashboard
+    const paramFont = searchParams.get('font') || 'amiri'
+    const paramFontSize = parseInt(searchParams.get('fs')) || 60
+    const paramNameY = (parseInt(searchParams.get('y')) || 65) / 100
+    const paramColor = searchParams.get('clr') ? `#${searchParams.get('clr')}` : ''
 
     const [name, setName] = useState(prefilledName)
     const [company, setCompany] = useState(null)
@@ -61,19 +66,19 @@ export default function GreetPage() {
             canvas.height = H
             const ctx = canvas.getContext('2d')
 
-            // Draw template background
             ctx.clearRect(0, 0, W, H)
             ctx.drawImage(templateImg, 0, 0, W, H)
 
-            // Recipient name — matching EditorPage: Y=0.65, fontSize=60 at 1080px
-            const textColor = template.textColor || template.nameColor || '#ffffff'
-            const fontSize = Math.round(60 * (W / 1080))
-            ctx.font = `normal ${fontSize}px ${FONT}`
+            // Use text settings from URL params (set by company dashboard)
+            const currentFont = fontList.find(fo => fo.id === paramFont) || fontList[1]
+            const textColor = paramColor || template.textColor || template.nameColor || '#ffffff'
+            const scaledSize = Math.round(paramFontSize * (W / 1080))
+            ctx.font = `normal ${scaledSize}px ${currentFont.family}`
             ctx.fillStyle = textColor
             ctx.textAlign = 'center'
             ctx.textBaseline = 'top'
             ctx.direction = 'rtl'
-            ctx.fillText(recipientName, W / 2, H * 0.65)
+            ctx.fillText(recipientName, W / 2, H * paramNameY)
 
             const dataUrl = canvas.toDataURL('image/png')
             setCardDataUrl(dataUrl)
@@ -86,6 +91,9 @@ export default function GreetPage() {
                     body: JSON.stringify({
                         name: recipientName,
                         templateId: String(template.id),
+                        font: paramFont,
+                        fontSize: paramFontSize,
+                        textColor,
                         mainText: greetingMsg || `كل عام وأنت بخير ${recipientName}`,
                     })
                 })
@@ -98,7 +106,7 @@ export default function GreetPage() {
         } finally {
             setGenerating(false)
         }
-    }, [template, slug, greetingMsg])
+    }, [template, slug, greetingMsg, paramFont, paramFontSize, paramNameY, paramColor])
 
     const handleGenerate = async () => {
         if (!name.trim()) { toast.error('اكتب اسمك أولاً'); return }
@@ -181,7 +189,7 @@ export default function GreetPage() {
                     <div style={{ position: 'relative', display: 'inline-block', marginBottom: 28, borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.4)', maxWidth: 300, width: '100%' }}>
                         <img src={template.image} alt="القالب" style={{ width: '100%', display: 'block' }} crossOrigin="anonymous" />
                         {name.trim() && (
-                            <div style={{ position: 'absolute', top: '65%', left: '50%', transform: 'translate(-50%,-50%)', color: template.textColor || '#fff', fontSize: 'clamp(16px, 4vw, 22px)', fontWeight: 400, fontFamily: FONT, textAlign: 'center', width: '80%', direction: 'rtl' }}>
+                            <div style={{ position: 'absolute', top: `${paramNameY * 100}%`, left: '50%', transform: 'translate(-50%,-50%)', color: paramColor || template.textColor || '#fff', fontSize: 'clamp(16px, 4vw, 22px)', fontWeight: 400, fontFamily: (fontList.find(fo => fo.id === paramFont) || fontList[1]).family, textAlign: 'center', width: '80%', direction: 'rtl' }}>
                                 {name.trim()}
                             </div>
                         )}
