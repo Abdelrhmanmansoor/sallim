@@ -593,8 +593,32 @@ export default function CheckoutPageNew() {
                 {/* ── Card Payment Button (PayMob) ── */}
                 {paymentMethod === 'card' && (
                   <>
+                    {/* ── EGP Notice — Paymob charges in EGP, shown to ALL users ── */}
+                    {exchangeInfo?.egpRate && price > 0 && (
+                      <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 12, padding: '14px 16px', marginBottom: 14 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                          <span style={{ fontSize: 14 }}>🏦</span>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: '#1e40af' }}>تنبيه مهم — المبلغ في كشف حسابك</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+                          <div style={{ flex: 1, textAlign: 'center', background: '#f8fafc', borderRadius: 10, padding: '10px 6px', border: '1px solid #e2e8f0' }}>
+                            <div style={{ fontSize: 9, fontWeight: 700, color: '#9ca3af', marginBottom: 3 }}>🇸🇦 السعر</div>
+                            <div style={{ fontSize: 20, fontWeight: 900, color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>{price} <SAR size={14} /></div>
+                          </div>
+                          <div style={{ fontSize: 18, color: '#1e40af', fontWeight: 900 }}>→</div>
+                          <div style={{ flex: 1, textAlign: 'center', background: '#f0f9ff', borderRadius: 10, padding: '10px 6px', border: '1px solid #bae6fd' }}>
+                            <div style={{ fontSize: 9, fontWeight: 700, color: '#9ca3af', marginBottom: 3 }}>🇪🇬 يُخصم من بطاقتك</div>
+                            <div style={{ fontSize: 20, fontWeight: 900, color: '#1e40af' }}>{(Math.ceil(price * exchangeInfo.egpRate * 100) / 100).toFixed(2)} EGP</div>
+                          </div>
+                        </div>
+                        <p style={{ fontSize: 10, color: '#6b7280', textAlign: 'center', margin: '8px 0 0', lineHeight: 1.7 }}>
+                          بوابة الدفع تعالج المبلغ بالجنيه المصري (EGP) · سعر الصرف: 1 ر.س = {exchangeInfo.egpRate?.toFixed(2)} ج.م · بدون رسوم إضافية
+                        </p>
+                      </div>
+                    )}
+
                     {/* ── Currency Converter — visible for non-Saudi visitors ── */}
-                    {isForeign && localPrice && (
+                    {isForeign && localPrice && visitorCurrency !== 'EGP' && (
                       <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '14px 16px', marginBottom: 14 }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -652,8 +676,8 @@ export default function CheckoutPageNew() {
                 <div style={{ marginTop: 10, padding: '10px 14px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, fontSize: 11, color: '#92400e', lineHeight: 1.8, textAlign: 'center' }}>
                   {paymentMethod === 'paypal'
                     ? `سيظهر المبلغ في إشعار البنك بالدولار ($${priceUSD} USD) وهو ما يعادل ${price} ر.س — بدون رسوم إضافية.`
-                    : isForeign && localPrice
-                      ? `المبلغ ${price} ر.س (≈ ${localPrice} ${currencyName}) — يتم التحويل تلقائياً بسعر الصرف اللحظي بدون رسوم إضافية.`
+                    : exchangeInfo?.egpRate
+                      ? `سيظهر في كشف حسابك ${(Math.ceil(price * exchangeInfo.egpRate * 100) / 100).toFixed(2)} جنيه مصري (EGP) وهو ما يعادل ${price} ر.س — بدون رسوم إضافية.`
                       : `المبلغ المطلوب ${price} ر.س فقط — تتم معالجة الدفع بشكل آمن ومشفّر.`
                   }
                 </div>
