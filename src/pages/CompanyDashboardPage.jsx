@@ -338,32 +338,23 @@ function BatchCardsView({ company, token, isDepleted, remaining }) {
             canvas.height = H
             const ctx = canvas.getContext('2d')
 
-            const primaryColor = company.branding?.primaryColor || '#b8860b'
+            // Match EditorPage exactly: Amiri font, Y=0.65, fontSize=60 at 1080px
             const textColor = selectedTemplate.textColor || selectedTemplate.nameColor || '#ffffff'
-            const fontFamily = 'Tajawal, Cairo, Arial'
-            const fontSize = Math.round(W * 0.065)
+            const fontFamily = "'Amiri', 'Cairo', serif"
+            const fontSize = Math.round(60 * (W / 1080))
+            const nameY = 0.65
 
             for (let i = 0; i < names.length; i++) {
                 ctx.clearRect(0, 0, W, H)
                 ctx.drawImage(templateImg, 0, 0, W, H)
 
-                ctx.font = `900 ${fontSize}px ${fontFamily}`
+                // Recipient name — identical to EditorPage Konva Text
+                ctx.font = `normal ${fontSize}px ${fontFamily}`
                 ctx.fillStyle = textColor
                 ctx.textAlign = 'center'
-                ctx.textBaseline = 'middle'
-                ctx.shadowColor = 'rgba(0,0,0,0.35)'
-                ctx.shadowBlur = 8
-                ctx.shadowOffsetX = 0
-                ctx.shadowOffsetY = 3
-
-                ctx.fillText(names[i], W / 2, H * 0.5)
-                ctx.shadowColor = 'transparent'
-
-                if (company.name) {
-                    ctx.font = `700 ${Math.round(fontSize * 0.5)}px ${fontFamily}`
-                    ctx.fillStyle = primaryColor
-                    ctx.fillText(company.name, W / 2, H * 0.88)
-                }
+                ctx.textBaseline = 'top'
+                ctx.direction = 'rtl'
+                ctx.fillText(names[i], W / 2, H * nameY)
 
                 const blob = await new Promise(r => canvas.toBlob(r, 'image/png'))
                 zip.file(`${names[i].replace(/[\/\\:*?"<>|]/g, '_')}.png`, blob)
@@ -509,14 +500,9 @@ function BatchCardsView({ company, token, isDepleted, remaining }) {
                     {selectedTemplate && (
                         <div style={{ position: 'relative', display: 'inline-block', marginBottom: 24, borderRadius: 14, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', maxWidth: 220 }}>
                             <img src={selectedTemplate.image || selectedTemplate.template} alt="Preview" style={{ width: '100%', display: 'block' }} crossOrigin="anonymous" />
-                            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', color: selectedTemplate.textColor || '#fff', fontSize: 18, fontWeight: 900, textShadow: '0 2px 8px rgba(0,0,0,0.4)', textAlign: 'center', width: '80%', direction: 'rtl' }}>
+                            <div style={{ position: 'absolute', top: '65%', left: '50%', transform: 'translate(-50%,-50%)', color: selectedTemplate.textColor || '#fff', fontSize: 18, fontWeight: 400, fontFamily: "'Amiri', serif", textAlign: 'center', width: '80%', direction: 'rtl' }}>
                                 {names[0]}
                             </div>
-                            {company?.name && (
-                                <div style={{ position: 'absolute', bottom: '12%', left: '50%', transform: 'translateX(-50%)', color: company.branding?.primaryColor || '#b8860b', fontSize: 11, fontWeight: 700, textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}>
-                                    {company.name}
-                                </div>
-                            )}
                         </div>
                     )}
 
