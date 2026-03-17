@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useCompany } from '../context/CompanyContext'
 import { updateCompanyProfile, getTemplates } from '../utils/api'
 import { templates as staticTemplates, designerOnlyTemplates } from '../data/templates'
-import { useEditorStore } from '../store'
+// JSZip loaded dynamically in handleGenerate
 import toast, { Toaster } from 'react-hot-toast'
 
 const WA = '201007835547'
@@ -266,6 +266,9 @@ function BatchCardsView({ company, token, isDepleted, remaining }) {
     const [publicTemplates, setPublicTemplates] = useState([])
     const [companyTemplates, setCompanyTemplates] = useState([])
     const [isLoadingTemplates, setIsLoadingTemplates] = useState(true)
+    const [generating, setGenerating] = useState(false)
+    const [progress, setProgress] = useState(0)
+    const [downloadReady, setDownloadReady] = useState(null)
 
     useEffect(() => {
         // Merge static templates + designer templates as fallback
@@ -311,11 +314,82 @@ function BatchCardsView({ company, token, isDepleted, remaining }) {
 
     const overLimit = names.length > remaining
 
-    const handleGenerate = () => {
-        const store = useEditorStore.getState()
-        store.setBatchNames(names)
-        if (selectedTemplate) store.setTemplate(selectedTemplate.id || selectedTemplate._id)
-        window.location.href = `/editor?mode=batch&company=1`
+    const handleGenerate = async () => {
+        if (!selectedTemplate || names.length === 0) return
+        setGenerating(true)
+        setProgress(0)
+        setDownloadReady(null)
+
+        try {
+            const { default: JSZip } = await import('jszip')
+            const zip = new JSZip()
+            const templateImg = await new Promise((resolve, reject) => {
+                const img = new Image()
+                img.crossOrigin = 'anonymous'
+                img.onload = () => resolve(img)
+                img.onerror = () => reject(new Error('فشل تحميل القالب'))
+                img.src = selectedTemplate.image || selectedTemplate.template
+            })
+
+            const W = templateImg.naturalWidth || 1080
+            const H = templateImg.naturalHeight || 1920
+            const canvas = document.createElement('canvas')
+            canvas.width = W
+            canvas.height = H
+            const ctx = canvas.getContext('2d')
+
+            const primaryColor = company.branding?.primaryColor || '#b8860b'
+            const textColor = selectedTemplate.textColor || selectedTemplate.nameColor || '#ffffff'
+            const fontFamily = 'Tajawal, Cairo, Arial'
+            const fontSize = Math.round(W * 0.065)
+
+            for (let i = 0; i < names.length; i++) {
+                ctx.clearRect(0, 0, W, H)
+                ctx.drawImage(templateImg, 0, 0, W, H)
+
+                ctx.font = `900 ${fontSize}px ${fontFamily}`
+                ctx.fillStyle = textColor
+                ctx.textAlign = 'center'
+                ctx.textBaseline = 'middle'
+                ctx.shadowColor = 'rgba(0,0,0,0.35)'
+                ctx.shadowBlur = 8
+                ctx.shadowOffsetX = 0
+                ctx.shadowOffsetY = 3
+
+                ctx.fillText(names[i], W / 2, H * 0.5)
+                ctx.shadowColor = 'transparent'
+
+                if (company.name) {
+                    ctx.font = `700 ${Math.round(fontSize * 0.5)}px ${fontFamily}`
+                    ctx.fillStyle = primaryColor
+                    ctx.fillText(company.name, W / 2, H * 0.88)
+                }
+
+                const blob = await new Promise(r => canvas.toBlob(r, 'image/png'))
+                zip.file(`${names[i].replace(/[\/\\:*?"<>|]/g, '_')}.png`, blob)
+                setProgress(Math.round(((i + 1) / names.length) * 100))
+            }
+
+            const zipBlob = await zip.generateAsync({ type: 'blob' })
+            setDownloadReady(zipBlob)
+            toast.success(`تم توليد ${names.length} بطاقة بنجاح!`)
+        } catch (err) {
+            console.error('Generation error:', err)
+            toast.error(err.message || 'حدث خطأ أثناء التوليد')
+        } finally {
+            setGenerating(false)
+        }
+    }
+
+    const handleDownload = () => {
+        if (!downloadReady) return
+        const link = document.createElement('a')
+        link.href = URL.createObjectURL(downloadReady)
+        link.download = `${company.name || 'cards'}-${names.length}.zip`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(link.href)
     }
 
     const STEPS = [{ n: 1, l: 'الأسماء' }, { n: 2, l: 'القالب' }, { n: 3, l: 'التوليد' }]
@@ -424,18 +498,67 @@ function BatchCardsView({ company, token, isDepleted, remaining }) {
             {/* Step 3: Generate */}
             {step === 3 && (
                 <div style={{ ...cardStyle, textAlign: 'center' }}>
-                    <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, marginBottom: 6 }}>جاهز للتوليد</h3>
-                    <p style={{ fontSize: 14, color: C.muted, marginBottom: 32 }}>
+                    <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, marginBottom: 6 }}>
+                        {generating ? 'جارٍ التوليد...' : downloadReady ? 'تم التوليد بنجاح ✅' : 'جاهز للتوليد'}
+                    </h3>
+                    <p style={{ fontSize: 14, color: C.muted, marginBottom: 20 }}>
                         {names.length} بطاقة — قالب: {selectedTemplate?.name || 'مختار'}
                     </p>
-                    <button onClick={handleGenerate} style={{ padding: '16px 44px', background: C.green, color: '#fff', border: 'none', borderRadius: 14, fontSize: 17, fontWeight: 900, cursor: 'pointer', fontFamily: f.font, boxShadow: '0 6px 20px rgba(5,150,105,0.25)' }}>
-                        ولّد {names.length} بطاقة
-                    </button>
-                    <div style={{ marginTop: 20 }}>
-                        <button onClick={() => setStep(2)} style={{ padding: '10px 20px', background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 10, fontSize: 13, cursor: 'pointer', fontFamily: f.font }}>
-                            العودة لاختيار القالب
+
+                    {/* Preview: show template with first name */}
+                    {selectedTemplate && (
+                        <div style={{ position: 'relative', display: 'inline-block', marginBottom: 24, borderRadius: 14, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', maxWidth: 220 }}>
+                            <img src={selectedTemplate.image || selectedTemplate.template} alt="Preview" style={{ width: '100%', display: 'block' }} crossOrigin="anonymous" />
+                            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', color: selectedTemplate.textColor || '#fff', fontSize: 18, fontWeight: 900, textShadow: '0 2px 8px rgba(0,0,0,0.4)', textAlign: 'center', width: '80%', direction: 'rtl' }}>
+                                {names[0]}
+                            </div>
+                            {company?.name && (
+                                <div style={{ position: 'absolute', bottom: '12%', left: '50%', transform: 'translateX(-50%)', color: company.branding?.primaryColor || '#b8860b', fontSize: 11, fontWeight: 700, textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}>
+                                    {company.name}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Progress bar */}
+                    {generating && (
+                        <div style={{ margin: '0 auto 20px', maxWidth: 320 }}>
+                            <div style={{ background: '#e2e8f0', borderRadius: 10, height: 12, overflow: 'hidden' }}>
+                                <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(90deg, #059669, #10b981)', borderRadius: 10, transition: 'width 0.3s ease' }} />
+                            </div>
+                            <p style={{ fontSize: 13, color: C.muted, marginTop: 8 }}>{progress}% — جارٍ توليد البطاقات...</p>
+                        </div>
+                    )}
+
+                    {/* Generate button */}
+                    {!downloadReady && (
+                        <button onClick={handleGenerate} disabled={generating} style={{ padding: '16px 44px', background: generating ? '#94a3b8' : C.green, color: '#fff', border: 'none', borderRadius: 14, fontSize: 17, fontWeight: 900, cursor: generating ? 'wait' : 'pointer', fontFamily: f.font, boxShadow: generating ? 'none' : '0 6px 20px rgba(5,150,105,0.25)' }}>
+                            {generating ? `جارٍ التوليد ${progress}%` : `ولّد ${names.length} بطاقة`}
                         </button>
-                    </div>
+                    )}
+
+                    {/* Download button */}
+                    {downloadReady && (
+                        <div>
+                            <button onClick={handleDownload} style={{ padding: '16px 44px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 14, fontSize: 17, fontWeight: 900, cursor: 'pointer', fontFamily: f.font, boxShadow: '0 6px 20px rgba(37,99,235,0.25)', display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+                                <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                تحميل {names.length} بطاقة (ZIP)
+                            </button>
+                            <div style={{ marginTop: 16 }}>
+                                <button onClick={() => { setDownloadReady(null); setProgress(0); setStep(2) }} style={{ padding: '10px 20px', background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 10, fontSize: 13, cursor: 'pointer', fontFamily: f.font }}>
+                                    توليد بقالب آخر
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {!downloadReady && (
+                        <div style={{ marginTop: 20 }}>
+                            <button onClick={() => setStep(2)} disabled={generating} style={{ padding: '10px 20px', background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 10, fontSize: 13, cursor: generating ? 'not-allowed' : 'pointer', fontFamily: f.font }}>
+                                العودة لاختيار القالب
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
