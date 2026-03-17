@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { templates as staticTemplates, designerOnlyTemplates, fonts as fontList } from '../data/templates'
 import toast, { Toaster } from 'react-hot-toast'
@@ -9,7 +9,7 @@ const UI_FONT = "'Tajawal', sans-serif"
 // Load image via fetch→blob to avoid CORS/tainted canvas issues
 async function loadImageSafe(src) {
     try {
-        const res = await fetch(src)
+        const res = await fetch(encodeURI(src))
         const blob = await res.blob()
         const url = URL.createObjectURL(blob)
         return new Promise((resolve, reject) => {
@@ -19,7 +19,7 @@ async function loadImageSafe(src) {
             img.src = url
         })
     } catch {
-        // Fallback: direct load
+        // Fallback: direct load with crossOrigin
         return new Promise((resolve, reject) => {
             const img = new Image()
             img.crossOrigin = 'anonymous'
@@ -31,15 +31,18 @@ async function loadImageSafe(src) {
 }
 
 export default function GreetPage() {
-    const { slug, occasionId } = useParams()
+    const { slug, occasionId, shortId } = useParams()
     const [searchParams] = useSearchParams()
     const prefilledName = searchParams.get('for') || ''
-    const tmplId = searchParams.get('tmpl') || ''
-    const greetingMsg = searchParams.get('msg') || ''
-    const paramFont = searchParams.get('font') || 'amiri'
-    const paramFontSize = parseInt(searchParams.get('fs')) || 60
-    const paramNameY = (parseInt(searchParams.get('y')) || 65) / 100
-    const paramColor = searchParams.get('clr') ? `#${searchParams.get('clr')}` : ''
+
+    // These will be overridden by API data when using shortId mode
+    const [tmplId, setTmplId] = useState(searchParams.get('tmpl') || '')
+    const [greetingMsg, setGreetingMsg] = useState(searchParams.get('msg') || '')
+    const [paramFont, setParamFont] = useState(searchParams.get('font') || 'amiri')
+    const [paramFontSize, setParamFontSize] = useState(parseInt(searchParams.get('fs')) || 60)
+    const [paramNameY, setParamNameY] = useState((parseInt(searchParams.get('y')) || 65) / 100)
+    const [paramColor, setParamColor] = useState(searchParams.get('clr') ? `#${searchParams.get('clr')}` : '')
+    const [templateImage, setTemplateImage] = useState('') // direct image URL (works for any source)
 
     const [name, setName] = useState(prefilledName)
     const [company, setCompany] = useState(null)
@@ -49,52 +52,86 @@ export default function GreetPage() {
     const [generating, setGenerating] = useState(false)
     const [cardDataUrl, setCardDataUrl] = useState(null)
     const [templateBlobUrl, setTemplateBlobUrl] = useState(null)
-    const canvasRef = useRef(null)
 
-    // Fetch company info
+    // ── Mode 1: shortId — fetch all settings from API ──
     useEffect(() => {
+        if (!shortId) return
+        setLoadingCompany(true)
+        fetch(`${API_BASE}/api/v1/company/greet-links/${shortId}`)
+            .then(r => r.json())
+            .then(res => {
+                if (!res.success) { toast.error(res.error || 'الرابط غير صالح'); return }
+                const d = res.data
+                if (d.company) setCompany(d.company)
+                setGreetingMsg(d.greetingText || d.occasionName || '')
+                setParamFont(d.font || 'amiri')
+                setParamFontSize(d.fontSize || 60)
+                setParamNameY(d.nameY || 0.65)
+                setParamColor(d.nameColor || '')
+                setTemplateImage(d.templateImage || '')
+                // Create a synthetic template object so preview works
+                setTemplate({ id: d.templateId || 'custom', image: d.templateImage, textColor: d.templateTextColor || '#ffffff', name: d.occasionName || 'قالب' })
+            })
+            .catch(() => toast.error('حدث خطأ في تحميل الرابط'))
+            .finally(() => setLoadingCompany(false))
+    }, [shortId])
+
+    // ── Mode 2: legacy /greet/:slug — fetch company then find template ──
+    useEffect(() => {
+        if (shortId) return // handled above
+        if (!slug) { setLoadingCompany(false); return }
         fetch(`${API_BASE}/api/v1/company/public/${slug}`)
             .then(r => r.json())
             .then(res => { if (res.success) setCompany(res.data) })
             .catch(() => {})
             .finally(() => setLoadingCompany(false))
-    }, [slug])
+    }, [slug, shortId])
 
-    // Find template + preload as blob
+    // Find/load template for legacy mode
     useEffect(() => {
+        if (shortId) return // handled via templateImage state
         if (!tmplId) return
         const all = [...staticTemplates, ...designerOnlyTemplates]
         const found = all.find(t => String(t.id) === String(tmplId))
         if (found) {
             setTemplate(found)
-            // Preload as blob URL for reliable display
-            fetch(found.image)
-                .then(r => r.blob())
-                .then(blob => setTemplateBlobUrl(URL.createObjectURL(blob)))
-                .catch(() => setTemplateBlobUrl(found.image))
+            setTemplateImage(found.image)
         }
-        return () => { if (templateBlobUrl) URL.revokeObjectURL(templateBlobUrl) }
-    }, [tmplId])
+    }, [tmplId, shortId])
+
+    // Preload template image as blob URL whenever templateImage changes
+    useEffect(() => {
+        if (!templateImage) return
+        let blobUrl = null
+        fetch(encodeURI(templateImage))
+            .then(r => r.blob())
+            .then(blob => {
+                blobUrl = URL.createObjectURL(blob)
+                setTemplateBlobUrl(blobUrl)
+            })
+            .catch(() => setTemplateBlobUrl(templateImage))
+        return () => { if (blobUrl) URL.revokeObjectURL(blobUrl) }
+    }, [templateImage])
 
     const generateCard = useCallback(async (recipientName) => {
-        if (!template) return null
+        if (!templateImage) return null
         setGenerating(true)
 
         try {
-            const templateImg = await loadImageSafe(template.image)
+            const templateImg = await loadImageSafe(templateImage)
 
             const W = templateImg.naturalWidth || 1080
             const H = templateImg.naturalHeight || 1920
-            const canvas = canvasRef.current || document.createElement('canvas')
-            canvas.width = W
-            canvas.height = H
-            const ctx = canvas.getContext('2d')
+            const offscreen = document.createElement('canvas')
+            offscreen.width = W
+            offscreen.height = H
+            const ctx = offscreen.getContext('2d')
 
             ctx.clearRect(0, 0, W, H)
             ctx.drawImage(templateImg, 0, 0, W, H)
 
             const currentFont = fontList.find(fo => fo.id === paramFont) || fontList[1]
-            const textColor = paramColor || template.textColor || template.nameColor || '#ffffff'
+            const textColor = paramColor || (template && (template.textColor || template.nameColor)) || '#ffffff'
             const scaledSize = Math.round(paramFontSize * (W / 1080))
             ctx.font = `normal ${scaledSize}px ${currentFont.family}`
             ctx.fillStyle = textColor
@@ -103,24 +140,35 @@ export default function GreetPage() {
             ctx.direction = 'rtl'
             ctx.fillText(recipientName, W / 2, H * paramNameY)
 
-            const dataUrl = canvas.toDataURL('image/png')
+            const dataUrl = offscreen.toDataURL('image/png')
             setCardDataUrl(dataUrl)
 
-            // Record card on backend (deducts from balance)
-            try {
-                await fetch(`${API_BASE}/api/v1/company/public/${slug}/cards`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: recipientName,
-                        templateId: String(template.id),
-                        font: paramFont,
-                        fontSize: paramFontSize,
-                        textColor,
-                        mainText: greetingMsg || `كل عام وأنت بخير ${recipientName}`,
+            // Record card on backend (deducts from balance) — only for legacy slug mode
+            if (slug) {
+                try {
+                    await fetch(`${API_BASE}/api/v1/company/public/${slug}/cards`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: recipientName,
+                            templateId: String(tmplId || (template && template.id) || ''),
+                            font: paramFont,
+                            fontSize: paramFontSize,
+                            textColor,
+                            mainText: greetingMsg || `كل عام وأنت بخير ${recipientName}`,
+                        })
                     })
-                })
-            } catch { /* silent */ }
+                } catch { /* silent */ }
+            } else if (shortId) {
+                // Record card via greet-link
+                try {
+                    await fetch(`${API_BASE}/api/v1/company/greet-links/${shortId}/record`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: recipientName })
+                    })
+                } catch { /* silent */ }
+            }
 
             return dataUrl
         } catch (err) {
@@ -129,10 +177,11 @@ export default function GreetPage() {
         } finally {
             setGenerating(false)
         }
-    }, [template, slug, greetingMsg, paramFont, paramFontSize, paramNameY, paramColor])
+    }, [templateImage, slug, shortId, greetingMsg, paramFont, paramFontSize, paramNameY, paramColor, template, tmplId])
 
     const handleGenerate = async () => {
         if (!name.trim()) { toast.error('اكتب اسمك أولاً'); return }
+        if (!templateImage) { toast.error('لم يتم تحميل القالب بعد'); return }
         const result = await generateCard(name.trim())
         if (result) {
             setCardGenerated(true)
@@ -177,7 +226,6 @@ export default function GreetPage() {
             padding: 24,
         }}>
             <Toaster position="top-center" />
-            <canvas ref={canvasRef} style={{ display: 'none' }} />
 
             <div style={{ width: '100%', maxWidth: 460, textAlign: 'center' }}>
 
@@ -208,11 +256,11 @@ export default function GreetPage() {
                 )}
 
                 {/* Template preview before generation */}
-                {template && !cardGenerated && (
+                {templateImage && !cardGenerated && (
                     <div style={{ position: 'relative', display: 'inline-block', marginBottom: 24, borderRadius: 14, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.1)', maxWidth: 280, width: '100%' }}>
-                        <img src={templateBlobUrl || template.image} alt="القالب" style={{ width: '100%', display: 'block' }} />
+                        <img src={templateBlobUrl || templateImage} alt="القالب" style={{ width: '100%', display: 'block' }} />
                         {name.trim() && (
-                            <div style={{ position: 'absolute', top: `${paramNameY * 100}%`, left: '50%', transform: 'translate(-50%,-50%)', color: paramColor || template.textColor || '#fff', fontSize: 'clamp(14px, 3.5vw, 20px)', fontWeight: 400, fontFamily: previewFont, textAlign: 'center', width: '80%', direction: 'rtl' }}>
+                            <div style={{ position: 'absolute', top: `${paramNameY * 100}%`, left: '50%', transform: 'translate(-50%,-50%)', color: paramColor || (template && template.textColor) || '#fff', fontSize: 'clamp(14px, 3.5vw, 20px)', fontWeight: 400, fontFamily: previewFont, textAlign: 'center', width: '80%', direction: 'rtl' }}>
                                 {name.trim()}
                             </div>
                         )}

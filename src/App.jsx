@@ -117,6 +117,7 @@ export default function App() {
           <Route path="/company/dashboard" element={<CompanyDashboardPage />} />
           <Route path="/greet/:slug" element={<GreetPage />} />
           <Route path="/greet/:slug/:occasionId" element={<GreetPage />} />
+          <Route path="/g/:shortId" element={<GreetPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/eid/:username" element={<PublicDiwaniyaPage />} />

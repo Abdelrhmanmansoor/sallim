@@ -6,7 +6,9 @@ import { templates as staticTemplates, designerOnlyTemplates, fonts } from '../d
 // JSZip loaded dynamically in handleGenerate
 import toast, { Toaster } from 'react-hot-toast'
 
-const WA = '201007835547'
+const RAW_API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const API_BASE = RAW_API_BASE.replace(/\/+$/, '')
+
 const f = { font: "'Tajawal', sans-serif" }
 const C = {
     bg: '#f5f7fa',
@@ -676,33 +678,76 @@ function EmployeeLinkView({ company, token, isDepleted }) {
 
     const companySlug = company.slug || 'company'
 
-    const handleCreateLink = () => {
+    const handleCreateLink = async () => {
         if (!occasionName.trim()) { toast.error('اكتب اسم المناسبة'); return }
         if (!selectedTemplate) { toast.error('اختر قالباً للموظفين'); return }
-        const linkId = Math.random().toString(36).substring(2, 8)
-        const params = new URLSearchParams({
-            tmpl: selectedTemplate.id || selectedTemplate._id,
-            ...(greetingText.trim() ? { msg: greetingText.trim() } : {}),
-            font: selectedFont, fs: linkFontSize, y: Math.round(linkNameY * 100),
-            ...(linkNameColor ? { clr: linkNameColor.replace('#', '') } : {}),
-        })
-        const link = `${window.location.origin}/greet/${companySlug}/${linkId}?${params}`
-        setGeneratedLink(link)
-        setStep(2)
-        toast.success('تم إنشاء الرابط')
+        const templateImg = selectedTemplate.image || selectedTemplate.template || ''
+        if (!templateImg) { toast.error('القالب المختار لا يحتوي على صورة'); return }
+
+        try {
+            const res = await fetch(`${API_BASE}/api/v1/company/greet-links`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({
+                    occasionName: occasionName.trim(),
+                    greetingText: greetingText.trim(),
+                    templateId: String(selectedTemplate.id || selectedTemplate._id || ''),
+                    templateImage: templateImg,
+                    templateTextColor: selectedTemplate.textColor || '#ffffff',
+                    font: selectedFont,
+                    fontSize: linkFontSize,
+                    nameY: linkNameY,
+                    nameColor: linkNameColor || '',
+                    expiresAt: expiryDate || null,
+                })
+            })
+            const data = await res.json()
+            if (!data.success) throw new Error(data.error || 'حدث خطأ')
+            const link = `${window.location.origin}/g/${data.data.shortId}`
+            setGeneratedLink(link)
+            setStep(2)
+            toast.success('تم إنشاء الرابط القصير')
+        } catch (err) {
+            toast.error(err.message || 'حدث خطأ في إنشاء الرابط')
+        }
     }
 
-    const handleGenerateIndividual = () => {
+    const handleGenerateIndividual = async () => {
         const names = employeeNames.split('\n').map(n => n.trim()).filter(Boolean)
         if (!names.length) { toast.error('أدخل أسماء الموظفين'); return }
         if (!selectedTemplate) { toast.error('اختر قالباً أولاً'); return }
-        const linkId = Math.random().toString(36).substring(2, 8)
-        const textParams = `&font=${selectedFont}&fs=${linkFontSize}&y=${Math.round(linkNameY * 100)}${linkNameColor ? `&clr=${linkNameColor.replace('#', '')}` : ''}`
-        const links = names.map(name => ({
-            name,
-            url: `${window.location.origin}/greet/${companySlug}/${linkId}?for=${encodeURIComponent(name)}&tmpl=${selectedTemplate.id || selectedTemplate._id}${textParams}`,
-        }))
-        setIndividualLinks(links)
+        const templateImg = selectedTemplate.image || selectedTemplate.template || ''
+        if (!templateImg) { toast.error('القالب المختار لا يحتوي على صورة'); return }
+
+        try {
+            const res = await fetch(`${API_BASE}/api/v1/company/greet-links`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({
+                    occasionName: occasionName.trim(),
+                    greetingText: greetingText.trim(),
+                    templateId: String(selectedTemplate.id || selectedTemplate._id || ''),
+                    templateImage: templateImg,
+                    templateTextColor: selectedTemplate.textColor || '#ffffff',
+                    font: selectedFont,
+                    fontSize: linkFontSize,
+                    nameY: linkNameY,
+                    nameColor: linkNameColor || '',
+                    expiresAt: expiryDate || null,
+                })
+            })
+            const data = await res.json()
+            if (!data.success) throw new Error(data.error || 'حدث خطأ')
+            const baseUrl = `${window.location.origin}/g/${data.data.shortId}`
+            const links = names.map(name => ({
+                name,
+                url: `${baseUrl}?for=${encodeURIComponent(name)}`,
+            }))
+            setIndividualLinks(links)
+            toast.success('تم إنشاء الروابط')
+        } catch (err) {
+            toast.error(err.message || 'حدث خطأ في إنشاء الروابط')
+        }
     }
 
     const handleCopyAll = () => {

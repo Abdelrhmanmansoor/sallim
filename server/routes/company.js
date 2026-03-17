@@ -6,6 +6,7 @@ import Company from '../models/Company.js'
 import CompanyTeam from '../models/CompanyTeam.js'
 import LicenseKey from '../models/LicenseKey.js'
 import Card from '../models/Card.js'
+import GreetLink from '../models/GreetLink.js'
 import { upload } from '../config/upload.js'
 import { loginLimiter, activationLimiter, employeeLimiter } from '../middleware/rateLimiter.js'
 
@@ -537,6 +538,69 @@ router.post('/consume-batch', protectCompanyRoute, async (req, res) => {
     res.json({
       success: true,
       data: { cardsUsed: updated.cardsUsed, cardsRemaining: Math.max(0, updated.cardsLimit - updated.cardsUsed) }
+    })
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'حدث خطأ' })
+  }
+})
+
+// ═══ GreetLink: Create short link (company auth required) ═══
+router.post('/greet-links', protectCompanyRoute, async (req, res) => {
+  try {
+    const company = req.company
+    const { occasionName, greetingText, templateId, templateImage, templateTextColor, font, fontSize, nameY, nameColor, expiresAt } = req.body
+    if (!templateImage) return res.status(400).json({ success: false, error: 'رابط صورة القالب مطلوب' })
+
+    const shortId = nanoid(6)
+    const greetLink = await GreetLink.create({
+      shortId,
+      companyId: company._id,
+      companySlug: company.slug,
+      occasionName: occasionName || '',
+      greetingText: greetingText || '',
+      templateId: String(templateId || ''),
+      templateImage,
+      templateTextColor: templateTextColor || '#ffffff',
+      font: font || 'amiri',
+      fontSize: Number(fontSize) || 60,
+      nameY: Number(nameY) || 0.65,
+      nameColor: nameColor || '',
+      expiresAt: expiresAt ? new Date(expiresAt) : null,
+    })
+    res.json({ success: true, data: { shortId: greetLink.shortId } })
+  } catch (error) {
+    console.error('greet-links create error', error)
+    res.status(500).json({ success: false, error: 'حدث خطأ في إنشاء الرابط' })
+  }
+})
+
+// ═══ GreetLink: Get link data (public) ═══
+router.get('/greet-links/:shortId', async (req, res) => {
+  try {
+    const link = await GreetLink.findOne({ shortId: req.params.shortId, active: true })
+    if (!link) return res.status(404).json({ success: false, error: 'الرابط غير موجود أو انتهت صلاحيته' })
+    if (link.expiresAt && link.expiresAt < new Date()) {
+      return res.status(410).json({ success: false, error: 'انتهت صلاحية هذا الرابط' })
+    }
+    // Increment view count (fire-and-forget)
+    GreetLink.findByIdAndUpdate(link._id, { $inc: { views: 1 } }).catch(() => {})
+    // Fetch company branding
+    const company = await Company.findById(link.companyId).select('name logoUrl slug').lean()
+    res.json({
+      success: true,
+      data: {
+        shortId: link.shortId,
+        companySlug: link.companySlug,
+        occasionName: link.occasionName,
+        greetingText: link.greetingText,
+        templateImage: link.templateImage,
+        templateTextColor: link.templateTextColor,
+        font: link.font,
+        fontSize: link.fontSize,
+        nameY: link.nameY,
+        nameColor: link.nameColor,
+        company: company ? { name: company.name, logoUrl: company.logoUrl, slug: company.slug } : null,
+      }
     })
   } catch (error) {
     res.status(500).json({ success: false, error: 'حدث خطأ' })
