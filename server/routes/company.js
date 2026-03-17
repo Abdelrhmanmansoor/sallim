@@ -551,6 +551,13 @@ router.post('/greet-links', protectCompanyRoute, async (req, res) => {
     const { occasionName, greetingText, customCompanyName, templateId, templateImage, templateTextColor, font, fontSize, nameY, nameColor, expiresAt } = req.body
     if (!templateImage) return res.status(400).json({ success: false, error: 'رابط صورة القالب مطلوب' })
 
+    // Ensure templateImage is absolute URL (convert relative paths)
+    let finalTemplateImage = templateImage
+    if (!templateImage.startsWith('http')) {
+      finalTemplateImage = `https://www.sallim.co${templateImage.startsWith('/') ? '' : '/'}${templateImage}`
+    }
+    console.log('[greet-links] saving templateImage:', finalTemplateImage)
+
     const shortId = nanoid(6)
     const greetLink = await GreetLink.create({
       shortId,
@@ -560,7 +567,7 @@ router.post('/greet-links', protectCompanyRoute, async (req, res) => {
       occasionName: occasionName || '',
       greetingText: greetingText || '',
       templateId: String(templateId || ''),
-      templateImage,
+      templateImage: finalTemplateImage,
       templateTextColor: templateTextColor || '#ffffff',
       font: font || 'amiri',
       fontSize: Number(fontSize) || 60,
@@ -587,6 +594,14 @@ router.get('/greet-links/:shortId', async (req, res) => {
     GreetLink.findByIdAndUpdate(link._id, { $inc: { views: 1 } }).catch(() => {})
     // Fetch company branding
     const company = await Company.findById(link.companyId).select('name logoUrl slug').lean()
+    
+    // Ensure templateImage is absolute URL (fix old relative paths)
+    let templateImage = link.templateImage || ''
+    if (templateImage && !templateImage.startsWith('http')) {
+      templateImage = `https://www.sallim.co${templateImage.startsWith('/') ? '' : '/'}${templateImage}`
+    }
+    console.log('[greet-links GET] returning templateImage:', templateImage)
+    
     res.json({
       success: true,
       data: {
@@ -595,7 +610,7 @@ router.get('/greet-links/:shortId', async (req, res) => {
         customCompanyName: link.customCompanyName || (company && company.name) || '',
         occasionName: link.occasionName,
         greetingText: link.greetingText,
-        templateImage: link.templateImage,
+        templateImage,
         templateTextColor: link.templateTextColor,
         font: link.font,
         fontSize: link.fontSize,

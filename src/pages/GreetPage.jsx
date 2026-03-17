@@ -124,6 +124,7 @@ export default function GreetPage() {
         fetch(`${API_BASE}/api/v1/company/greet-links/${shortId}`)
             .then(r => r.json())
             .then(res => {
+                console.log('[GreetPage] API response:', res)
                 if (!res.success) return
                 const d = res.data
                 if (d.company) setCompany(d.company)
@@ -134,9 +135,12 @@ export default function GreetPage() {
                 setParamNameY(d.nameY || 0.65)
                 setParamColor(d.nameColor || '')
                 setTemplateTextColor(d.templateTextColor || '#ffffff')
-                setTemplateImage(resolveImg(d.templateImage || ''))
+                const resolvedImg = resolveImg(d.templateImage || '')
+                console.log('[GreetPage] templateImage from API:', d.templateImage)
+                console.log('[GreetPage] resolved image URL:', resolvedImg)
+                setTemplateImage(resolvedImg)
             })
-            .catch(() => {})
+            .catch(err => console.error('[GreetPage] fetch error:', err))
             .finally(() => setLoading(false))
     }, [shortId])
 
