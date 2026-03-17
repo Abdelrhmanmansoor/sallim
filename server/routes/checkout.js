@@ -197,16 +197,16 @@ router.post('/initiate', checkoutLimiter, async (req, res) => {
       first_name: customerName.trim().split(' ')[0],
       last_name: customerName.trim().split(' ').slice(1).join(' ') || '-',
       email: customerEmail || 'no-email@sallim.local',
-      phone_number: customerPhone,
+      phone_number: customerPhone.replace(/[\s\-()]/g, '').replace(/^00/, '+') || '+201000000000',
       apartment: 'NA',
       floor: 'NA',
       street: 'NA',
       building: 'NA',
       shipping_method: 'NA',
       postal_code: '00000',
-      city: 'Riyadh',
-      country: 'SA',
-      state: 'Riyadh',
+      city: 'Cairo',
+      country: 'EG',
+      state: 'Cairo',
     })
 
     if (!paymentKey?.token) {
