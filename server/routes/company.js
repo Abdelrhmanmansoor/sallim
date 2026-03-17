@@ -13,6 +13,18 @@ import { loginLimiter, activationLimiter, employeeLimiter } from '../middleware/
 
 const router = Router()
 
+// Helper: Encode URL with Arabic characters
+function encodeArabicUrl(url) {
+  try {
+    const u = new URL(url)
+    // Encode each path segment separately
+    u.pathname = u.pathname.split('/').map(seg => encodeURIComponent(decodeURIComponent(seg))).join('/')
+    return u.toString()
+  } catch {
+    return url
+  }
+}
+
 // Helper: Upload image URL to Cloudinary (for template images)
 async function uploadToCloudinary(imageUrl) {
   try {
@@ -20,17 +32,24 @@ async function uploadToCloudinary(imageUrl) {
     if (imageUrl.includes('cloudinary.com') || imageUrl.includes('res.cloudinary')) {
       return imageUrl
     }
+    
+    // Encode Arabic characters in the URL
+    const encodedUrl = encodeArabicUrl(imageUrl)
+    console.log('[Cloudinary] Uploading from:', encodedUrl)
+    
     // Upload the remote image to Cloudinary
-    const result = await cloudinaryV2.uploader.upload(imageUrl, {
+    const result = await cloudinaryV2.uploader.upload(encodedUrl, {
       folder: 'sallim/greet-templates',
       resource_type: 'image',
-      quality: 'auto:good',
-      fetch_format: 'auto',
+      format: 'png',
+      transformation: [{ quality: 'auto:best' }]
     })
-    console.log('[Cloudinary] Uploaded:', result.secure_url)
+    
+    console.log('[Cloudinary] Uploaded successfully:', result.secure_url)
     return result.secure_url
   } catch (error) {
-    console.error('[Cloudinary] Upload failed:', error.message)
+    console.error('[Cloudinary] Upload failed:', error.message, error)
+    // Return original URL if upload fails
     return imageUrl
   }
 }
