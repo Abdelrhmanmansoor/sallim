@@ -13,6 +13,7 @@ const greetLinkSchema = new mongoose.Schema({
     required: true
   },
   companySlug: { type: String, required: true },
+  customCompanyName: { type: String, default: '' },
   occasionName: { type: String, default: '' },
   greetingText: { type: String, default: '' },
   templateId: { type: String, default: '' },

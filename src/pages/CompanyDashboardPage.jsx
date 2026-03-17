@@ -644,6 +644,7 @@ function TemplateTile({ t, selected, onSelect }) {
 function EmployeeLinkView({ company, token, isDepleted }) {
     const [occasionName, setOccasionName] = useState('')
     const [greetingText, setGreetingText] = useState('')
+    const [customCompanyName, setCustomCompanyName] = useState(company?.name || '')
     const [expiryDate, setExpiryDate] = useState('')
     const [selectedTemplate, setSelectedTemplate] = useState(null)
     const [templates, setTemplates] = useState([])
@@ -681,8 +682,10 @@ function EmployeeLinkView({ company, token, isDepleted }) {
     const handleCreateLink = async () => {
         if (!occasionName.trim()) { toast.error('اكتب اسم المناسبة'); return }
         if (!selectedTemplate) { toast.error('اختر قالباً للموظفين'); return }
-        const templateImg = selectedTemplate.image || selectedTemplate.template || ''
-        if (!templateImg) { toast.error('القالب المختار لا يحتوي على صورة'); return }
+        const templateImgRaw = selectedTemplate.image || selectedTemplate.template || ''
+        if (!templateImgRaw) { toast.error('القالب المختار لا يحتوي على صورة'); return }
+        // Convert relative path to absolute URL so it works from any domain
+        const templateImg = templateImgRaw.startsWith('http') ? templateImgRaw : `${window.location.origin}${templateImgRaw}`
 
         try {
             const res = await fetch(`${API_BASE}/api/v1/company/greet-links`, {
@@ -691,6 +694,7 @@ function EmployeeLinkView({ company, token, isDepleted }) {
                 body: JSON.stringify({
                     occasionName: occasionName.trim(),
                     greetingText: greetingText.trim(),
+                    customCompanyName: customCompanyName.trim() || company?.name || '',
                     templateId: String(selectedTemplate.id || selectedTemplate._id || ''),
                     templateImage: templateImg,
                     templateTextColor: selectedTemplate.textColor || '#ffffff',
@@ -716,8 +720,9 @@ function EmployeeLinkView({ company, token, isDepleted }) {
         const names = employeeNames.split('\n').map(n => n.trim()).filter(Boolean)
         if (!names.length) { toast.error('أدخل أسماء الموظفين'); return }
         if (!selectedTemplate) { toast.error('اختر قالباً أولاً'); return }
-        const templateImg = selectedTemplate.image || selectedTemplate.template || ''
-        if (!templateImg) { toast.error('القالب المختار لا يحتوي على صورة'); return }
+        const templateImgRaw = selectedTemplate.image || selectedTemplate.template || ''
+        if (!templateImgRaw) { toast.error('القالب المختار لا يحتوي على صورة'); return }
+        const templateImg = templateImgRaw.startsWith('http') ? templateImgRaw : `${window.location.origin}${templateImgRaw}`
 
         try {
             const res = await fetch(`${API_BASE}/api/v1/company/greet-links`, {
@@ -726,6 +731,7 @@ function EmployeeLinkView({ company, token, isDepleted }) {
                 body: JSON.stringify({
                     occasionName: occasionName.trim(),
                     greetingText: greetingText.trim(),
+                    customCompanyName: customCompanyName.trim() || company?.name || '',
                     templateId: String(selectedTemplate.id || selectedTemplate._id || ''),
                     templateImage: templateImg,
                     templateTextColor: selectedTemplate.textColor || '#ffffff',
@@ -771,6 +777,10 @@ function EmployeeLinkView({ company, token, isDepleted }) {
                     </p>
 
                     <div style={{ display: 'grid', gap: 16 }}>
+                        <div>
+                            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 6 }}>اسم الشركة الظاهر في الرابط</label>
+                            <input value={customCompanyName} onChange={e => setCustomCompanyName(e.target.value)} placeholder={company?.name || 'اسم شركتك'} dir="rtl" style={inputStyle} />
+                        </div>
                         <div>
                             <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 6 }}>اسم المناسبة *</label>
                             <input value={occasionName} onChange={e => setOccasionName(e.target.value)} placeholder="مثال: عيد الفطر 2026" dir="rtl" style={inputStyle} />

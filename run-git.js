@@ -1,31 +1,34 @@
 const { execSync } = require('child_process');
-const path = require('path');
 
 const dir = `c:\\Users\\abdel\\Desktop\\تهنئة العيد`;
-const options = {
-  cwd: dir,
-  encoding: 'utf-8',
-  stdio: 'pipe'
-};
+const options = { cwd: dir, encoding: 'utf-8', stdio: 'pipe' };
+
+const msg = `fix: GreetPage clean design + fix image + credit deduction + custom name
+
+- Fix template image: convert relative /templates/... to absolute URL before saving
+- Fix CORS canvas: use fetch->blob on offscreen canvas
+- New GreetPage: elegant minimal design, no header/footer, gradient bg
+- Loading spinner replaces old loading text
+- Add customCompanyName field editable when creating link
+- Add POST /greet-links/:shortId/record endpoint to deduct company credit
+- Return customCompanyName from GET /greet-links/:shortId
+- Add customCompanyName to GreetLink model
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>`;
 
 try {
-  console.log('=== Running git add -A ===');
-  const addOutput = execSync('git add -A', options);
-  console.log(addOutput || '(no output)');
+  console.log('=== git add ===');
+  console.log(execSync('git add -A', options) || '(ok)');
 
-  console.log('\n=== Running git commit ===');
-  const commitOutput = execSync(`git commit -m "feat: short greet links /g/:shortId stored in MongoDB\n\n- Add GreetLink model with shortId, templateImage, font, etc.\n- POST /company/greet-links (auth) creates short link, returns shortId\n- GET /company/greet-links/:shortId (public) returns full settings\n- Add /g/:shortId route to App.jsx\n- GreetPage now fetches all settings from API by shortId\n- Fix canvas image loading: use offscreen canvas + encodeURI\n- Fix template not found for custom/DB templates\n- EmployeeLinkView saves to backend and generates clean short URL\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"`, options);
-  console.log(commitOutput || '(no output)');
+  console.log('=== git commit ===');
+  console.log(execSync(`git commit -m "${msg.replace(/"/g, '\\"')}"`, options) || '(ok)');
 
-  console.log('\n=== Running git push ===');
-  const pushOutput = execSync('git push', options);
-  console.log(pushOutput || '(no output)');
+  console.log('=== git push ===');
+  console.log(execSync('git push', options) || '(ok)');
 
-  console.log('\n✅ All git commands completed successfully!');
-} catch (error) {
-  console.error('❌ Error executing git commands:');
-  console.error('STDOUT:', error.stdout);
-  console.error('STDERR:', error.stderr);
-  console.error('Message:', error.message);
+  console.log('\n✅ Done!');
+} catch (e) {
+  console.error('STDOUT:', e.stdout);
+  console.error('STDERR:', e.stderr);
   process.exit(1);
 }
