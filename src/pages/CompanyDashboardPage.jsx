@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCompany } from '../context/CompanyContext'
 import { updateCompanyProfile, getTemplates } from '../utils/api'
+import { templates as staticTemplates, designerOnlyTemplates } from '../data/templates'
 import { useEditorStore } from '../store'
 import toast, { Toaster } from 'react-hot-toast'
 
@@ -267,15 +268,31 @@ function BatchCardsView({ company, token, isDepleted, remaining }) {
     const [isLoadingTemplates, setIsLoadingTemplates] = useState(true)
 
     useEffect(() => {
+        // Merge static templates + designer templates as fallback
+        const allStatic = [...staticTemplates, ...designerOnlyTemplates].map(t => ({
+            ...t, _id: t.id, id: t.id,
+            name: t.name,
+            image: t.image,
+        }))
+
         getTemplates()
             .then(res => {
-                if (res.success && res.data) {
-                    setPublicTemplates(res.data)
-                    // Company-specific templates stored on the company object
-                    if (company.customTemplates?.length) setCompanyTemplates(company.customTemplates)
+                if (res.success && res.data && res.data.length > 0) {
+                    // API has templates — use them + static as fallback
+                    const apiTemplates = res.data
+                    const apiIds = new Set(apiTemplates.map(t => String(t._id || t.id)))
+                    const extras = allStatic.filter(t => !apiIds.has(String(t.id)))
+                    setPublicTemplates([...apiTemplates, ...extras])
+                } else {
+                    // API empty — use all static templates
+                    setPublicTemplates(allStatic)
                 }
+                if (company.customTemplates?.length) setCompanyTemplates(company.customTemplates)
             })
-            .catch(() => {})
+            .catch(() => {
+                // API failed — use static templates
+                setPublicTemplates(allStatic)
+            })
             .finally(() => setIsLoadingTemplates(false))
     }, [company])
 
@@ -461,7 +478,18 @@ function EmployeeLinkView({ company, token, isDepleted }) {
     const [allCopied, setAllCopied] = useState(false)
 
     useEffect(() => {
-        getTemplates().then(res => { if (res.success && res.data) setTemplates(res.data) }).catch(() => {})
+        const allStatic = [...staticTemplates, ...designerOnlyTemplates].map(t => ({
+            ...t, _id: t.id, id: t.id, name: t.name, image: t.image,
+        }))
+        getTemplates().then(res => {
+            if (res.success && res.data && res.data.length > 0) {
+                const apiIds = new Set(res.data.map(t => String(t._id || t.id)))
+                const extras = allStatic.filter(t => !apiIds.has(String(t.id)))
+                setTemplates([...res.data, ...extras])
+            } else {
+                setTemplates(allStatic)
+            }
+        }).catch(() => setTemplates(allStatic))
     }, [])
 
     const companySlug = company.slug || 'company'
