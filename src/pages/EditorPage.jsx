@@ -1433,6 +1433,16 @@ function EditorPageInner() {
     }
 
     sessionStorage.setItem(PERSONAL_CHECKOUT_KEY, JSON.stringify(payload))
+
+    // Save canvas image so PaymentResultPage can download it directly after payment
+    try {
+      if (stageRef.current) {
+        const dataUrl = stageRef.current.toDataURL({ pixelRatio: 4 })
+        localStorage.setItem('sallim_checkout_image', dataUrl)
+        localStorage.setItem('sallim_checkout_name', payload.templateName || 'تصميمي')
+      }
+    } catch (_) { /* ignore if canvas capture fails */ }
+
     const checkoutUrl = `/checkout?product=template&templateId=${encodeURIComponent(payload.templateId)}&price=${currentTemplate?.price || PERSONAL_CARD_PRICE}&name=${encodeURIComponent(payload.templateName || 'تصميم مميز')}`
     navigate(checkoutUrl)
   }, [buildPersonalSnapshot, currentTemplate?.id, currentTemplate?.name, navigate, personalRecipientName, personalSenderName, store.selectedTemplate])

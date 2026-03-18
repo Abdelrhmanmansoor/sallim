@@ -68,9 +68,25 @@ export default function PaymentResultPage() {
   }, [navigate, searchParams])
 
   const openDesign = () => {
-    if (!redirectUrl) return
+    if (openingNow) return
     setOpeningNow(true)
-    navigate(redirectUrl, { replace: true })
+
+    // Try to download the saved canvas image directly
+    const savedImage = localStorage.getItem('sallim_checkout_image')
+    const savedName = localStorage.getItem('sallim_checkout_name') || 'تصميمي'
+    if (savedImage) {
+      const a = document.createElement('a')
+      a.href = savedImage
+      a.download = `${savedName}.png`
+      a.click()
+      localStorage.removeItem('sallim_checkout_image')
+      localStorage.removeItem('sallim_checkout_name')
+      setOpeningNow(false)
+      return
+    }
+
+    // Fallback: go back to editor
+    if (redirectUrl) navigate(redirectUrl, { replace: true })
   }
 
   return (
