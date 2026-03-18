@@ -525,16 +525,6 @@ router.get('/status/:sessionId', async (req, res) => {
             }
             if (!session.completedAt) session.completedAt = new Date()
             await session.save()
-          } else if (
-            resolved.state === 'failed' &&
-            session.status !== 'failed' &&
-            session.status !== 'completed'
-          ) {
-            session.status = 'failed'
-            if (resolved.transactionId && !session.transactionId) {
-              session.transactionId = String(resolved.transactionId)
-            }
-            await session.save()
           }
         }
       } catch (error) {
@@ -594,7 +584,7 @@ router.get('/transaction/:transactionId', async (req, res) => {
  */
 router.post('/confirm-success', async (req, res) => {
   try {
-    const { sessionId } = req.body
+    const { sessionId, transactionId: urlTransactionId } = req.body
     if (!sessionId) {
       return res.status(400).json({ success: false, error: 'معرف الجلسة مطلوب' })
     }
@@ -604,25 +594,41 @@ router.post('/confirm-success', async (req, res) => {
       return res.status(404).json({ success: false, error: 'الجلسة غير موجودة' })
     }
 
-    if (session.status !== 'completed' && session.intentionId) {
-      try {
-        const intentionStatus = await getIntentionStatus(session.intentionId)
-        if (intentionStatus?.success && intentionStatus.data) {
-          const resolved = resolveIntentionState(intentionStatus.data)
-          if (resolved.state === 'completed') {
+    if (session.status !== 'completed') {
+      // Try direct transaction verification first (most reliable)
+      const txId = urlTransactionId || session.transactionId
+      if (txId) {
+        try {
+          const txDetails = await getTransactionDetails(parseInt(txId, 10))
+          if (txDetails?.data?.success === true) {
             session.status = 'completed'
-            if (resolved.transactionId && !session.transactionId) {
-              session.transactionId = String(resolved.transactionId)
-            }
+            if (!session.transactionId) session.transactionId = String(txId)
             if (!session.completedAt) session.completedAt = new Date()
             await session.save()
-          } else if (resolved.state === 'failed' && session.status !== 'completed') {
-            session.status = 'failed'
-            await session.save()
           }
+        } catch (e) {
+          console.error('[Paymob Flash] Transaction verification error:', e.message)
         }
-      } catch (error) {
-        console.error('[Paymob Flash] Confirm success reconcile error:', error.message)
+      }
+
+      // Fallback: check intention status
+      if (session.status !== 'completed' && session.intentionId) {
+        try {
+          const intentionStatus = await getIntentionStatus(session.intentionId)
+          if (intentionStatus?.success && intentionStatus.data) {
+            const resolved = resolveIntentionState(intentionStatus.data)
+            if (resolved.state === 'completed') {
+              session.status = 'completed'
+              if (resolved.transactionId && !session.transactionId) {
+                session.transactionId = String(resolved.transactionId)
+              }
+              if (!session.completedAt) session.completedAt = new Date()
+              await session.save()
+            }
+          }
+        } catch (error) {
+          console.error('[Paymob Flash] Confirm success reconcile error:', error.message)
+        }
       }
     }
 

@@ -13,6 +13,7 @@ export default function PaymentResultPage() {
   const finalizedRef = useRef(false)
 
   const urlSuccess = searchParams.get('success') === 'true'
+  const urlTransactionId = searchParams.get('id') || null
   const getSessionId = () => localStorage.getItem('paymob_session_id') || searchParams.get('session_id')
   const resolveTargetUrl = (candidate, sessionId) => {
     const fallback = `/editor?autodownload=1&paymobSession=${encodeURIComponent(sessionId || '')}`
@@ -47,7 +48,7 @@ export default function PaymentResultPage() {
       const confirmRes = await fetch(`${apiBase}/api/v1/paymob-flash/confirm-success`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId }),
+        body: JSON.stringify({ sessionId, transactionId: urlTransactionId }),
       })
       const confirmData = await confirmRes.json()
 
@@ -105,7 +106,7 @@ export default function PaymentResultPage() {
         const res = await fetch(`${apiBase}/api/v1/paymob-flash/confirm-success`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId }),
+          body: JSON.stringify({ sessionId, transactionId: urlTransactionId }),
         })
         const data = await res.json()
         if (!res.ok || !data.success) {
