@@ -15,6 +15,8 @@ export default function AdminTemplatesPage() {
   const [saving, setSaving] = useState({})
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [user, setUser] = useState(null)
+  const [companies, setCompanies] = useState([])
+  const [companySelect, setCompanySelect] = useState({}) // templateId → selected companyId
 
   useEffect(() => {
     const userData = localStorage.getItem('user')
@@ -24,6 +26,10 @@ export default function AdminTemplatesPage() {
     }
     setUser(JSON.parse(userData))
     loadTemplates()
+    // Load companies for assignment
+    fetch(`${API}/api/v1/admin/companies`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    }).then(r => r.json()).then(d => { if (d.success) setCompanies(d.data || []) }).catch(() => {})
   }, [])
 
   const getToken = () => localStorage.getItem('token')
@@ -83,6 +89,15 @@ export default function AdminTemplatesPage() {
 
   const savePrice = (template) => {
     updateTemplate(template._id, { price: Number(template.price) || 0 })
+  }
+
+  const assignCompany = (template) => {
+    const selectedId = companySelect[template._id] ?? (template.companyId || '')
+    if (selectedId) {
+      updateTemplate(template._id, { companyId: selectedId, visibility: 'company_exclusive' })
+    } else {
+      updateTemplate(template._id, { companyId: null, visibility: 'public' })
+    }
   }
 
   const handleLogout = () => {
@@ -355,6 +370,32 @@ export default function AdminTemplatesPage() {
                             <ToggleLeft size={32} color="#94a3b8" />
                           )}
                         </button>
+                      </div>
+
+                      {/* Company Assignment */}
+                      <div style={{ marginTop: 12, padding: '10px 12px', background: template.companyId ? '#eff6ff' : '#f8fafc', borderRadius: 10, border: template.companyId ? '1px solid #bfdbfe' : '1px solid #e2e8f0' }}>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 6 }}>
+                          {template.companyId ? '🔒 حصري لشركة' : '🌐 عام لجميع الشركات'}
+                        </div>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <select
+                            value={companySelect[template._id] ?? (template.companyId || '')}
+                            onChange={e => setCompanySelect(prev => ({ ...prev, [template._id]: e.target.value }))}
+                            style={{ flex: 1, padding: '6px 8px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 12, fontFamily: "'Tajawal', sans-serif", background: '#fff' }}
+                          >
+                            <option value="">— عام (بدون تخصيص) —</option>
+                            {companies.map(c => (
+                              <option key={c._id} value={c._id}>{c.name}</option>
+                            ))}
+                          </select>
+                          <button
+                            onClick={() => assignCompany(template)}
+                            disabled={saving[template._id]}
+                            style={{ padding: '6px 10px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: "'Tajawal', sans-serif", opacity: saving[template._id] ? 0.6 : 1 }}
+                          >
+                            حفظ
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

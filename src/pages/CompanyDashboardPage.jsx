@@ -285,22 +285,20 @@ function BatchCardsView({ company, token, isDepleted, remaining }) {
             image: t.image,
         }))
 
-        getTemplates()
+        getTemplates('', { companySlug: company.slug })
             .then(res => {
                 if (res.success && res.data && res.data.length > 0) {
-                    // API has templates — use them + static as fallback
-                    const apiTemplates = res.data
+                    // Normalize: DB templates use imageUrl, components expect image
+                    const apiTemplates = res.data.map(t => ({ ...t, image: t.image || t.imageUrl }))
                     const apiIds = new Set(apiTemplates.map(t => String(t._id || t.id)))
                     const extras = allStatic.filter(t => !apiIds.has(String(t.id)))
                     setPublicTemplates([...apiTemplates, ...extras])
                 } else {
-                    // API empty — use all static templates
                     setPublicTemplates(allStatic)
                 }
                 if (company.customTemplates?.length) setCompanyTemplates(company.customTemplates)
             })
             .catch(() => {
-                // API failed — use static templates
                 setPublicTemplates(allStatic)
             })
             .finally(() => setIsLoadingTemplates(false))
@@ -678,12 +676,14 @@ function EmployeeLinkView({ company, token, isDepleted }) {
             t.companyNames?.some(n => companyName.toLowerCase().includes(n.toLowerCase()))
         ).map(t => ({ ...t, _id: t.id, id: t.id }))
         
-        getTemplates().then(res => {
+        getTemplates('', { companySlug: company.slug }).then(res => {
             if (res.success && res.data && res.data.length > 0) {
-                const apiIds = new Set(res.data.map(t => String(t._id || t.id)))
+                // Normalize: DB templates use imageUrl, components expect image
+                const apiTemplates = res.data.map(t => ({ ...t, image: t.image || t.imageUrl }))
+                const apiIds = new Set(apiTemplates.map(t => String(t._id || t.id)))
                 const extras = allStatic.filter(t => !apiIds.has(String(t.id)))
-                // Put exclusive templates first
-                setTemplates([...exclusiveForCompany, ...res.data, ...extras])
+                // Company-exclusive DB templates (visibility=company_exclusive) are already filtered server-side
+                setTemplates([...exclusiveForCompany, ...apiTemplates, ...extras])
             } else {
                 setTemplates([...exclusiveForCompany, ...allStatic])
             }
@@ -695,7 +695,7 @@ function EmployeeLinkView({ company, token, isDepleted }) {
     const handleCreateLink = async () => {
         if (!occasionName.trim()) { toast.error('اكتب اسم المناسبة'); return }
         if (!selectedTemplate) { toast.error('اختر قالباً للموظفين'); return }
-        const templateImgRaw = selectedTemplate.image || selectedTemplate.template || ''
+        const templateImgRaw = selectedTemplate.image || selectedTemplate.imageUrl || selectedTemplate.template || ''
         if (!templateImgRaw) { toast.error('القالب المختار لا يحتوي على صورة'); return }
         // Convert relative path to absolute URL so it works from any domain
         const templateImg = templateImgRaw.startsWith('http') ? templateImgRaw : `${window.location.origin}${templateImgRaw}`
@@ -733,7 +733,7 @@ function EmployeeLinkView({ company, token, isDepleted }) {
         const names = employeeNames.split('\n').map(n => n.trim()).filter(Boolean)
         if (!names.length) { toast.error('أدخل أسماء الموظفين'); return }
         if (!selectedTemplate) { toast.error('اختر قالباً أولاً'); return }
-        const templateImgRaw = selectedTemplate.image || selectedTemplate.template || ''
+        const templateImgRaw = selectedTemplate.image || selectedTemplate.imageUrl || selectedTemplate.template || ''
         if (!templateImgRaw) { toast.error('القالب المختار لا يحتوي على صورة'); return }
         const templateImg = templateImgRaw.startsWith('http') ? templateImgRaw : `${window.location.origin}${templateImgRaw}`
 
