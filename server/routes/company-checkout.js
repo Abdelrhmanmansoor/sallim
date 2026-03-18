@@ -191,14 +191,15 @@ router.post('/complete', async (req, res) => {
       try {
         const intentionResult = await getIntentionStatus(order.intentionId)
         const d = intentionResult?.data || {}
+        const SUCCESS_WORDS = ['success', 'succeeded', 'paid', 'completed', 'captured', 'approved']
+        const statusText = String(d.status || d.payment_status || d.state || d.intention_status || '').toLowerCase()
+        const txBuckets = [d.transactions, d.payments, d.payment_attempts, d.intention_detail?.transactions].filter(Array.isArray)
+        const allTx = txBuckets.flat().filter(Boolean)
         const isPaid =
-          d.status === 'PAID' ||
-          d.status === 'paid' ||
-          d.intention_status === 'PAID' ||
           d.is_paid === true ||
           d.paid === true ||
-          (d.transactions || []).some((t) => t.success === true) ||
-          (d.payments || []).some((t) => t.success === true)
+          SUCCESS_WORDS.some((w) => statusText.includes(w)) ||
+          allTx.some((t) => t.success === true || t.paid === true)
 
         if (!isPaid) {
           return res.status(402).json({ success: false, error: 'لم يتم تأكيد الدفع بعد' })
