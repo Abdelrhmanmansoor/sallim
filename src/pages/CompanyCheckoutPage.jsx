@@ -207,8 +207,11 @@ export default function CompanyCheckoutPage() {
     }),
   }
 
-  // ─── STEP 0: Package Selection ───
-  if (step === 0 || (step !== 1 && step !== 3)) {
+  // ─── Single Page: Packages + Form ───
+  if (step !== 3) {
+    const payMethods = paymentMethods.length ? paymentMethods : [
+      { id: 'visa', name: 'Visa' }, { id: 'mastercard', name: 'Mastercard' }, { id: 'mada', name: 'Mada' },
+    ]
     return (
       <div style={S.page}>
         <style>{`@keyframes co_spin { to { transform: rotate(360deg); } }`}</style>
@@ -218,9 +221,10 @@ export default function CompanyCheckoutPage() {
             <button style={S.back} onClick={() => navigate('/companies')}>← العودة</button>
           </nav>
 
-          <h1 style={S.heading}>اختر الباقة المناسبة</h1>
-          <p style={S.sub}>اشترِ الآن وستصلك كود التفعيل فوراً لتبدأ خلال دقائق</p>
+          <h1 style={S.heading}>باقات الشركات والمؤسسات</h1>
+          <p style={S.sub}>اختر الباقة، أدخل بياناتك، وادفع — ستدخل لوحة التحكم فوراً</p>
 
+          {/* Packages */}
           <div style={S.grid}>
             {PACKAGES.map((pkg) => (
               <div key={pkg.key} style={S.card(selected?.key === pkg.key)} onClick={() => setSelected(pkg)}>
@@ -232,72 +236,25 @@ export default function CompanyCheckoutPage() {
                   <div key={i} style={S.feat}><Check />{f}</div>
                 ))}
                 <button style={S.selectBtn(selected?.key === pkg.key)}>
-                  {selected?.key === pkg.key ? '✓ محددة' : 'اختر هذه الباقة'}
+                  {selected?.key === pkg.key ? '✓ محددة' : 'اختر'}
                 </button>
               </div>
             ))}
           </div>
 
-          <div style={{ textAlign: 'center' }}>
-            <button
-              onClick={() => selected ? setStep(1) : null}
-              style={{
-                ...S.primaryBtn(!selected),
-                maxWidth: 320, margin: '0 auto',
-              }}
-            >
-              {selected ? `متابعة — ${selected.name} (${selected.price} ر.س)` : 'اختر باقة أولاً'}
-            </button>
-            <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 16 }}>
-              🔒 دفع آمن عبر Paymob — Apple Pay / Visa / Mastercard / مدى
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
-              {(paymentMethods.length ? paymentMethods : [
-                { id: 'apple-pay', name: 'Apple Pay' },
-                { id: 'visa', name: 'Visa' },
-                { id: 'mastercard', name: 'Mastercard' },
-                { id: 'mada', name: 'Mada' },
-              ]).map((m) => (
-                <div key={m.id} style={{ minHeight: 30, minWidth: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 8px' }}>
-                  {m.logo ? (
-                    <img src={m.logo} alt={m.name} style={{ maxHeight: 24, width: 'auto', objectFit: 'contain' }} />
-                  ) : (
-                    <span style={{ fontSize: 11, fontWeight: 700, color: '#374151', whiteSpace: 'nowrap' }}>{m.name}</span>
-                  )}
+          {/* Form — always visible */}
+          <div style={{ ...S.formCard, marginTop: 8 }}>
+            {selected && (
+              <div style={{ background: '#f5f3ff', borderRadius: 12, padding: '14px 18px', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#111827' }}>{selected.name}</p>
+                  <p style={{ margin: 0, fontSize: 12, color: '#6b7280' }}>{selected.cardLimit.toLocaleString()} بطاقة / سنة</p>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // ─── STEP 1: Company Details Form ───
-  if (step === 1) {
-    return (
-      <div style={S.page}>
-        <style>{`@keyframes co_spin { to { transform: rotate(360deg); } }`}</style>
-        <div style={S.container}>
-          <nav style={S.nav}>
-            <a href="/companies" style={S.brand}>سَلِّم للشركات</a>
-            <button style={S.back} onClick={() => setStep(0)}>← تغيير الباقة</button>
-          </nav>
-
-          <div style={S.formCard}>
-            {/* Package summary */}
-            <div style={{
-              background: '#f5f3ff', borderRadius: 12, padding: '16px 20px',
-              marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            }}>
-              <div>
-                <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#111827' }}>{selected.name}</p>
-                <p style={{ margin: 0, fontSize: 12, color: '#6b7280' }}>{selected.cardLimit.toLocaleString()} بطاقة / سنة</p>
+                <p style={{ margin: 0, fontSize: 22, fontWeight: 900, color: '#7c3aed' }}>{selected.price} <span style={{ fontSize: 13 }}>ر.س</span></p>
               </div>
-              <p style={{ margin: 0, fontSize: 22, fontWeight: 900, color: '#7c3aed' }}>{selected.price} <span style={{ fontSize: 13 }}>ر.س</span></p>
-            </div>
+            )}
 
-            <h2 style={{ fontSize: 18, fontWeight: 800, color: '#111827', margin: '0 0 24px' }}>بيانات الشركة</h2>
+            <h2 style={{ fontSize: 17, fontWeight: 800, color: '#111827', margin: '0 0 20px' }}>بيانات الشركة</h2>
 
             {errors.submit && (
               <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '12px 16px', marginBottom: 20, fontSize: 14, color: '#b91c1c', fontWeight: 600 }}>
@@ -305,75 +262,67 @@ export default function CompanyCheckoutPage() {
               </div>
             )}
 
-            <div style={{ marginBottom: 18 }}>
-              <label style={S.label}>اسم الشركة أو الجهة</label>
-              <input
-                type="text" value={form.companyName} placeholder="مثال: شركة الفجر"
-                onChange={e => { setForm(p => ({ ...p, companyName: e.target.value })); setErrors(p => ({ ...p, companyName: '' })) }}
-                style={S.inp(errors.companyName)}
-                onFocus={e => e.currentTarget.style.borderColor = '#7c3aed'}
-                onBlur={e => e.currentTarget.style.borderColor = errors.companyName ? '#fca5a5' : '#e2e8f0'}
-              />
-              {errors.companyName && <p style={S.errTxt}>{errors.companyName}</p>}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 16, marginBottom: 20 }}>
+              <div>
+                <label style={S.label}>اسم الشركة أو الجهة</label>
+                <input type="text" value={form.companyName} placeholder="مثال: شركة الفجر"
+                  onChange={e => { setForm(p => ({ ...p, companyName: e.target.value })); setErrors(p => ({ ...p, companyName: '' })) }}
+                  style={S.inp(errors.companyName)}
+                  onFocus={e => e.currentTarget.style.borderColor = '#7c3aed'}
+                  onBlur={e => e.currentTarget.style.borderColor = errors.companyName ? '#fca5a5' : '#e2e8f0'}
+                />
+                {errors.companyName && <p style={S.errTxt}>{errors.companyName}</p>}
+              </div>
+              <div>
+                <label style={S.label}>رقم الهاتف</label>
+                <input type="tel" value={form.companyPhone} placeholder="05xxxxxxxx" dir="ltr"
+                  onChange={e => { setForm(p => ({ ...p, companyPhone: e.target.value })); setErrors(p => ({ ...p, companyPhone: '' })) }}
+                  style={S.inp(errors.companyPhone)}
+                  onFocus={e => e.currentTarget.style.borderColor = '#7c3aed'}
+                  onBlur={e => e.currentTarget.style.borderColor = errors.companyPhone ? '#fca5a5' : '#e2e8f0'}
+                />
+                {errors.companyPhone && <p style={S.errTxt}>{errors.companyPhone}</p>}
+              </div>
             </div>
 
-            <div style={{ marginBottom: 18 }}>
-              <label style={S.label}>البريد الإلكتروني للتواصل</label>
-              <input
-                type="email" value={form.companyEmail} placeholder="hr@company.com" dir="ltr"
+            <div style={{ marginBottom: 24 }}>
+              <label style={S.label}>البريد الإلكتروني</label>
+              <input type="email" value={form.companyEmail} placeholder="hr@company.com" dir="ltr"
                 onChange={e => { setForm(p => ({ ...p, companyEmail: e.target.value })); setErrors(p => ({ ...p, companyEmail: '' })) }}
                 style={S.inp(errors.companyEmail)}
                 onFocus={e => e.currentTarget.style.borderColor = '#7c3aed'}
                 onBlur={e => e.currentTarget.style.borderColor = errors.companyEmail ? '#fca5a5' : '#e2e8f0'}
               />
-              <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>سيُرسَل كود التفعيل لهذا البريد</p>
+              <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>ستصلك بيانات الدخول على هذا البريد بعد الدفع مباشرة</p>
               {errors.companyEmail && <p style={S.errTxt}>{errors.companyEmail}</p>}
             </div>
 
-            <div style={{ marginBottom: 28 }}>
-              <label style={S.label}>رقم الهاتف</label>
-              <input
-                type="tel" value={form.companyPhone} placeholder="05xxxxxxxx" dir="ltr"
-                onChange={e => { setForm(p => ({ ...p, companyPhone: e.target.value })); setErrors(p => ({ ...p, companyPhone: '' })) }}
-                style={S.inp(errors.companyPhone)}
-                onFocus={e => e.currentTarget.style.borderColor = '#7c3aed'}
-                onBlur={e => e.currentTarget.style.borderColor = errors.companyPhone ? '#fca5a5' : '#e2e8f0'}
-              />
-              {errors.companyPhone && <p style={S.errTxt}>{errors.companyPhone}</p>}
-            </div>
+            {!selected && (
+              <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '12px 16px', marginBottom: 16, fontSize: 13, color: '#92400e', fontWeight: 600 }}>
+                اختر باقة أولاً من الأعلى
+              </div>
+            )}
 
             {hasApplePay && (
-              <button
-                onClick={handlePay}
-                disabled={loading}
-                style={{ ...S.primaryBtn(loading), background: loading ? '#9ca3af' : '#111827', marginBottom: 10 }}
-              >
-                {loading ? <Spinner /> : 'Apple'}
-                {loading ? 'جاري الاتصال...' : `ادفع عبر Apple Pay — ${selected.price} ر.س`}
+              <button onClick={handlePay} disabled={loading || !selected}
+                style={{ ...S.primaryBtn(loading || !selected), background: loading ? '#9ca3af' : '#111827', marginBottom: 10 }}>
+                {loading ? <Spinner /> : null}
+                {loading ? 'جاري الاتصال...' : `ادفع عبر Apple Pay${selected ? ` — ${selected.price} ر.س` : ''}`}
               </button>
             )}
 
-            <button onClick={handlePay} disabled={loading} style={S.primaryBtn(loading)}>
+            <button onClick={handlePay} disabled={loading || !selected} style={S.primaryBtn(loading || !selected)}>
               {loading ? <Spinner /> : '🔒'}
-              {loading ? 'جاري الاتصال...' : `ادفع بالفيزا / ماستركارد — ${selected.price} ر.س`}
+              {loading ? 'جاري الاتصال...' : `ادفع الآن${selected ? ` — ${selected.price} ر.س` : ' — اختر باقة أولاً'}`}
             </button>
 
-            <p style={{ textAlign: 'center', fontSize: 12, color: '#9ca3af', marginTop: 16 }}>
-              دفع آمن عبر Paymob — Apple Pay / Visa / Mastercard / مدى
+            <p style={{ textAlign: 'center', fontSize: 11, color: '#9ca3af', marginTop: 12 }}>
+              🔒 دفع آمن · بعد الدفع ستدخل لوحة التحكم فوراً
             </p>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
-              {(paymentMethods.length ? paymentMethods : [
-                { id: 'apple-pay', name: 'Apple Pay' },
-                { id: 'visa', name: 'Visa' },
-                { id: 'mastercard', name: 'Mastercard' },
-                { id: 'mada', name: 'Mada' },
-              ]).map((m) => (
-                <div key={m.id} style={{ minHeight: 32, minWidth: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 8px' }}>
-                  {m.logo ? (
-                    <img src={m.logo} alt={m.name} style={{ maxHeight: 26, width: 'auto', objectFit: 'contain' }} />
-                  ) : (
-                    <span style={{ fontSize: 11, fontWeight: 700, color: '#374151', whiteSpace: 'nowrap' }}>{m.name}</span>
-                  )}
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
+              {payMethods.map(m => (
+                <div key={m.id} style={{ minHeight: 28, minWidth: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '3px 7px' }}>
+                  {m.logo ? <img src={m.logo} alt={m.name} style={{ maxHeight: 22, objectFit: 'contain' }} /> : <span style={{ fontSize: 10, fontWeight: 700, color: '#374151' }}>{m.name}</span>}
                 </div>
               ))}
             </div>

@@ -255,6 +255,31 @@ function HomeView({ isDepleted, setActiveView, company, remaining, totalCredits 
                     </div>
                 </div>
             </button>
+
+            {/* Quick Guide */}
+            <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 20, padding: 'clamp(20px,4vw,28px)' }}>
+                <h3 style={{ fontSize: 16, fontWeight: 800, color: C.text, margin: '0 0 16px' }}>كيف تبدأ؟ 3 خطوات فقط</h3>
+                <div style={{ display: 'grid', gap: 12 }}>
+                    {[
+                        { n: '١', title: 'أضف شعار شركتك', desc: 'اذهب لـ "الهوية" وارفع لوجو شركتك لتظهر على البطاقات', tab: 'settings' },
+                        { n: '٢', title: 'أنشئ بطاقات جماعية', desc: 'اذهب لـ "أنشئ بطاقات" وارفع أسماء موظفيك (CSV أو يدوي)', tab: 'cards' },
+                        { n: '٣', title: 'أرسل رابط لكل موظف', desc: 'اذهب لـ "رابط الموظفين" وأنشئ رابط مناسبة يشاركه الكل', tab: 'link' },
+                    ].map(step => (
+                        <button key={step.n} onClick={() => setActiveView(step.tab)}
+                            style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', background: '#f8fafc', border: `1px solid ${C.border}`, borderRadius: 14, cursor: 'pointer', fontFamily: f.font, textAlign: 'right', transition: 'all 0.15s' }}
+                            onMouseEnter={e => e.currentTarget.style.borderColor = C.accent}
+                            onMouseLeave={e => e.currentTarget.style.borderColor = C.border}
+                        >
+                            <div style={{ width: 36, height: 36, borderRadius: 10, background: C.accent, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 900, flexShrink: 0 }}>{step.n}</div>
+                            <div>
+                                <div style={{ fontSize: 14, fontWeight: 800, color: C.text }}>{step.title}</div>
+                                <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>{step.desc}</div>
+                            </div>
+                            <div style={{ marginRight: 'auto', fontSize: 18, color: C.muted }}>←</div>
+                        </button>
+                    ))}
+                </div>
+            </div>
         </div>
     )
 }

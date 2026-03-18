@@ -315,7 +315,7 @@ export default function LandingPage() {
               </div>
 
               <button
-                onClick={() => navigate('/companies')}
+                onClick={() => navigate('/company-checkout')}
                 style={{
                   width: '100%',
                   display: 'flex',
@@ -323,17 +323,38 @@ export default function LandingPage() {
                   justifyContent: 'center',
                   gap: '8px',
                   padding: '14px',
-                  background: '#111827',
+                  background: '#7c3aed',
                   color: '#fff',
-                  fontSize: '14px',
-                  fontWeight: 700,
+                  fontSize: '15px',
+                  fontWeight: 800,
                   borderRadius: '14px',
                   border: 'none',
                   cursor: 'pointer',
                   transition: 'all 200ms',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.background = '#6d28d9' }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = '#7c3aed' }}
+              >
+                🏢 اشترِ الآن
+              </button>
+              <button
+                onClick={() => navigate('/companies')}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '11px',
+                  background: 'transparent',
+                  color: '#6b7280',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  borderRadius: '14px',
+                  border: '1px solid #e2e8f0',
+                  cursor: 'pointer',
+                  marginTop: 8,
+                }}
               >
                 تفاصيل الباقات
               </button>

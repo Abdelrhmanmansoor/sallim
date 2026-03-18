@@ -7,6 +7,7 @@ import LicenseKey from '../models/LicenseKey.js'
 import Company from '../models/Company.js'
 import { checkoutLimiter } from '../middleware/rateLimiter.js'
 import { createPaymentIntention, verifyPaymobHMAC, buildHmacDataFromParams } from '../utils/paymob-flash.js'
+import { sendCompanyCredentialsEmail } from '../utils/email.js'
 
 const router = Router()
 
@@ -277,12 +278,22 @@ router.post('/complete', async (req, res) => {
 
     console.log(`[CompanyCheckout] Company created: ${company._id} | ${order.packageKey} | ${order.companyEmail}`)
 
+    // Send credentials email (fire-and-forget)
+    sendCompanyCredentialsEmail({
+      to: order.companyEmail,
+      companyName: order.companyName,
+      email: order.companyEmail,
+      password,
+      packageName: order.packageSnapshot?.name || order.packageKey,
+      limit: order.packageSnapshot?.cardLimit || 500,
+    }).catch(err => console.error('[CompanyCheckout] Email send failed:', err.message))
+
     const token = jwt.sign({ id: company._id, role: company.role }, JWT_SECRET, { expiresIn: '30d' })
 
     res.json({
       success: true,
       token,
-      password, // returned once so user can note it
+      password,
       company: buildCompanyPayload(company),
     })
   } catch (error) {

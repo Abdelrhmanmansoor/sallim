@@ -288,6 +288,50 @@ async function sendNewOrderNotification({ companyName, packageName, contactNumbe
 }
 
 // ══════════════════════════════════════════
+// 8. sendCompanyCredentialsEmail — بيانات الدخول بعد الدفع
+// ══════════════════════════════════════════
+
+async function sendCompanyCredentialsEmail({ to, companyName, email, password, packageName, limit }) {
+  const html = emailLayout(`
+    <h2 style="color:#7c3aed;margin:0 0 16px;font-size:22px;">🎉 تم تفعيل حساب شركتك بنجاح!</h2>
+    <p>أهلاً <strong>${companyName}</strong>،</p>
+    <p>تم الدفع بنجاح وحسابك جاهز الآن. باقتك: <strong>${packageName}</strong> — <strong>${limit}</strong> بطاقة سنوياً.</p>
+
+    <div style="background:#f8fafc;border:2px solid #7c3aed33;border-radius:14px;padding:24px;margin:24px 0;">
+      <div style="font-size:13px;font-weight:700;color:#7c3aed;margin-bottom:14px;text-align:center;">بيانات الدخول للوحة التحكم</div>
+      <table style="width:100%;border-collapse:collapse;">
+        <tr>
+          <td style="padding:10px 0;font-size:14px;color:#64748b;width:40%;">البريد الإلكتروني:</td>
+          <td style="padding:10px 0;font-weight:800;font-size:14px;direction:ltr;text-align:right;">${email}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 0;font-size:14px;color:#64748b;">كلمة المرور:</td>
+          <td style="padding:10px 0;font-weight:800;font-size:16px;font-family:monospace;letter-spacing:2px;color:#7c3aed;">${password}</td>
+        </tr>
+      </table>
+    </div>
+
+    <p style="font-size:13px;color:#dc2626;font-weight:700;text-align:center;">⚠️ احتفظ بهذه البيانات — لن تُرسَل مرة أخرى</p>
+
+    ${btn('ادخل لوحة التحكم الآن', `${SITE_URL}/company-login`)}
+
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;margin-top:20px;">
+      <div style="font-size:13px;color:#166534;font-weight:700;margin-bottom:8px;">ابدأ بـ 3 خطوات بسيطة:</div>
+      <div style="font-size:13px;color:#166534;">١. ارفع أسماء موظفيك</div>
+      <div style="font-size:13px;color:#166534;margin-top:4px;">٢. اختر قالب البطاقة</div>
+      <div style="font-size:13px;color:#166534;margin-top:4px;">٣. ولّد وحمّل كل البطاقات دفعة واحدة</div>
+    </div>
+  `)
+
+  return resend.emails.send({
+    from: `سَلِّم <${FROM_EMAIL}>`,
+    to,
+    subject: '✅ حسابك جاهز — بيانات الدخول لمنصة سلّم',
+    html,
+  })
+}
+
+// ══════════════════════════════════════════
 // Exports
 // ══════════════════════════════════════════
 
@@ -298,5 +342,6 @@ export {
   sendCompanyWelcomeEmail,
   sendLimitWarningEmail,
   sendLimitReachedEmail,
-  sendNewOrderNotification
+  sendNewOrderNotification,
+  sendCompanyCredentialsEmail
 }
