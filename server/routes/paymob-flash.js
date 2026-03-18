@@ -107,6 +107,25 @@ function resolveIntentionState(data) {
 }
 
 /**
+ * Health check endpoint for debugging
+ * GET /api/v1/paymob-flash/health
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    mode: PAYMOB_MODE,
+    hasSecretKey: !!process.env.PAYMOB_SECRET_KEY,
+    hasPublicKey: !!process.env.PAYMOB_PUBLIC_KEY,
+    hasApiKey: !!process.env.PAYMOB_API_KEY,
+    hasIntegrationId: !!process.env.PAYMOB_INTEGRATION_ID,
+    integrationId: process.env.PAYMOB_INTEGRATION_ID || 'default',
+    clientUrl: CLIENT_URL,
+    backendUrl: BACKEND_URL,
+    secretKeyPrefix: process.env.PAYMOB_SECRET_KEY ? process.env.PAYMOB_SECRET_KEY.substring(0, 15) + '...' : 'MISSING',
+  })
+})
+
+/**
  * Create Payment Intention (Flash Integration)
  * POST /api/v1/paymob-flash/create-intention
  */
@@ -292,10 +311,15 @@ router.post('/create-intention', checkoutLimiter, async (req, res) => {
     })
 
   } catch (error) {
-    console.error('[Paymob Flash] Create intention error:', error.message)
+    console.error('[Paymob Flash] Create intention error:', {
+      message: error.message,
+      stack: error.stack,
+      response: error.response?.data || error.response || 'No response data'
+    })
     res.status(500).json({
       success: false,
-      error: error.message || 'فشل إنشاء الطلب. يرجى المحاولة مرة أخرى'
+      error: error.message || 'فشل إنشاء الطلب. يرجى المحاولة مرة أخرى',
+      details: process.env.NODE_ENV !== 'production' ? error.stack : undefined
     })
   }
 })

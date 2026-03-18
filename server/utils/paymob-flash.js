@@ -114,6 +114,10 @@ async function createPaymentIntention({
     })
 
     // Make API request
+    console.log('[Paymob Flash] Making API request to:', `${PAYMOB_BASE_URL}/intention/`)
+    console.log('[Paymob Flash] Auth key present:', !!PAYMOB_AUTH_KEY)
+    console.log('[Paymob Flash] Auth key prefix:', PAYMOB_AUTH_KEY ? PAYMOB_AUTH_KEY.substring(0, 10) + '...' : 'MISSING')
+    
     const response = await fetch(`${PAYMOB_BASE_URL}/intention/`, {
       method: 'POST',
       headers: {
@@ -125,9 +129,11 @@ async function createPaymentIntention({
 
     const data = await response.json()
 
+    console.log('[Paymob Flash] API Response status:', response.status)
+    
     if (!response.ok) {
-      console.error('[Paymob Flash] Error response:', data)
-      throw new Error(data.detail || data.message || 'Failed to create payment intention')
+      console.error('[Paymob Flash] Error response:', JSON.stringify(data, null, 2))
+      throw new Error(data.detail || data.message || JSON.stringify(data) || 'Failed to create payment intention')
     }
 
     console.log('[Paymob Flash] Intention created successfully:', {
