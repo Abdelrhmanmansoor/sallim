@@ -314,29 +314,11 @@ export default function LandingPage() {
                 ))}
               </div>
 
-              <button
-                onClick={() => navigate('/company-checkout')}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  padding: '14px',
-                  background: '#7c3aed',
-                  color: '#fff',
-                  fontSize: '15px',
-                  fontWeight: 800,
-                  borderRadius: '14px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  transition: 'all 200ms',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.background = '#6d28d9' }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = '#7c3aed' }}
-              >
-                🏢 اشترِ الآن
-              </button>
+              <div className="btn-animated-border">
+                <button onClick={() => navigate('/company-checkout')}>
+                  اشترِ الآن
+                </button>
+              </div>
               <button
                 onClick={() => navigate('/companies')}
                 style={{
@@ -390,6 +372,36 @@ export default function LandingPage() {
             @keyframes slideUp {
               from { opacity: 0; transform: translateY(30px); }
               to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes borderSpin {
+              0%   { background-position: 0% 50%; }
+              50%  { background-position: 100% 50%; }
+              100% { background-position: 0% 50%; }
+            }
+            .btn-animated-border {
+              background: linear-gradient(270deg, #d4af37, #f5d77a, #c4901a, #e8c547, #d4af37);
+              background-size: 400% 400%;
+              animation: borderSpin 2.4s ease infinite;
+              border-radius: 15px;
+              padding: 2px;
+              display: block;
+              width: 100%;
+            }
+            .btn-animated-border button {
+              width: 100%;
+              padding: 13px;
+              background: #0f172a;
+              color: #fff;
+              font-size: 15px;
+              font-weight: 800;
+              border-radius: 13px;
+              border: none;
+              cursor: pointer;
+              font-family: 'Tajawal', sans-serif;
+              transition: background 200ms;
+            }
+            .btn-animated-border button:hover {
+              background: #1e293b;
             }
           `}</style>
         </div>
