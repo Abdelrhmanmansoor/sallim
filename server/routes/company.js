@@ -462,25 +462,11 @@ router.get('/profile', protectCompanyRoute, (req, res) => {
 // ═══ Update Company Profile (Upload Logo) ═══
 router.put('/profile', protectCompanyRoute, upload.single('logo'), async (req, res) => {
     try {
-        // If a file was uploaded, upload to Cloudinary for persistent CDN storage
+        // If a file was uploaded, multer-storage-cloudinary already uploaded it directly
+        // req.file.path is the Cloudinary secure URL
         if (req.file) {
-            const localPath = req.file.path
-            try {
-                const result = await cloudinaryV2.uploader.upload(localPath, {
-                    folder: 'sallim/company-logos',
-                    resource_type: 'image',
-                    transformation: [{ quality: 'auto:best', width: 400, crop: 'limit' }]
-                })
-                req.company.logoUrl = result.secure_url
-                // Delete local file after upload
-                const fs = await import('fs')
-                fs.default.unlink(localPath, () => {})
-            } catch (cloudErr) {
-                console.error('[Profile] Cloudinary upload failed:', cloudErr.message)
-                // Fallback: use local server URL (may not persist on redeploy)
-                const serverUrl = process.env.SERVER_URL || 'http://localhost:3001'
-                req.company.logoUrl = `${serverUrl}/uploads/companies/${req.file.filename}`
-            }
+            req.company.logoUrl = req.file.path
+            console.log('[Profile] Logo uploaded to Cloudinary:', req.file.path)
         }
 
         // Allow updating profile fields from body
