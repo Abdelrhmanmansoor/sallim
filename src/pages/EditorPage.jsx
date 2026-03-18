@@ -447,7 +447,7 @@ function EditorPageInner() {
           // Map to editor format
           const mappedReady = accessibleTemplates
             .filter(t => t.type === 'public' || t.type === 'premium')
-            .map(t => ({ id: t._id, name: t.name, image: t.imageUrl, textColor: '#ffffff' }))
+            .map(t => ({ id: t._id, name: t.name, image: t.imageUrl, textColor: '#ffffff', price: t.price }))
 
           const mappedDesigner = accessibleTemplates
             .filter(t => t.type === 'exclusive')
@@ -1433,7 +1433,7 @@ function EditorPageInner() {
     }
 
     sessionStorage.setItem(PERSONAL_CHECKOUT_KEY, JSON.stringify(payload))
-    const checkoutUrl = `/checkout?product=template&templateId=${encodeURIComponent(payload.templateId)}&price=${PERSONAL_CARD_PRICE}&name=${encodeURIComponent(payload.templateName || 'تصميم مميز')}`
+    const checkoutUrl = `/checkout?product=template&templateId=${encodeURIComponent(payload.templateId)}&price=${currentTemplate?.price || PERSONAL_CARD_PRICE}&name=${encodeURIComponent(payload.templateName || 'تصميم مميز')}`
     navigate(checkoutUrl)
   }, [buildPersonalSnapshot, currentTemplate?.id, currentTemplate?.name, navigate, personalRecipientName, personalSenderName, store.selectedTemplate])
 
@@ -1851,7 +1851,7 @@ function EditorPageInner() {
           شراء فردي
         </p>
         <p style={{ margin: '0 0 12px', fontSize: compact ? 28 : 34, fontWeight: 900, color: '#0f172a' }}>
-          {PERSONAL_CARD_PRICE} <span style={{ fontSize: compact ? 16 : 18 }}>ر.س</span>
+          {currentTemplate?.price || PERSONAL_CARD_PRICE} <span style={{ fontSize: compact ? 16 : 18 }}>ر.س</span>
         </p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
           {['VISA', 'MADA', 'Mastercard'].map(method => (
