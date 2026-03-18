@@ -459,41 +459,29 @@ router.get('/profile', protectCompanyRoute, (req, res) => {
     })
 })
 
-// ═══ Update Company Profile (Upload Logo) ═══
-router.put('/profile', protectCompanyRoute, upload.single('logo'), async (req, res) => {
+// ═══ Update Company Profile ═══
+router.put('/profile', protectCompanyRoute, async (req, res) => {
     try {
-        // If a file was uploaded, push the buffer directly to Cloudinary
-        if (req.file) {
-            const cloudName = process.env.CLOUDINARY_CLOUD_NAME
-            const apiKey = process.env.CLOUDINARY_API_KEY
-            const apiSecret = process.env.CLOUDINARY_API_SECRET
-            if (!cloudName || !apiKey || !apiSecret) {
-                console.error('[Profile] Cloudinary env vars missing:', { cloudName: !!cloudName, apiKey: !!apiKey, apiSecret: !!apiSecret })
-                return res.status(500).json({ success: false, error: 'إعدادات رفع الصور غير مكتملة على السيرفر (Cloudinary env vars missing)' })
+        // Logo arrives as base64 data URL in JSON body (logoBase64 field)
+        if (req.body.logoBase64) {
+            const dataUrl = req.body.logoBase64
+            if (!dataUrl.startsWith('data:image/')) {
+                return res.status(400).json({ success: false, error: 'صيغة الصورة غير صحيحة' })
             }
-            // Ensure config is set (in case it wasn't at startup)
-            cloudinaryV2.config({ cloud_name: cloudName, api_key: apiKey, api_secret: apiSecret })
-
-            const cloudUrl = await new Promise((resolve, reject) => {
-                const stream = cloudinaryV2.uploader.upload_stream(
-                    {
-                        folder: 'sallim/company-logos',
-                        resource_type: 'image',
-                        transformation: [{ quality: 'auto:best', width: 400, crop: 'limit' }],
-                    },
-                    (err, result) => {
-                        if (err) {
-                            console.error('[Profile] Cloudinary upload_stream error:', err)
-                            reject(err)
-                        } else {
-                            resolve(result.secure_url)
-                        }
-                    }
-                )
-                stream.end(req.file.buffer)
+            // Ensure Cloudinary is configured
+            cloudinaryV2.config({
+                cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+                api_key: process.env.CLOUDINARY_API_KEY,
+                api_secret: process.env.CLOUDINARY_API_SECRET,
             })
-            req.company.logoUrl = cloudUrl
-            console.log('[Profile] Logo uploaded to Cloudinary:', cloudUrl)
+            console.log('[Profile] Uploading logo to Cloudinary, cloud_name:', process.env.CLOUDINARY_CLOUD_NAME)
+            const result = await cloudinaryV2.uploader.upload(dataUrl, {
+                folder: 'sallim/company-logos',
+                resource_type: 'image',
+                transformation: [{ quality: 'auto:best', width: 400, crop: 'limit' }],
+            })
+            req.company.logoUrl = result.secure_url
+            console.log('[Profile] Logo uploaded:', result.secure_url)
         }
 
         // Allow updating profile fields from body

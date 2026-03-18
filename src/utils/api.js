@@ -119,26 +119,37 @@ export async function updateCompanyAsAdmin(adminKey, companyId, updateData) {
 }
 
 /**
- * Company: Update profile (including logo via FormData)
+ * Company: Update profile (logo sent as base64 JSON — avoids multipart/Cloudinary issues)
  */
 export async function updateCompanyProfile(token, formData) {
   const url = `${API_BASE}/api/v1/company/profile`
 
-  // We use direct fetch here because we CANNOT set Content-Type
-  // The browser MUST set it to multipart/form-data with the correct boundary
+  // Convert FormData to a plain JSON payload; read logo file as base64
+  const payload = {}
+  for (const [key, value] of formData.entries()) {
+    if (value instanceof File) {
+      payload[key + 'Base64'] = await new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result)
+        reader.onerror = reject
+        reader.readAsDataURL(value)
+      })
+    } else {
+      payload[key] = value
+    }
+  }
+
   const res = await fetch(url, {
     method: 'PUT',
     headers: {
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
     },
-    body: formData
+    body: JSON.stringify(payload),
   })
 
   const data = await res.json()
-  if (!res.ok) {
-    throw new Error(data.error || 'حدث خطأ أثناء رفع الشعار')
-  }
-
+  if (!res.ok) throw new Error(data.error || 'حدث خطأ أثناء رفع الشعار')
   return data
 }
 
