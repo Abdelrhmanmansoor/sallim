@@ -468,20 +468,34 @@ router.put('/profile', protectCompanyRoute, async (req, res) => {
             if (!dataUrl.startsWith('data:image/')) {
                 return res.status(400).json({ success: false, error: 'صيغة الصورة غير صحيحة' })
             }
-            // Ensure Cloudinary is configured
-            cloudinaryV2.config({
-                cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-                api_key: process.env.CLOUDINARY_API_KEY,
-                api_secret: process.env.CLOUDINARY_API_SECRET,
-            })
-            console.log('[Profile] Uploading logo to Cloudinary, cloud_name:', process.env.CLOUDINARY_CLOUD_NAME)
-            const result = await cloudinaryV2.uploader.upload(dataUrl, {
-                folder: 'sallim/company-logos',
-                resource_type: 'image',
-                transformation: [{ quality: 'auto:best', width: 400, crop: 'limit' }],
-            })
-            req.company.logoUrl = result.secure_url
-            console.log('[Profile] Logo uploaded:', result.secure_url)
+
+            // Try Cloudinary first; fall back to storing base64 directly in MongoDB
+            const cloudName = process.env.CLOUDINARY_CLOUD_NAME
+            const apiKey = process.env.CLOUDINARY_API_KEY
+            const apiSecret = process.env.CLOUDINARY_API_SECRET
+
+            let uploaded = false
+            if (cloudName && apiKey && apiSecret) {
+                try {
+                    cloudinaryV2.config({ cloud_name: cloudName, api_key: apiKey, api_secret: apiSecret })
+                    const result = await cloudinaryV2.uploader.upload(dataUrl, {
+                        folder: 'sallim/company-logos',
+                        resource_type: 'image',
+                        transformation: [{ quality: 'auto:best', width: 400, crop: 'limit' }],
+                    })
+                    req.company.logoUrl = result.secure_url
+                    uploaded = true
+                    console.log('[Profile] Logo uploaded to Cloudinary:', result.secure_url)
+                } catch (cloudErr) {
+                    console.warn('[Profile] Cloudinary failed, storing base64 in DB:', cloudErr.message)
+                }
+            }
+
+            if (!uploaded) {
+                // Store base64 directly — works without any CDN (logos are small ~50-100KB)
+                req.company.logoUrl = dataUrl
+                console.log('[Profile] Logo stored as base64 in MongoDB')
+            }
         }
 
         // Allow updating profile fields from body
