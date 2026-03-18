@@ -462,11 +462,21 @@ router.get('/profile', protectCompanyRoute, (req, res) => {
 // ═══ Update Company Profile (Upload Logo) ═══
 router.put('/profile', protectCompanyRoute, upload.single('logo'), async (req, res) => {
     try {
-        // If a file was uploaded, multer-storage-cloudinary already uploaded it directly
-        // req.file.path is the Cloudinary secure URL
+        // If a file was uploaded, push the buffer directly to Cloudinary
         if (req.file) {
-            req.company.logoUrl = req.file.path
-            console.log('[Profile] Logo uploaded to Cloudinary:', req.file.path)
+            const cloudUrl = await new Promise((resolve, reject) => {
+                const stream = cloudinaryV2.uploader.upload_stream(
+                    {
+                        folder: 'sallim/company-logos',
+                        resource_type: 'image',
+                        transformation: [{ quality: 'auto:best', width: 400, crop: 'limit' }],
+                    },
+                    (err, result) => err ? reject(err) : resolve(result.secure_url)
+                )
+                stream.end(req.file.buffer)
+            })
+            req.company.logoUrl = cloudUrl
+            console.log('[Profile] Logo uploaded to Cloudinary:', cloudUrl)
         }
 
         // Allow updating profile fields from body
