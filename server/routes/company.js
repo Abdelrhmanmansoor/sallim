@@ -26,20 +26,20 @@ function encodeArabicUrl(url) {
   }
 }
 
-// Helper: Upload image URL to Cloudinary (for template images)
+// Helper: Upload image URL or data URL to Cloudinary (for template images)
 async function uploadToCloudinary(imageUrl) {
   try {
     // If already a Cloudinary URL, return as-is
     if (imageUrl.includes('cloudinary.com') || imageUrl.includes('res.cloudinary')) {
       return imageUrl
     }
-    
-    // Encode Arabic characters in the URL
-    const encodedUrl = encodeArabicUrl(imageUrl)
-    console.log('[Cloudinary] Uploading from:', encodedUrl)
-    
-    // Upload the remote image to Cloudinary
-    const result = await cloudinaryV2.uploader.upload(encodedUrl, {
+
+    // Data URLs (base64) are uploaded directly — no remote fetch, no Arabic encoding issues
+    const urlToUpload = imageUrl.startsWith('data:') ? imageUrl : encodeArabicUrl(imageUrl)
+    console.log('[Cloudinary] Uploading:', imageUrl.startsWith('data:') ? 'data URL (base64)' : urlToUpload)
+
+    // Upload to Cloudinary (accepts both remote URLs and base64 data URLs)
+    const result = await cloudinaryV2.uploader.upload(urlToUpload, {
       folder: 'sallim/greet-templates',
       resource_type: 'image',
       format: 'png',

@@ -9,6 +9,31 @@ import toast, { Toaster } from 'react-hot-toast'
 const RAW_API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 const API_BASE = RAW_API_BASE.replace(/\/+$/, '')
 
+// Convert an image URL to a base64 data URL so the backend can upload it to Cloudinary
+// without hitting Arabic-character URL encoding issues on remote fetch.
+// Returns the data URL, or falls back to the original URL on failure.
+async function fetchImageAsDataUrl(url) {
+  if (!url) return url
+  if (url.startsWith('data:')) return url
+  if (url.includes('cloudinary.com') || url.includes('res.cloudinary')) return url
+  try {
+    const segments = url.split('/')
+    const encoded = segments.slice(0, 3).join('/') + '/' +
+      segments.slice(3).map(s => { try { return encodeURIComponent(decodeURIComponent(s)) } catch { return s } }).join('/')
+    const res = await fetch(encoded, { mode: 'cors', cache: 'force-cache' })
+    if (!res.ok) return url
+    const blob = await res.blob()
+    return await new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onloadend = () => resolve(reader.result)
+      reader.onerror = () => resolve(url)
+      reader.readAsDataURL(blob)
+    })
+  } catch {
+    return url
+  }
+}
+
 const f = { font: "'Tajawal', sans-serif" }
 const C = {
     bg: '#f5f7fa',
@@ -722,8 +747,9 @@ function EmployeeLinkView({ company, token, isDepleted }) {
         if (!selectedTemplate) { toast.error('اختر قالباً للموظفين'); return }
         const templateImgRaw = selectedTemplate.image || selectedTemplate.imageUrl || selectedTemplate.template || ''
         if (!templateImgRaw) { toast.error('القالب المختار لا يحتوي على صورة'); return }
-        // Convert relative path to absolute URL so it works from any domain
-        const templateImg = templateImgRaw.startsWith('http') ? templateImgRaw : `${window.location.origin}${templateImgRaw}`
+        const templateImgAbs = templateImgRaw.startsWith('http') ? templateImgRaw : `${window.location.origin}${templateImgRaw}`
+        // Convert to data URL so Cloudinary upload works even for Arabic-path static templates
+        const templateImg = await fetchImageAsDataUrl(templateImgAbs)
 
         try {
             const res = await fetch(`${API_BASE}/api/v1/company/greet-links`, {
@@ -760,7 +786,8 @@ function EmployeeLinkView({ company, token, isDepleted }) {
         if (!selectedTemplate) { toast.error('اختر قالباً أولاً'); return }
         const templateImgRaw = selectedTemplate.image || selectedTemplate.imageUrl || selectedTemplate.template || ''
         if (!templateImgRaw) { toast.error('القالب المختار لا يحتوي على صورة'); return }
-        const templateImg = templateImgRaw.startsWith('http') ? templateImgRaw : `${window.location.origin}${templateImgRaw}`
+        const templateImgAbs = templateImgRaw.startsWith('http') ? templateImgRaw : `${window.location.origin}${templateImgRaw}`
+        const templateImg = await fetchImageAsDataUrl(templateImgAbs)
 
         try {
             const res = await fetch(`${API_BASE}/api/v1/company/greet-links`, {
