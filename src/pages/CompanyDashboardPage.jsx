@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCompany } from '../context/CompanyContext'
 import { updateCompanyProfile, getTemplates, consumeBatchCards } from '../utils/api'
@@ -709,6 +709,18 @@ function EmployeeLinkView({ company, token, isDepleted }) {
     const [employeeNames, setEmployeeNames] = useState('')
     const [individualLinks, setIndividualLinks] = useState([])
     const [allCopied, setAllCopied] = useState(false)
+    // Overlay (logo/text watermark)
+    const [overlayType, setOverlayType] = useState('none')
+    const [overlayX, setOverlayX] = useState(0.5)
+    const [overlayY, setOverlayY] = useState(0.1)
+    const [overlayText, setOverlayText] = useState('')
+    const [overlayFontSize, setOverlayFontSize] = useState(32)
+    const [overlayOpacity, setOverlayOpacity] = useState(0.85)
+    const [overlaySize, setOverlaySize] = useState(80)
+    const [isDragging, setIsDragging] = useState(false)
+    const previewRef = React.useRef(null)
+    // Tour
+    const [tourStep, setTourStep] = useState(0)
 
     // Check if this company has exclusive templates
     const companyName = company?.name || ''
@@ -767,6 +779,8 @@ function EmployeeLinkView({ company, token, isDepleted }) {
                     nameY: linkNameY,
                     nameColor: linkNameColor || '',
                     expiresAt: expiryDate || null,
+                    overlayType, overlayX, overlayY,
+                    overlayText, overlayFontSize, overlayOpacity, overlaySize,
                 })
             })
             const data = await res.json()
@@ -805,6 +819,8 @@ function EmployeeLinkView({ company, token, isDepleted }) {
                     nameY: linkNameY,
                     nameColor: linkNameColor || '',
                     expiresAt: expiryDate || null,
+                    overlayType, overlayX, overlayY,
+                    overlayText, overlayFontSize, overlayOpacity, overlaySize,
                 })
             })
             const data = await res.json()
@@ -832,8 +848,64 @@ function EmployeeLinkView({ company, token, isDepleted }) {
     const inputStyle = { width: '100%', padding: '12px 16px', fontSize: 14, fontFamily: f.font, background: '#f8fafc', border: `1px solid ${C.border}`, borderRadius: 12, color: C.text, outline: 'none', boxSizing: 'border-box' }
     const cardStyle = { background: C.card, border: `1px solid ${C.border}`, borderRadius: 20, padding: 'clamp(22px,4vw,32px)' }
 
+    const tourSteps = [
+        { title: 'اختر القالب', desc: 'اختر تصميم البطاقة المناسب للمناسبة من القوالب المتاحة أسفل النموذج', icon: '🖼️' },
+        { title: 'اضبط الإعدادات', desc: 'حدد اسم المناسبة ونص التهنئة وخط الاسم وموضعه على البطاقة', icon: '⚙️' },
+        { title: 'أضف شعارك (اختياري)', desc: 'في قسم "شعار / نص على البطاقة" اختر شعار شركتك أو نصاً مخصصاً واسحبه للموضع المناسب', icon: '🏷️' },
+        { title: 'أنشئ الرابط وشاركه', desc: 'اضغط "أنشئ الرابط العام" ثم شاركه مع موظفيك عبر واتساب. كل موظف يكتب اسمه ويحمّل بطاقته', icon: '🔗' },
+    ]
+
     return (
         <div style={{ display: 'grid', gap: 20 }}>
+            {/* ── Tour Button ── */}
+            {tourStep === 0 && (
+                <div style={{ background: 'linear-gradient(135deg,#f5f3ff,#ede9fe)', border: `1px solid #ddd6fe`, borderRadius: 16, padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                    <div>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: C.accent }}>جديد هنا؟</div>
+                        <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>تعلّم كيف تنشئ رابط تهنئة في 4 خطوات</div>
+                    </div>
+                    <button onClick={() => setTourStep(1)} style={{ padding: '9px 18px', background: C.accent, color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: f.font, whiteSpace: 'nowrap' }}>
+                        ابدأ الجولة
+                    </button>
+                </div>
+            )}
+
+            {/* ── Tour Overlay ── */}
+            {tourStep > 0 && (
+                <div style={{ background: '#fff', border: `2px solid ${C.accent}`, borderRadius: 16, padding: 20, position: 'relative' }}>
+                    <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+                        {tourSteps.map((_, i) => (
+                            <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: tourStep > i ? C.accent : '#e2e8f0', transition: 'background 0.3s' }} />
+                        ))}
+                    </div>
+                    <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                        <div style={{ fontSize: 32, flexShrink: 0 }}>{tourSteps[tourStep - 1].icon}</div>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 6 }}>
+                                الخطوة {tourStep} من {tourSteps.length}: {tourSteps[tourStep - 1].title}
+                            </div>
+                            <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.8 }}>{tourSteps[tourStep - 1].desc}</div>
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 16, justifyContent: 'flex-end' }}>
+                        {tourStep > 1 && (
+                            <button onClick={() => setTourStep(s => s - 1)} style={{ padding: '7px 16px', background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: f.font }}>
+                                السابق
+                            </button>
+                        )}
+                        {tourStep < tourSteps.length ? (
+                            <button onClick={() => setTourStep(s => s + 1)} style={{ padding: '7px 16px', background: C.accent, color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: f.font }}>
+                                التالي →
+                            </button>
+                        ) : (
+                            <button onClick={() => setTourStep(0)} style={{ padding: '7px 16px', background: C.green, color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: f.font }}>
+                                فهمت ✓
+                            </button>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {step === 1 ? (
                 <div style={cardStyle}>
                     <h3 style={{ fontSize: 17, fontWeight: 800, color: C.text, marginBottom: 6 }}>إنشاء رابط مناسبة للموظفين</h3>
@@ -920,6 +992,108 @@ function EmployeeLinkView({ company, token, isDepleted }) {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        )}
+
+                        {/* ── Overlay Editor ── */}
+                        {selectedTemplate && (
+                            <div style={{ padding: 16, background: '#faf5ff', borderRadius: 12, border: `1px solid #e9d5ff` }}>
+                                <h4 style={{ fontSize: 13, fontWeight: 800, color: C.text, margin: '0 0 12px' }}>شعار / نص على البطاقة</h4>
+                                <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+                                    {[['none','بدون'],['logo','شعار الشركة'],['text','نص مخصص']].map(([v,l]) => (
+                                        <button key={v} onClick={() => setOverlayType(v)} style={{
+                                            flex: 1, padding: '7px 4px', borderRadius: 8, fontSize: 11, fontWeight: 700, fontFamily: f.font,
+                                            border: overlayType === v ? `2px solid ${C.accent}` : `1px solid ${C.border}`,
+                                            background: overlayType === v ? '#f5f3ff' : '#fff', color: overlayType === v ? C.accent : C.muted, cursor: 'pointer'
+                                        }}>{l}</button>
+                                    ))}
+                                </div>
+
+                                {overlayType !== 'none' && (
+                                    <>
+                                        {overlayType === 'text' && (
+                                            <div style={{ marginBottom: 10 }}>
+                                                <input value={overlayText} onChange={e => setOverlayText(e.target.value)}
+                                                    placeholder="مثال: شركة الأفق — عيد مبارك" dir="rtl"
+                                                    style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: f.font, boxSizing: 'border-box' }} />
+                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
+                                                    <div>
+                                                        <label style={{ fontSize: 11, color: C.muted, fontWeight: 700 }}>حجم: {overlayFontSize}</label>
+                                                        <input type="range" min={16} max={80} value={overlayFontSize} onChange={e => setOverlayFontSize(Number(e.target.value))} style={{ width: '100%' }} />
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ fontSize: 11, color: C.muted, fontWeight: 700 }}>شفافية: {Math.round(overlayOpacity * 100)}%</label>
+                                                        <input type="range" min={20} max={100} value={Math.round(overlayOpacity * 100)} onChange={e => setOverlayOpacity(Number(e.target.value) / 100)} style={{ width: '100%' }} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {overlayType === 'logo' && (
+                                            <div style={{ marginBottom: 10 }}>
+                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                                                    <div>
+                                                        <label style={{ fontSize: 11, color: C.muted, fontWeight: 700 }}>حجم: {overlaySize}px</label>
+                                                        <input type="range" min={40} max={300} value={overlaySize} onChange={e => setOverlaySize(Number(e.target.value))} style={{ width: '100%' }} />
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ fontSize: 11, color: C.muted, fontWeight: 700 }}>شفافية: {Math.round(overlayOpacity * 100)}%</label>
+                                                        <input type="range" min={20} max={100} value={Math.round(overlayOpacity * 100)} onChange={e => setOverlayOpacity(Number(e.target.value) / 100)} style={{ width: '100%' }} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Draggable preview */}
+                                        <p style={{ fontSize: 11, color: C.muted, margin: '0 0 8px', textAlign: 'center' }}>اسحب الـ {overlayType === 'logo' ? 'شعار' : 'نص'} لتحديد موضعه على البطاقة</p>
+                                        <div
+                                            ref={previewRef}
+                                            style={{ position: 'relative', display: 'inline-block', borderRadius: 10, overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', width: '100%', cursor: isDragging ? 'grabbing' : 'crosshair', userSelect: 'none' }}
+                                            onMouseDown={e => {
+                                                setIsDragging(true)
+                                                const rect = previewRef.current.getBoundingClientRect()
+                                                setOverlayX((e.clientX - rect.left) / rect.width)
+                                                setOverlayY((e.clientY - rect.top) / rect.height)
+                                            }}
+                                            onMouseMove={e => {
+                                                if (!isDragging) return
+                                                const rect = previewRef.current.getBoundingClientRect()
+                                                setOverlayX(Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width)))
+                                                setOverlayY(Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height)))
+                                            }}
+                                            onMouseUp={() => setIsDragging(false)}
+                                            onMouseLeave={() => setIsDragging(false)}
+                                            onTouchStart={e => {
+                                                const touch = e.touches[0]
+                                                const rect = previewRef.current.getBoundingClientRect()
+                                                setOverlayX((touch.clientX - rect.left) / rect.width)
+                                                setOverlayY((touch.clientY - rect.top) / rect.height)
+                                            }}
+                                            onTouchMove={e => {
+                                                e.preventDefault()
+                                                const touch = e.touches[0]
+                                                const rect = previewRef.current.getBoundingClientRect()
+                                                setOverlayX(Math.min(1, Math.max(0, (touch.clientX - rect.left) / rect.width)))
+                                                setOverlayY(Math.min(1, Math.max(0, (touch.clientY - rect.top) / rect.height)))
+                                            }}
+                                        >
+                                            <img src={selectedTemplate.image || selectedTemplate.template} alt="" style={{ width: '100%', display: 'block', pointerEvents: 'none' }} />
+                                            {/* Name preview */}
+                                            <div style={{ position: 'absolute', top: `${linkNameY * 100}%`, left: '50%', transform: 'translate(-50%,-50%)', color: linkNameColor || selectedTemplate.textColor || '#fff', fontSize: Math.max(7, linkFontSize * 0.14), fontFamily: (fonts.find(fo => fo.id === selectedFont) || fonts[1]).family, textAlign: 'center', width: '80%', direction: 'rtl', pointerEvents: 'none' }}>
+                                                اسم الموظف
+                                            </div>
+                                            {/* Overlay dot indicator */}
+                                            {overlayType === 'logo' && company?.logoUrl ? (
+                                                <img src={company.logoUrl} alt="" style={{ position: 'absolute', left: `${overlayX * 100}%`, top: `${overlayY * 100}%`, transform: 'translate(-50%,-50%)', width: `${(overlaySize / 1080) * 100}%`, minWidth: 20, opacity: overlayOpacity, pointerEvents: 'none', borderRadius: 4 }} />
+                                            ) : overlayType === 'logo' ? (
+                                                <div style={{ position: 'absolute', left: `${overlayX * 100}%`, top: `${overlayY * 100}%`, transform: 'translate(-50%,-50%)', width: 22, height: 22, borderRadius: '50%', background: C.accent, opacity: overlayOpacity, pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#fff', fontWeight: 900 }}>ش</div>
+                                            ) : overlayType === 'text' && overlayText ? (
+                                                <div style={{ position: 'absolute', left: `${overlayX * 100}%`, top: `${overlayY * 100}%`, transform: 'translate(-50%,-50%)', color: '#fff', opacity: overlayOpacity, fontSize: Math.max(7, overlayFontSize * 0.14), fontWeight: 700, fontFamily: "'Cairo',sans-serif", whiteSpace: 'nowrap', pointerEvents: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{overlayText}</div>
+                                            ) : (
+                                                <div style={{ position: 'absolute', left: `${overlayX * 100}%`, top: `${overlayY * 100}%`, transform: 'translate(-50%,-50%)', width: 16, height: 16, borderRadius: '50%', background: C.accent, border: '2px solid #fff', pointerEvents: 'none' }} />
+                                            )}
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         )}
 

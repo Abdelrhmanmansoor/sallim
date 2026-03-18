@@ -25,7 +25,15 @@ const greetLinkSchema = new mongoose.Schema({
   nameColor: { type: String, default: '' },
   expiresAt: { type: Date, default: null },
   views: { type: Number, default: 0 },
-  active: { type: Boolean, default: true }
+  active: { type: Boolean, default: true },
+  // Overlay (logo or text watermark dragged onto the card)
+  overlayType: { type: String, enum: ['none', 'logo', 'text'], default: 'none' },
+  overlayX: { type: Number, default: 0.5 },
+  overlayY: { type: Number, default: 0.1 },
+  overlayText: { type: String, default: '' },
+  overlayFontSize: { type: Number, default: 32 },
+  overlayOpacity: { type: Number, default: 0.85 },
+  overlaySize: { type: Number, default: 80 }
 }, { timestamps: true })
 
 greetLinkSchema.index({ companyId: 1, createdAt: -1 })

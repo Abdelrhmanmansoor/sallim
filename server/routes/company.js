@@ -760,7 +760,7 @@ router.post('/consume-batch', protectCompanyRoute, async (req, res) => {
 router.post('/greet-links', protectCompanyRoute, async (req, res) => {
   try {
     const company = req.company
-    const { occasionName, greetingText, customCompanyName, templateId, templateImage, templateTextColor, font, fontSize, nameY, nameColor, expiresAt } = req.body
+    const { occasionName, greetingText, customCompanyName, templateId, templateImage, templateTextColor, font, fontSize, nameY, nameColor, expiresAt, overlayType, overlayX, overlayY, overlayText, overlayFontSize, overlayOpacity, overlaySize } = req.body
     if (!templateImage) return res.status(400).json({ success: false, error: 'رابط صورة القالب مطلوب' })
 
     // Ensure templateImage is absolute URL (convert relative paths)
@@ -790,6 +790,13 @@ router.post('/greet-links', protectCompanyRoute, async (req, res) => {
       nameY: Number(nameY) || 0.65,
       nameColor: nameColor || '',
       expiresAt: expiresAt ? new Date(expiresAt) : null,
+      overlayType: overlayType || 'none',
+      overlayX: Number(overlayX) || 0.5,
+      overlayY: Number(overlayY) || 0.1,
+      overlayText: overlayText || '',
+      overlayFontSize: Number(overlayFontSize) || 32,
+      overlayOpacity: Number(overlayOpacity) ?? 0.85,
+      overlaySize: Number(overlaySize) || 80,
     })
     res.json({ success: true, data: { shortId: greetLink.shortId } })
   } catch (error) {
@@ -841,6 +848,13 @@ router.get('/greet-links/:shortId', async (req, res) => {
         font: link.font,
         fontSize: link.fontSize,
         nameY: link.nameY,
+        overlayType: link.overlayType || 'none',
+        overlayX: link.overlayX ?? 0.5,
+        overlayY: link.overlayY ?? 0.1,
+        overlayText: link.overlayText || '',
+        overlayFontSize: link.overlayFontSize || 32,
+        overlayOpacity: link.overlayOpacity ?? 0.85,
+        overlaySize: link.overlaySize || 80,
         nameColor: link.nameColor,
         company: company ? { name: company.name, logoUrl: company.logoUrl, slug: company.slug } : null,
       }

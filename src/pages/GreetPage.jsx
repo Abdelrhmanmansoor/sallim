@@ -60,6 +60,36 @@ function ElegantBackground() {
                     0%, 100% { opacity: 0.3 }
                     50% { opacity: 0.6 }
                 }
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(28px) }
+                    to   { opacity: 1; transform: translateY(0) }
+                }
+                @keyframes cardFloat {
+                    0%, 100% { transform: translateY(0) }
+                    50%      { transform: translateY(-6px) }
+                }
+                @keyframes shimmerSweep {
+                    0%   { transform: translateX(-100%) }
+                    100% { transform: translateX(200%) }
+                }
+                @keyframes glowRing {
+                    0%, 100% { box-shadow: 0 0 0 0 rgba(124,58,237,0) }
+                    50%      { box-shadow: 0 0 30px 6px rgba(124,58,237,0.13) }
+                }
+                .greet-card-wrap {
+                    animation: fadeInUp 0.6s cubic-bezier(0.22,1,0.36,1) both;
+                }
+                .greet-img-wrap {
+                    animation: cardFloat 6s ease-in-out infinite, glowRing 4s ease-in-out infinite;
+                }
+                .greet-shimmer::after {
+                    content: '';
+                    position: absolute; inset: 0;
+                    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.35) 50%, transparent 60%);
+                    animation: shimmerSweep 2.5s ease-in-out infinite;
+                    pointer-events: none;
+                    border-radius: inherit;
+                }
                 .elegant-shape { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; }
             `}</style>
             {/* Soft gradient shapes */}
@@ -156,6 +186,7 @@ export default function GreetPage() {
     const [paramColor, setParamColor] = useState(searchParams.get('clr') ? `#${searchParams.get('clr')}` : '')
     const [templateImage, setTemplateImage] = useState('')
     const [templateTextColor, setTemplateTextColor] = useState('#ffffff')
+    const [overlay, setOverlay] = useState({ type: 'none', x: 0.5, y: 0.1, text: '', fontSize: 32, opacity: 0.85, size: 80 })
 
     const [name, setName] = useState(prefilledName)
     const [company, setCompany] = useState(null)
@@ -192,6 +223,15 @@ export default function GreetPage() {
                 setParamNameY(d.nameY || 0.65)
                 setParamColor(d.nameColor || '')
                 setTemplateTextColor(d.templateTextColor || '#ffffff')
+                setOverlay({
+                    type: d.overlayType || 'none',
+                    x: d.overlayX ?? 0.5,
+                    y: d.overlayY ?? 0.1,
+                    text: d.overlayText || '',
+                    fontSize: d.overlayFontSize || 32,
+                    opacity: d.overlayOpacity ?? 0.85,
+                    size: d.overlaySize || 80,
+                })
                 const resolvedImg = resolveImg(d.templateImage || '')
                 console.log('[GreetPage] templateImage from API:', d.templateImage)
                 console.log('[GreetPage] resolved image URL:', resolvedImg)
@@ -247,6 +287,28 @@ export default function GreetPage() {
             ctx.textBaseline = 'top'
             ctx.direction = 'rtl'
             ctx.fillText(recipientName, W / 2, H * paramNameY)
+
+            // Draw overlay (logo or text watermark)
+            if (overlay?.type === 'logo' && companyLogo) {
+                try {
+                    const { img: logoImg, objUrl: logoObjUrl } = await loadImageForCanvas(companyLogo)
+                    const sz = Math.round((overlay.size || 80) * (W / 1080))
+                    ctx.globalAlpha = overlay.opacity ?? 0.85
+                    ctx.drawImage(logoImg, overlay.x * W - sz / 2, overlay.y * H - sz / 2, sz, sz)
+                    ctx.globalAlpha = 1
+                    if (logoObjUrl) URL.revokeObjectURL(logoObjUrl)
+                } catch { /* ignore overlay errors */ }
+            } else if (overlay?.type === 'text' && overlay.text) {
+                const sz = Math.round((overlay.fontSize || 32) * (W / 1080))
+                ctx.font = `bold ${sz}px 'Cairo', 'Tajawal', sans-serif`
+                ctx.fillStyle = '#ffffff'
+                ctx.globalAlpha = overlay.opacity ?? 0.85
+                ctx.textAlign = 'center'
+                ctx.textBaseline = 'middle'
+                ctx.fillText(overlay.text, overlay.x * W, overlay.y * H)
+                ctx.globalAlpha = 1
+            }
+
             const dataUrl = offscreen.toDataURL('image/png')
             setCardDataUrl(dataUrl)
 
@@ -511,7 +573,7 @@ export default function GreetPage() {
         }}>
             <ElegantBackground />
 
-            <div style={{ width: '100%', maxWidth: 420, position: 'relative', zIndex: 1 }}>
+            <div className="greet-card-wrap" style={{ width: '100%', maxWidth: 500, position: 'relative', zIndex: 1 }}>
 
                 {/* ── Company Brand ── */}
                 <div style={{ textAlign: 'center', marginBottom: 24 }}>
@@ -543,7 +605,7 @@ export default function GreetPage() {
 
                 {/* ── Template Preview ── */}
                 {templateImage && !cardGenerated && (
-                    <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.12)', marginBottom: 20, position: 'relative', background: '#f1f5f9', minHeight: imgError ? 180 : 'auto' }}>
+                    <div className="greet-img-wrap greet-shimmer" style={{ borderRadius: 24, overflow: 'hidden', boxShadow: '0 16px 56px rgba(0,0,0,0.18)', marginBottom: 24, position: 'relative', background: '#f1f5f9', minHeight: imgError ? 180 : 'auto' }}>
                         {!imgError ? (
                             <>
                                 <img
@@ -560,16 +622,40 @@ export default function GreetPage() {
                                         left: '50%',
                                         transform: 'translate(-50%, -50%)',
                                         color: paramColor || templateTextColor || '#fff',
-                                        fontSize: 'clamp(13px,3.5vw,19px)',
+                                        fontSize: 'clamp(14px,4vw,22px)',
                                         fontWeight: 400,
                                         fontFamily: previewFont,
                                         textAlign: 'center',
                                         width: '80%',
                                         direction: 'rtl',
                                         pointerEvents: 'none',
+                                        textShadow: '0 2px 8px rgba(0,0,0,0.4)',
                                     }}>
                                         {name.trim()}
                                     </div>
+                                )}
+                                {/* Overlay preview */}
+                                {overlay?.type === 'logo' && companyLogo && (
+                                    <img src={companyLogo} alt="" style={{
+                                        position: 'absolute',
+                                        left: `${overlay.x * 100}%`, top: `${overlay.y * 100}%`,
+                                        transform: 'translate(-50%,-50%)',
+                                        width: `${(overlay.size / 1080) * 100}%`,
+                                        opacity: overlay.opacity, pointerEvents: 'none',
+                                        borderRadius: 8,
+                                    }} />
+                                )}
+                                {overlay?.type === 'text' && overlay.text && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        left: `${overlay.x * 100}%`, top: `${overlay.y * 100}%`,
+                                        transform: 'translate(-50%,-50%)',
+                                        color: '#ffffff', opacity: overlay.opacity,
+                                        fontSize: `clamp(10px, ${(overlay.fontSize / 1080) * 100}vw, ${overlay.fontSize * 0.5}px)`,
+                                        fontWeight: 700, fontFamily: "'Cairo', sans-serif",
+                                        pointerEvents: 'none', whiteSpace: 'nowrap',
+                                        textShadow: '0 2px 6px rgba(0,0,0,0.5)',
+                                    }}>{overlay.text}</div>
                                 )}
                             </>
                         ) : (
