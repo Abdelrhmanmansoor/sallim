@@ -6,7 +6,7 @@ import CompanyOrder from '../models/CompanyOrder.js'
 import LicenseKey from '../models/LicenseKey.js'
 import Company from '../models/Company.js'
 import { checkoutLimiter } from '../middleware/rateLimiter.js'
-import { createPaymentIntention, getIntentionStatus, getTransactionDetails } from '../utils/paymob-flash.js'
+import { createPaymentIntention, getTransactionDetails } from '../utils/paymob-flash.js'
 
 const router = Router()
 
@@ -183,48 +183,25 @@ router.post('/complete', async (req, res) => {
       }
     }
 
-    // If not yet completed, verify with Paymob
+    // If not yet completed, verify via transaction ID (webhook may not have fired yet)
     if (order.status !== 'completed') {
-      let verified = false
-
-      // 1) Direct transaction verification (most reliable)
-      const txId = urlTransactionId || order.transactionId
+      const txId = urlTransactionId || order.paymobTransactionId
       if (txId) {
         try {
           const txResult = await getTransactionDetails(parseInt(txId, 10))
           if (txResult?.data?.success === true) {
-            verified = true
-            order.transactionId = String(txId)
+            order.status = 'completed'
+            if (!order.paymobTransactionId) order.paymobTransactionId = String(txId)
+            await order.save()
           }
         } catch (e) {
           console.error('[CompanyCheckout] Transaction verification error:', e.message)
         }
       }
 
-      // 2) Fallback: intention status check
-      if (!verified && order.intentionId) {
-        try {
-          const intentionResult = await getIntentionStatus(order.intentionId)
-          const d = intentionResult?.data || {}
-          const SUCCESS_WORDS = ['success', 'succeeded', 'paid', 'completed', 'captured', 'approved']
-          const statusText = String(d.status || d.payment_status || d.state || d.intention_status || '').toLowerCase()
-          const txBuckets = [d.transactions, d.payments, d.payment_attempts, d.intention_detail?.transactions].filter(Array.isArray)
-          const allTx = txBuckets.flat().filter(Boolean)
-          verified =
-            d.is_paid === true ||
-            d.paid === true ||
-            SUCCESS_WORDS.some((w) => statusText.includes(w)) ||
-            allTx.some((t) => t.success === true || t.paid === true)
-        } catch (e) {
-          console.error('[CompanyCheckout] Paymob verification error:', e.message)
-        }
-      }
-
-      if (!verified) {
+      if (order.status !== 'completed') {
         return res.status(402).json({ success: false, error: 'لم يتم تأكيد الدفع بعد' })
       }
-      order.status = 'completed'
-      await order.save()
     }
 
     // Generate license code + create LicenseKey

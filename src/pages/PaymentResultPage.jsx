@@ -86,7 +86,32 @@ export default function PaymentResultPage() {
   useEffect(() => {
     const sessionId = getSessionId()
     if (!sessionId) {
-      if (urlSuccess) {
+      if (urlSuccess && urlTransactionId) {
+        // Session ID missing from localStorage (e.g. different device/tab) but payment succeeded
+        // Try to confirm directly using the transaction ID from the URL
+        setState('checking')
+        setMessage('جاري تأكيد الدفع...')
+        fetch(`${apiBase}/api/v1/paymob-flash/confirm-success`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ transactionId: urlTransactionId }),
+        })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data.success && data.redirectUrl) {
+              setState('success')
+              setMessage('تم تأكيد الدفع بنجاح. جارٍ التحويل...')
+              setTimeout(() => navigate(data.redirectUrl, { replace: true }), 1200)
+            } else {
+              setState('pending')
+              setMessage('تم الدفع، جاري تأكيد الطلب. يرجى الانتظار أو التواصل معنا عبر واتساب.')
+            }
+          })
+          .catch(() => {
+            setState('pending')
+            setMessage('تم الدفع، جاري تأكيد الطلب. يرجى الانتظار أو التواصل معنا عبر واتساب.')
+          })
+      } else if (urlSuccess) {
         setState('pending')
         setMessage('تم الدفع، جاري تأكيد الطلب. يرجى الانتظار أو التواصل معنا عبر واتساب.')
       } else {

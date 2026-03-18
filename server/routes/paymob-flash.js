@@ -347,7 +347,8 @@ router.get('/payment-methods', async (_req, res) => {
     res.json({ success: true, methods })
   } catch (error) {
     console.error('[Paymob Flash] Payment methods error:', error.message)
-    res.status(500).json({ success: false, error: error.message || 'Failed to fetch payment methods' })
+    // Return empty array so the UI still loads (logos are cosmetic only)
+    res.json({ success: true, methods: [] })
   }
 })
 
@@ -585,11 +586,17 @@ router.get('/transaction/:transactionId', async (req, res) => {
 router.post('/confirm-success', async (req, res) => {
   try {
     const { sessionId, transactionId: urlTransactionId } = req.body
-    if (!sessionId) {
+    if (!sessionId && !urlTransactionId) {
       return res.status(400).json({ success: false, error: 'معرف الجلسة مطلوب' })
     }
 
-    const session = await CheckoutSession.findOne({ sessionId })
+    let session = sessionId ? await CheckoutSession.findOne({ sessionId }) : null
+
+    // Fallback: look up by transaction ID (when sessionId is missing from localStorage)
+    if (!session && urlTransactionId) {
+      session = await CheckoutSession.findOne({ transactionId: String(urlTransactionId) })
+    }
+
     if (!session) {
       return res.status(404).json({ success: false, error: 'الجلسة غير موجودة' })
     }
