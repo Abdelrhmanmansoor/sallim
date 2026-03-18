@@ -6,7 +6,7 @@ import CompanyOrder from '../models/CompanyOrder.js'
 import LicenseKey from '../models/LicenseKey.js'
 import Company from '../models/Company.js'
 import { checkoutLimiter } from '../middleware/rateLimiter.js'
-import { createPaymentIntention, getIntentionStatus } from '../utils/paymob-flash.js'
+import { createPaymentIntention, getIntentionStatus, getTransactionDetails } from '../utils/paymob-flash.js'
 
 const router = Router()
 
@@ -160,7 +160,7 @@ router.post('/initiate', checkoutLimiter, async (req, res) => {
 // Called after payment redirect — verifies payment, creates company account, returns JWT
 router.post('/complete', async (req, res) => {
   try {
-    const { merchantOrderId } = req.body
+    const { merchantOrderId, transactionId: urlTransactionId } = req.body
     if (!merchantOrderId) {
       return res.status(400).json({ success: false, error: 'merchantOrderId مطلوب' })
     }
@@ -185,31 +185,46 @@ router.post('/complete', async (req, res) => {
 
     // If not yet completed, verify with Paymob
     if (order.status !== 'completed') {
-      if (!order.intentionId) {
-        return res.status(402).json({ success: false, error: 'لم يتم الدفع بعد' })
-      }
-      try {
-        const intentionResult = await getIntentionStatus(order.intentionId)
-        const d = intentionResult?.data || {}
-        const SUCCESS_WORDS = ['success', 'succeeded', 'paid', 'completed', 'captured', 'approved']
-        const statusText = String(d.status || d.payment_status || d.state || d.intention_status || '').toLowerCase()
-        const txBuckets = [d.transactions, d.payments, d.payment_attempts, d.intention_detail?.transactions].filter(Array.isArray)
-        const allTx = txBuckets.flat().filter(Boolean)
-        const isPaid =
-          d.is_paid === true ||
-          d.paid === true ||
-          SUCCESS_WORDS.some((w) => statusText.includes(w)) ||
-          allTx.some((t) => t.success === true || t.paid === true)
+      let verified = false
 
-        if (!isPaid) {
-          return res.status(402).json({ success: false, error: 'لم يتم تأكيد الدفع بعد' })
+      // 1) Direct transaction verification (most reliable)
+      const txId = urlTransactionId || order.transactionId
+      if (txId) {
+        try {
+          const txResult = await getTransactionDetails(parseInt(txId, 10))
+          if (txResult?.data?.success === true) {
+            verified = true
+            order.transactionId = String(txId)
+          }
+        } catch (e) {
+          console.error('[CompanyCheckout] Transaction verification error:', e.message)
         }
-        order.status = 'completed'
-        await order.save()
-      } catch (e) {
-        console.error('[CompanyCheckout] Paymob verification error:', e.message)
-        return res.status(402).json({ success: false, error: 'فشل التحقق من الدفع' })
       }
+
+      // 2) Fallback: intention status check
+      if (!verified && order.intentionId) {
+        try {
+          const intentionResult = await getIntentionStatus(order.intentionId)
+          const d = intentionResult?.data || {}
+          const SUCCESS_WORDS = ['success', 'succeeded', 'paid', 'completed', 'captured', 'approved']
+          const statusText = String(d.status || d.payment_status || d.state || d.intention_status || '').toLowerCase()
+          const txBuckets = [d.transactions, d.payments, d.payment_attempts, d.intention_detail?.transactions].filter(Array.isArray)
+          const allTx = txBuckets.flat().filter(Boolean)
+          verified =
+            d.is_paid === true ||
+            d.paid === true ||
+            SUCCESS_WORDS.some((w) => statusText.includes(w)) ||
+            allTx.some((t) => t.success === true || t.paid === true)
+        } catch (e) {
+          console.error('[CompanyCheckout] Paymob verification error:', e.message)
+        }
+      }
+
+      if (!verified) {
+        return res.status(402).json({ success: false, error: 'لم يتم تأكيد الدفع بعد' })
+      }
+      order.status = 'completed'
+      await order.save()
     }
 
     // Generate license code + create LicenseKey
