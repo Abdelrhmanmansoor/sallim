@@ -184,7 +184,7 @@ async function createPaymentIntention({
  */
 function verifyPaymobHMAC(data, receivedHmac) {
   try {
-    const secret = PAYMOB_SECRET_KEY || process.env.PAYMOB_HMAC_SECRET || process.env.HMAC_SECRET
+    const secret = process.env.HMAC_SECRET || process.env.PAYMOB_HMAC_SECRET || PAYMOB_SECRET_KEY
     if (!secret || !receivedHmac) {
       console.error('[Paymob Flash] HMAC verification failed: missing secret or signature')
       return false

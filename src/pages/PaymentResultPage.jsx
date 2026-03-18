@@ -12,6 +12,7 @@ export default function PaymentResultPage() {
   const [openingNow, setOpeningNow] = useState(false)
   const finalizedRef = useRef(false)
 
+  const urlSuccess = searchParams.get('success') === 'true'
   const getSessionId = () => localStorage.getItem('paymob_session_id') || searchParams.get('session_id')
   const resolveTargetUrl = (candidate, sessionId) => {
     const fallback = `/editor?autodownload=1&paymobSession=${encodeURIComponent(sessionId || '')}`
@@ -84,8 +85,13 @@ export default function PaymentResultPage() {
   useEffect(() => {
     const sessionId = getSessionId()
     if (!sessionId) {
-      setState('failure')
-      setMessage('تعذر العثور على بيانات جلسة الدفع.')
+      if (urlSuccess) {
+        setState('pending')
+        setMessage('تم الدفع، جاري تأكيد الطلب. يرجى الانتظار أو التواصل معنا عبر واتساب.')
+      } else {
+        setState('failure')
+        setMessage('تعذر العثور على بيانات جلسة الدفع.')
+      }
       return
     }
 
@@ -141,8 +147,13 @@ export default function PaymentResultPage() {
         }
 
         if (data.status === 'failed') {
-          setState('failure')
-          setMessage('فشلت عملية الدفع. يمكنك المحاولة مرة أخرى.')
+          if (urlSuccess) {
+            setState('pending')
+            setMessage('تم الدفع، جاري تأكيد الطلب من بوابة الدفع...')
+          } else {
+            setState('failure')
+            setMessage('فشلت عملية الدفع. يمكنك المحاولة مرة أخرى.')
+          }
           return
         }
 
