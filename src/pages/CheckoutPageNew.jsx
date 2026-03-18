@@ -152,6 +152,14 @@ export default function CheckoutPageNew() {
   const dynamicPaymentMethods = mapPaymentMethodsForDisplay(paymobMethods)
   const hasApplePay = dynamicPaymentMethods.some((m) => m.nameKey?.includes('apple'))
 
+  // Calculate prices (moved up so they're available in handleSubmit)
+  const price = cardData?.price || 0
+  const egpRate = Number(exchangeInfo?.egpRate || 13.16)
+  const paymobAmountEGP = Math.ceil(price * egpRate * 100) / 100
+  const SAR_TO_USD = 0.2667
+  const priceUSD = price ? (Math.ceil(price * SAR_TO_USD * 100) / 100).toFixed(2) : '0.00'
+  const localPrice = convertFromSAR(price) // null for Saudis
+
   useEffect(() => { injectCheckoutCSS() }, [])
 
   // Load PayPal JS SDK
@@ -346,13 +354,6 @@ export default function CheckoutPageNew() {
       setSubmitting(false)
     }
   }
-
-  const price = cardData?.price || 0
-  const egpRate = Number(exchangeInfo?.egpRate || 13.16)
-  const paymobAmountEGP = Math.ceil(price * egpRate * 100) / 100
-  const SAR_TO_USD = 0.2667
-  const priceUSD = price ? (Math.ceil(price * SAR_TO_USD * 100) / 100).toFixed(2) : '0.00'
-  const localPrice = convertFromSAR(price) // null for Saudis
 
   // Post-PayPal-payment handler
   const handlePayPalSuccess = useCallback((captureData) => {

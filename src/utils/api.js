@@ -291,6 +291,8 @@ export async function verifyLicense() {
 export async function createPaymobFlashIntention({
   cardId,
   productName,
+  productType,
+  planType,
   customerName,
   customerPhone,
   customerEmail,
@@ -304,6 +306,8 @@ export async function createPaymobFlashIntention({
     body: JSON.stringify({
       cardId,
       productName,
+      productType,
+      planType,
       customerName,
       customerPhone,
       customerEmail,
