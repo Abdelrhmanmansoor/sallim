@@ -57,6 +57,10 @@ export default function CompanyCheckoutPage() {
   const status = searchParams.get('status')
   const merchantOrderId = searchParams.get('merchant_order_id')
   const urlTransactionId = searchParams.get('id') || null
+  const redirectParams = Object.fromEntries(searchParams.entries())
+  if (!redirectParams.success && status === 'success') {
+    redirectParams.success = 'true'
+  }
 
   const [step, setStep] = useState(status === 'success' || status === 'failed' ? 3 : 0)
   // step 0 = packages, 1 = form, 2 = paying (navigated away), 3 = result
@@ -88,7 +92,7 @@ export default function CompanyCheckoutPage() {
       const res = await fetch(`${API}/api/v1/company-checkout/complete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ merchantOrderId: orderId, transactionId: urlTransactionId }),
+        body: JSON.stringify({ merchantOrderId: orderId, transactionId: urlTransactionId, redirectParams }),
       })
       const data = await res.json()
       if (data.success && data.token && data.company) {

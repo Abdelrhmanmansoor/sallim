@@ -33,6 +33,36 @@ function buildUnifiedCheckoutUrl(clientSecret) {
 }
 
 /**
+ * Normalize redirect/query params to HMAC payload shape
+ */
+function buildHmacDataFromParams(params = {}) {
+  if (!params || typeof params !== 'object') return null
+  const orderValue = params.order ?? params['order.id'] ?? params.order_id
+  return {
+    amount_cents: params.amount_cents,
+    created_at: params.created_at,
+    currency: params.currency,
+    error_occured: params.error_occured,
+    has_parent_transaction: params.has_parent_transaction,
+    id: params.id || params.transaction_id || params.txn_id,
+    integration_id: params.integration_id,
+    is_3d_secure: params.is_3d_secure,
+    is_auth: params.is_auth,
+    is_capture: params.is_capture,
+    is_refunded: params.is_refunded,
+    is_standalone_payment: params.is_standalone_payment,
+    is_voided: params.is_voided,
+    order: orderValue,
+    owner: params.owner,
+    pending: params.pending,
+    source_data_pan: params['source_data.pan'] || params.source_data_pan,
+    source_data_sub_type: params['source_data.sub_type'] || params.source_data_sub_type,
+    source_data_type: params['source_data.type'] || params.source_data_type,
+    success: params.success,
+  }
+}
+
+/**
  * Create Payment Intention using Paymob Flash API
  * This is a one-step integration that returns a checkout URL
  * 
@@ -355,6 +385,7 @@ async function getPaymentMethods() {
 export {
   createPaymentIntention,
   verifyPaymobHMAC,
+  buildHmacDataFromParams,
   getIntentionStatus,
   getTransactionDetails,
   getPaymentMethods,

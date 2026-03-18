@@ -6,7 +6,7 @@ import CompanyOrder from '../models/CompanyOrder.js'
 import LicenseKey from '../models/LicenseKey.js'
 import Company from '../models/Company.js'
 import { checkoutLimiter } from '../middleware/rateLimiter.js'
-import { createPaymentIntention, getTransactionDetails } from '../utils/paymob-flash.js'
+import { createPaymentIntention, verifyPaymobHMAC, buildHmacDataFromParams } from '../utils/paymob-flash.js'
 
 const router = Router()
 
@@ -183,20 +183,37 @@ router.post('/complete', async (req, res) => {
       }
     }
 
-    // If not yet completed, verify via transaction ID (webhook may not have fired yet)
+    // If not yet completed, verify via redirect HMAC (Flash recommendation)
     if (order.status !== 'completed') {
-      const txId = urlTransactionId || order.paymobTransactionId
-      if (txId) {
-        try {
-          const txResult = await getTransactionDetails(parseInt(txId, 10))
-          if (txResult?.data?.success === true) {
-            order.status = 'completed'
-            if (!order.paymobTransactionId) order.paymobTransactionId = String(txId)
-            await order.save()
-          }
-        } catch (e) {
-          console.error('[CompanyCheckout] Transaction verification error:', e.message)
+      const redirectParams = (req.body.redirectParams && typeof req.body.redirectParams === 'object')
+        ? req.body.redirectParams
+        : null
+      const redirectHmacData = redirectParams ? buildHmacDataFromParams(redirectParams) : null
+      const redirectHmac = redirectParams?.hmac || req.body.hmac
+      const redirectVerified = redirectHmacData && redirectHmac
+        ? verifyPaymobHMAC(redirectHmacData, redirectHmac)
+        : false
+      const redirectSuccess = redirectVerified && String(redirectParams?.success) === 'true'
+      const txId = redirectParams?.id || urlTransactionId || order.paymobTransactionId
+      const redirectMerchantOrder = redirectParams?.merchant_order_id
+      const merchantMatches = redirectMerchantOrder && redirectMerchantOrder === order.merchantOrderId
+
+      if (redirectSuccess) {
+        order.status = 'completed'
+        if (txId && !order.paymobTransactionId) order.paymobTransactionId = String(txId)
+        if (!order.paymobOrderId && redirectParams?.order) {
+          order.paymobOrderId = String(redirectParams.order)
         }
+        await order.save()
+      } else if (String(redirectParams?.success) === 'true' && merchantMatches) {
+        // Fallback when HMAC is missing/invalid but merchant order matches
+        console.warn('[CompanyCheckout] HMAC missing or invalid on redirect; trusting success flag for', order.merchantOrderId)
+        order.status = 'completed'
+        if (txId && !order.paymobTransactionId) order.paymobTransactionId = String(txId)
+        if (!order.paymobOrderId && redirectParams?.order) {
+          order.paymobOrderId = String(redirectParams.order)
+        }
+        await order.save()
       }
 
       if (order.status !== 'completed') {

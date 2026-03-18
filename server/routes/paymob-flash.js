@@ -6,6 +6,7 @@ import express from 'express'
 import { 
   createPaymentIntention, 
   verifyPaymobHMAC, 
+  buildHmacDataFromParams,
   getIntentionStatus,
   getTransactionDetails,
   getPaymentMethods,
@@ -226,7 +227,7 @@ router.post('/create-intention', checkoutLimiter, async (req, res) => {
       checkoutSession = await CheckoutSession.findOneAndUpdate(
         { sessionId },
         updatePayload,
-        { upsert: true, new: true }
+        { upsert: true, returnDocument: 'after' }
       )
     }
 
@@ -572,31 +573,8 @@ router.post('/verify-result', async (req, res) => {
 
     const isSuccess = String(success) === 'true'
 
-    // Map redirect URL params to HMAC data format (dots → underscores for nested fields)
-    const hmacData = {
-      amount_cents: params.amount_cents,
-      created_at: params.created_at,
-      currency: params.currency,
-      error_occured: params.error_occured,
-      has_parent_transaction: params.has_parent_transaction,
-      id: transactionId,
-      integration_id: params.integration_id,
-      is_3d_secure: params.is_3d_secure,
-      is_auth: params.is_auth,
-      is_capture: params.is_capture,
-      is_refunded: params.is_refunded,
-      is_standalone_payment: params.is_standalone_payment,
-      is_voided: params.is_voided,
-      order: params.order,
-      owner: params.owner,
-      pending: params.pending,
-      source_data_pan: params['source_data.pan'],
-      source_data_sub_type: params['source_data.sub_type'],
-      source_data_type: params['source_data.type'],
-      success,
-    }
-
-    const isValidHmac = hmac ? verifyPaymobHMAC(hmacData, hmac) : false
+    const hmacData = buildHmacDataFromParams(params)
+    const isValidHmac = hmacData && hmac ? verifyPaymobHMAC(hmacData, hmac) : false
     if (!isValidHmac) {
       console.warn('[Paymob Flash] HMAC mismatch on redirect — transactionId:', transactionId)
     }
@@ -647,20 +625,31 @@ router.post('/confirm-success', async (req, res) => {
     }
 
     if (session.status !== 'completed') {
-      // Verify directly via transaction ID (most reliable, no polling)
-      const txId = urlTransactionId || session.transactionId
-      if (txId) {
-        try {
-          const txDetails = await getTransactionDetails(parseInt(txId, 10))
-          if (txDetails?.data?.success === true) {
-            session.status = 'completed'
-            if (!session.transactionId) session.transactionId = String(txId)
-            if (!session.completedAt) session.completedAt = new Date()
-            await session.save()
-          }
-        } catch (e) {
-          console.error('[Paymob Flash] Transaction verification error:', e.message)
+      const redirectParams = (req.body.redirectParams && typeof req.body.redirectParams === 'object')
+        ? req.body.redirectParams
+        : null
+      const redirectHmacData = redirectParams ? buildHmacDataFromParams(redirectParams) : null
+      const redirectHmac = redirectParams?.hmac || req.body.hmac
+      const redirectSuccessFlag = redirectParams?.success
+      const redirectVerified = redirectHmacData && redirectHmac
+        ? verifyPaymobHMAC(redirectHmacData, redirectHmac)
+        : false
+      const redirectSuccess = redirectVerified && String(redirectSuccessFlag) === 'true'
+      const redirectTxId = redirectParams?.id || urlTransactionId
+
+      if (redirectSuccess) {
+        session.status = 'completed'
+        if (redirectTxId && !session.transactionId) session.transactionId = String(redirectTxId)
+        if (!session.completedAt) session.completedAt = new Date()
+        if (!session.paymobOrderId && redirectParams?.order) {
+          session.paymobOrderId = String(redirectParams.order)
         }
+        if (redirectParams?.merchant_order_id && !session.merchantOrderId) {
+          session.merchantOrderId = String(redirectParams.merchant_order_id)
+        }
+        session.paymobData = session.paymobData || {}
+        session.paymobData.redirect = redirectParams
+        await session.save()
       }
     }
 

@@ -50,7 +50,7 @@ export default function PaymentResultPage() {
         fetch(`${apiBase}/api/v1/paymob-flash/confirm-success`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId, transactionId }),
+          body: JSON.stringify({ sessionId, transactionId, redirectParams: params }),
         }).catch(() => {})
         localStorage.removeItem('paymob_session_id')
 

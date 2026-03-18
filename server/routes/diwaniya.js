@@ -249,7 +249,7 @@ router.post('/:username/view', async (req, res) => {
         const diwaniya = await Diwaniya.findOneAndUpdate(
             { username },
             { $inc: { views: 1 } },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!diwaniya) {

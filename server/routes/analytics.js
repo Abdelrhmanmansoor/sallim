@@ -134,7 +134,7 @@ router.patch('/cards/:cardId', async (req, res) => {
     const card = await Card.findByIdAndUpdate(
       cardId,
       { $set: updateData },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!card) {

@@ -284,7 +284,7 @@ router.put('/profile', async (req, res) => {
         if (avatar !== undefined) updates.avatar = avatar;
 
         // Update user directly (avoiding pre-save hook for password re-hashing)
-        await User.findByIdAndUpdate(user._id, { $set: updates }, { new: true });
+        await User.findByIdAndUpdate(user._id, { $set: updates }, { returnDocument: 'after' });
 
         // Return updated user with populated diwaniyas
         const updatedUser = await User.findById(user._id)

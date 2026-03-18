@@ -71,7 +71,7 @@ router.post('/:username/view', async (req, res) => {
         const diwan = await Diwan.findOneAndUpdate(
             { username },
             { $inc: { views: 1 } },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!diwan) {

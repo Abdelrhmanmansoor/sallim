@@ -170,7 +170,7 @@ router.put('/:id', async (req, res) => {
     const updated = await InviteCode.findByIdAndUpdate(
       req.params.id,
       updates,
-      { new: true }
+      { returnDocument: 'after' }
     ).populate('createdBy', 'name email')
 
     // Log action

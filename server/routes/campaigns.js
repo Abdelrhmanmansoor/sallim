@@ -212,7 +212,7 @@ router.put('/:id', protectCompanyRoute, async (req, res) => {
     const updated = await CardCampaign.findByIdAndUpdate(
       req.params.id,
       updates,
-      { new: true }
+      { returnDocument: 'after' }
     )
 
     // Log action

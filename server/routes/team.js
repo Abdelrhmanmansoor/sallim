@@ -168,7 +168,7 @@ router.put('/:id', protectCompanyRoute, checkTeamPermission('manageTeam'), async
     const updated = await CompanyTeam.findByIdAndUpdate(
       req.params.id,
       updates,
-      { new: true }
+      { returnDocument: 'after' }
     ).select('-password -inviteToken')
 
     // Log action
