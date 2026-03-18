@@ -9,15 +9,15 @@ import crypto from 'crypto'
  * Paymob Flash Configuration
  */
 const PAYMOB_API_KEY = process.env.PAYMOB_API_KEY
-const PAYMOB_SECRET_KEY = process.env.PAYMOB_SECRET_KEY
-const PAYMOB_PUBLIC_KEY = process.env.PAYMOB_PUBLIC_KEY
-const PAYMOB_INTEGRATION_ID = process.env.PAYMOB_INTEGRATION_ID || '5577534' // Test ID by default
+const PAYMOB_SECRET_KEY = process.env.PAYMOB_SECRET_KEY || process.env.SECRET_KEY
+const PAYMOB_PUBLIC_KEY = process.env.PAYMOB_PUBLIC_KEY || process.env.PUBLIC_KEY
+const PAYMOB_INTEGRATION_ID = process.env.PAYMOB_INTEGRATION_ID || process.env.INTEGRATIONID || '5577534' // Test ID by default
 
 // Use Secret Key for authentication (Flash API uses secret key, not API key)
 const PAYMOB_AUTH_KEY = PAYMOB_SECRET_KEY || PAYMOB_API_KEY
 
 // Test or Live mode
-const PAYMOB_MODE = process.env.PAYMOB_MODE || 'test' // 'test' or 'live'
+const PAYMOB_MODE = process.env.PAYMOB_MODE || (process.env.NODE_ENV === 'production' ? 'live' : 'test')
 
 // API Endpoints
 const PAYMOB_BASE_URL = PAYMOB_MODE === 'live' 
@@ -184,7 +184,7 @@ async function createPaymentIntention({
  */
 function verifyPaymobHMAC(data, receivedHmac) {
   try {
-    const secret = PAYMOB_SECRET_KEY || process.env.PAYMOB_HMAC_SECRET
+    const secret = PAYMOB_SECRET_KEY || process.env.PAYMOB_HMAC_SECRET || process.env.HMAC_SECRET
     if (!secret || !receivedHmac) {
       console.error('[Paymob Flash] HMAC verification failed: missing secret or signature')
       return false
