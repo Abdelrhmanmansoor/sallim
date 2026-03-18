@@ -298,7 +298,7 @@ export default function CheckoutPageNew() {
     const e = {}
     if (!formData.customerName.trim()) e.customerName = 'الاسم مطلوب'
     if (!formData.customerPhone.trim()) e.customerPhone = 'رقم الهاتف مطلوب'
-    else if (!/^\+?[\d\s\-()]{7,20}$/.test(formData.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح'
+    else if (formData.customerPhone.trim().replace(/\D/g, '').length < 7) e.customerPhone = 'رقم هاتف غير صالح'
     if (!formData.customerEmail.trim()) e.customerEmail = 'البريد الإلكتروني مطلوب'
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.customerEmail)) e.customerEmail = 'بريد إلكتروني غير صالح'
     if (isEidSong && !formData.recipientName.trim()) e.recipientName = 'اسم المُهدى إليه مطلوب'
@@ -314,6 +314,7 @@ export default function CheckoutPageNew() {
 
   const handleSubmit = async () => {
     if (!cardData) { toast.error('لم يتم تحميل بيانات المنتج'); return }
+    if (!paymobAmountEGP || paymobAmountEGP <= 0) { toast.error('السعر غير محدد لهذا المنتج'); return }
     if (!validate()) { setStep(0); return }
 
     const sessionId = crypto.randomUUID()
