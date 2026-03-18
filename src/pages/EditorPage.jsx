@@ -465,11 +465,11 @@ function EditorPageInner() {
     loadTemplates()
   }, [companyIsActive, scopedCompany])
 
-  // Computed - Combine API templates with static fallbacks + custom uploads
-  const mergedReady = [...staticTemplates, ...dbReadyTemplates]
+  // Computed - DB templates take priority over static fallbacks (DB has prices)
+  const mergedReady = [...dbReadyTemplates, ...staticTemplates]
   const finalReadyTemplates = mergedReady.filter((t, i, self) => i === self.findIndex((tx) => tx.image === t.image))
 
-  const mergedDesigner = [...staticDesignerTemplates, ...dbDesignerTemplates]
+  const mergedDesigner = [...dbDesignerTemplates, ...staticDesignerTemplates]
   const finalDesignerTemplates = mergedDesigner.filter((t, i, self) => i === self.findIndex((tx) => tx.image === t.image))
 
   const allTemplates = mode === 'designer'

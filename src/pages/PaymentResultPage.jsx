@@ -43,7 +43,7 @@ export default function PaymentResultPage() {
         const target = data.redirectUrl || `/editor?autodownload=1`
         setRedirectUrl(target)
         setState('success')
-        setMessage('تم تأكيد الدفع بنجاح! جارٍ تحويلك للتصميم...')
+        setMessage('تم تأكيد الدفع بنجاح! اضغط الزر أدناه لتحميل تصميمك.')
 
         // Fire-and-forget: update DB record
         const sessionId = localStorage.getItem('paymob_session_id')
@@ -53,8 +53,6 @@ export default function PaymentResultPage() {
           body: JSON.stringify({ sessionId, transactionId, redirectParams: params }),
         }).catch(() => {})
         localStorage.removeItem('paymob_session_id')
-
-        setTimeout(() => navigate(target, { replace: true }), 1500)
       })
       .catch(() => {
         // Network error — trust success=true from URL
@@ -64,9 +62,8 @@ export default function PaymentResultPage() {
           : '/editor'
         setRedirectUrl(target)
         setState('success')
-        setMessage('تم الدفع بنجاح! جارٍ تحويلك...')
+        setMessage('تم الدفع بنجاح! اضغط الزر أدناه لتحميل تصميمك.')
         localStorage.removeItem('paymob_session_id')
-        setTimeout(() => navigate(target, { replace: true }), 1500)
       })
   }, [navigate, searchParams])
 
