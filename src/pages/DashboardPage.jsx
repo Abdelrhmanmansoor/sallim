@@ -1,10 +1,6 @@
 ﻿import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import {
-  Palette, Settings, BarChart3, Upload, Image as ImageIcon,
-  Check, Globe, Building2, FileText, Link2, MessageSquare,
-  ArrowLeft, Sparkles, ChevronRight
-} from 'lucide-react'
+import { Palette, Settings, BarChart3, Upload, Image as ImageIcon, Check, Globe, Building2, FileText, Link2, MessageSquare, ArrowLeft, Sparkles, ChevronRight } from 'lucide-react'
 import { useWhiteLabelStore } from '../store'
 import { getPublicStats, getAdminTickets, adminReplyToTicket, updateAdminTicketStatus, getAdminCards, getAdminCompanies, inviteCompany, updateCompanyAsAdmin, getAdminTemplates, addAdminTemplate, updateAdminTemplate, deleteAdminTemplate, getAdminBlogPosts, addAdminBlogPost, updateAdminBlogPost, deleteAdminBlogPost } from '../utils/api'
 import toast from 'react-hot-toast'

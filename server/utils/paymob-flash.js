@@ -23,6 +23,14 @@ const PAYMOB_MODE = process.env.PAYMOB_MODE || 'test' // 'test' or 'live'
 const PAYMOB_BASE_URL = PAYMOB_MODE === 'live' 
   ? 'https://accept.paymob.com/v1' 
   : 'https://accept.paymob.com/v1'
+const UNIFIED_CHECKOUT_BASE = 'https://accept.paymob.com/unifiedcheckout/'
+
+function buildUnifiedCheckoutUrl(clientSecret) {
+  if (!clientSecret || !PAYMOB_PUBLIC_KEY) return null
+  const key = encodeURIComponent(PAYMOB_PUBLIC_KEY)
+  const secret = encodeURIComponent(clientSecret)
+  return `${UNIFIED_CHECKOUT_BASE}?publicKey=${key}&clientSecret=${secret}`
+}
 
 /**
  * Create Payment Intention using Paymob Flash API
@@ -141,15 +149,24 @@ async function createPaymentIntention({
       client_secret: data.client_secret ? 'present' : 'missing'
     })
 
-    const unifiedUrl = data.client_secret && PAYMOB_PUBLIC_KEY
-      ? `https://accept.paymob.com/unifiedcheckout/?publicKey=${PAYMOB_PUBLIC_KEY}&clientSecret=${data.client_secret}`
-      : data.payment_url || data.iframe_url || data.redirect_url
+    const unifiedCheckoutUrl = buildUnifiedCheckoutUrl(data.client_secret)
+    const fallbackUrl = data.payment_url || data.iframe_url || data.redirect_url || null
+    const checkoutUrl = unifiedCheckoutUrl || fallbackUrl
+
+    if (!checkoutUrl) {
+      if (!PAYMOB_PUBLIC_KEY) {
+        throw new Error('Paymob public key is not configured; cannot build checkout URL.')
+      }
+      throw new Error('Paymob response did not include a checkout URL.')
+    }
 
     return {
       success: true,
       intention_id: data.id,
       client_secret: data.client_secret,
-      payment_url: unifiedUrl,
+      payment_url: checkoutUrl,
+      unified_checkout_url: unifiedCheckoutUrl,
+      fallback_url: fallbackUrl,
       data: data
     }
 
@@ -342,4 +359,5 @@ export {
   getTransactionDetails,
   getPaymentMethods,
   PAYMOB_MODE,
+  buildUnifiedCheckoutUrl,
 }

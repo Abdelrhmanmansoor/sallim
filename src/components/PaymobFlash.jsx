@@ -76,12 +76,13 @@ export function PaymobFlashButton({
         }
       })
 
-      if (response.success && response.paymentUrl) {
+      const checkoutUrl = response?.checkoutUrl || response?.paymentUrl
+      if (response.success && checkoutUrl) {
         // Store session ID for status checking
         localStorage.setItem('paymob_session_id', sessionId)
         
         // Redirect to Paymob payment page
-        window.location.href = response.paymentUrl
+        window.location.href = checkoutUrl
         
         // Optional: Call success callback
         if (onSuccess) {

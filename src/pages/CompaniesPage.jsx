@@ -196,7 +196,7 @@ export default function CompaniesPage() {
                     color: pkg.badge ? '#fff' : '#6366f1',
                     border: `1px solid ${pkg.badge ? '#4f46e5' : '#2d2d4d'}`,
                     borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer',
-                    fontFamily: 'Arial, sans-serif', width: '100%', marginTop: 20,
+                    fontFamily: 'Arial, sans-serif', width: '100%',
                   }}
                 >
                   اشترِ الآن →

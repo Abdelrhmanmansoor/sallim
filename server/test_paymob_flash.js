@@ -83,10 +83,11 @@ async function testCreateIntention() {
       log('✅ Payment intention created successfully', 'green')
       log(`   Intention ID: ${data.intentionId}`, 'yellow')
       log(`   Merchant Order ID: ${data.merchantOrderId}`, 'yellow')
-      log(`   Has Payment URL: ${!!data.paymentUrl}`, 'yellow')
+      const redirectUrl = data.checkoutUrl || data.paymentUrl
+      log(`   Has Checkout URL: ${!!redirectUrl}`, 'yellow')
       
-      if (data.paymentUrl) {
-        log(`   Payment URL: ${data.paymentUrl.substring(0, 50)}...`, 'yellow')
+      if (redirectUrl) {
+        log(`   Checkout URL: ${redirectUrl.substring(0, 50)}...`, 'yellow')
       }
       
       return { success: true, data }

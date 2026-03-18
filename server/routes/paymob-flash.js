@@ -9,7 +9,8 @@ import {
   getIntentionStatus,
   getTransactionDetails,
   getPaymentMethods,
-  PAYMOB_MODE 
+  PAYMOB_MODE,
+  buildUnifiedCheckoutUrl
 } from '../utils/paymob-flash.js'
 import CheckoutSession from '../models/CheckoutSession.js'
 import Card from '../models/Card.js'
@@ -283,30 +284,41 @@ router.post('/create-intention', checkoutLimiter, async (req, res) => {
       }
     })
 
+    const clientSecret = intention.client_secret || intention.clientSecret || null
+    const checkoutUrl =
+      intention.unified_checkout_url ||
+      buildUnifiedCheckoutUrl(clientSecret) ||
+      intention.payment_url ||
+      null
+
+    if (!checkoutUrl) {
+      console.error('[Paymob Flash] Missing checkout URL from intention response')
+      throw new Error('تعذر إنشاء رابط الدفع من Paymob. تأكد من ضبط PAYMOB_PUBLIC_KEY.')
+    }
+
     // Update session with intention details (skip for test cards)
     if (!isTestCard && checkoutSession) {
       await CheckoutSession.findOneAndUpdate(
         { sessionId },
         {
           intentionId: intention.intention_id,
-          clientSecret: intention.client_secret,
-          paymentUrl: intention.payment_url,
+          clientSecret,
+          paymentUrl: checkoutUrl,
         }
       )
     }
 
     console.log('[Paymob Flash] Intention created:', {
       intentionId: intention.intention_id,
-      hasPaymentUrl: !!intention.payment_url
+      hasCheckoutUrl: !!checkoutUrl
     })
-
-    const unifiedUrl = intention.payment_url
 
     res.json({
       success: true,
       intentionId: intention.intention_id,
-      clientSecret: intention.client_secret,
-      paymentUrl: unifiedUrl,
+      clientSecret,
+      paymentUrl: checkoutUrl,
+      checkoutUrl,
       merchantOrderId,
     })
 

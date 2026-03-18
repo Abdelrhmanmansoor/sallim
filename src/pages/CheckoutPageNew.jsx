@@ -341,12 +341,14 @@ export default function CheckoutPageNew() {
         }
       })
 
-      if (!response?.success || !response.paymentUrl) {
-        throw new Error(response?.error || 'تعذر بدء عملية الدفع')
+      const paymobUrl = response?.checkoutUrl || response?.paymentUrl
+      if (!response?.success || !paymobUrl) {
+        console.error('Missing Paymob checkout URL', response)
+        throw new Error(response?.error || 'تعذر بدء عملية الدفع، يرجى المحاولة لاحقاً')
       }
 
       localStorage.setItem('paymob_session_id', sessionId)
-      window.location.href = response.paymentUrl
+      window.location.href = paymobUrl
     } catch (error) {
       console.error('Checkout initiate error:', error)
       toast.error(error.message || 'حدث خطأ أثناء تجهيز الدفع')
