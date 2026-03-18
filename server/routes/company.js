@@ -464,6 +464,16 @@ router.put('/profile', protectCompanyRoute, upload.single('logo'), async (req, r
     try {
         // If a file was uploaded, push the buffer directly to Cloudinary
         if (req.file) {
+            const cloudName = process.env.CLOUDINARY_CLOUD_NAME
+            const apiKey = process.env.CLOUDINARY_API_KEY
+            const apiSecret = process.env.CLOUDINARY_API_SECRET
+            if (!cloudName || !apiKey || !apiSecret) {
+                console.error('[Profile] Cloudinary env vars missing:', { cloudName: !!cloudName, apiKey: !!apiKey, apiSecret: !!apiSecret })
+                return res.status(500).json({ success: false, error: 'إعدادات رفع الصور غير مكتملة على السيرفر (Cloudinary env vars missing)' })
+            }
+            // Ensure config is set (in case it wasn't at startup)
+            cloudinaryV2.config({ cloud_name: cloudName, api_key: apiKey, api_secret: apiSecret })
+
             const cloudUrl = await new Promise((resolve, reject) => {
                 const stream = cloudinaryV2.uploader.upload_stream(
                     {
@@ -471,7 +481,14 @@ router.put('/profile', protectCompanyRoute, upload.single('logo'), async (req, r
                         resource_type: 'image',
                         transformation: [{ quality: 'auto:best', width: 400, crop: 'limit' }],
                     },
-                    (err, result) => err ? reject(err) : resolve(result.secure_url)
+                    (err, result) => {
+                        if (err) {
+                            console.error('[Profile] Cloudinary upload_stream error:', err)
+                            reject(err)
+                        } else {
+                            resolve(result.secure_url)
+                        }
+                    }
                 )
                 stream.end(req.file.buffer)
             })
@@ -497,7 +514,7 @@ router.put('/profile', protectCompanyRoute, upload.single('logo'), async (req, r
 
     } catch (error) {
         console.error('Update profile error:', error)
-        res.status(500).json({ success: false, error: 'حدث خطأ أثناء تحديث البيانات' })
+        res.status(500).json({ success: false, error: error.message || 'حدث خطأ أثناء تحديث البيانات' })
     }
 })
 
