@@ -13,7 +13,7 @@ const checkoutSessionSchema = new mongoose.Schema(
     cardId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Card',
-      required: true,
+      required: false,
       index: true,
     },
     userId: {
@@ -58,13 +58,50 @@ const checkoutSessionSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['initiated', 'completed', 'failed'],
+      enum: ['initiated', 'pending', 'completed', 'failed'],
       default: 'initiated',
       index: true,
     },
     analyticsId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Analytics',
+    },
+    // Paymob Flash Integration fields
+    paymentMethod: {
+      type: String,
+      enum: ['paymob_legacy', 'paymob_flash', 'paypal'],
+      default: 'paymob_legacy',
+    },
+    intentionId: {
+      type: String,
+      index: true,
+    },
+    clientSecret: {
+      type: String,
+    },
+    paymentUrl: {
+      type: String,
+    },
+    merchantOrderId: {
+      type: String,
+      index: true,
+    },
+    transactionId: {
+      type: String,
+      index: true,
+    },
+    paymobData: {
+      type: mongoose.Schema.Types.Mixed,
+    },
+    completedAt: {
+      type: Date,
+    },
+    postPaymentRedirect: {
+      type: String,
+      default: '',
+    },
+    paymentEmailSentAt: {
+      type: Date,
     },
   },
   {

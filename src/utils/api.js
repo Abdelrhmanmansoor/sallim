@@ -271,6 +271,83 @@ export async function verifyLicense() {
   return apiRequest('/orders/license/verify')
 }
 
+// ═══════════════════════════════════════════
+// Paymob Flash Payment Integration
+// ═══════════════════════════════════════════
+
+/**
+ * Create Paymob Flash Payment Intention
+ * @param {Object} params - Payment parameters
+ * @param {string} params.cardId - Card ID
+ * @param {string} params.customerName - Customer name
+ * @param {string} params.customerPhone - Customer phone
+ * @param {string} params.customerEmail - Customer email
+ * @param {number} params.amount - Amount (in main currency, e.g., 100.00 EGP)
+ * @param {string} params.currency - Currency code (default: 'EGP')
+ * @param {string} params.sessionId - Unique session ID
+ * @param {Object} params.billing_data - Optional billing data
+ * @returns {Promise<Object>} - Payment intention with checkout URL
+ */
+export async function createPaymobFlashIntention({
+  cardId,
+  productName,
+  customerName,
+  customerPhone,
+  customerEmail,
+  amount,
+  currency = 'EGP',
+  sessionId,
+  billing_data = {}
+}) {
+  return apiRequest('/paymob-flash/create-intention', {
+    method: 'POST',
+    body: JSON.stringify({
+      cardId,
+      productName,
+      customerName,
+      customerPhone,
+      customerEmail,
+      amount,
+      currency,
+      sessionId,
+      billing_data
+    })
+  })
+}
+
+/**
+ * Check Paymob Flash Payment Status
+ * @param {string} sessionId - Session ID
+ * @returns {Promise<Object>} - Payment status
+ */
+export async function getPaymobFlashStatus(sessionId) {
+  return apiRequest(`/paymob-flash/status/${sessionId}`)
+}
+
+/**
+ * Get Paymob Flash Transaction Details
+ * @param {number} transactionId - Transaction ID
+ * @returns {Promise<Object>} - Transaction details
+ */
+export async function getPaymobFlashTransaction(transactionId) {
+  return apiRequest(`/paymob-flash/transaction/${transactionId}`)
+}
+
+/**
+ * Check Paymob Flash Health
+ * @returns {Promise<Object>} - Health status
+ */
+export async function checkPaymobFlashHealth() {
+  return apiRequest('/paymob-flash/health')
+}
+
+/**
+ * Get Paymob payment methods (single source)
+ */
+export async function getPaymobPaymentMethods() {
+  return apiRequest('/paymob-flash/payment-methods')
+}
+
 /**
  * Public: Log preview/security events
  */
@@ -284,9 +361,45 @@ export async function logProtectionEvent(eventType, payload = {}) {
 /**
  * Public: Get active templates
  */
-export async function getTemplates(season = '') {
-  const query = season ? `?season=${season}` : ''
-  return apiRequest(`/templates${query}`)
+export async function getTemplates(season = '', options = {}) {
+  const params = new URLSearchParams()
+  if (season) params.set('season', season)
+  if (options.companySlug) params.set('companySlug', options.companySlug)
+  if (options.companyContextToken) params.set('companyContextToken', options.companyContextToken)
+  if (options.companyAccessCode) params.set('companyAccessCode', options.companyAccessCode)
+
+  let userToken = ''
+  let companyToken = ''
+  let companyContextToken = options.companyContextToken || ''
+  try {
+    userToken = localStorage.getItem('token') || ''
+    companyToken = localStorage.getItem('sallim_company_token') || ''
+    if (!companyContextToken) {
+      companyContextToken = sessionStorage.getItem('sallim_company_context_token') || localStorage.getItem('sallim_company_context_token') || ''
+    }
+  } catch {
+    // ignore storage read errors
+  }
+
+  const query = params.toString() ? `?${params.toString()}` : ''
+  return apiRequest(`/templates${query}`, {
+    headers: {
+      ...(userToken ? { Authorization: `Bearer ${userToken}` } : {}),
+      ...(companyToken ? { 'x-company-auth-token': companyToken } : {}),
+      ...(companyContextToken ? { 'x-company-context-token': companyContextToken } : {}),
+    }
+  })
+}
+
+export async function getCompanyContextBySlug(slug) {
+  return apiRequest(`/company/context/${encodeURIComponent(slug)}`)
+}
+
+export async function resolveCompanyAccessCode(accessCode) {
+  return apiRequest('/company/access-code', {
+    method: 'POST',
+    body: JSON.stringify({ accessCode })
+  })
 }
 
 /**
@@ -826,6 +939,18 @@ export async function updateUserProfile(data) {
   const token = localStorage.getItem('token')
   return apiRequest('/auth/profile', {
     method: 'PUT',
+    headers: { 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify(data)
+  })
+}
+
+/**
+ * Auth: Link current user account to a company
+ */
+export async function linkUserCompany(data) {
+  const token = localStorage.getItem('token')
+  return apiRequest('/auth/link-company', {
+    method: 'POST',
     headers: { 'Authorization': `Bearer ${token}` },
     body: JSON.stringify(data)
   })

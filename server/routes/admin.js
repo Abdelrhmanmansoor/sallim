@@ -54,7 +54,17 @@ router.post('/licenses/generate', isAdmin, async (req, res) => {
 // ═══ Create a new company and send invitation ═══
 router.post('/companies', isAdmin, async (req, res) => {
     try {
-        const { name, email, features } = req.body
+        const {
+            name,
+            email,
+            features,
+            slug,
+            accessCode,
+            logoUrl,
+            brandColors,
+            allowedFonts,
+            isActive,
+        } = req.body
 
         if (!name || !email) {
             return res.status(400).json({ success: false, error: 'الاسم والبريد الإلكتروني مطلوبان' })
@@ -77,9 +87,15 @@ router.post('/companies', isAdmin, async (req, res) => {
         const company = await Company.create({
             name,
             email,
-            status: 'pending',
+            status: isActive ? 'active' : 'pending',
+            isActive: isActive === undefined ? false : Boolean(isActive),
             activationCode,
             activationExpires: expires,
+            slug: slug || undefined,
+            accessCode: accessCode ? String(accessCode).trim().toUpperCase() : undefined,
+            logoUrl: logoUrl || '',
+            brandColors: brandColors || undefined,
+            allowedFonts: Array.isArray(allowedFonts) ? allowedFonts : [],
             features: features || ['basic_templates'],
             role: 'company'
         })
@@ -127,7 +143,17 @@ router.get('/companies', isAdmin, async (req, res) => {
 // ═══ Update specific company (Targeting features & status) ═══
 router.put('/companies/:id', isAdmin, async (req, res) => {
     try {
-        const { status, features, name } = req.body
+        const {
+            status,
+            features,
+            name,
+            isActive,
+            slug,
+            accessCode,
+            logoUrl,
+            brandColors,
+            allowedFonts,
+        } = req.body
 
         const company = await Company.findById(req.params.id)
         if (!company) {
@@ -135,8 +161,16 @@ router.put('/companies/:id', isAdmin, async (req, res) => {
         }
 
         if (status) company.status = status
+        if (isActive !== undefined) company.isActive = Boolean(isActive)
         if (features && Array.isArray(features)) company.features = features
         if (name) company.name = name
+        if (slug) company.slug = String(slug).trim().toLowerCase()
+        if (accessCode !== undefined) company.accessCode = accessCode ? String(accessCode).trim().toUpperCase() : undefined
+        if (logoUrl !== undefined) company.logoUrl = logoUrl || ''
+        if (brandColors && typeof brandColors === 'object') {
+            company.brandColors = { ...company.brandColors, ...brandColors }
+        }
+        if (Array.isArray(allowedFonts)) company.allowedFonts = allowedFonts
 
         await company.save()
 
@@ -148,6 +182,38 @@ router.put('/companies/:id', isAdmin, async (req, res) => {
     } catch (error) {
         console.error('Error updating company:', error)
         res.status(500).json({ success: false, error: 'حدث خطأ أثناء التحديث' })
+    }
+})
+
+// ═══ Assign templates to company (company_exclusive) ═══
+router.post('/companies/:id/templates', isAdmin, async (req, res) => {
+    try {
+        const { templateIds = [], makeExclusive = true } = req.body
+        if (!Array.isArray(templateIds) || templateIds.length === 0) {
+            return res.status(400).json({ success: false, error: 'templateIds مطلوبة' })
+        }
+
+        const company = await Company.findById(req.params.id)
+        if (!company) {
+            return res.status(404).json({ success: false, error: 'الشركة غير موجودة' })
+        }
+
+        if (makeExclusive) {
+            await Template.updateMany(
+                { _id: { $in: templateIds } },
+                { $set: { visibility: 'company_exclusive', companyId: company._id } }
+            )
+        } else {
+            await Template.updateMany(
+                { _id: { $in: templateIds }, companyId: company._id },
+                { $set: { visibility: 'public', companyId: null } }
+            )
+        }
+
+        return res.json({ success: true, message: 'تم تحديث ربط القوالب بالشركة' })
+    } catch (error) {
+        console.error('Assign company templates error:', error)
+        return res.status(500).json({ success: false, error: 'حدث خطأ أثناء ربط القوالب' })
     }
 })
 
@@ -172,7 +238,7 @@ router.post('/templates', isAdmin, upload.single('image'), async (req, res) => {
             return res.status(400).json({ success: false, error: 'صورة القالب مطلوبة' })
         }
 
-        const { name, type, season, requiredFeature, isActive } = req.body
+        const { name, type, season, requiredFeature, isActive, visibility, companyId } = req.body
 
         const serverUrl = process.env.SERVER_URL || 'http://localhost:3001'
         const imageUrl = `${serverUrl}/uploads/templates/${req.file.filename}`
@@ -183,7 +249,9 @@ router.post('/templates', isAdmin, upload.single('image'), async (req, res) => {
             type: type || 'public',
             season: season || 'eid_al_fitr',
             requiredFeature: requiredFeature || '',
-            isActive: isActive === undefined ? true : isActive === 'true'
+            isActive: isActive === undefined ? true : isActive === 'true',
+            visibility: visibility || 'public',
+            companyId: companyId || null,
         })
 
         res.status(201).json({
@@ -201,7 +269,7 @@ router.post('/templates', isAdmin, upload.single('image'), async (req, res) => {
 // ═══ Update template (e.g., toggle active status) ═══
 router.put('/templates/:id', isAdmin, async (req, res) => {
     try {
-        const { isActive, name, type, price, isFree } = req.body
+        const { isActive, name, type, price, isFree, visibility, companyId } = req.body
         const template = await Template.findById(req.params.id)
 
         if (!template) {
@@ -213,6 +281,8 @@ router.put('/templates/:id', isAdmin, async (req, res) => {
         if (type) template.type = type
         if (price !== undefined) template.price = Number(price)
         if (isFree !== undefined) template.isFree = isFree
+        if (visibility) template.visibility = visibility
+        if (companyId !== undefined) template.companyId = companyId || null
 
         await template.save()
 

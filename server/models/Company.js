@@ -23,6 +23,15 @@ const companySchema = new mongoose.Schema({
         trim: true,
         default: () => nanoid(10).toLowerCase(),
     },
+    accessCode: {
+        type: String,
+        trim: true,
+        uppercase: true,
+        select: false,
+        unique: true,
+        sparse: true,
+        index: true,
+    },
     password: {
         type: String,
         select: false,
@@ -39,6 +48,11 @@ const companySchema = new mongoose.Schema({
         type: String,
         enum: ['pending', 'active', 'suspended'],
         default: 'pending',
+    },
+    isActive: {
+        type: Boolean,
+        default: false,
+        index: true,
     },
     activationCode: {
         type: String,
@@ -81,6 +95,10 @@ const companySchema = new mongoose.Schema({
             type: String,
             default: 'Cairo'
         }
+    },
+    allowedFonts: {
+        type: [String],
+        default: [],
     },
     contactInfo: {
         phone: String,
@@ -218,6 +236,15 @@ const companySchema = new mongoose.Schema({
 
 // Hash password before saving if modified
 companySchema.pre('save', async function () {
+    if (this.isModified('accessCode') && this.accessCode) {
+        this.accessCode = String(this.accessCode).trim().toUpperCase()
+    }
+    if (this.isModified('status') && !this.isModified('isActive')) {
+        this.isActive = this.status === 'active'
+    }
+    if (this.isModified('isActive') && !this.isModified('status')) {
+        this.status = this.isActive ? 'active' : 'suspended'
+    }
     if (!this.isModified('password') || !this.password) return
 
     try {

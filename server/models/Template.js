@@ -31,6 +31,18 @@ const templateSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    visibility: {
+        type: String,
+        enum: ['public', 'company_exclusive'],
+        default: 'public',
+        index: true
+    },
+    companyId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Company',
+        default: null,
+        index: true
+    },
     price: {
         type: Number,
         default: 0
@@ -38,8 +50,34 @@ const templateSchema = new mongoose.Schema({
     isFree: {
         type: Boolean,
         default: true
+    },
+    billingType: {
+        type: String,
+        enum: ['free', 'paid'],
+        default: 'free',
+        index: true
+    },
+    currency: {
+        type: String,
+        default: 'SAR',
+        trim: true
     }
 }, { timestamps: true })
+
+templateSchema.pre('save', function normalizeBilling(next) {
+    const price = Number(this.price || 0)
+    const isPaid = price > 0 || this.isFree === false || this.billingType === 'paid'
+    this.isFree = !isPaid
+    this.billingType = isPaid ? 'paid' : 'free'
+    if (!this.currency) this.currency = 'SAR'
+    if (this.companyId && this.visibility !== 'company_exclusive') {
+        this.visibility = 'company_exclusive'
+    }
+    if (!this.companyId && this.visibility === 'company_exclusive') {
+        this.visibility = 'public'
+    }
+    next()
+})
 
 const Template = mongoose.model('Template', templateSchema)
 export default Template

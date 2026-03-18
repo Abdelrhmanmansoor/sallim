@@ -35,7 +35,7 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState(null)
   const [previewTemplates, setPreviewTemplates] = useState([])
   const [showPopup, setShowPopup] = useState(false)
-  const [popupCountdown, setPopupCountdown] = useState(3)
+  const [popupCountdown, setPopupCountdown] = useState(8)
   const [playingAudio, setPlayingAudio] = useState(null)
   const [templateTab, setTemplateTab] = useState('free') // 'free' | 'paid'
   const [marketingIdx, setMarketingIdx] = useState(0)
@@ -157,7 +157,7 @@ export default function LandingPage() {
       setShowPopup(true)
     }, 1500)
 
-    // Countdown timer for popup (3s auto-close)
+    // Countdown timer for popup (auto-close)
     const countdownInterval = setInterval(() => {
       setPopupCountdown((prev) => {
         if (prev <= 1) {
@@ -278,94 +278,44 @@ export default function LandingPage() {
               <div style={{ textAlign: 'center', marginBottom: '24px' }}>
                 <div style={{ width: '60px', height: '60px', margin: '0 auto 16px', borderRadius: '50%', background: 'linear-gradient(135deg, #d4af37, #f5d77a)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(212,175,55,0.3)' }}><Sparkles size={28} color="#fff" /></div>
                 <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a', marginBottom: '6px', lineHeight: 1.4 }}>
-                  🎉 عيدك أجمل مع سَلِّم
+                  🏢 باقات الشركات والمؤسسات
                 </h2>
                 <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6 }}>
-                  ابدأ الآن واصنع تهنئة لا تُنسى
+                  هنّئ موظفيك وعملاءك بهوية شركتك المميزة
                 </p>
               </div>
 
-              {/* 3 Mode Options */}
+              {/* Companies Features */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
-                <button
-                  onClick={() => navigate('/editor?mode=ready')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '14px 18px',
-                    background: '#f8fafc',
-                    border: '2px solid #e2e8f0',
-                    borderRadius: '16px',
-                    cursor: 'pointer',
-                    transition: 'all 200ms',
-                    textAlign: 'right',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0f172a'; e.currentTarget.style.background = '#fff' }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.background = '#f8fafc' }}
-                >
-                  <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Palette size={22} color="#0f172a" /></div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>قوالب جاهزة</div>
-                    <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>اختر واكتب الاسم وحمّل فوراً</div>
+                {[
+                  'لوجو وألوان شركتك على كل بطاقة',
+                  'رابط ذكي للموظفين',
+                  'لوحة تحكم ومتابعة الاستهلاك',
+                  'رفع CSV جماعي',
+                ].map((item) => (
+                  <div
+                    key={item}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      padding: '12px 14px',
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: 12,
+                      color: '#334155',
+                      fontSize: 13,
+                      fontWeight: 700,
+                    }}
+                  >
+                    <span style={{ color: '#16a34a', fontSize: 16 }}>✓</span>
+                    <span>{item}</span>
                   </div>
-                  <span style={{ background: '#16a34a', color: '#fff', padding: '4px 10px', borderRadius: '100px', fontSize: '11px', fontWeight: 700 }}>مجاني</span>
-                </button>
-
-                <button
-                  onClick={() => navigate('/editor?mode=designer')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '14px 18px',
-                    background: '#fffbeb',
-                    border: '2px solid #fde68a',
-                    borderRadius: '16px',
-                    cursor: 'pointer',
-                    transition: 'all 200ms',
-                    textAlign: 'right',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#f59e0b'; e.currentTarget.style.background = '#fefce8' }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#fde68a'; e.currentTarget.style.background = '#fffbeb' }}
-                >
-                  <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Type size={22} color="#d97706" /></div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>مصمم احترافي</div>
-                    <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>تحكم كامل بالتصميم والخطوط والألوان</div>
-                  </div>
-                  <span style={{ background: '#f59e0b', color: '#fff', padding: '4px 10px', borderRadius: '100px', fontSize: '11px', fontWeight: 700 }}>مدفوع</span>
-                </button>
-
-                <button
-                  onClick={() => navigate('/editor?mode=batch')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '14px 18px',
-                    background: '#faf5ff',
-                    border: '2px solid #e9d5ff',
-                    borderRadius: '16px',
-                    cursor: 'pointer',
-                    transition: 'all 200ms',
-                    textAlign: 'right',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#a855f7'; e.currentTarget.style.background = '#f5f3ff' }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#e9d5ff'; e.currentTarget.style.background = '#faf5ff' }}
-                >
-                  <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#f3e8ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Layers size={22} color="#a855f7" /></div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>جماعي</div>
-                    <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>أرسل تهنئة مخصصة لعدة أشخاص دفعة واحدة</div>
-                  </div>
-                  <span style={{ background: '#a855f7', color: '#fff', padding: '4px 10px', borderRadius: '100px', fontSize: '11px', fontWeight: 700 }}>للشركات</span>
-                </button>
+                ))}
               </div>
 
-              {/* Song CTA */}
               <button
-                onClick={() => navigate('/editor?mode=ready')}
+                onClick={() => navigate('/companies')}
                 style={{
                   width: '100%',
                   display: 'flex',
@@ -373,7 +323,7 @@ export default function LandingPage() {
                   justifyContent: 'center',
                   gap: '8px',
                   padding: '14px',
-                  background: 'linear-gradient(135deg, #1e1b4b, #4338ca)',
+                  background: '#111827',
                   color: '#fff',
                   fontSize: '14px',
                   fontWeight: 700,
@@ -385,7 +335,28 @@ export default function LandingPage() {
                 onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)' }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)' }}
               >
-                اصنع أغنية العيد لمن تحب — 50 <SAR size={11} style={{ verticalAlign: '-1px' }} />
+                تفاصيل الباقات
+              </button>
+              <button
+                onClick={() => handleWhatsAppLink('مرحباً، أرغب بالاستفسار عن باقات الشركات لبطاقات التهنئة')}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '14px',
+                  marginTop: 10,
+                  background: '#25D366',
+                  color: '#fff',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  borderRadius: '14px',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                تواصل معنا عبر واتساب
               </button>
             </div>
           </div>
@@ -662,218 +633,106 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ROTATING MARKETING SECTION — Typewriter style */}
-      <section style={{ padding: '48px 0', background: '#fff', overflow: 'hidden' }}>
-        <div style={{ maxWidth: '700px', margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
-          <div style={{ position: 'relative', minHeight: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {/* For Corporates */}
+      {/* ROTATING MARKETING SECTION */}
+      <section style={{ padding: '56px 0', background: '#f8fafc' }}>
+        <div style={{ maxWidth: '820px', margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
+          {marketingIdx === 0 ? (
             <div style={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              opacity: marketingIdx === 0 ? 1 : 0,
-              transform: marketingIdx === 0 ? 'translateY(0)' : 'translateY(12px)',
-              transition: 'all 0.6s ease',
-              pointerEvents: marketingIdx === 0 ? 'auto' : 'none',
+              background: '#fff',
+              border: '1px solid #e5e7eb',
+              borderRadius: 22,
+              padding: '32px 24px',
+              boxShadow: '0 10px 30px rgba(15,23,42,0.06)',
             }}>
-              <span style={{ fontSize: '13px', color: '#a855f7', fontWeight: 700, marginBottom: '12px', letterSpacing: '0.05em' }}>للشركات والمؤسسات</span>
-              <h2 className="typewriter-text" style={{ fontSize: 'clamp(22px, 4vw, 34px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.4, marginBottom: '10px' }}>
+              <span style={{ fontSize: '13px', color: '#7c3aed', fontWeight: 700, marginBottom: '12px', display: 'inline-block', letterSpacing: '0.04em' }}>
+                للشركات والمؤسسات
+              </span>
+              <h2 style={{ fontSize: 'clamp(24px, 4vw, 34px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.35, marginBottom: 12 }}>
                 عزّز علاقتك بموظفيك وعملائك
               </h2>
-              <p style={{ fontSize: '15px', color: '#64748b', lineHeight: 1.8, maxWidth: '520px' }}>
-                أرسل تهنئة مخصصة باسم كل موظف وعميل دفعة واحدة — بهوية شركتك وشعارها
+              <p style={{ fontSize: '15px', color: '#64748b', lineHeight: 1.9, maxWidth: 560, margin: '0 auto' }}>
+                أرسل تهنئة مخصصة باسم كل موظف وعميل دفعة واحدة، بهوية شركتك وشعارها بشكل احترافي.
               </p>
               <Link
                 to="/editor?mode=batch"
-                style={{ marginTop: '20px', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', background: '#a855f7', color: '#fff', fontSize: '14px', fontWeight: 700, borderRadius: '12px', textDecoration: 'none', transition: 'all 200ms' }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(168,85,247,0.3)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
+                style={{
+                  marginTop: 22,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '12px 26px',
+                  background: '#7c3aed',
+                  color: '#fff',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  borderRadius: 12,
+                  textDecoration: 'none',
+                }}
               >
-                جرّب النظام الجماعي ←
+                جرّب النظام الجماعي
               </Link>
             </div>
-
-            {/* For Individuals */}
+          ) : (
             <div style={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              opacity: marketingIdx === 1 ? 1 : 0,
-              transform: marketingIdx === 1 ? 'translateY(0)' : 'translateY(12px)',
-              transition: 'all 0.6s ease',
-              pointerEvents: marketingIdx === 1 ? 'auto' : 'none',
+              background: '#fff',
+              border: '1px solid #e5e7eb',
+              borderRadius: 22,
+              padding: '32px 24px',
+              boxShadow: '0 10px 30px rgba(15,23,42,0.06)',
             }}>
-              <span style={{ fontSize: '13px', color: '#b8860b', fontWeight: 700, marginBottom: '12px', letterSpacing: '0.05em' }}>للأفراد والعائلات</span>
-              <h2 className="typewriter-text" style={{ fontSize: 'clamp(22px, 4vw, 34px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.4, marginBottom: '10px' }}>
+              <span style={{ fontSize: '13px', color: '#b8860b', fontWeight: 700, marginBottom: '12px', display: 'inline-block', letterSpacing: '0.04em' }}>
+                للأفراد والعائلات
+              </span>
+              <h2 style={{ fontSize: 'clamp(24px, 4vw, 34px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.35, marginBottom: 12 }}>
                 اصنع فرحة العيد بلمستك الخاصة
               </h2>
-              <p style={{ fontSize: '15px', color: '#64748b', lineHeight: 1.8, maxWidth: '520px' }}>
-                صمّم بطاقة فريدة لأحبابك — اختر قالباً أنيقاً، أضف اسمهم، وشاركها فوراً
+              <p style={{ fontSize: '15px', color: '#64748b', lineHeight: 1.9, maxWidth: 560, margin: '0 auto' }}>
+                صمّم بطاقة فريدة لأحبابك، اختر قالباً أنيقاً، أضف الاسم، ثم شاركها فوراً.
               </p>
               <Link
                 to="/editor?mode=ready"
-                style={{ marginTop: '20px', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', background: '#b8860b', color: '#fff', fontSize: '14px', fontWeight: 700, borderRadius: '12px', textDecoration: 'none', transition: 'all 200ms' }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(184,134,11,0.3)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
+                style={{
+                  marginTop: 22,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '12px 26px',
+                  background: '#b8860b',
+                  color: '#fff',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  borderRadius: 12,
+                  textDecoration: 'none',
+                }}
               >
-                ابدأ تصميم بطاقتك ←
+                ابدأ تصميم بطاقتك
               </Link>
             </div>
-          </div>
+          )}
 
           {/* Dots */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 14 }}>
             {[0, 1].map(i => (
-              <button key={i} onClick={() => setMarketingIdx(i)} style={{
-                width: marketingIdx === i ? 24 : 8,
-                height: 8,
-                borderRadius: 100,
-                border: 'none',
-                cursor: 'pointer',
-                background: marketingIdx === i ? '#0f172a' : '#e2e8f0',
-                transition: 'all 0.3s',
-              }} />
+              <button
+                key={i}
+                onClick={() => setMarketingIdx(i)}
+                style={{
+                  width: marketingIdx === i ? 24 : 8,
+                  height: 8,
+                  borderRadius: 100,
+                  border: 'none',
+                  cursor: 'pointer',
+                  background: marketingIdx === i ? '#0f172a' : '#d1d5db',
+                  transition: 'all 0.3s',
+                }}
+              />
             ))}
           </div>
         </div>
-
-        <style>{`
-          .typewriter-text {
-            overflow: hidden;
-            border-left: 3px solid #0f172a;
-            white-space: nowrap;
-            animation: typing 1.2s steps(30, end) forwards, blink-caret 0.6s step-end infinite;
-          }
-          @keyframes typing {
-            from { max-width: 0; }
-            to { max-width: 100%; }
-          }
-          @keyframes blink-caret {
-            from, to { border-color: transparent; }
-            50% { border-color: #0f172a; }
-          }
-          @media (max-width: 600px) {
-            .typewriter-text {
-              white-space: normal;
-              border-left: none;
-              animation: fadeInUp 0.6s ease forwards;
-            }
-            @keyframes fadeInUp {
-              from { opacity: 0; transform: translateY(10px); }
-              to { opacity: 1; transform: translateY(0); }
-            }
-          }
-        `}</style>
       </section>
 
       {/* OCCASION CATEGORIES SLIDER */}
       <OccasionSlider />
-
-      {/* COMPANIES PROMO SECTION */}
-      <section style={{ padding: '0 0 0', background: '#fff' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '48px 24px' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-            borderRadius: '28px',
-            padding: 'clamp(32px, 5vw, 52px)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'clamp(24px, 4vw, 48px)',
-            flexWrap: 'wrap',
-            position: 'relative',
-            overflow: 'hidden',
-          }}>
-            {/* Decorative */}
-            <div style={{ position: 'absolute', top: -60, left: -60, width: 200, height: 200, background: 'radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%)', borderRadius: '50%' }} />
-            <div style={{ position: 'absolute', bottom: -40, right: -40, width: 160, height: 160, background: 'radial-gradient(circle, rgba(37,211,102,0.1) 0%, transparent 70%)', borderRadius: '50%' }} />
-
-            <div style={{ flex: '1 1 400px', position: 'relative', zIndex: 1 }}>
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8,
-                background: 'rgba(168,85,247,0.15)', border: '1px solid rgba(168,85,247,0.3)',
-                borderRadius: 100, padding: '6px 16px', marginBottom: 20,
-              }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#c4b5fd' }}>للشركات والمؤسسات</span>
-              </div>
-
-              <h2 style={{
-                fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 900, color: '#fff',
-                lineHeight: 1.3, marginBottom: 16, letterSpacing: '-0.02em',
-              }}>
-                هنّئ موظفيك وعملاءك
-                <br />
-                <span style={{ color: '#a855f7' }}>بهوية شركتك المميزة</span>
-              </h2>
-
-              <p style={{ fontSize: 'clamp(14px, 2vw, 17px)', color: '#94a3b8', lineHeight: 1.9, marginBottom: 28, maxWidth: 520 }}>
-                باقات مخصصة للشركات تبدأ من 50 بطاقة — رابط ذكي لموظفيك، لوجو وألوان شركتك على كل بطاقة، ولوحة تحكم كاملة لمتابعة الاستهلاك.
-              </p>
-
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                <a
-                  href={`https://wa.me/201007835547?text=${encodeURIComponent('مرحباً، أرغب بالاستفسار عن باقات الشركات لبطاقات التهنئة')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => { if (typeof snaptr !== 'undefined') { snaptr('track', 'CUSTOM_EVENT_1') } }}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 10,
-                    padding: '16px 32px', background: '#25D366', color: '#fff',
-                    borderRadius: 16, textDecoration: 'none',
-                    fontSize: 'clamp(14px, 2vw, 16px)', fontWeight: 800,
-                    fontFamily: "'Tajawal', sans-serif",
-                    boxShadow: '0 8px 24px rgba(37,211,102,0.3)',
-                    transition: 'all 0.2s',
-                  }}
-                >
-                  <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                  تواصل معنا عبر واتساب
-                </a>
-                <Link
-                  to="/companies"
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 8,
-                    padding: '16px 28px',
-                    background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
-                    color: '#e2e8f0', borderRadius: 16, textDecoration: 'none',
-                    fontSize: 'clamp(14px, 2vw, 16px)', fontWeight: 700,
-                    fontFamily: "'Tajawal', sans-serif",
-                    transition: 'all 0.2s',
-                  }}
-                >
-                  تفاصيل الباقات
-                </Link>
-              </div>
-            </div>
-
-            {/* Features List */}
-            <div style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', gap: 16, position: 'relative', zIndex: 1 }}>
-              {[
-                { icon: '🏢', text: 'لوجو وألوان شركتك' },
-                { icon: '🔗', text: 'رابط ذكي للموظفين' },
-                { icon: '📊', text: 'لوحة تحكم ومتابعة' },
-                { icon: '📦', text: 'رفع CSV جماعي' },
-                { icon: '🎨', text: '5 خطوط عربية فاخرة' },
-              ].map((f, i) => (
-                <div key={i} style={{
-                  display: 'flex', alignItems: 'center', gap: 12,
-                  background: 'rgba(255,255,255,0.05)', borderRadius: 14,
-                  padding: '12px 20px', border: '1px solid rgba(255,255,255,0.08)',
-                }}>
-                  <span style={{ fontSize: 20 }}>{f.icon}</span>
-                  <span style={{ fontSize: 14, color: '#cbd5e1', fontWeight: 600, fontFamily: "'Tajawal', sans-serif" }}>{f.text}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* PRODUCT SHOWCASE — Tabbed Free / Paid */}
       <section style={{ padding: '72px 0 80px', background: '#f8fafc', overflow: 'hidden' }}>

@@ -82,6 +82,67 @@ function ElegantBackground() {
     )
 }
 
+// ── Ramadan/Eid theme for Oud Scent (exclusive) ──
+function RamadanBackground() {
+    return (
+        <>
+            <style>{`
+                @keyframes twinkle {
+                    0%, 100% { opacity: 0.3; transform: scale(1) }
+                    50% { opacity: 1; transform: scale(1.2) }
+                }
+                @keyframes floatSlow {
+                    0%, 100% { transform: translateY(0) rotate(0deg) }
+                    50% { transform: translateY(-20px) rotate(5deg) }
+                }
+                @keyframes glow {
+                    0%, 100% { filter: drop-shadow(0 0 8px rgba(212,168,67,0.3)) }
+                    50% { filter: drop-shadow(0 0 20px rgba(212,168,67,0.6)) }
+                }
+                .ramadan-star { position: fixed; color: #d4a843; pointer-events: none; z-index: 0; opacity: 0; animation: twinkle ease-in-out infinite; }
+                .ramadan-lantern { position: fixed; pointer-events: none; z-index: 0; animation: floatSlow ease-in-out infinite; }
+                .ramadan-mosque { position: fixed; bottom: 0; left: 0; right: 0; height: 120px; pointer-events: none; z-index: 0; opacity: 0.15; }
+            `}</style>
+            {/* Mosque silhouette at bottom */}
+            <div className="ramadan-mosque" style={{
+                background: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 400 100\'%3E%3Cpath fill=\'%23d4a843\' d=\'M0 100h400V60c-20 0-30-20-30-20s-10 20-30 20-30-20-30-20-10 20-30 20-30-20-30-20-10 20-30 20-30-20-30-20-10 20-30 20-30-20-30-20-10 20-30 20V100z\'/%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'15\' fill=\'%23d4a843\'/%3E%3Crect x=\'47\' y=\'60\' width=\'6\' height=\'40\' fill=\'%23d4a843\'/%3E%3Ccircle cx=\'200\' cy=\'35\' r=\'25\' fill=\'%23d4a843\'/%3E%3Crect x=\'195\' y=\'55\' width=\'10\' height=\'45\' fill=\'%23d4a843\'/%3E%3Ccircle cx=\'350\' cy=\'45\' r=\'18\' fill=\'%23d4a843\'/%3E%3Crect x=\'346\' y=\'60\' width=\'8\' height=\'40\' fill=\'%23d4a843\'/%3E%3C/svg%3E") repeat-x bottom',
+                backgroundSize: 'auto 100%',
+            }} />
+            {/* Golden stars */}
+            {[...Array(12)].map((_, i) => (
+                <div key={i} className="ramadan-star" style={{
+                    left: `${(i * 8.5 + 2) % 100}%`,
+                    top: `${(i * 7.3 + 5) % 70}%`,
+                    fontSize: `${8 + (i % 4) * 4}px`,
+                    animationDuration: `${2 + (i % 3)}s`,
+                    animationDelay: `${i * 0.3}s`,
+                }}>
+                    ✦
+                </div>
+            ))}
+            {/* Crescent moon */}
+            <div style={{
+                position: 'fixed', top: '8%', right: '8%', fontSize: 48, color: '#d4a843',
+                animation: 'glow 3s ease-in-out infinite', zIndex: 0, pointerEvents: 'none',
+                textShadow: '0 0 30px rgba(212,168,67,0.5)',
+            }}>
+                ☪
+            </div>
+            {/* Soft radial glow */}
+            <div style={{
+                position: 'fixed', top: '-20%', right: '-10%', width: '60%', height: '60%',
+                background: 'radial-gradient(circle, rgba(212,168,67,0.08), transparent 70%)',
+                pointerEvents: 'none', zIndex: 0,
+            }} />
+            <div style={{
+                position: 'fixed', bottom: '-10%', left: '-10%', width: '50%', height: '50%',
+                background: 'radial-gradient(circle, rgba(13,122,62,0.06), transparent 70%)',
+                pointerEvents: 'none', zIndex: 0,
+            }} />
+        </>
+    )
+}
+
 export default function GreetPage() {
     const { slug, shortId } = useParams()
     const [searchParams] = useSearchParams()
@@ -234,6 +295,11 @@ export default function GreetPage() {
     const displayName = customCompanyName || company?.name || ''
     const companyLogo = company?.logoUrl || ''
     const previewFont = (fontList.find(fo => fo.id === paramFont) || fontList[1]).family
+    
+    // Check if this is Oud Scent company for special Ramadan theme
+    const isOudScent = ['ريحة عود', 'Oud Scent', 'Oud scent', 'oud scent', 'OUD SCENT'].some(
+        n => displayName.toLowerCase().includes(n.toLowerCase())
+    )
 
     if (loading) return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg,#fafafa,#f0f4ff)', fontFamily: UI_FONT }}>
@@ -242,6 +308,193 @@ export default function GreetPage() {
         </div>
     )
 
+    // Oud Scent special dark green Ramadan theme
+    if (isOudScent) {
+        return (
+            <div style={{
+                minHeight: '100vh',
+                background: 'linear-gradient(160deg, #021a0a 0%, #0d3320 50%, #021a0a 100%)',
+                fontFamily: UI_FONT,
+                direction: 'rtl',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '32px 16px 48px',
+                position: 'relative',
+                overflow: 'hidden',
+            }}>
+                <RamadanBackground />
+
+                <div style={{ width: '100%', maxWidth: 420, position: 'relative', zIndex: 1 }}>
+
+                    {/* ── Company Brand ── */}
+                    <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                        {companyLogo ? (
+                            <img src={companyLogo} alt={displayName}
+                                style={{ width: 70, height: 70, borderRadius: 18, objectFit: 'cover', margin: '0 auto 12px', display: 'block', boxShadow: '0 4px 24px rgba(212,168,67,0.3)', border: '2px solid rgba(212,168,67,0.3)' }} />
+                        ) : displayName ? (
+                            <div style={{
+                                width: 70, height: 70, borderRadius: 18,
+                                background: 'linear-gradient(135deg, #d4a843, #8a6d1f)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                margin: '0 auto 12px', fontSize: 26, fontWeight: 900, color: '#fff',
+                                boxShadow: '0 4px 24px rgba(212,168,67,0.4)',
+                            }}>
+                                {displayName[0]}
+                            </div>
+                        ) : null}
+                        {displayName && (
+                            <div style={{ fontSize: 15, fontWeight: 700, color: '#d4a843', letterSpacing: 1 }}>
+                                {displayName}
+                            </div>
+                        )}
+                        {greetingMsg && (
+                            <h1 style={{ fontSize: 'clamp(18px,5vw,24px)', fontWeight: 900, color: '#fff', margin: '12px 0 0', lineHeight: 1.5, textShadow: '0 2px 12px rgba(0,0,0,0.4)' }}>
+                                {greetingMsg}
+                            </h1>
+                        )}
+                    </div>
+
+                    {/* ── Template Preview ── */}
+                    {templateImage && !cardGenerated && (
+                        <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 12px 48px rgba(0,0,0,0.5), 0 0 30px rgba(212,168,67,0.15)', marginBottom: 20, position: 'relative', background: '#0d3320', minHeight: imgError ? 180 : 'auto' }}>
+                            {!imgError ? (
+                                <>
+                                    <img
+                                        src={templateImage}
+                                        alt="القالب"
+                                        crossOrigin="anonymous"
+                                        style={{ width: '100%', display: 'block' }}
+                                        onError={() => setImgError(true)}
+                                    />
+                                    {name.trim() && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: `${paramNameY * 100}%`,
+                                            left: '50%',
+                                            transform: 'translate(-50%, -50%)',
+                                            color: paramColor || templateTextColor || '#d4a843',
+                                            fontSize: 'clamp(13px,3.5vw,19px)',
+                                            fontWeight: 400,
+                                            fontFamily: previewFont,
+                                            textAlign: 'center',
+                                            width: '80%',
+                                            direction: 'rtl',
+                                            pointerEvents: 'none',
+                                        }}>
+                                            {name.trim()}
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <div style={{ padding: 40, textAlign: 'center', color: 'rgba(212,168,67,0.5)', fontSize: 13 }}>
+                                    جارٍ تحميل القالب...
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* ── Generated Card ── */}
+                    {cardGenerated && cardDataUrl && (
+                        <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 12px 48px rgba(0,0,0,0.5), 0 0 30px rgba(212,168,67,0.15)', marginBottom: 20 }}>
+                            <img src={cardDataUrl} alt="بطاقتك" style={{ width: '100%', display: 'block' }} />
+                        </div>
+                    )}
+
+                    {/* ── Input / Action ── */}
+                    {!cardGenerated ? (
+                        <div style={{
+                            background: 'rgba(13,51,32,0.8)',
+                            backdropFilter: 'blur(20px)',
+                            WebkitBackdropFilter: 'blur(20px)',
+                            borderRadius: 20,
+                            padding: 24,
+                            border: '1px solid rgba(212,168,67,0.2)',
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                        }}>
+                            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', margin: '0 0 14px', textAlign: 'center', lineHeight: 1.7 }}>
+                                اكتب اسمك لتحصل على بطاقتك
+                            </p>
+                            <input
+                                type="text"
+                                value={name}
+                                onChange={e => setName(e.target.value)}
+                                onKeyDown={e => e.key === 'Enter' && handleGenerate()}
+                                placeholder="اسمك هنا..."
+                                dir="rtl"
+                                style={{
+                                    width: '100%', padding: '14px 16px', boxSizing: 'border-box',
+                                    background: 'rgba(255,255,255,0.08)', border: '1.5px solid rgba(212,168,67,0.3)',
+                                    borderRadius: 12, fontSize: 16, fontWeight: 700, color: '#fff',
+                                    fontFamily: UI_FONT, outline: 'none', textAlign: 'center',
+                                    marginBottom: 14, transition: 'border-color 0.2s',
+                                }}
+                                onFocus={e => { e.target.style.borderColor = '#d4a843' }}
+                                onBlur={e => { e.target.style.borderColor = 'rgba(212,168,67,0.3)' }}
+                            />
+                            <button
+                                onClick={handleGenerate}
+                                disabled={generating || !name.trim() || !templateImage}
+                                style={{
+                                    width: '100%', padding: '14px 0',
+                                    background: (generating || !name.trim() || !templateImage)
+                                        ? 'rgba(255,255,255,0.1)'
+                                        : 'linear-gradient(135deg, #d4a843 0%, #8a6d1f 100%)',
+                                    color: (generating || !name.trim() || !templateImage) ? 'rgba(255,255,255,0.3)' : '#fff',
+                                    border: 'none', borderRadius: 14, fontSize: 16, fontWeight: 800,
+                                    cursor: (generating || !name.trim() || !templateImage) ? 'not-allowed' : 'pointer',
+                                    fontFamily: UI_FONT,
+                                    boxShadow: (generating || !name.trim() || !templateImage) ? 'none' : '0 4px 24px rgba(212,168,67,0.4)',
+                                    transition: 'all 0.2s',
+                                }}
+                            >
+                                {generating ? 'جارٍ التحضير...' : 'احصل على بطاقتك'}
+                            </button>
+                        </div>
+                    ) : (
+                        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
+                            <button onClick={handleDownload} style={{
+                                flex: 1, minWidth: 140, padding: '13px 20px',
+                                background: 'linear-gradient(135deg, #d4a843, #8a6d1f)',
+                                color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 800,
+                                cursor: 'pointer', fontFamily: UI_FONT,
+                                boxShadow: '0 4px 24px rgba(212,168,67,0.4)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                            }}>
+                                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                تحميل
+                            </button>
+                            <button onClick={handleShare} style={{
+                                flex: 1, minWidth: 140, padding: '13px 20px',
+                                background: 'rgba(13,51,32,0.8)', color: '#d4a843',
+                                border: '1.5px solid rgba(212,168,67,0.3)',
+                                borderRadius: 14, fontSize: 15, fontWeight: 800, cursor: 'pointer', fontFamily: UI_FONT,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                                backdropFilter: 'blur(10px)',
+                            }}>
+                                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                                مشاركة
+                            </button>
+                            <button onClick={() => { setCardGenerated(false); setCardDataUrl(null); setName('') }} style={{
+                                width: '100%', padding: '10px 0',
+                                background: 'transparent', color: 'rgba(212,168,67,0.5)', border: 'none',
+                                borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: UI_FONT,
+                            }}>
+                                بطاقة جديدة
+                            </button>
+                        </div>
+                    )}
+
+                    <p style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.2)', marginTop: 32 }}>
+                        بتقنية <a href="https://sallim.co" style={{ color: 'rgba(212,168,67,0.5)', textDecoration: 'none', fontWeight: 700 }}>سلّم</a>
+                    </p>
+                </div>
+            </div>
+        )
+    }
+
+    // Default light theme for other companies
     return (
         <div style={{
             minHeight: '100vh',

@@ -36,6 +36,7 @@ import companyBulkRoutes from './routes/company-bulk.js'
 import ordersRoutes from './routes/orders.js'
 import checkoutRoutes from './routes/checkout.js'
 import companyCheckoutRoutes from './routes/company-checkout.js'
+import paymobFlashRoutes from './routes/paymob-flash.js'
 import { scheduleMonthlyReset } from './jobs/reset-monthly-usage.js'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -224,6 +225,7 @@ app.use('/api/v1/company/bulk', companyBulkRoutes)
 app.use('/api/v1/orders', ordersRoutes)
 app.use('/api/v1/checkout', checkoutRoutes)
 app.use('/api/v1/company-checkout', companyCheckoutRoutes)
+app.use('/api/v1/paymob-flash', paymobFlashRoutes)
 app.use('/api/v1/templates', templateRoutes)
 app.use('/api/v1/blog', blogRoutes)
 app.use('/api/v1/tickets', ticketRoutes)

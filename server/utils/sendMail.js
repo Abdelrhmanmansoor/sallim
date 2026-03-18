@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer'
  * Send an email using Nodemailer
  * It uses the environment variables for SMTP configuration
  */
-export async function sendEmail({ to, subject, html }) {
+export async function sendEmail({ to, subject, html, attachments = [] }) {
     try {
         // In production, configure these in your .env
         // We are using a test account or generic SMTP as fallback
@@ -26,6 +26,7 @@ export async function sendEmail({ to, subject, html }) {
             to,
             subject,
             html, // html body
+            attachments,
         })
 
         console.log('Message sent: %s', info.messageId)

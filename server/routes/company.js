@@ -8,6 +8,7 @@ import CompanyTeam from '../models/CompanyTeam.js'
 import LicenseKey from '../models/LicenseKey.js'
 import Card from '../models/Card.js'
 import GreetLink from '../models/GreetLink.js'
+import Template from '../models/Template.js'
 import { upload } from '../config/upload.js'
 import { loginLimiter, activationLimiter, employeeLimiter } from '../middleware/rateLimiter.js'
 
@@ -61,6 +62,30 @@ if (!process.env.JWT_SECRET) {
   process.exit(1)
 }
 const JWT_SECRET = process.env.JWT_SECRET
+
+const buildCompanyContext = (company) => ({
+  id: company._id,
+  name: company.name,
+  slug: company.slug,
+  logoUrl: company.logoUrl || '',
+  brandColors: company.brandColors || {
+    primary: company.primaryColor || '#2563eb',
+    secondary: '#1e40af',
+  },
+  allowedFonts: Array.isArray(company.allowedFonts) ? company.allowedFonts : [],
+  isActive: company.status === 'active' && company.isActive !== false,
+  status: company.status,
+})
+
+const issueCompanyContextToken = (company) => jwt.sign(
+  {
+    type: 'company_context',
+    companyId: String(company._id),
+    slug: company.slug,
+  },
+  JWT_SECRET,
+  { expiresIn: '12h' }
+)
 
 // ─── Helpers ───
 const hashLicenseCode = (code) => {
@@ -179,6 +204,9 @@ router.post('/activate', activationLimiter, async (req, res) => {
           slug: company.slug,
           logoUrl: company.logoUrl,
           primaryColor: company.primaryColor,
+          brandColors: company.brandColors,
+          allowedFonts: company.allowedFonts || [],
+          isActive: company.isActive !== false,
           cardsLimit: company.cardsLimit,
           cardsUsed: company.cardsUsed,
           features: company.features,
@@ -235,6 +263,9 @@ router.post('/login', loginLimiter, async (req, res) => {
                     slug: company.slug,
                     logoUrl: company.logoUrl,
                     primaryColor: company.primaryColor,
+                    brandColors: company.brandColors,
+                    allowedFonts: company.allowedFonts || [],
+                    isActive: company.isActive !== false,
                     cardsLimit: company.cardsLimit,
                     cardsUsed: company.cardsUsed,
                     features: company.features,
@@ -264,6 +295,9 @@ export const protectCompanyRoute = async (req, res, next) => {
         req.company = await Company.findById(decoded.id)
         if (!req.company) {
             return res.status(404).json({ success: false, error: 'الشركة غير موجودة' })
+        }
+        if (req.company.status !== 'active' || req.company.isActive === false) {
+            return res.status(403).json({ success: false, error: 'حساب الشركة غير مفعل حالياً' })
         }
         next()
     } catch (error) {
@@ -457,11 +491,88 @@ router.put('/profile', protectCompanyRoute, upload.single('logo'), async (req, r
     }
 })
 
+// ═══ Company context by slug (for /company/:slug) ═══
+router.get('/context/:slug', async (req, res) => {
+  try {
+    const slug = String(req.params.slug || '').trim().toLowerCase()
+    if (!slug) {
+      return res.status(400).json({ success: false, error: 'رابط الشركة غير صالح' })
+    }
+
+    const company = await Company.findOne({
+      slug,
+      status: 'active',
+      $or: [{ isActive: true }, { isActive: { $exists: false } }]
+    }).select('name slug logoUrl primaryColor brandColors brandFonts allowedFonts status isActive cardsLimit cardsUsed subscription usage')
+
+    if (!company) {
+      return res.status(404).json({ success: false, error: 'الشركة غير موجودة أو غير مفعلة' })
+    }
+
+    const companyContext = buildCompanyContext(company)
+    const companyContextToken = issueCompanyContextToken(company)
+
+    res.json({
+      success: true,
+      data: {
+        ...companyContext,
+        cardsLimit: company.cardsLimit,
+        cardsUsed: company.cardsUsed,
+        subscriptionActive: company.subscription?.isActive !== false,
+      },
+      companyContextToken,
+    })
+  } catch (error) {
+    console.error('Company context error:', error)
+    res.status(500).json({ success: false, error: 'حدث خطأ أثناء تحميل بيانات الشركة' })
+  }
+})
+
+// ═══ Company context by access code (Method 2) ═══
+router.post('/access-code', loginLimiter, async (req, res) => {
+  try {
+    const accessCode = String(req.body?.accessCode || '').trim().toUpperCase()
+    if (!accessCode) {
+      return res.status(400).json({ success: false, error: 'كود الدخول مطلوب' })
+    }
+
+    const company = await Company.findOne({
+      accessCode,
+      status: 'active',
+      $or: [{ isActive: true }, { isActive: { $exists: false } }]
+    }).select('name slug logoUrl primaryColor brandColors brandFonts allowedFonts status isActive cardsLimit cardsUsed subscription usage')
+
+    if (!company) {
+      return res.status(404).json({ success: false, error: 'كود الشركة غير صحيح أو الشركة غير مفعلة' })
+    }
+
+    const companyContext = buildCompanyContext(company)
+    const companyContextToken = issueCompanyContextToken(company)
+
+    res.json({
+      success: true,
+      data: {
+        ...companyContext,
+        cardsLimit: company.cardsLimit,
+        cardsUsed: company.cardsUsed,
+        subscriptionActive: company.subscription?.isActive !== false,
+      },
+      companyContextToken,
+    })
+  } catch (error) {
+    console.error('Company access code error:', error)
+    res.status(500).json({ success: false, error: 'حدث خطأ أثناء التحقق من كود الشركة' })
+  }
+})
+
 // ═══ Public company info (for /c/:slug) ═══
 router.get('/public/:slug', async (req, res) => {
   try {
-    const company = await Company.findOne({ slug: req.params.slug, status: 'active' })
-      .select('name slug logoUrl cardsLimit cardsUsed subscription usage')
+    const company = await Company.findOne({
+      slug: req.params.slug,
+      status: 'active',
+      $or: [{ isActive: true }, { isActive: { $exists: false } }]
+    }).select('name slug logoUrl cardsLimit cardsUsed subscription usage primaryColor brandColors brandFonts allowedFonts status isActive')
 
     if (!company) {
       return res.status(404).json({ success: false, error: 'الشركة غير موجودة أو غير مفعلة' })
@@ -482,6 +593,14 @@ router.get('/public/:slug', async (req, res) => {
         name: company.name,
         slug: company.slug,
         logoUrl: company.logoUrl,
+        primaryColor: company.primaryColor,
+        brandColors: company.brandColors || {
+          primary: company.primaryColor || '#2563eb',
+          secondary: '#1e40af',
+        },
+        brandFonts: company.brandFonts || { heading: 'Cairo', body: 'Cairo' },
+        allowedFonts: Array.isArray(company.allowedFonts) ? company.allowedFonts : [],
+        isActive: company.status === 'active' && company.isActive !== false,
         cardsLimit: company.cardsLimit,
         cardsUsed: company.cardsUsed,
         cardsRemaining: remaining,
@@ -496,7 +615,11 @@ router.get('/public/:slug', async (req, res) => {
 // ═══ إنشاء بطاقة من صفحة الموظف (public) ═══
 router.post('/public/:slug/cards', employeeLimiter, async (req, res) => {
   try {
-    const company = await Company.findOne({ slug: req.params.slug, status: 'active' })
+    const company = await Company.findOne({
+      slug: req.params.slug,
+      status: 'active',
+      $or: [{ isActive: true }, { isActive: { $exists: false } }]
+    })
 
     if (!company) {
       return res.status(404).json({ success: false, error: 'الشركة غير موجودة أو غير مفعلة' })
@@ -523,6 +646,24 @@ router.post('/public/:slug/cards', employeeLimiter, async (req, res) => {
     }
     if (!templateId) {
       return res.status(400).json({ success: false, error: 'القالب مطلوب' })
+    }
+
+    const dbTemplate = await Template.findById(templateId).catch(() => null)
+    if (dbTemplate) {
+      if (!dbTemplate.isActive) {
+        return res.status(403).json({ success: false, error: 'القالب غير متاح حالياً' })
+      }
+      const visibility = dbTemplate.visibility || 'public'
+      if (visibility === 'company_exclusive') {
+        if (!dbTemplate.companyId || String(dbTemplate.companyId) !== String(company._id)) {
+          return res.status(403).json({ success: false, error: 'هذا القالب غير متاح لهذه الشركة' })
+        }
+      }
+      if (dbTemplate.type === 'exclusive' && dbTemplate.requiredFeature) {
+        if (!company.features?.includes(dbTemplate.requiredFeature)) {
+          return res.status(403).json({ success: false, error: 'هذا القالب غير متاح في باقة شركتك' })
+        }
+      }
     }
 
     const card = await Card.create({

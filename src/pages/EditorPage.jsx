@@ -4,7 +4,7 @@ import { Stage, Layer, Rect, Text, Image as KonvaImage, Group, Circle } from 're
 import { useEditorStore, useCompanyStore } from '../store'
 import { templates as staticTemplates, fonts, designerOnlyTemplates as staticDesignerTemplates } from '../data/templates'
 import { greetingTexts } from '../data/texts'
-import { activateLicense, capturePayPalOrder, consumeBatchOrder, consumePersonalOrder, createBatchOrder, createPayPalOrder, createPersonalOrder, getPersonalOrder, getTemplates, logProtectionEvent, trackStat, verifyLicense } from '../utils/api'
+import { activateLicense, capturePayPalOrder, consumeBatchOrder, consumePersonalOrder, createBatchOrder, createPayPalOrder, createPersonalOrder, getPaymobFlashStatus, getPersonalOrder, getTemplates, logProtectionEvent, trackStat, verifyLicense } from '../utils/api'
 import { useCompany } from '../context/CompanyContext'
 import { calligraphy, calligraphyCategories } from '../data/calligraphy'
 import { BsDownload, BsFilePdf, BsWhatsapp, BsLink45Deg, BsShareFill, BsCheck2, BsPencilFill, BsStars, BsSearch, BsPersonCircle, BsImage, BsChatLeftText, BsSliders, BsPlusLg, BsX, BsArrowLeft, BsInfoCircle, BsBuilding, BsPeople, BsFileEarmarkText, BsCloudDownload, BsTwitterX, BsFacebook } from 'react-icons/bs'
@@ -254,7 +254,7 @@ const readyDesigns = [
 أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯أ¢â€¢ع¯ */
 function EditorPageInner() {
   const store = useEditorStore()
-  const { company, isAuthenticated } = useCompany()
+  const { company, activeCompany, contextMode } = useCompany()
   const navigate = useNavigate()
   const stageRef = useRef(null)
   const containerRef = useRef(null)
@@ -299,12 +299,6 @@ function EditorPageInner() {
   const [processingPersonalOrder, setProcessingPersonalOrder] = useState(false)
   const [activePersonalOrder, setActivePersonalOrder] = useState(null)
   const [temporarilyUnlocked, setTemporarilyUnlocked] = useState(false)
-  const [personalPaymentData, setPersonalPaymentData] = useState({
-    cardNumber: '',
-    cardName: '',
-    expiryDate: '',
-    cvv: '',
-  })
   const [personalPaymentError, setPersonalPaymentError] = useState('')
   const [processingBatchOrder, setProcessingBatchOrder] = useState(false)
   const [activeBatchOrder, setActiveBatchOrder] = useState(null)
@@ -326,6 +320,11 @@ function EditorPageInner() {
   const [showBatchCardPayment, setShowBatchCardPayment] = useState(false)
   const [processingPayPal, setProcessingPayPal] = useState(false)
   const [payPalError, setPayPalError] = useState('')
+  const scopedCompany = activeCompany || company || null
+  const companyIsActive = Boolean(
+    scopedCompany &&
+    (scopedCompany.status === 'active' || scopedCompany.isActive !== false)
+  )
 
   // Handle URL template parameter - select template from landing page
   const urlTemplateId = searchParams.get('template')
@@ -432,13 +431,13 @@ function EditorPageInner() {
             if (t.type === 'public') return true
 
             // If it's premium or exclusive, company must be logged in and active
-            if (!isAuthenticated || !company || company.status !== 'active') return false
+            if (!companyIsActive) return false
 
             if (t.type === 'premium') return true // All active companies get premium
 
             if (t.type === 'exclusive') {
               // Must have the specific feature flag
-              return company.features && company.features.includes(t.requiredFeature)
+              return scopedCompany?.features && scopedCompany.features.includes(t.requiredFeature)
             }
             return false
           })
@@ -464,7 +463,7 @@ function EditorPageInner() {
       }
     }
     loadTemplates()
-  }, [isAuthenticated, company])
+  }, [companyIsActive, scopedCompany])
 
   // Computed - Combine API templates with static fallbacks + custom uploads
   const mergedReady = [...staticTemplates, ...dbReadyTemplates]
@@ -479,16 +478,27 @@ function EditorPageInner() {
       ? [...finalReadyTemplates, ...finalDesignerTemplates, ...customTemplates]
       : [...finalReadyTemplates, ...customTemplates]
 
+  const allowedFontsSet = new Set(
+    (Array.isArray(scopedCompany?.allowedFonts) ? scopedCompany.allowedFonts : [])
+      .map((f) => String(f).trim().toLowerCase())
+      .filter(Boolean)
+  )
+  const filteredCompanyFonts = allowedFontsSet.size > 0
+    ? fonts.filter((f) => (
+      allowedFontsSet.has(String(f.id).toLowerCase()) ||
+      allowedFontsSet.has(String(f.name || '').toLowerCase())
+    ))
+    : []
+  const availableFonts = filteredCompanyFonts.length > 0 ? filteredCompanyFonts : fonts
   const currentTemplate = allTemplates.find(t => t.id === store.selectedTemplate) || allTemplates[0]
-  const currentFont = fonts.find(f => f.id === store.selectedFont) || fonts[1]
+  const currentFont = availableFonts.find(f => f.id === store.selectedFont) || fonts.find(f => f.id === store.selectedFont) || availableFonts[0] || fonts[1]
   const scale = stageSize.width / 1080
   const purchaseOrderId = searchParams.get('purchaseOrderId')
+  const paymobSessionId = searchParams.get('paymobSession')
   const isCompanyUnlocked = Boolean(
-    isAuthenticated &&
-    company &&
-    company.status === 'active' &&
-    company.subscription?.isActive !== false &&
-    (!company.subscription?.expiresAt || new Date(company.subscription.expiresAt) >= new Date())
+    companyIsActive &&
+    (!scopedCompany?.subscription?.expiresAt || new Date(scopedCompany.subscription.expiresAt) >= new Date()) &&
+    (scopedCompany?.subscription?.isActive !== false)
   )
   const isPersonalDesignLocked = !isCompanyUnlocked && Boolean(activePersonalOrder)
   const isBatchDesignLocked = !isCompanyUnlocked && ['paid', 'consumed'].includes(activeBatchOrder?.status)
@@ -498,6 +508,34 @@ function EditorPageInner() {
     : (licenseActive ? Math.max(1, Number(licenseMaxRecipients || 500)) : BATCH_ZIP_MAX_RECIPIENTS)
   const personalRecipientName = (mode === 'ready' ? readyName : store.recipientName || readyName).trim()
   const personalSenderName = (mode === 'ready' ? readySenderName : store.senderName || readySenderName).trim()
+
+  useEffect(() => {
+    if (!availableFonts.length) return
+    if (!availableFonts.some((f) => f.id === store.selectedFont)) {
+      store.setFont(availableFonts[0].id)
+    }
+  }, [availableFonts, store])
+
+  useEffect(() => {
+    if (!scopedCompany || !companyIsActive) return
+
+    const companyLogoUrl = scopedCompany.logoUrl || ''
+    const primaryBrand = scopedCompany?.brandColors?.primary || scopedCompany?.primaryColor
+    const secondaryBrand = scopedCompany?.brandColors?.secondary
+
+    if (companyLogoUrl && !store.companyLogo) {
+      store.setCompanyLogo(companyLogoUrl)
+    }
+    if (primaryBrand && !readyNameColor) {
+      setReadyNameColor(primaryBrand)
+    }
+    if (primaryBrand && store.textColor === '#ffffff') {
+      store.setTextColor(primaryBrand)
+    }
+    if (secondaryBrand && store.subTextColor === '#ffffff') {
+      store.setSubTextColor(secondaryBrand)
+    }
+  }, [companyIsActive, readyNameColor, scopedCompany, store])
 
   useEffect(() => {
     protectionStateRef.current = {
@@ -886,6 +924,47 @@ function EditorPageInner() {
   }, [applyPersonalSnapshot, purchaseOrderId])
 
   useEffect(() => {
+    if (!paymobSessionId) return
+    let cancelled = false
+    let attempts = 0
+    let intervalId = null
+
+    async function verifyPaymobAccess() {
+      try {
+        const res = await getPaymobFlashStatus(paymobSessionId)
+        if (cancelled) return
+        if (res.success && res.status === 'completed') {
+          setTemporarilyUnlocked(true)
+          return true
+        }
+      } catch {
+        // ignore and keep protection enabled
+      }
+      return false
+    }
+
+    verifyPaymobAccess().then((done) => {
+      if (done || cancelled) return
+      intervalId = window.setInterval(async () => {
+        attempts += 1
+        if (attempts > 40 || cancelled) {
+          window.clearInterval(intervalId)
+          return
+        }
+        const unlocked = await verifyPaymobAccess()
+        if (unlocked) {
+          window.clearInterval(intervalId)
+        }
+      }, 3000)
+    })
+
+    return () => {
+      cancelled = true
+      if (intervalId) window.clearInterval(intervalId)
+    }
+  }, [paymobSessionId])
+
+  useEffect(() => {
     if (!isPreviewProtected) return
 
     const handleContextMenu = (event) => {
@@ -933,21 +1012,11 @@ function EditorPageInner() {
     }
   }, [isPreviewProtected, logProtectedAction])
 
-  const handlePersonalPaymentChange = useCallback((e) => {
-    const { name, value } = e.target
-    setPersonalPaymentData(prev => ({ ...prev, [name]: value }))
-  }, [])
-
   const validatePersonalPayment = useCallback(() => {
     setPersonalPaymentError('')
 
     if (!personalRecipientName) {
       setPersonalPaymentError('اكتب الاسم أولاً.')
-      return false
-    }
-
-    if (!personalPaymentData.cardNumber || !personalPaymentData.cardName || !personalPaymentData.expiryDate || !personalPaymentData.cvv) {
-      setPersonalPaymentError('يرجى إكمال بيانات الدفع.')
       return false
     }
 
@@ -962,7 +1031,7 @@ function EditorPageInner() {
     }
 
     return true
-  }, [bgLoaded, mode, personalPaymentData.cardName, personalPaymentData.cardNumber, personalPaymentData.cvv, personalPaymentData.expiryDate, personalRecipientName])
+  }, [bgLoaded, mode, personalRecipientName])
 
   const handleBatchPaymentChange = useCallback((e) => {
     const { name, value } = e.target
@@ -1336,7 +1405,7 @@ function EditorPageInner() {
         downloadedAt: consumeRes.data?.downloadedAt || new Date().toISOString(),
       } : prev)
 
-      toast.success(consumeRes.message || 'تم تحميل بطاقتك بنجاح.')
+      toast.success(consumeRes.message || 'تم تحميل بطاقتك بنجاح. نهنئكم بحلول عيد الفطر المبارك 🌙')
       trackStat('downloads')
     } catch (error) {
       const message = error?.message || `تعذر إتمام العملية. للمساعدة: ${SUPPORT_CONTACT}`
@@ -1364,7 +1433,8 @@ function EditorPageInner() {
     }
 
     sessionStorage.setItem(PERSONAL_CHECKOUT_KEY, JSON.stringify(payload))
-    navigate('/checkout?plan=personal')
+    const checkoutUrl = `/checkout?product=template&templateId=${encodeURIComponent(payload.templateId)}&price=${PERSONAL_CARD_PRICE}&name=${encodeURIComponent(payload.templateName || 'تصميم مميز')}`
+    navigate(checkoutUrl)
   }, [buildPersonalSnapshot, currentTemplate?.id, currentTemplate?.name, navigate, personalRecipientName, personalSenderName, store.selectedTemplate])
 
   const startPersonalCheckout = useCallback(() => {
@@ -1390,15 +1460,14 @@ function EditorPageInner() {
       return
     }
 
-    executePersonalPurchase(payload)
-  }, [activePersonalOrder?.status, buildPersonalSnapshot, currentTemplate?.id, executePersonalPurchase, logProtectedAction, personalRecipientName, personalSenderName, store.selectedTemplate, validatePersonalPayment])
+    persistCheckoutDraft()
+  }, [activePersonalOrder?.status, buildPersonalSnapshot, currentTemplate?.id, logProtectedAction, persistCheckoutDraft, personalRecipientName, personalSenderName, store.selectedTemplate, validatePersonalPayment])
 
   const confirmPaymentWarning = useCallback(() => {
     sessionStorage.setItem(PAYMENT_WARNING_KEY, 'true')
     setShowPaymentWarning(false)
-    const payload = pendingPersonalPurchaseRef.current
-    if (payload) executePersonalPurchase(payload)
-  }, [executePersonalPurchase])
+    if (pendingPersonalPurchaseRef.current) persistCheckoutDraft()
+  }, [persistCheckoutDraft])
 
   const handlePersonalDownload = useCallback(async () => {
     if (!stageRef.current || !activePersonalOrder?.orderId) return
@@ -1425,7 +1494,7 @@ function EditorPageInner() {
         downloadedAt: res.data?.downloadedAt || new Date().toISOString(),
       } : prev)
 
-      toast.success(res.message || 'تم تحميل بطاقتك! نتمنى أن تُسعد من تُهديها.')
+      toast.success(res.message || 'تم تحميل بطاقتك فورًا! نهنئكم بحلول عيد الفطر المبارك 🌙')
       trackStat('downloads')
     } catch (error) {
       toast.error(error.message || `تعذر تجهيز البطاقة الحالية. للمساعدة: ${SUPPORT_CONTACT}`)
@@ -1489,6 +1558,21 @@ function EditorPageInner() {
       trackStat('downloads')
     } catch { toast.error('حدث خطأ أثناء التحميل.') }
   }, [])
+
+  useEffect(() => {
+    if (autodownloadParam !== '1') return
+    if (!temporarilyUnlocked) return
+    if (!stageRef.current || !currentTemplate) return
+    if (mode === 'ready' && !bgLoaded) return
+    if (autoDownloadAttemptedRef.current) return
+
+    autoDownloadAttemptedRef.current = true
+    const timer = window.setTimeout(() => {
+      handleExportPNG()
+    }, 300)
+
+    return () => window.clearTimeout(timer)
+  }, [autodownloadParam, bgLoaded, currentTemplate, handleExportPNG, mode, temporarilyUnlocked])
 
   const handleExportPDF = useCallback(async () => {
     if (!stageRef.current) return
@@ -1709,9 +1793,11 @@ function EditorPageInner() {
           textAlign: 'center',
         }}>
           <p style={{ margin: '0 0 8px', fontSize: compact ? 15 : 16, fontWeight: 800, color: '#0f172a' }}>
-            تم الدفع بنجاح
+            تم الدفع بنجاح ✅
           </p>
           <p style={{ margin: '0 0 16px', fontSize: 12, color: '#64748b', lineHeight: 1.8 }}>
+            نهنئكم بحلول عيد الفطر المبارك 🌙
+            <br />
             سيبدأ التحميل تلقائياً. إن لم يبدأ، استخدم الزر التالي مرة واحدة.
           </p>
           <button onClick={handlePersonalDownload} disabled={processingPersonalOrder} style={{
@@ -1727,7 +1813,7 @@ function EditorPageInner() {
             opacity: processingPersonalOrder ? 0.7 : 1,
             fontFamily: ds.font,
           }}>
-            {processingPersonalOrder ? 'جارٍ التحميل...' : 'تحميل بطاقتي الآن'}
+            {processingPersonalOrder ? 'جارٍ التحميل...' : 'تحميل بطاقتي فورًا'}
           </button>
         </div>
       )
@@ -1782,44 +1868,20 @@ function EditorPageInner() {
             </span>
           ))}
         </div>
-        <div style={{ display: 'grid', gap: 10, marginBottom: 12, textAlign: 'right' }}>
-          <input
-            type="text"
-            name="cardNumber"
-            value={personalPaymentData.cardNumber}
-            onChange={handlePersonalPaymentChange}
-            placeholder="0000 0000 0000 0000"
-            dir="ltr"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-slate-900 text-left"
-          />
-          <input
-            type="text"
-            name="cardName"
-            value={personalPaymentData.cardName}
-            onChange={handlePersonalPaymentChange}
-            placeholder="الاسم على البطاقة"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-slate-900"
-          />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <input
-              type="text"
-              name="expiryDate"
-              value={personalPaymentData.expiryDate}
-              onChange={handlePersonalPaymentChange}
-              placeholder="MM/YY"
-              dir="ltr"
-              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-slate-900 text-left"
-            />
-            <input
-              type="text"
-              name="cvv"
-              value={personalPaymentData.cvv}
-              onChange={handlePersonalPaymentChange}
-              placeholder="CVV"
-              dir="ltr"
-              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-slate-900 text-left"
-            />
-          </div>
+        <div style={{
+          marginBottom: 12,
+          padding: '12px 14px',
+          borderRadius: 14,
+          background: '#f8fafc',
+          border: '1px solid #e2e8f0',
+          color: '#334155',
+          fontSize: 12,
+          lineHeight: 1.9,
+          textAlign: 'right',
+        }}>
+          لن نطلب منك إدخال بيانات البطاقة هنا.
+          <br />
+          عند الضغط على الدفع سيتم تحويلك مباشرة إلى بوابة دفع آمنة لإتمام العملية.
         </div>
         {personalPaymentError && (
           <div style={{
@@ -1837,7 +1899,7 @@ function EditorPageInner() {
           </div>
         )}
         <p style={{ margin: '0 0 16px', fontSize: 12, color: '#92400e', lineHeight: 1.9 }}>
-          بطاقة واحدة لكل عملية شراء. الاسم يصبح نهائياً بعد الدفع مباشرة.
+          اكتب الاسم أولاً، ثم ادفع عبر البوابة الآمنة، وبعد التأكيد سيظهر التحميل فوراً.
         </p>
         <button onClick={startPersonalCheckout} disabled={processingPersonalOrder} style={{
           width: '100%',
@@ -1852,7 +1914,7 @@ function EditorPageInner() {
           opacity: processingPersonalOrder ? 0.7 : 1,
           fontFamily: ds.font,
         }}>
-          {processingPersonalOrder ? 'جارٍ المعالجة...' : 'ادفع وحمّل الآن'}
+          {processingPersonalOrder ? 'جارٍ التحويل...' : 'متابعة إلى الدفع الآمن'}
         </button>
       </div>
     )
@@ -2017,6 +2079,37 @@ function EditorPageInner() {
         boxSizing: 'border-box',
       }}>
         <h1 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: '#000' }}>محرر البطاقات</h1>
+        {scopedCompany && companyIsActive && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '6px 10px',
+            borderRadius: 999,
+            background: '#f8fafc',
+            border: '1px solid #e2e8f0',
+          }}>
+            {scopedCompany.logoUrl ? (
+              <img
+                src={scopedCompany.logoUrl}
+                alt={scopedCompany.name || 'company'}
+                style={{ width: 20, height: 20, borderRadius: 4, objectFit: 'contain' }}
+              />
+            ) : (
+              <span style={{ width: 20, height: 20, borderRadius: 4, background: scopedCompany?.brandColors?.primary || '#2563eb', color: '#fff', display: 'grid', placeItems: 'center', fontSize: 11, fontWeight: 800 }}>
+                {(scopedCompany?.name || 'ش')[0]}
+              </span>
+            )}
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#334155', fontFamily: ds.font }}>
+              {scopedCompany?.name}
+            </span>
+            {contextMode === 'portal' && (
+              <span style={{ fontSize: 10, color: '#64748b', fontFamily: ds.font }}>
+                بوابة الشركة
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Mode Switcher - Prominent */}
         <div style={{
@@ -2140,14 +2233,14 @@ function EditorPageInner() {
           <BsBuilding size={18} color="#b45309" />
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: 13, fontWeight: 700, color: '#92400e', margin: '0 0 4px 0', fontFamily: ds.font }}>
-              {(isAuthenticated && company?.status === 'active') ? 'حساب شركة مفعل' : 'للشركات: افتح المحرر الكامل'}
+              {companyIsActive ? 'حساب شركة مفعل' : 'للشركات: افتح المحرر الكامل'}
             </p>
             <p style={{ fontSize: 11, color: '#b45309', margin: 0, fontFamily: ds.font }}>
-              {(isAuthenticated && company?.status === 'active') ? 'استمتع بكل المزايا والتحميل غير المحدود.' : 'بعد الشراء ستحصل على حساب شركة ورابط خاص للموظفين.'}
+              {companyIsActive ? 'استمتع بكل المزايا والتحميل غير المحدود.' : 'بعد الشراء ستحصل على حساب شركة ورابط خاص للموظفين.'}
             </p>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            {(isAuthenticated && company?.status === 'active') ? (
+            {companyIsActive ? (
               <a
                 href="/company/dashboard"
                 style={{
@@ -2303,7 +2396,7 @@ function EditorPageInner() {
               <div style={{ marginBottom: 20 }}>
                 <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 10 }}>الخط</label>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {fonts.map(f => (
+                  {availableFonts.map(f => (
                     <button key={f.id} onClick={() => store.setFont(f.id)} style={{
                       padding: '10px 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
                       background: store.selectedFont === f.id ? '#000' : '#f5f5f5',
@@ -2780,7 +2873,7 @@ function EditorPageInner() {
             <div style={{ marginBottom: 20 }}>
               <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 10 }}>الخط</label>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                {fonts.map(f => (
+                {availableFonts.map(f => (
                   <button key={f.id} onClick={() => store.setFont(f.id)} style={{
                     padding: '10px 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
                     background: store.selectedFont === f.id ? '#000' : '#f5f5f5', color: store.selectedFont === f.id ? '#fff' : '#666',
@@ -4074,7 +4167,7 @@ function EditorPageInner() {
         <div style={{ marginBottom: 24 }}>
           <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 10 }}>الخط</label>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {fonts.map(f => (
+            {availableFonts.map(f => (
               <button key={f.id} onClick={() => store.setFont(f.id)} style={{
                 padding: '10px 16px', borderRadius: 10, border: 'none', cursor: 'pointer',
                 background: store.selectedFont === f.id ? '#000' : '#f5f5f5',

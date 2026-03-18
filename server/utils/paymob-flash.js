@@ -1,0 +1,339 @@
+// ═══════════════════════════════════════════
+// Paymob Flash Integration - Create Intention API
+// ═══════════════════════════════════════════
+// Documentation: https://developers.paymob.com/paymob-docs/api-reference/create-intention
+
+import crypto from 'crypto'
+
+/**
+ * Paymob Flash Configuration
+ */
+const PAYMOB_API_KEY = process.env.PAYMOB_API_KEY
+const PAYMOB_SECRET_KEY = process.env.PAYMOB_SECRET_KEY
+const PAYMOB_PUBLIC_KEY = process.env.PAYMOB_PUBLIC_KEY
+const PAYMOB_INTEGRATION_ID = process.env.PAYMOB_INTEGRATION_ID || '5577534' // Test ID by default
+
+// Use Secret Key for authentication (Flash API uses secret key, not API key)
+const PAYMOB_AUTH_KEY = PAYMOB_SECRET_KEY || PAYMOB_API_KEY
+
+// Test or Live mode
+const PAYMOB_MODE = process.env.PAYMOB_MODE || 'test' // 'test' or 'live'
+
+// API Endpoints
+const PAYMOB_BASE_URL = PAYMOB_MODE === 'live' 
+  ? 'https://accept.paymob.com/v1' 
+  : 'https://accept.paymob.com/v1'
+
+/**
+ * Create Payment Intention using Paymob Flash API
+ * This is a one-step integration that returns a checkout URL
+ * 
+ * @param {Object} params - Payment parameters
+ * @param {number} params.amount - Amount in cents (e.g., 10000 for 100 EGP)
+ * @param {string} params.currency - Currency code (e.g., 'EGP', 'SAR')
+ * @param {Object} params.customer - Customer information
+ * @param {string} params.customer.first_name - Customer first name
+ * @param {string} params.customer.last_name - Customer last name
+ * @param {string} params.customer.email - Customer email
+ * @param {string} params.customer.phone - Customer phone number
+ * @param {Array<number>} params.payment_methods - Array of integration IDs
+ * @param {Object} params.billing_data - Billing information
+ * @param {Object} params.extras - Additional metadata
+ * @returns {Promise<Object>} - Payment intention response with checkout URL
+ */
+async function createPaymentIntention({
+  amount,
+  currency = 'EGP',
+  customer,
+  payment_methods,
+  billing_data,
+  extras = {}
+}) {
+  try {
+    // Validate required fields
+    if (!amount || amount <= 0) {
+      throw new Error('Invalid amount')
+    }
+
+    if (!customer || !customer.first_name || !customer.email || !customer.phone) {
+      throw new Error('Customer information is incomplete')
+    }
+
+    if (!PAYMOB_AUTH_KEY) {
+      throw new Error('Paymob authentication key is not configured')
+    }
+
+    // Prepare payment methods (use default test integration if not provided)
+    const paymentMethodsArray = payment_methods && payment_methods.length > 0
+      ? payment_methods
+      : [parseInt(PAYMOB_INTEGRATION_ID, 10)]
+
+    // Prepare billing data with defaults
+    const billingInfo = {
+      first_name: customer.first_name || billing_data?.first_name || 'N/A',
+      last_name: customer.last_name || billing_data?.last_name || 'N/A',
+      email: customer.email,
+      phone_number: customer.phone,
+      country: billing_data?.country || 'N/A',
+      state: billing_data?.state || 'N/A',
+      city: billing_data?.city || 'N/A',
+      street: billing_data?.street || 'N/A',
+      building: billing_data?.building || 'N/A',
+      floor: billing_data?.floor || 'N/A',
+      apartment: billing_data?.apartment || 'N/A',
+      postal_code: billing_data?.postal_code || '00000',
+    }
+
+    // Create intention payload
+    const payload = {
+      amount,
+      currency,
+      payment_methods: paymentMethodsArray,
+      items: extras.items || [],
+      billing_data: billingInfo,
+      customer: {
+        first_name: customer.first_name,
+        last_name: customer.last_name || 'N/A',
+        email: customer.email,
+        phone: customer.phone,
+      },
+      extras: {
+        ...extras,
+        merchant_order_id: extras.merchant_order_id || `order-${Date.now()}`,
+      },
+      ...(extras.special_reference && { special_reference: extras.special_reference }),
+      ...(extras.notification_url && { notification_url: extras.notification_url }),
+      ...(extras.redirection_url && { redirection_url: extras.redirection_url }),
+    }
+
+    console.log('[Paymob Flash] Creating intention:', {
+      amount,
+      currency,
+      customer: customer.email,
+      mode: PAYMOB_MODE
+    })
+
+    // Make API request
+    const response = await fetch(`${PAYMOB_BASE_URL}/intention/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Token ${PAYMOB_AUTH_KEY}`,
+      },
+      body: JSON.stringify(payload),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      console.error('[Paymob Flash] Error response:', data)
+      throw new Error(data.detail || data.message || 'Failed to create payment intention')
+    }
+
+    console.log('[Paymob Flash] Intention created successfully:', {
+      id: data.id,
+      client_secret: data.client_secret ? 'present' : 'missing'
+    })
+
+    const unifiedUrl = data.client_secret && PAYMOB_PUBLIC_KEY
+      ? `https://accept.paymob.com/unifiedcheckout/?publicKey=${PAYMOB_PUBLIC_KEY}&clientSecret=${data.client_secret}`
+      : data.payment_url || data.iframe_url || data.redirect_url
+
+    return {
+      success: true,
+      intention_id: data.id,
+      client_secret: data.client_secret,
+      payment_url: unifiedUrl,
+      data: data
+    }
+
+  } catch (error) {
+    console.error('[Paymob Flash] Create intention error:', error.message)
+    throw error
+  }
+}
+
+/**
+ * Verify HMAC signature for callback
+ * @param {Object} data - Callback data
+ * @param {string} receivedHmac - HMAC from callback
+ * @returns {boolean} - True if HMAC is valid
+ */
+function verifyPaymobHMAC(data, receivedHmac) {
+  try {
+    const secret = PAYMOB_SECRET_KEY || process.env.PAYMOB_HMAC_SECRET
+    if (!secret || !receivedHmac) {
+      console.error('[Paymob Flash] HMAC verification failed: missing secret or signature')
+      return false
+    }
+
+    // Paymob HMAC calculation: concatenate specific fields in order
+    const orderValue = typeof data.order === 'object' ? (data.order?.id || '') : (data.order || '')
+    const concatenated = [
+      data.amount_cents,
+      data.created_at,
+      data.currency,
+      data.error_occured,
+      data.has_parent_transaction,
+      data.id,
+      data.integration_id,
+      data.is_3d_secure,
+      data.is_auth,
+      data.is_capture,
+      data.is_refunded,
+      data.is_standalone_payment,
+      data.is_voided,
+      orderValue,
+      data.owner,
+      data.pending,
+      data.source_data_pan,
+      data.source_data_sub_type,
+      data.source_data_type,
+      data.success,
+    ].join('')
+
+    const calculatedHmac = crypto
+      .createHmac('sha512', secret)
+      .update(concatenated)
+      .digest('hex')
+
+    const received = String(receivedHmac)
+    const isValid = calculatedHmac.length === received.length &&
+      crypto.timingSafeEqual(
+        Buffer.from(calculatedHmac, 'utf8'),
+        Buffer.from(received, 'utf8')
+      )
+
+    if (!isValid) {
+      console.error('[Paymob Flash] HMAC verification failed')
+    }
+
+    return isValid
+
+  } catch (error) {
+    console.error('[Paymob Flash] HMAC verification error:', error.message)
+    return false
+  }
+}
+
+/**
+ * Get intention status
+ * @param {string} intentionId - Intention ID
+ * @returns {Promise<Object>} - Intention details
+ */
+async function getIntentionStatus(intentionId) {
+  try {
+    if (!PAYMOB_AUTH_KEY) {
+      throw new Error('Paymob authentication key is not configured')
+    }
+
+    const urls = [
+      `${PAYMOB_BASE_URL}/intention/${intentionId}`,
+      `${PAYMOB_BASE_URL}/intention/${intentionId}/`,
+    ]
+    let lastError = null
+
+    for (const url of urls) {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Token ${PAYMOB_AUTH_KEY}`,
+        },
+      })
+
+      let data = null
+      try {
+        data = await response.json()
+      } catch {
+        data = null
+      }
+
+      if (response.ok) {
+        return {
+          success: true,
+          data,
+        }
+      }
+
+      lastError = data?.detail || data?.message || `Failed to get intention status (${response.status})`
+    }
+
+    throw new Error(lastError || 'Failed to get intention status')
+
+  } catch (error) {
+    console.error('[Paymob Flash] Get intention status error:', error.message)
+    throw error
+  }
+}
+
+/**
+ * Retrieve transaction details
+ * @param {number} transactionId - Transaction ID from callback
+ * @returns {Promise<Object>} - Transaction details
+ */
+async function getTransactionDetails(transactionId) {
+  try {
+    if (!PAYMOB_AUTH_KEY) {
+      throw new Error('Paymob authentication key is not configured')
+    }
+
+    const response = await fetch(`https://accept.paymob.com/api/acceptance/transactions/${transactionId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Token ${PAYMOB_AUTH_KEY}`,
+      },
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error('Failed to retrieve transaction details')
+    }
+
+    return {
+      success: true,
+      data: data
+    }
+
+  } catch (error) {
+    console.error('[Paymob Flash] Get transaction error:', error.message)
+    throw error
+  }
+}
+
+// Cache payment methods for reuse
+let cachedMethods = null
+let cachedAt = 0
+const METHODS_TTL = 10 * 60 * 1000 // 10 minutes
+
+async function getPaymentMethods() {
+  if (cachedMethods && Date.now() - cachedAt < METHODS_TTL) {
+    return cachedMethods
+  }
+
+  if (!PAYMOB_PUBLIC_KEY) {
+    throw new Error('Paymob public key is not configured')
+  }
+
+  const url = `https://accept.paymob.com/v1/intention/payment-methods?public_key=${PAYMOB_PUBLIC_KEY}`
+  const response = await fetch(url)
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Failed to fetch payment methods')
+  }
+
+  cachedMethods = data
+  cachedAt = Date.now()
+  return data
+}
+
+// Export individual functions and constants
+export {
+  createPaymentIntention,
+  verifyPaymobHMAC,
+  getIntentionStatus,
+  getTransactionDetails,
+  getPaymentMethods,
+  PAYMOB_MODE,
+}

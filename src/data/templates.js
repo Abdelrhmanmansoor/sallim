@@ -27,6 +27,21 @@ export const templates = [
 ]
 
 // ═══════════════════════════════════════════════════════════════
+// قوالب حصرية للشركات - تظهر فقط للشركة المحددة
+// ═══════════════════════════════════════════════════════════════
+export const exclusiveCompanyTemplates = [
+  { 
+    id: 'oud-scent-1', 
+    name: 'ريحة عود - عيد الفطر', 
+    image: '/templates/exclusive/oud-scent-eid.png', 
+    textColor: '#d4a843',
+    companyNames: ['ريحة عود', 'Oud Scent', 'Oud scent', 'oud scent', 'OUD SCENT'],
+    theme: 'ramadan-green',
+    exclusive: true
+  },
+]
+
+// ═══════════════════════════════════════════════════════════════
 // قوالب حصرية - تظهر فقط في "صمّم"
 // المسار: public/templates/مصمم/
 // ═══════════════════════════════════════════════════════════════
@@ -219,4 +234,4 @@ export const pricingPlans = [
   },
 ]
 
-export default { templates, themes, fonts, pricingPlans }
+export default { templates, exclusiveCompanyTemplates, themes, fonts, pricingPlans }

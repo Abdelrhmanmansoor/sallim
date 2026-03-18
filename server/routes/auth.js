@@ -2,6 +2,7 @@ import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import Diwaniya from '../models/Diwan.js';
+import Company from '../models/Company.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
 import Joi from 'joi';
 
@@ -35,7 +36,9 @@ const registerSchema = Joi.object({
         'string.min': 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
         'string.max': 'كلمة المرور طويلة جداً',
         'any.required': 'كلمة المرور مطلوبة'
-    })
+    }),
+    companySlug: Joi.string().trim().lowercase().optional().allow(''),
+    companyAccessCode: Joi.string().trim().uppercase().optional().allow('')
 });
 
 const updateProfileSchema = Joi.object({
@@ -63,6 +66,24 @@ const claimDiwaniyaSchema = Joi.object({
     })
 });
 
+async function resolveActiveCompany({ companySlug, companyAccessCode }) {
+    if (companySlug) {
+        return Company.findOne({
+            slug: String(companySlug).trim().toLowerCase(),
+            status: 'active',
+            $or: [{ isActive: true }, { isActive: { $exists: false } }]
+        })
+    }
+    if (companyAccessCode) {
+        return Company.findOne({
+            accessCode: String(companyAccessCode).trim().toUpperCase(),
+            status: 'active',
+            $or: [{ isActive: true }, { isActive: { $exists: false } }]
+        })
+    }
+    return null
+}
+
 // ═══ Register New User ═══
 router.post('/register', authLimiter, async (req, res) => {
     try {
@@ -72,7 +93,7 @@ router.post('/register', authLimiter, async (req, res) => {
             return res.status(400).json({ success: false, error: error.details[0].message });
         }
 
-        const { name, email, password } = value;
+        const { name, email, password, companySlug, companyAccessCode } = value;
 
         // Check if user exists
         const existingUser = await User.findOne({ email: email.toLowerCase() });
@@ -80,20 +101,26 @@ router.post('/register', authLimiter, async (req, res) => {
             return res.status(400).json({ success: false, error: 'هذا البريد الإلكتروني مستخدم بالفعل' });
         }
 
+        const linkedCompany = await resolveActiveCompany({ companySlug, companyAccessCode });
+
         // Create user
         const user = await User.create({
             name,
             email: email.toLowerCase(),
-            password
+            password,
+            company: linkedCompany?._id || null,
         });
 
         // Generate token
         const token = generateToken(user._id);
+        const createdUser = await User.findById(user._id)
+            .populate('diwaniyas')
+            .populate('company', 'name slug logoUrl brandColors allowedFonts status isActive');
 
         res.status(201).json({
             success: true,
             data: {
-                user,
+                user: createdUser,
                 token
             }
         });
@@ -130,7 +157,9 @@ router.post('/login', authLimiter, async (req, res) => {
         const token = generateToken(user._id);
 
         // Populate diwaniyas
-        const userWithDiwaniyas = await User.findById(user._id).populate('diwaniyas');
+        const userWithDiwaniyas = await User.findById(user._id)
+            .populate('diwaniyas')
+            .populate('company', 'name slug logoUrl brandColors allowedFonts status isActive');
 
         res.json({
             success: true,
@@ -205,7 +234,9 @@ router.get('/profile', async (req, res) => {
 
         // Validate token
         const decoded = jwt.verify(token, JWT_SECRET);
-        const user = await User.findById(decoded.userId).populate('diwaniyas');
+        const user = await User.findById(decoded.userId)
+            .populate('diwaniyas')
+            .populate('company', 'name slug logoUrl brandColors allowedFonts status isActive');
 
         if (!user) {
             return res.status(404).json({ success: false, error: 'المستخدم غير موجود' });
@@ -256,7 +287,9 @@ router.put('/profile', async (req, res) => {
         await User.findByIdAndUpdate(user._id, { $set: updates }, { new: true });
 
         // Return updated user with populated diwaniyas
-        const updatedUser = await User.findById(user._id).populate('diwaniyas');
+        const updatedUser = await User.findById(user._id)
+            .populate('diwaniyas')
+            .populate('company', 'name slug logoUrl brandColors allowedFonts status isActive');
 
         res.json({ success: true, data: updatedUser });
     } catch (error) {
@@ -265,6 +298,42 @@ router.put('/profile', async (req, res) => {
             return res.status(401).json({ success: false, error: 'رمز المصادقة غير صالح' });
         }
         res.status(500).json({ success: false, error: 'حدث خطأ أثناء تحديث البيانات' });
+    }
+});
+
+// ═══ Link User Account to Company (slug or access code) ═══
+router.post('/link-company', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.replace('Bearer ', '');
+        if (!token) {
+            return res.status(401).json({ success: false, error: 'يرجى تسجيل الدخول' });
+        }
+
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const user = await User.findById(decoded.userId);
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'المستخدم غير موجود' });
+        }
+
+        const companySlug = String(req.body?.companySlug || '').trim().toLowerCase();
+        const companyAccessCode = String(req.body?.companyAccessCode || '').trim().toUpperCase();
+        const linkedCompany = await resolveActiveCompany({ companySlug, companyAccessCode });
+
+        if (!linkedCompany) {
+            return res.status(404).json({ success: false, error: 'الشركة غير موجودة أو غير مفعلة' });
+        }
+
+        user.company = linkedCompany._id;
+        await user.save();
+
+        const userWithCompany = await User.findById(user._id)
+            .populate('diwaniyas')
+            .populate('company', 'name slug logoUrl brandColors allowedFonts status isActive');
+
+        res.json({ success: true, data: userWithCompany });
+    } catch (error) {
+        console.error('Link company error:', error);
+        res.status(500).json({ success: false, error: 'حدث خطأ أثناء ربط الشركة' });
     }
 });
 

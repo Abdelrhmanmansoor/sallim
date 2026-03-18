@@ -95,6 +95,9 @@ export default function CompanyLoginPage() {
             <Link to="/companies" style={{ display: 'block', padding: '12px', background: '#f9fafb', color: '#374151', borderRadius: 12, textAlign: 'center', textDecoration: 'none', fontSize: 13, fontWeight: 600, border: '1px solid #e5e7eb' }}>
               اطلع على الباقات
             </Link>
+            <Link to="/company-access" style={{ display: 'block', padding: '12px', background: '#eef2ff', color: '#3730a3', borderRadius: 12, textAlign: 'center', textDecoration: 'none', fontSize: 13, fontWeight: 700, border: '1px solid #c7d2fe' }}>
+              دخول بكود الشركة
+            </Link>
           </div>
         </div>
 

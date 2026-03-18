@@ -35,6 +35,11 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin'],
         default: 'user'
     },
+    company: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Company',
+        default: null
+    },
     diwaniyas: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Diwaniya'

@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import SAR from '../components/SAR'
 import { useCurrency, CURRENCY_NAMES, COUNTRY_FLAG } from '../utils/useCurrency'
+import { createPaymobFlashIntention } from '../utils/api'
+import { usePaymentMethods, mapPaymentMethodsForDisplay } from '../hooks/usePaymentMethods'
 
 const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID || ''
@@ -114,12 +116,21 @@ export default function CheckoutPageNew() {
   const purchaseId = searchParams.get('purchase')
   const productType = searchParams.get('product')
   const productPrice = searchParams.get('price')
+  const plan = searchParams.get('plan')
 
   const isEidSong = productType === 'eid-song'
   const isCustomDesign = productType === 'custom-design'
   const isTemplate = productType === 'template'
+  const isPlan = !!plan
   const productName = searchParams.get('name') ? decodeURIComponent(searchParams.get('name')) : null
   const templateId = searchParams.get('templateId')
+
+  // Plan pricing configuration
+  const PLAN_CONFIG = {
+    starter: { name: 'باقة البداية', price: 199, description: 'للأفراد والمشاريع الصغيرة — حتى 100 بطاقة سنوياً' },
+    business: { name: 'باقة الأعمال', price: 599, description: 'للشركات الصغيرة والمتوسطة — حتى 500 بطاقة سنوياً' },
+    enterprise: { name: 'باقة المؤسسات', price: 1999, description: 'للمؤسسات الكبيرة — بطاقات غير محدودة' },
+  }
 
   const [loadingCard, setLoadingCard] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -137,6 +148,9 @@ export default function CheckoutPageNew() {
     customerEmail: '',
     recipientName: '',
   })
+  const { methods: paymobMethods } = usePaymentMethods()
+  const dynamicPaymentMethods = mapPaymentMethodsForDisplay(paymobMethods)
+  const hasApplePay = dynamicPaymentMethods.some((m) => m.nameKey?.includes('apple'))
 
   useEffect(() => { injectCheckoutCSS() }, [])
 
@@ -163,6 +177,20 @@ export default function CheckoutPageNew() {
     if (status === 'failed') {
       toast.error('فشلت عملية الدفع. يمكنك المحاولة مرة أخرى.')
     }
+    // Handle subscription plans (starter, business, enterprise)
+    if (isPlan && PLAN_CONFIG[plan]) {
+      const planInfo = PLAN_CONFIG[plan]
+      setCardData({
+        name: planInfo.name,
+        price: planInfo.price,
+        image: null,
+        description: planInfo.description,
+        isPlan: true,
+        planType: plan,
+      })
+      setLoadingCard(false)
+      return
+    }
     if (isEidSong || isCustomDesign || isTemplate) {
       setCardData({
         name: productName || (isEidSong ? 'اصنع أغنية العيد لمن تحب' : isCustomDesign ? 'طلب تصميم خاص' : 'قالب مميز'),
@@ -176,7 +204,7 @@ export default function CheckoutPageNew() {
     if (!cardId) { setLoadingCard(false); return }
     loadCardData(cardId)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardId, orderId, status])
+  }, [cardId, orderId, status, plan])
 
   const verifySuccessfulPayment = async (currentOrderId) => {
     // ── Detect company checkout order ──
@@ -278,19 +306,39 @@ export default function CheckoutPageNew() {
 
   const handleSubmit = async () => {
     if (!cardData) { toast.error('لم يتم تحميل بيانات المنتج'); return }
-    const sessionId = localStorage.getItem('sessionId') || crypto.randomUUID()
+    if (!validate()) { setStep(0); return }
+
+    const sessionId = crypto.randomUUID()
     localStorage.setItem('sessionId', sessionId)
+
     try {
       setSubmitting(true)
-      const token = localStorage.getItem('token')
-      const response = await fetch(`${apiBase}/api/v1/checkout/initiate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ cardId, sessionId, ...formData }),
+
+      const paymobCardId = isPlan ? `plan-${plan}` : cardId || templateId || 'test_card_123'
+      const response = await createPaymobFlashIntention({
+        cardId: paymobCardId,
+        productName: cardData?.name || 'منتج رقمي',
+        productType: isPlan ? 'plan' : isEidSong ? 'eid-song' : isCustomDesign ? 'custom-design' : isTemplate ? 'template' : 'card',
+        planType: plan || null,
+        customerName: formData.customerName,
+        customerPhone: formData.customerPhone,
+        customerEmail: formData.customerEmail,
+        amount: paymobAmountEGP,
+        currency: 'EGP',
+        sessionId,
+        billing_data: {
+          country: 'EG',
+          city: 'Cairo',
+          street: 'N/A',
+        }
       })
-      const data = await response.json()
-      if (!response.ok || !data.success || !data.iframeUrl) throw new Error(data.message || 'تعذر بدء عملية الدفع')
-      window.location.href = data.iframeUrl
+
+      if (!response?.success || !response.paymentUrl) {
+        throw new Error(response?.error || 'تعذر بدء عملية الدفع')
+      }
+
+      localStorage.setItem('paymob_session_id', sessionId)
+      window.location.href = response.paymentUrl
     } catch (error) {
       console.error('Checkout initiate error:', error)
       toast.error(error.message || 'حدث خطأ أثناء تجهيز الدفع')
@@ -300,6 +348,8 @@ export default function CheckoutPageNew() {
   }
 
   const price = cardData?.price || 0
+  const egpRate = Number(exchangeInfo?.egpRate || 13.16)
+  const paymobAmountEGP = Math.ceil(price * egpRate * 100) / 100
   const SAR_TO_USD = 0.2667
   const priceUSD = price ? (Math.ceil(price * SAR_TO_USD * 100) / 100).toFixed(2) : '0.00'
   const localPrice = convertFromSAR(price) // null for Saudis
@@ -342,7 +392,7 @@ export default function CheckoutPageNew() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
             body: JSON.stringify({
-              product: isEidSong ? 'eid-song' : isCustomDesign ? 'custom-design' : isTemplate ? 'template' : 'card',
+              product: isPlan ? `plan-${plan}` : isEidSong ? 'eid-song' : isCustomDesign ? 'custom-design' : isTemplate ? 'template' : 'card',
               amount: price,
               currency: 'SAR',
               cardId,
@@ -591,6 +641,28 @@ export default function CheckoutPageNew() {
                 {/* ── Card Payment Button (PayMob) ── */}
                 {paymentMethod === 'card' && (
                   <>
+                    <div style={{ marginBottom: 12 }}>
+                      <div style={{ fontSize: 12, fontWeight: 800, color: '#111827', marginBottom: 6 }}>ندعم</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                        {(dynamicPaymentMethods.length > 0 ? dynamicPaymentMethods : null)?.map((m) => (
+                          <div key={m.id} style={{ minHeight: 40, minWidth: 68, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: '6px 8px' }}>
+                            {m.logo ? (
+                              <img src={m.logo} alt={m.name} style={{ maxHeight: 36, width: 'auto', objectFit: 'contain' }} />
+                            ) : (
+                              <span style={{ fontSize: 11, fontWeight: 700, color: '#374151', whiteSpace: 'nowrap' }}>{m.name}</span>
+                            )}
+                          </div>
+                        ))}
+                        {dynamicPaymentMethods.length === 0 && (
+                          <>
+                            <LogoVisa size={42} />
+                            <LogoMastercard size={32} />
+                            <LogoApplePay size={40} />
+                          </>
+                        )}
+                      </div>
+                    </div>
+
                     {/* ── EGP Notice — Paymob charges in EGP, shown to ALL users ── */}
                     {exchangeInfo?.egpRate && price > 0 && (
                       <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 12, padding: '14px 16px', marginBottom: 14 }}>
@@ -648,16 +720,32 @@ export default function CheckoutPageNew() {
 
                     <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
                       <button className="co-btn co-btn-outline" style={{ flex: 1 }} onClick={() => setStep(0)}>تعديل</button>
-                      <button className="co-btn co-btn-primary" style={{ flex: 2 }} onClick={handleSubmit} disabled={submitting || loadingCard}>
+                    </div>
+                    {hasApplePay && (
+                      <button
+                        className="co-btn"
+                        onClick={handleSubmit}
+                        disabled={submitting || loadingCard}
+                        style={{ marginBottom: 10, background: '#111827', color: '#fff' }}
+                      >
                         {submitting ? <span className="co-spinner" /> : (
                           <>
-                            <IconLock />
-                            <span>ادفع بالبطاقة</span>
+                            <LogoApplePay size={46} />
+                            <span>ادفع الآن عبر Apple Pay</span>
                             <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>{price} <SAR size={12} color="#fff" /></span>
                           </>
                         )}
                       </button>
-                    </div>
+                    )}
+                    <button className="co-btn co-btn-primary" onClick={handleSubmit} disabled={submitting || loadingCard} style={{ marginBottom: 12 }}>
+                        {submitting ? <span className="co-spinner" /> : (
+                          <>
+                            <IconLock />
+                            <span>ادفع بالفيزا / ماستركارد</span>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>{price} <SAR size={12} color="#fff" /></span>
+                          </>
+                        )}
+                      </button>
                     <p style={{ textAlign: 'center', fontSize: 11, color: '#9ca3af', margin: '0 0 6px', lineHeight: 1.6 }}>
                       ستنتقل لبوابة الدفع المشفرة لإتمام العملية بأمان
                     </p>
@@ -732,10 +820,24 @@ export default function CheckoutPageNew() {
 
               {/* Payment methods */}
               <div className="co-methods" style={{ gap: 6, flexWrap: 'wrap' }}>
-                <LogoVisa size={36} />
-                <LogoMastercard size={24} />
-                <LogoApplePay size={32} />
-                {PAYPAL_CLIENT_ID && <LogoPayPal size={32} />}
+                {dynamicPaymentMethods.length > 0 ? (
+                  dynamicPaymentMethods.map((m) => (
+                    <div key={m.id} style={{ minHeight: 32, minWidth: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 6px' }}>
+                      {m.logo ? (
+                        <img src={m.logo} alt={m.name} style={{ maxHeight: 28, width: 'auto', objectFit: 'contain' }} />
+                      ) : (
+                        <span style={{ fontSize: 10, fontWeight: 700, color: '#374151', whiteSpace: 'nowrap' }}>{m.name}</span>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <>
+                    <LogoVisa size={36} />
+                    <LogoMastercard size={24} />
+                    <LogoApplePay size={32} />
+                    {PAYPAL_CLIENT_ID && <LogoPayPal size={32} />}
+                  </>
+                )}
               </div>
             </div>
           </aside>

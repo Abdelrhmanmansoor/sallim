@@ -21,6 +21,8 @@ const ProductCard = ({
     if (isFree) {
       navigate(`/editor?template=${id}&free=1`);
     } else {
+      const confirmed = window.confirm('هذه بطاقة مدفوعة. هل تريد المتابعة إلى تأكيد الشراء؟');
+      if (!confirmed) return;
       navigate(`/checkout?product=template&templateId=${id}&price=${price}&name=${encodeURIComponent(name)}`);
     }
   };

@@ -4,12 +4,15 @@ import { trackStat } from './utils/api'
 import Navbar from './components/Layout/Navbar'
 import Footer from './components/Layout/Footer'
 import WhatsAppFloat from './components/WhatsAppFloat'
+import { prefetchPaymentMethods } from './hooks/usePaymentMethods'
 import LandingPage from './pages/LandingPage'
 import EditorPage from './pages/EditorPage'
 import TextBankPage from './pages/TextBankPage'
 import SendPage from './pages/SendPage'
 import DashboardPage from './pages/DashboardPage'
 import CardViewPage from './pages/CardViewPage'
+import PaymobTestPage from './pages/PaymobTestPage'
+import PaymentResultPage from './pages/PaymentResultPage'
 
 import StandaloneEidiyaGamePage from './pages/StandaloneEidiyaGamePage'
 import GameLeaderboardPage from './pages/GameLeaderboardPage'
@@ -46,6 +49,8 @@ import RefundPage from './pages/RefundPage'
 import ContactPage from './pages/ContactPage'
 import CheckoutPageNew from './pages/CheckoutPageNew'
 import CompanyCheckoutPage from './pages/CompanyCheckoutPage'
+import CompanyPortalPage from './pages/CompanyPortalPage'
+import CompanyAccessPage from './pages/CompanyAccessPage'
 import WeddingInvitationPage from './pages/WeddingInvitationPage'
 
 export default function App() {
@@ -59,6 +64,7 @@ export default function App() {
       trackStat('uniqueVisitors')
       sessionStorage.setItem('sallim_tracked', 'true')
     }
+    prefetchPaymentMethods().catch(() => {})
   }, [])
 
   const hideWhatsAppFloat = [
@@ -80,13 +86,13 @@ export default function App() {
     '/company-checkout',
     '/create-game',
     '/wedding-invitation',
-  ].includes(pathname) || pathname.startsWith('/game/') || pathname.startsWith('/eid/') || pathname.startsWith('/diwan/') || pathname.startsWith('/g/')
+  ].includes(pathname) || pathname.startsWith('/game/') || pathname.startsWith('/eid/') || pathname.startsWith('/diwan/') || pathname.startsWith('/g/') || pathname.startsWith('/company/') || pathname.startsWith('/c/')
 
   // Define isBusiness - assuming it's false for free version
   const isBusiness = false
 
-  const hideNavbar = pathname === '/editor' || pathname === '/company/dashboard' || pathname.startsWith('/greet/') || pathname.startsWith('/g/') || pathname === '/company-checkout'
-  const hideFooter = pathname === '/editor' || pathname === '/company/dashboard' || pathname.startsWith('/greet/') || pathname.startsWith('/g/') || pathname === '/company-checkout'
+  const hideNavbar = pathname === '/editor' || pathname === '/company/dashboard' || pathname.startsWith('/greet/') || pathname.startsWith('/g/') || pathname === '/company-checkout' || pathname === '/company-access' || pathname.startsWith('/company/') || pathname.startsWith('/c/')
+  const hideFooter = pathname === '/editor' || pathname === '/company/dashboard' || pathname.startsWith('/greet/') || pathname.startsWith('/g/') || pathname === '/company-checkout' || pathname === '/company-access' || pathname.startsWith('/company/') || pathname.startsWith('/c/')
   const noNavPadding = hideNavbar || pathname === '/'
 
   return (
@@ -139,6 +145,11 @@ export default function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/checkout" element={<CheckoutPageNew />} />
           <Route path="/company-checkout" element={<CompanyCheckoutPage />} />
+          <Route path="/company/:slug" element={<CompanyPortalPage />} />
+          <Route path="/c/:slug" element={<CompanyPortalPage />} />
+          <Route path="/company-access" element={<CompanyAccessPage />} />
+          <Route path="/payment-result" element={<PaymentResultPage />} />
+          <Route path="/paymob-test" element={<PaymobTestPage />} />
           <Route path="/batch-access" element={<BatchAccessPage />} />
           <Route path="/bulk" element={<BulkPage />} />
           <Route path="/wedding-invitation" element={<WeddingInvitationPage />} />

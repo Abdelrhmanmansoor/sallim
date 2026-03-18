@@ -2,6 +2,7 @@ import { Router } from 'express'
 import Card from '../models/Card.js'
 import Company from '../models/Company.js'
 import Stats from '../models/Stats.js'
+import Template from '../models/Template.js'
 import { protectCompanyRoute, checkTeamPermission } from './company.js'
 
 const router = Router()
@@ -46,6 +47,23 @@ router.post('/', protectCompanyRoute, checkTeamPermission('createCards'), async 
         success: false, 
         error: `تم استنفاد رصيد البطاقات (${company.cardsLimit}). يرجى ترقية الباقة` 
       })
+    }
+
+    const dbTemplate = await Template.findById(templateId).catch(() => null)
+    if (dbTemplate) {
+      if (!dbTemplate.isActive) {
+        return res.status(403).json({ success: false, error: 'القالب غير متاح حالياً' })
+      }
+      if (dbTemplate.visibility === 'company_exclusive') {
+        if (!dbTemplate.companyId || String(dbTemplate.companyId) !== String(company._id)) {
+          return res.status(403).json({ success: false, error: 'هذا القالب غير متاح لشركتك' })
+        }
+      }
+      if (dbTemplate.type === 'exclusive' && dbTemplate.requiredFeature) {
+        if (!company.features?.includes(dbTemplate.requiredFeature)) {
+          return res.status(403).json({ success: false, error: 'لا تملك صلاحية استخدام هذا القالب' })
+        }
+      }
     }
 
     const card = await Card.create({

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { usePaymentMethods, mapPaymentMethodsForDisplay } from '../hooks/usePaymentMethods'
 
 const API = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
 const FONT = "'Tajawal', sans-serif"
@@ -63,6 +64,9 @@ export default function CompanyCheckoutPage() {
   const [result, setResult] = useState(null) // { licenseCode, companyEmail, packageName, cardLimit }
   const [polling, setPolling] = useState(false)
   const [pollError, setPollError] = useState('')
+  const { methods } = usePaymentMethods()
+  const paymentMethods = mapPaymentMethodsForDisplay(methods)
+  const hasApplePay = paymentMethods.some((m) => m.nameKey?.includes('apple'))
 
   // Poll status after returning from Paymob
   useEffect(() => {
@@ -238,8 +242,24 @@ export default function CompanyCheckoutPage() {
               {selected ? `متابعة — ${selected.name} (${selected.price} ر.س)` : 'اختر باقة أولاً'}
             </button>
             <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 16 }}>
-              🔒 دفع آمن عبر Paymob — Visa / Mastercard / مدى
+              🔒 دفع آمن عبر Paymob — Apple Pay / Visa / Mastercard / مدى
             </p>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+              {(paymentMethods.length ? paymentMethods : [
+                { id: 'apple-pay', name: 'Apple Pay' },
+                { id: 'visa', name: 'Visa' },
+                { id: 'mastercard', name: 'Mastercard' },
+                { id: 'mada', name: 'Mada' },
+              ]).map((m) => (
+                <div key={m.id} style={{ minHeight: 30, minWidth: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 8px' }}>
+                  {m.logo ? (
+                    <img src={m.logo} alt={m.name} style={{ maxHeight: 24, width: 'auto', objectFit: 'contain' }} />
+                  ) : (
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#374151', whiteSpace: 'nowrap' }}>{m.name}</span>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -315,14 +335,41 @@ export default function CompanyCheckoutPage() {
               {errors.companyPhone && <p style={S.errTxt}>{errors.companyPhone}</p>}
             </div>
 
+            {hasApplePay && (
+              <button
+                onClick={handlePay}
+                disabled={loading}
+                style={{ ...S.primaryBtn(loading), background: loading ? '#9ca3af' : '#111827', marginBottom: 10 }}
+              >
+                {loading ? <Spinner /> : 'Apple'}
+                {loading ? 'جاري الاتصال...' : `ادفع عبر Apple Pay — ${selected.price} ر.س`}
+              </button>
+            )}
+
             <button onClick={handlePay} disabled={loading} style={S.primaryBtn(loading)}>
               {loading ? <Spinner /> : '🔒'}
-              {loading ? 'جاري الاتصال...' : `ادفع ${selected.price} ر.س الآن`}
+              {loading ? 'جاري الاتصال...' : `ادفع بالفيزا / ماستركارد — ${selected.price} ر.س`}
             </button>
 
             <p style={{ textAlign: 'center', fontSize: 12, color: '#9ca3af', marginTop: 16 }}>
-              دفع آمن عبر Paymob — Visa / Mastercard / مدى
+              دفع آمن عبر Paymob — Apple Pay / Visa / Mastercard / مدى
             </p>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+              {(paymentMethods.length ? paymentMethods : [
+                { id: 'apple-pay', name: 'Apple Pay' },
+                { id: 'visa', name: 'Visa' },
+                { id: 'mastercard', name: 'Mastercard' },
+                { id: 'mada', name: 'Mada' },
+              ]).map((m) => (
+                <div key={m.id} style={{ minHeight: 32, minWidth: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 8px' }}>
+                  {m.logo ? (
+                    <img src={m.logo} alt={m.name} style={{ maxHeight: 26, width: 'auto', objectFit: 'contain' }} />
+                  ) : (
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#374151', whiteSpace: 'nowrap' }}>{m.name}</span>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCompany } from '../context/CompanyContext'
 import { updateCompanyProfile, getTemplates, consumeBatchCards } from '../utils/api'
-import { templates as staticTemplates, designerOnlyTemplates, fonts } from '../data/templates'
+import { templates as staticTemplates, designerOnlyTemplates, exclusiveCompanyTemplates, fonts } from '../data/templates'
 // JSZip loaded dynamically in handleGenerate
 import toast, { Toaster } from 'react-hot-toast'
 
@@ -662,20 +662,33 @@ function EmployeeLinkView({ company, token, isDepleted }) {
     const [individualLinks, setIndividualLinks] = useState([])
     const [allCopied, setAllCopied] = useState(false)
 
+    // Check if this company has exclusive templates
+    const companyName = company?.name || ''
+    const isOudScent = ['ريحة عود', 'Oud Scent', 'Oud scent', 'oud scent', 'OUD SCENT'].some(
+        name => companyName.toLowerCase().includes(name.toLowerCase())
+    )
+
     useEffect(() => {
         const allStatic = [...staticTemplates, ...designerOnlyTemplates].map(t => ({
             ...t, _id: t.id, id: t.id, name: t.name, image: t.image,
         }))
+        
+        // Add exclusive templates for this company
+        const exclusiveForCompany = exclusiveCompanyTemplates.filter(t => 
+            t.companyNames?.some(n => companyName.toLowerCase().includes(n.toLowerCase()))
+        ).map(t => ({ ...t, _id: t.id, id: t.id }))
+        
         getTemplates().then(res => {
             if (res.success && res.data && res.data.length > 0) {
                 const apiIds = new Set(res.data.map(t => String(t._id || t.id)))
                 const extras = allStatic.filter(t => !apiIds.has(String(t.id)))
-                setTemplates([...res.data, ...extras])
+                // Put exclusive templates first
+                setTemplates([...exclusiveForCompany, ...res.data, ...extras])
             } else {
-                setTemplates(allStatic)
+                setTemplates([...exclusiveForCompany, ...allStatic])
             }
-        }).catch(() => setTemplates(allStatic))
-    }, [])
+        }).catch(() => setTemplates([...exclusiveForCompany, ...allStatic]))
+    }, [companyName])
 
     const companySlug = company.slug || 'company'
 
