@@ -414,6 +414,13 @@ router.post('/callback', async (req, res) => {
         if (paymobOrderId && !companyOrder.paymobOrderId) companyOrder.paymobOrderId = paymobOrderId
         await companyOrder.save()
         console.log('[Paymob Flash] Company order updated:', { merchantOrderId, status: newStatus })
+
+        // ═══════════════════════════════════════════
+        // ✅ INSTANT DELIVERY: Create dashboard immediately
+        // ═══════════════════════════════════════════
+        if (success && !companyOrder.companyId) {
+          await createCompanyDashboard(companyOrder, req)
+        }
       }
       return res.json({ message: 'Company callback processed' })
     }
