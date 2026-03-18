@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { usePaymentMethods, mapPaymentMethodsForDisplay } from '../hooks/usePaymentMethods'
+import { useCompany } from '../context/CompanyContext'
 
 const API = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
 const FONT = "'Tajawal', sans-serif"
@@ -52,8 +53,9 @@ const Spinner = ({ color = '#fff' }) => (
 export default function CompanyCheckoutPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const { login: companyLogin } = useCompany()
   const status = searchParams.get('status')
-  const paymobOrderId = searchParams.get('paymobOrderId')
+  const merchantOrderId = searchParams.get('merchant_order_id')
 
   const [step, setStep] = useState(status === 'success' || status === 'failed' ? 3 : 0)
   // step 0 = packages, 1 = form, 2 = paying (navigated away), 3 = result
@@ -61,47 +63,48 @@ export default function CompanyCheckoutPage() {
   const [form, setForm] = useState({ companyName: '', companyEmail: '', companyPhone: '' })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState(null) // { licenseCode, companyEmail, packageName, cardLimit }
   const [polling, setPolling] = useState(false)
   const [pollError, setPollError] = useState('')
   const { methods } = usePaymentMethods()
   const paymentMethods = mapPaymentMethodsForDisplay(methods)
   const hasApplePay = paymentMethods.some((m) => m.nameKey?.includes('apple'))
 
-  // Poll status after returning from Paymob
+  // After returning from Paymob, complete the order and redirect to dashboard
   useEffect(() => {
-    if (status === 'success' && paymobOrderId) {
-      pollOrderStatus(paymobOrderId)
+    if (status === 'success' && merchantOrderId) {
+      completeOrder(merchantOrderId)
     }
     if (status === 'failed') {
       setStep(3)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, paymobOrderId])
+  }, [status, merchantOrderId])
 
-  const pollOrderStatus = async (orderId, attempt = 0) => {
+  const completeOrder = async (orderId, attempt = 0) => {
     setPolling(true)
     setPollError('')
     try {
-      const res = await fetch(`${API}/api/v1/company-checkout/status?paymobOrderId=${orderId}`)
+      const res = await fetch(`${API}/api/v1/company-checkout/complete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ merchantOrderId: orderId }),
+      })
       const data = await res.json()
-      if (data?.data?.status === 'completed' && data?.data?.licenseCode) {
-        setResult(data.data)
-        setStep(3)
-        setPolling(false)
-      } else if (data?.data?.status === 'failed') {
-        setPollError('فشلت عملية الدفع. يمكنك المحاولة مجدداً.')
-        setStep(3)
-        setPolling(false)
-      } else if (attempt < 8) {
-        setTimeout(() => pollOrderStatus(orderId, attempt + 1), 2000)
+      if (data.success && data.token && data.company) {
+        companyLogin(data.token, data.company)
+        localStorage.removeItem('sallim_co_pending')
+        navigate('/company/dashboard', { replace: true })
+      } else if (res.status === 402 && attempt < 6) {
+        // Payment webhook may not have fired yet — retry
+        setTimeout(() => completeOrder(orderId, attempt + 1), 2500)
       } else {
-        setPollError('لم يكتمل التحقق بعد. تواصل مع الدعم إذا اكتمل الدفع.')
+        setPollError(data.error || 'فشل إنشاء الحساب. تواصل مع الدعم.')
+        setStep(3)
         setPolling(false)
       }
     } catch {
-      if (attempt < 5) setTimeout(() => pollOrderStatus(orderId, attempt + 1), 3000)
-      else { setPollError('خطأ في الاتصال بالسيرفر.'); setPolling(false) }
+      if (attempt < 4) setTimeout(() => completeOrder(orderId, attempt + 1), 3000)
+      else { setPollError('خطأ في الاتصال بالسيرفر.'); setPolling(false); setStep(3) }
     }
   }
 
@@ -125,15 +128,14 @@ export default function CompanyCheckoutPage() {
         body: JSON.stringify({ packageKey: selected.key, ...form }),
       })
       const data = await res.json()
-      if (!res.ok || !data.success || !data.iframeUrl) {
+      if (!res.ok || !data.success || !data.paymentUrl) {
         throw new Error(data.error || 'فشل بدء عملية الدفع')
       }
-      // Store pending order in localStorage so CheckoutPageNew can detect it on return
       localStorage.setItem('sallim_co_pending', JSON.stringify({
-        paymobOrderId: data.paymobOrderId,
+        merchantOrderId: data.merchantOrderId,
         email: form.companyEmail.trim().toLowerCase(),
       }))
-      window.location.href = data.iframeUrl
+      window.location.href = data.paymentUrl
     } catch (err) {
       setErrors({ submit: err.message })
       setLoading(false)
@@ -376,9 +378,7 @@ export default function CompanyCheckoutPage() {
     )
   }
 
-  // ─── STEP 3: Result (success or failed) ───
-  const isSuccess = status === 'success' && !pollError
-
+  // ─── STEP 3: Result (processing / failed) ───
   return (
     <div style={S.page}>
       <style>{`@keyframes co_spin { to { transform: rotate(360deg); } } @keyframes co_fade { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }`}</style>
@@ -389,14 +389,14 @@ export default function CompanyCheckoutPage() {
 
         <div style={{ ...S.formCard, maxWidth: 520, textAlign: 'center', animation: 'co_fade .4s ease' }}>
 
-          {/* Polling state */}
+          {/* Processing / polling state */}
           {polling && (
             <>
               <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#f5f3ff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
                 <Spinner color="#7c3aed" />
               </div>
-              <h2 style={{ fontSize: 22, fontWeight: 800, color: '#111827', margin: '0 0 8px' }}>يتحقق من الدفع...</h2>
-              <p style={{ fontSize: 14, color: '#6b7280' }}>لحظة من فضلك، يتم التحقق من عملية الدفع</p>
+              <h2 style={{ fontSize: 22, fontWeight: 800, color: '#111827', margin: '0 0 8px' }}>جاري فتح لوحة التحكم...</h2>
+              <p style={{ fontSize: 14, color: '#6b7280' }}>تم الدفع بنجاح، يتم الآن إنشاء حسابك</p>
             </>
           )}
 
@@ -412,50 +412,6 @@ export default function CompanyCheckoutPage() {
               <p style={{ fontSize: 13, color: '#9ca3af', marginTop: 16 }}>
                 أو{' '}
                 <a href="https://wa.me/201007835547" target="_blank" rel="noopener noreferrer" style={{ color: '#7c3aed', fontWeight: 700 }}>تواصل معنا على واتساب</a>
-              </p>
-            </>
-          )}
-
-          {/* Success */}
-          {!polling && isSuccess && result?.licenseCode && (
-            <>
-              {/* Success icon */}
-              <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}>✓</div>
-              <h2 style={{ fontSize: 24, fontWeight: 900, color: '#111827', margin: '0 0 6px' }}>تم الدفع بنجاح! 🎉</h2>
-              <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 28 }}>
-                تم شراء <strong>{result.packageName}</strong> بنجاح. كود التفعيل الخاص بك:
-              </p>
-
-              {/* License Code */}
-              <div style={{ background: '#f5f3ff', border: '2px solid #7c3aed', borderRadius: 14, padding: '20px 24px', marginBottom: 24 }}>
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#7c3aed', letterSpacing: 2, textTransform: 'uppercase', margin: '0 0 8px' }}>كود التفعيل</p>
-                <p style={{ fontSize: 28, fontWeight: 900, color: '#111827', fontFamily: 'monospace', letterSpacing: 4, margin: 0 }}>{result.licenseCode}</p>
-              </div>
-
-              {/* Copy button */}
-              <button
-                onClick={() => { navigator.clipboard?.writeText(result.licenseCode); alert('تم نسخ الكود!') }}
-                style={{ background: '#f5f3ff', border: '1.5px solid #c4b5fd', borderRadius: 10, padding: '10px 24px', fontSize: 14, fontWeight: 700, color: '#7c3aed', cursor: 'pointer', fontFamily: FONT, marginBottom: 24 }}
-              >
-                نسخ الكود
-              </button>
-
-              <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: 24 }}>
-                <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 16 }}>الخطوة التالية: فعّل حسابك الآن</p>
-                <a
-                  href={`/company-activation?code=${encodeURIComponent(result.licenseCode)}&email=${encodeURIComponent(result.companyEmail)}`}
-                  style={{
-                    display: 'block', padding: '15px 28px', background: '#7c3aed', color: '#fff',
-                    borderRadius: 12, fontWeight: 800, fontSize: 16, textDecoration: 'none',
-                    textAlign: 'center',
-                  }}
-                >
-                  تفعيل الحساب الآن ←
-                </a>
-              </div>
-
-              <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 20 }}>
-                البريد: <strong>{result.companyEmail}</strong> — احتفظ بالكود في مكان آمن
               </p>
             </>
           )}

@@ -26,6 +26,8 @@ const companyOrderSchema = new mongoose.Schema(
     licenseCode: { type: String, default: '' }, // plain activation code, set after payment
     licenseKeyId: { type: mongoose.Schema.Types.ObjectId, ref: 'LicenseKey' },
     paymobTransactionId: { type: String, default: '' },
+    intentionId: { type: String, default: '' },
+    companyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', default: null },
   },
   { timestamps: true }
 )

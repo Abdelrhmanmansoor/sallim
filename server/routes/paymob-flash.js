@@ -13,6 +13,7 @@ import {
   buildUnifiedCheckoutUrl
 } from '../utils/paymob-flash.js'
 import CheckoutSession from '../models/CheckoutSession.js'
+import CompanyOrder from '../models/CompanyOrder.js'
 import Card from '../models/Card.js'
 import Analytics from '../models/Analytics.js'
 import { checkoutLimiter } from '../middleware/rateLimiter.js'
@@ -401,6 +402,20 @@ router.post('/callback', async (req, res) => {
       return res.status(400).json({ message: 'Missing payment identifiers' })
     }
 
+    // ── Company order callback (merchant_order_id starts with "co-") ──
+    if (merchantOrderId && merchantOrderId.startsWith('co-')) {
+      const companyOrder = await CompanyOrder.findOne({ merchantOrderId })
+      if (companyOrder && companyOrder.status !== 'completed') {
+        const newStatus = success ? 'completed' : pending ? 'initiated' : 'failed'
+        companyOrder.status = newStatus
+        if (transactionId) companyOrder.paymobTransactionId = String(transactionId)
+        if (paymobOrderId && !companyOrder.paymobOrderId) companyOrder.paymobOrderId = paymobOrderId
+        await companyOrder.save()
+        console.log('[Paymob Flash] Company order updated:', { merchantOrderId, status: newStatus })
+      }
+      return res.json({ message: 'Company callback processed' })
+    }
+
     // Find checkout session with fallbacks
     const session = await CheckoutSession.findOne({
       $or: [
@@ -443,7 +458,7 @@ router.post('/callback', async (req, res) => {
     // If payment successful, record analytics once
     if (success && !alreadyCompleted) {
       const card = await Card.findById(session.cardId)
-      
+
       if (card) {
         await Analytics.create({
           cardId: session.cardId,
