@@ -512,27 +512,6 @@ router.get('/status/:sessionId', async (req, res) => {
       })
     }
 
-    // If we have an intention ID, get latest status from Paymob
-    let intentionStatus = null
-    if (session.intentionId) {
-      try {
-        intentionStatus = await getIntentionStatus(session.intentionId)
-        if (intentionStatus?.success && intentionStatus.data) {
-          const resolved = resolveIntentionState(intentionStatus.data)
-          if (resolved.state === 'completed' && session.status !== 'completed') {
-            session.status = 'completed'
-            if (resolved.transactionId && !session.transactionId) {
-              session.transactionId = String(resolved.transactionId)
-            }
-            if (!session.completedAt) session.completedAt = new Date()
-            await session.save()
-          }
-        }
-      } catch (error) {
-        console.error('[Paymob Flash] Failed to get intention status:', error.message)
-      }
-    }
-
     res.json({
       success: true,
       status: session.status,
@@ -543,7 +522,6 @@ router.get('/status/:sessionId', async (req, res) => {
       completedAt: session.completedAt,
       redirectUrl: buildFallbackRedirect(session),
       paymentEmailSentAt: session.paymentEmailSentAt,
-      intentionStatus: intentionStatus?.data,
     })
 
   } catch (error) {
@@ -580,6 +558,73 @@ router.get('/transaction/:transactionId', async (req, res) => {
 })
 
 /**
+ * Verify payment result from Paymob redirect URL params
+ * POST /api/v1/paymob-flash/verify-result
+ */
+router.post('/verify-result', async (req, res) => {
+  try {
+    const params = req.body
+    const { hmac, id: transactionId, success } = params
+
+    if (!transactionId) {
+      return res.json({ verified: false, success: false, error: 'Missing transaction ID' })
+    }
+
+    const isSuccess = String(success) === 'true'
+
+    // Map redirect URL params to HMAC data format (dots → underscores for nested fields)
+    const hmacData = {
+      amount_cents: params.amount_cents,
+      created_at: params.created_at,
+      currency: params.currency,
+      error_occured: params.error_occured,
+      has_parent_transaction: params.has_parent_transaction,
+      id: transactionId,
+      integration_id: params.integration_id,
+      is_3d_secure: params.is_3d_secure,
+      is_auth: params.is_auth,
+      is_capture: params.is_capture,
+      is_refunded: params.is_refunded,
+      is_standalone_payment: params.is_standalone_payment,
+      is_voided: params.is_voided,
+      order: params.order,
+      owner: params.owner,
+      pending: params.pending,
+      source_data_pan: params['source_data.pan'],
+      source_data_sub_type: params['source_data.sub_type'],
+      source_data_type: params['source_data.type'],
+      success,
+    }
+
+    const isValidHmac = hmac ? verifyPaymobHMAC(hmacData, hmac) : false
+    if (!isValidHmac) {
+      console.warn('[Paymob Flash] HMAC mismatch on redirect — transactionId:', transactionId)
+    }
+
+    // Find session to get redirectUrl
+    const session = await CheckoutSession.findOne({
+      $or: [
+        { transactionId: String(transactionId) },
+        ...(params.merchant_order_id ? [{ merchantOrderId: params.merchant_order_id }] : []),
+      ],
+    }).catch(() => null)
+
+    const redirectUrl = session ? buildFallbackRedirect(session) : null
+
+    return res.json({
+      verified: isValidHmac,
+      success: isSuccess,
+      transactionId,
+      redirectUrl,
+      sessionId: session?.sessionId || null,
+    })
+  } catch (error) {
+    console.error('[Paymob Flash] Verify result error:', error.message)
+    res.json({ verified: false, success: false, error: error.message })
+  }
+})
+
+/**
  * Confirm successful payment (webhook is source of truth)
  * POST /api/v1/paymob-flash/confirm-success
  */
@@ -602,7 +647,7 @@ router.post('/confirm-success', async (req, res) => {
     }
 
     if (session.status !== 'completed') {
-      // Try direct transaction verification first (most reliable)
+      // Verify directly via transaction ID (most reliable, no polling)
       const txId = urlTransactionId || session.transactionId
       if (txId) {
         try {
@@ -617,28 +662,9 @@ router.post('/confirm-success', async (req, res) => {
           console.error('[Paymob Flash] Transaction verification error:', e.message)
         }
       }
-
-      // Fallback: check intention status
-      if (session.status !== 'completed' && session.intentionId) {
-        try {
-          const intentionStatus = await getIntentionStatus(session.intentionId)
-          if (intentionStatus?.success && intentionStatus.data) {
-            const resolved = resolveIntentionState(intentionStatus.data)
-            if (resolved.state === 'completed') {
-              session.status = 'completed'
-              if (resolved.transactionId && !session.transactionId) {
-                session.transactionId = String(resolved.transactionId)
-              }
-              if (!session.completedAt) session.completedAt = new Date()
-              await session.save()
-            }
-          }
-        } catch (error) {
-          console.error('[Paymob Flash] Confirm success reconcile error:', error.message)
-        }
-      }
     }
 
+    // Idempotent: if still not completed, return 409 (caller should retry with transactionId)
     if (session.status !== 'completed') {
       return res.status(409).json({
         success: false,

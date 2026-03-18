@@ -205,7 +205,6 @@ const diwaniyaSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Database indexes for performance
-diwaniyaSchema.index({ username: 1 });
 diwaniyaSchema.index({ ownerName: 1 });
 diwaniyaSchema.index({ visibility: 1, createdAt: -1 });
 diwaniyaSchema.index({ isFamilyMode: 1 });

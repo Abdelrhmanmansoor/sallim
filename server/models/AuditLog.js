@@ -7,18 +7,18 @@ const auditLogSchema = new mongoose.Schema({
   },
   userType: {
     type: String,
-    enum: ['super_admin', 'company_admin', 'company_editor', 'system'],
+    enum: ['super_admin', 'company_admin', 'company_editor', 'system', 'guest'],
     required: true
   },
   action: {
     type: String,
     required: true,
-    enum: ['create', 'read', 'update', 'delete', 'login', 'logout', 'purchase', 'activate', 'deactivate', 'send', 'upload', 'download', 'assign', 'unassign', 'bulk_send']
+    enum: ['create', 'read', 'update', 'delete', 'login', 'logout', 'purchase', 'activate', 'deactivate', 'send', 'upload', 'download', 'assign', 'unassign', 'bulk_send', 'attempt']
   },
   entity: {
     type: String,
     required: true,
-    enum: ['company', 'user', 'wallet', 'transaction', 'template', 'card', 'campaign', 'ticket', 'invite_code', 'feature_flag', 'theme', 'package', 'card_campaign']
+    enum: ['company', 'user', 'wallet', 'transaction', 'template', 'card', 'campaign', 'ticket', 'invite_code', 'feature_flag', 'theme', 'package', 'card_campaign', 'order']
   },
   entityId: {
     type: mongoose.Schema.Types.ObjectId,
