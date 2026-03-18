@@ -162,7 +162,7 @@ async function createPaymentIntention({
 
     return {
       success: true,
-      intention_id: data.id,
+      intention_id: data.intention_id || data.id,
       client_secret: data.client_secret,
       payment_url: checkoutUrl,
       unified_checkout_url: unifiedCheckoutUrl,
