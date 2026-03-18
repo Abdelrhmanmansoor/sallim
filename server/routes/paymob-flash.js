@@ -15,10 +15,15 @@ import {
 } from '../utils/paymob-flash.js'
 import CheckoutSession from '../models/CheckoutSession.js'
 import CompanyOrder from '../models/CompanyOrder.js'
+import Company from '../models/Company.js'
+import LicenseKey from '../models/LicenseKey.js'
 import Card from '../models/Card.js'
 import Analytics from '../models/Analytics.js'
 import { checkoutLimiter } from '../middleware/rateLimiter.js'
 import { sendEmail } from '../utils/sendMail.js'
+import { nanoid } from 'nanoid'
+import jwt from 'jsonwebtoken'
+import crypto from 'crypto'
 
 const router = express.Router()
 
@@ -740,6 +745,220 @@ async function sendPaymentConfirmationEmail(session, card) {
     subject: 'تم تأكيد الدفع - منصة سلّم',
     html,
   })
+}
+
+/**
+ * ═══════════════════════════════════════════
+ * ✅ INSTANT DELIVERY: Create Company Dashboard
+ * ═══════════════════════════════════════════
+ * Creates company account, license, and dashboard immediately after payment
+ */
+async function createCompanyDashboard(companyOrder, req) {
+  try {
+    console.log('[Instant Delivery] Creating company dashboard for order:', companyOrder.merchantOrderId)
+
+    const JWT_SECRET = process.env.JWT_SECRET
+    const now = new Date()
+    const expiresAt = new Date(now)
+    expiresAt.setFullYear(expiresAt.getFullYear() + 1)
+
+    // 1. Generate license code
+    const licenseCode = `SALL-${crypto.randomBytes(2).toString('hex').toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`
+    const codeHash = crypto.createHash('sha256').update(licenseCode.toUpperCase()).digest('hex')
+
+    // 2. Create license key
+    const license = await LicenseKey.create({
+      codeHash,
+      status: 'activated',
+      maxRecipients: companyOrder.packageSnapshot?.cardLimit || 500,
+      activatedAt: now,
+      activatedIp: req.ip || '',
+      activatedUserAgent: req.headers['user-agent'] || '',
+      note: `Auto-generated for company order ${companyOrder.merchantOrderId} — ${companyOrder.companyEmail}`,
+    })
+
+    // 3. Map package key to subscription plan
+    const packagePlanMap = {
+      'enterprise': 'enterprise',
+      'pro': 'pro',
+      'starter': 'basic'
+    }
+    const subscriptionPlan = packagePlanMap[companyOrder.packageKey] || 'basic'
+
+    // 4. Create company account
+    const slug = nanoid(10).toLowerCase()
+    const password = crypto.randomBytes(12).toString('base64url')
+
+    const company = await Company.create({
+      name: companyOrder.companyName,
+      email: companyOrder.companyEmail,
+      password,
+      slug,
+      logoUrl: '',
+      primaryColor: '#7c3aed',
+      brandColors: {
+        primary: '#7c3aed',
+        secondary: '#8b5cf6',
+        accent: '#a78bfa',
+      },
+      cardsLimit: companyOrder.packageSnapshot?.cardLimit || 500,
+      cardsUsed: 0,
+      status: 'active',
+      isActive: true,
+      subscription: {
+        plan: subscriptionPlan,
+        startDate: now,
+        renewalDate: expiresAt,
+        expiresAt,
+        isActive: true,
+        limits: {
+          cardsPerMonth: companyOrder.packageSnapshot?.cardLimit || 500,
+          teamMembers: companyOrder.packageKey === 'enterprise' ? 20 : companyOrder.packageKey === 'pro' ? 10 : 3,
+          campaignsPerMonth: 999,
+        },
+      },
+      usage: {
+        cardsThisMonth: 0,
+        campaignsThisMonth: 0,
+        lastReset: now,
+      },
+      stats: {
+        views: 0,
+        downloads: 0,
+      },
+      features: [
+        'templates_access',
+        'custom_branding',
+        'analytics',
+        'campaigns',
+        'team_management',
+      ],
+    })
+
+    // 5. Update company order with references
+    companyOrder.licenseCode = licenseCode
+    companyOrder.licenseKeyId = license._id
+    companyOrder.companyId = company._id
+    await companyOrder.save()
+
+    // 6. Generate JWT token for auto-login
+    const token = jwt.sign(
+      { id: company._id, role: 'company' },
+      JWT_SECRET,
+      { expiresIn: '30d' }
+    )
+
+    console.log('[Instant Delivery] ✅ Company dashboard created successfully:', {
+      companyId: company._id,
+      slug: company.slug,
+      email: company.email,
+      licenseCode,
+      subscriptionPlan,
+    })
+
+    // 7. Send welcome email with login credentials
+    await sendCompanyWelcomeEmail(company, password, licenseCode, companyOrder.packageSnapshot?.name)
+
+    return {
+      success: true,
+      company,
+      token,
+      password,
+      licenseCode,
+    }
+
+  } catch (error) {
+    console.error('[Instant Delivery] ❌ Error creating company dashboard:', {
+      message: error.message,
+      stack: error.stack,
+      order: companyOrder.merchantOrderId,
+    })
+
+    // Don't throw - allow callback to complete
+    return {
+      success: false,
+      error: error.message,
+    }
+  }
+}
+
+/**
+ * Send welcome email to new company
+ */
+async function sendCompanyWelcomeEmail(company, password, licenseCode, packageName) {
+  try {
+    const dashboardUrl = `${CLIENT_URL}/c/${company.slug}?utm=company&auto_login=1`
+    
+    const html = `
+      <div dir="rtl" style="font-family: Arial, sans-serif; color:#0f172a; line-height:1.8; max-width:600px; margin:0 auto;">
+        <div style="background:linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%); padding:30px; border-radius:15px 15px 0 0; text-align:center;">
+          <h1 style="margin:0; color:#fff; font-size:28px;">🎉 مرحباً بك في سلّم للشركات!</h1>
+          <p style="margin:10px 0 0; color:#e0e7ff; font-size:16px;">تم إنشاء حسابك بنجاح - كود الاشتراك: ${licenseCode}</p>
+        </div>
+        
+        <div style="background:#f8fafc; padding:30px; border-radius:0 0 15px 15px; border:1px solid #e2e8f0;">
+          <h2 style="margin:0 0 20px; color:#1e293b; font-size:20px;">تفاصيل حسابك</h2>
+          
+          <table style="width:100%; border-collapse:collapse;">
+            <tr>
+              <td style="padding:12px 0; border-bottom:1px solid #e2e8f0; color:#64748b; font-weight:bold;">اسم الشركة:</td>
+              <td style="padding:12px 0; border-bottom:1px solid #e2e8f0; color:#1e293b;">${company.name}</td>
+            </tr>
+            <tr>
+              <td style="padding:12px 0; border-bottom:1px solid #e2e8f0; color:#64748b; font-weight:bold;">البريد الإلكتروني:</td>
+              <td style="padding:12px 0; border-bottom:1px solid #e2e8f0; color:#1e293b;">${company.email}</td>
+            </tr>
+            <tr>
+              <td style="padding:12px 0; border-bottom:1px solid #e2e8f0; color:#64748b; font-weight:bold;">كلمة المرور:</td>
+              <td style="padding:12px 0; border-bottom:1px solid #e2e8f0; color:#1e293b; font-family:monospace; font-size:14px; background:#fef3c7; padding:4px 8px; border-radius:4px;">${password}</td>
+            </tr>
+            <tr>
+              <td style="padding:12px 0; border-bottom:1px solid #e2e8f0; color:#64748b; font-weight:bold;">كود الاشتراك:</td>
+              <td style="padding:12px 0; border-bottom:1px solid #e2e8f0; color:#1e293b; font-family:monospace; font-size:14px; background:#dbeafe; padding:4px 8px; border-radius:4px;">${licenseCode}</td>
+            </tr>
+            <tr>
+              <td style="padding:12px 0; border-bottom:1px solid #e2e8f0; color:#64748b; font-weight:bold;">الباقة:</td>
+              <td style="padding:12px 0; border-bottom:1px solid #e2e8f0; color:#1e293b;">${packageName || 'الباقة الأساسية'}</td>
+            </tr>
+          </table>
+
+          <div style="margin:30px 0; text-align:center;">
+            <p style="margin:0 0 15px; color:#475569; font-size:16px;">💡 احفظ كلمة المرور وكود الاشتراك في مكان آمن</p>
+            
+            <a href="${dashboardUrl}" 
+               style="display:inline-block; padding:15px 30px; background:linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%); 
+                      color:#fff; text-decoration:none; border-radius:10px; font-weight:bold; font-size:16px; 
+                      box-shadow:0 4px 15px rgba(124, 58, 237, 0.3);">
+              🚀 الدخول للوحة التحكم الآن
+            </a>
+          </div>
+
+          <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:8px; padding:15px; margin-top:20px;">
+            <p style="margin:0; color:#166534; font-size:14px;">
+              <strong>✅ حسابك جاهز للاستخدام!</strong><br>
+              يمكنك الآن إنشاء بطاقات تهنئة وتخصيصها وإرسالها فوراً.
+            </p>
+          </div>
+
+          <div style="margin-top:30px; padding-top:20px; border-top:1px solid #e2e8f0; text-align:center;">
+            <p style="margin:0; color:#94a3b8; font-size:12px;">
+              إذا واجهتك أي مشاكل، تواصل معنا عبر البريد: support@sallim.co
+            </p>
+          </div>
+        </div>
+      </div>
+    `
+
+    return sendEmail({
+      to: company.email,
+      subject: '🎉 تم إنشاء حسابك بنجاح - منصة سلّم للشركات',
+      html,
+    })
+
+  } catch (error) {
+    console.error('[Instant Delivery] Error sending welcome email:', error.message)
+    return false
+  }
 }
 
 /**

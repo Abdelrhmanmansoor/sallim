@@ -153,7 +153,14 @@ export default function CheckoutPageNew() {
   const hasApplePay = dynamicPaymentMethods.some((m) => m.nameKey?.includes('apple'))
 
   // Calculate prices (moved up so they're available in handleSubmit)
-  const price = cardData?.price || 0
+  const parsedProductPrice = productPrice ? Number(productPrice) : null
+  const price =
+    Number(
+      cardData?.price ??
+      (isPlan && PLAN_CONFIG[plan]?.price) ??
+      parsedProductPrice ??
+      0
+    ) || 0
   const egpRate = Number(exchangeInfo?.egpRate || 13.16)
   const paymobAmountEGP = Math.ceil(price * egpRate * 100) / 100
   const SAR_TO_USD = 0.2667
@@ -313,8 +320,8 @@ export default function CheckoutPageNew() {
   }
 
   const handleSubmit = async () => {
-    if (!cardData) { toast.error('لم يتم تحميل بيانات المنتج'); return }
-    if (!paymobAmountEGP || paymobAmountEGP <= 0) { toast.error('السعر غير محدد لهذا المنتج'); return }
+    if (!cardData && !parsedProductPrice && !price) { toast.error('لم يتم تحميل بيانات المنتج'); return }
+    if (!price || !paymobAmountEGP || paymobAmountEGP <= 0) { toast.error('السعر غير محدد لهذا المنتج'); return }
     if (!validate()) { setStep(0); return }
 
     const sessionId = crypto.randomUUID()

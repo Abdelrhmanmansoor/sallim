@@ -371,11 +371,7 @@ router.post('/callback', async (req, res) => {
     return res.json({
       success: true,
       purchaseId: analyticsEntry._id,
-      redirectUrl: buildCheckoutRedirect('success', {
-        orderId,
-        cardId: String(checkoutSession.cardId?._id || ''),
-        purchase: String(analyticsEntry._id),
-      }),
+      redirectUrl: `/editor?cardId=${checkoutSession.cardId?._id}&purchase=${analyticsEntry._id}&autodownload=1`,
     })
   } catch (error) {
     console.error('Checkout callback error:', error)
@@ -405,7 +401,7 @@ router.get('/success', async (req, res) => {
           id: checkoutSession.cardId?._id,
           name: checkoutSession.cardId?.name || checkoutSession.cardId?.mainText || 'بطاقة رقمية',
         },
-        redirectUrl: `/editor?cardId=${checkoutSession.cardId?._id}&purchase=${checkoutSession.analyticsId}`,
+        redirectUrl: `/editor?cardId=${checkoutSession.cardId?._id}&purchase=${checkoutSession.analyticsId}&autodownload=1`,
       },
     })
   } catch (error) {
