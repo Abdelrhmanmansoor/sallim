@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { templates as localTemplates, designerOnlyTemplates, fonts } from '../data/templates'
-import { useCurrency } from '../utils/useCurrency'
 import toast, { Toaster } from 'react-hot-toast'
 
 const WA = '201007835547'
@@ -13,22 +12,6 @@ const GREEN = '#059669'
 // دمج كل القوالب معاً
 const ALL_TEMPLATES = [...localTemplates, ...designerOnlyTemplates]
 
-/* ─── Packages — أسعار تنافسية للسوق السعودي والخليجي ─────────────────────────────────── */
-const PACKAGES = [
-  { id: 'free',  count: 1,   price: 0,   label: 'تجريبية',   desc: 'بطاقة واحدة مجاناً', free: true },
-  { id: 'p10',   count: 10,  price: 99,   perCard: 9.9,  label: '10 بطاقات' },
-  { id: 'p25',   count: 25,  price: 199,  perCard: 7.96, label: '25 بطاقة', popular: true },
-  { id: 'p50',   count: 50,  price: 349,  perCard: 6.98, label: '50 بطاقة' },
-  { id: 'p100',  count: 100, price: 599,  perCard: 5.99, label: '100 بطاقة' },
-]
-function calcCustom(n) {
-  if (n <= 25)  return n * 8
-  if (n <= 50)  return n * 7
-  if (n <= 100) return n * 6
-  if (n <= 250) return n * 5
-  if (n <= 500) return n * 4
-  return n * 3.5
-}
 
 /* ─── Features copy ─────────────────────────────── */
 const FEATURES = [
@@ -49,7 +32,7 @@ const FEATURES = [
   },
   {
     title: 'من 5 إلى 500 بطاقة في ضغطة',
-    body: 'باقات مرنة للفرق الصغيرة والشركات الكبيرة. ادفع مرة وحمّل الكل بصيغة ZIP جاهزة للطباعة والواتساب.',
+    body: 'مرن للفرق الصغيرة والشركات الكبيرة. ولّد الكل بصيغة PNG جاهزة للطباعة والواتساب — مجاناً.',
     accent: GREEN,
   },
   {
@@ -68,8 +51,8 @@ const FEATURES = [
     accent: ORANGE,
   },
   {
-    title: 'بدون تسجيل — ادفع وابدأ فوراً',
-    body: 'الأفراد لا يحتاجون حساب. ادفع، استلم الكود، أدخله، وابدأ. العملية كلها أقل من دقيقة.',
+    title: 'بدون تسجيل — ابدأ فوراً',
+    body: 'الأفراد لا يحتاجون حساب. اختر القالب، أدخل الاسم، وحمّل البطاقة — كل شيء مجاني وفوري.',
     accent: GREEN,
   },
 ]
@@ -140,36 +123,14 @@ function injectCss(css) {
   document.head.appendChild(s)
 }
 
-/* ─── Cookie helpers ─────────────────────────────── */
-function getCookie(name) {
-  return document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith(name + '='))?.split('=')[1] || ''
-}
-function setCookie(name, value, hours = 24) {
-  const exp = new Date(Date.now() + hours * 3600000).toUTCString()
-  document.cookie = `${name}=${value};expires=${exp};path=/`
-}
-function getTrialCount() {
-  const count = getCookie('sallim_trial_count')
-  return count ? parseInt(count) : 0
-}
-function incrementTrialCount() {
-  const current = getTrialCount()
-  setCookie('sallim_trial_count', String(current + 1), 168) // 7 days
-  return current + 1
-}
-const MAX_FREE_TRIALS = 2
 
 /* ═══════════════════════════════════════════════════
    MAIN COMPONENT
 ═══════════════════════════════════════════════════ */
 export default function BulkPage() {
-  const { isForeign, convertFromSAR, currency, flag } = useCurrency()
   const [name, setName] = useState('')
   const [selectedTmpl, setSelectedTmpl] = useState(null)
-  const [customCount, setCustomCount] = useState(30)
-  const [expandedPkg, setExpandedPkg] = useState(null)
-  const [trialCount, setTrialCount] = useState(getTrialCount())
-  
+
   const nameRef = useRef(null)
   const editorRef = useRef(null)
 
@@ -178,34 +139,11 @@ export default function BulkPage() {
     injectCss(MARQUEE_CSS)
   }, [])
 
-  // Track VIEW_CONTENT for Snapchat Pixel
-  useEffect(() => {
-    if (typeof snaptr !== 'undefined') {
-      snaptr('track', 'VIEW_CONTENT')
-    }
-  }, [])
-
-  // Check if trials exhausted
-  const isTrialExhausted = useMemo(() => trialCount >= MAX_FREE_TRIALS, [trialCount])
-
   // Template selection handler
   const handleSelectTemplate = useCallback((tmpl) => {
-    if (isTrialExhausted) {
-      toast.error('انتهت المحاولات المجانية — اشترِ باقة للمتابعة')
-      return
-    }
     setSelectedTmpl(tmpl)
     setTimeout(() => editorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150)
-  }, [isTrialExhausted])
-
-  // Format foreign currency
-  const fmtForeign = useCallback((sar) => 
-    isForeign ? ` (${convertFromSAR(sar)} ${currency})` : '', 
-    [isForeign, convertFromSAR, currency]
-  )
-  
-  // Calculate custom price
-  const customPrice = useMemo(() => Math.round(calcCustom(customCount)), [customCount])
+  }, [])
 
   return (
     <div dir="rtl" style={{ minHeight: '100vh', background: '#fafafa', fontFamily: FONT, color: '#111827', overflowX: 'hidden' }}>
@@ -216,7 +154,7 @@ export default function BulkPage() {
         <div style={{ maxWidth: 740, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#f3f0ff', borderRadius: 20, padding: '6px 16px', marginBottom: 20 }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: PURPLE, display: 'inline-block' }} />
-            <span style={{ fontSize: 13, color: PURPLE, fontWeight: 700 }}>بطاقات تهنئة احترافية — تسليم فوري</span>
+            <span style={{ fontSize: 13, color: PURPLE, fontWeight: 700 }}>مجاني بالكامل — بدون حدود</span>
           </div>
           <h1 style={{ fontSize: 'clamp(30px,6vw,54px)', fontWeight: 900, color: '#111827', lineHeight: 1.2, marginBottom: 18, letterSpacing: '-0.02em' }}>
             بطاقة تهنئة لكل موظف
@@ -226,25 +164,13 @@ export default function BulkPage() {
             ارفع أسماء فريقك، اختار التصميم، وحمّل كل البطاقات دفعة واحدة — بهوية شركتك وشعارك، بدون تصميم مسبق
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a
-              href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى أطلب باقة بطاقات تهنئة من سلّم')}`}
-              target="_blank" rel="noopener noreferrer"
-              onClick={() => {
-                if (typeof snaptr !== 'undefined') {
-                  snaptr('track', 'CUSTOM_EVENT_1')
-                }
-              }}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '16px 36px', background: ORANGE, color: '#fff', borderRadius: 12, fontSize: 16, fontWeight: 800, textDecoration: 'none', boxShadow: '0 6px 20px rgba(234,88,12,0.3)', fontFamily: FONT }}
-            >
-              اطلب الآن
-            </a>
             <button
               onClick={() => { nameRef.current?.focus(); nameRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }) }}
-              style={{ padding: '16px 32px', background: 'transparent', color: PURPLE, border: `2px solid ${PURPLE}`, borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}
-            >جرّب مجاناً</button>
+              style={{ padding: '16px 40px', background: PURPLE, color: '#fff', border: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800, cursor: 'pointer', fontFamily: FONT, boxShadow: `0 6px 20px rgba(124,58,237,0.3)` }}
+            >🎉 ابدأ مجاناً</button>
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 24, flexWrap: 'wrap', marginTop: 28, fontSize: 13, color: '#9ca3af', fontWeight: 600 }}>
-            {['بدون تسجيل', 'جاهز للطباعة والواتساب', 'يعمل على الموبايل', '+50 قالب احترافي'].map((t, i) => (
+            {['مجاني بالكامل', 'بدون تسجيل', 'جاهز للطباعة والواتساب', '+50 قالب احترافي'].map((t, i) => (
               <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                 <span style={{ color: GREEN, fontSize: 12 }}>✓</span> {t}
               </span>
@@ -259,13 +185,13 @@ export default function BulkPage() {
       {/* ═══════ اختر التصميم أولاً ═══════ */}
       <section style={{ padding: 'clamp(56px,8vw,80px) 24px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{ 
-            display: 'inline-flex', alignItems: 'center', gap: 10, 
-            background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)', 
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 10,
+            background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
             borderRadius: 30, padding: '10px 24px', marginBottom: 20,
             border: '1px solid #2d2d44'
           }}>
-            <span style={{ fontSize: 14, color: '#a78bfa', fontWeight: 700 }}>جرّب مجاناً — {MAX_FREE_TRIALS - trialCount} محاولة متبقية</span>
+            <span style={{ fontSize: 14, color: '#a78bfa', fontWeight: 700 }}>🎉 مجاني بالكامل — محاولات غير محدودة</span>
           </div>
           <h2 style={{ fontSize: 'clamp(24px,5vw,38px)', fontWeight: 900, color: '#111827', marginBottom: 12 }}>
             اختر التصميم الذي يعجبك
@@ -276,11 +202,11 @@ export default function BulkPage() {
         </div>
 
         {/* شبكة التصاميم */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', 
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
           gap: 16,
-          marginBottom: 40 
+          marginBottom: 40
         }}>
           {ALL_TEMPLATES.map((t, idx) => (
             <TemplateCard
@@ -288,71 +214,23 @@ export default function BulkPage() {
               template={t}
               selected={selectedTmpl?.id === t.id}
               onSelect={() => handleSelectTemplate(t)}
-              disabled={isTrialExhausted && selectedTmpl?.id !== t.id}
+              disabled={false}
               index={idx}
             />
           ))}
         </div>
 
         {/* المحرر الكامل - يفتح مباشرة بعد اختيار التصميم */}
-        {selectedTmpl && !isTrialExhausted && (
+        {selectedTmpl && (
           <div ref={editorRef} style={{ animation: 'slideInScale 0.5s ease-out' }}>
             <FullEditor
               template={selectedTmpl}
               initialName={name}
               onNameChange={setName}
               onClose={() => setSelectedTmpl(null)}
-              onDownloadSuccess={() => {
-                const newCount = incrementTrialCount()
-                setTrialCount(newCount)
-                if (newCount >= MAX_FREE_TRIALS) {
-                  toast.success('انتهت المحاولات المجانية — اشترِ باقة للمزيد')
-                }
-              }}
-              remainingTrials={MAX_FREE_TRIALS - trialCount}
+              onDownloadSuccess={() => {}}
+              remainingTrials={999}
             />
-          </div>
-        )}
-
-        {/* رسالة انتهاء المحاولات */}
-        {isTrialExhausted && (
-          <div style={{
-            background: '#fff',
-            borderRadius: 20,
-            padding: 40,
-            textAlign: 'center',
-            border: '1px solid #e5e7eb',
-            boxShadow: '0 4px 24px rgba(0,0,0,0.06)'
-          }}>
-            <div style={{ 
-              width: 56, height: 56, borderRadius: '50%', 
-              background: '#fee2e2', display: 'flex', 
-              alignItems: 'center', justifyContent: 'center',
-              margin: '0 auto 20px', fontSize: 24, color: '#dc2626'
-            }}>!</div>
-            <h3 style={{ fontSize: 20, fontWeight: 800, color: '#111827', marginBottom: 10 }}>
-              انتهت المحاولات المجانية
-            </h3>
-            <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 24, lineHeight: 1.6 }}>
-              استمتعت بمحاولتين مجانيتين.<br />اشترِ باقة للحصول على المزيد من البطاقات.
-            </p>
-            <a
-              href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى باقة بطاقات من سلّم')}`}
-              target="_blank" rel="noopener noreferrer"
-              onClick={() => {
-                if (typeof snaptr !== 'undefined') {
-                  snaptr('track', 'CUSTOM_EVENT_1')
-                }
-              }}
-              style={{ 
-                display: 'inline-block', 
-                padding: '14px 32px', background: PURPLE, color: '#fff', 
-                borderRadius: 10, fontSize: 15, fontWeight: 700, 
-                textDecoration: 'none', fontFamily: FONT 
-              }}
-            >
-              اطلب باقة الآن
-            </a>
           </div>
         )}
       </section>
@@ -400,137 +278,12 @@ export default function BulkPage() {
 
           {/* CTA below features */}
           <div style={{ marginTop: 48, textAlign: 'center' }}>
-            <a
-              href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى أطلب باقة بطاقات تهنئة من سلّم')}`}
-              target="_blank" rel="noopener noreferrer"
-              onClick={() => {
-                if (typeof snaptr !== 'undefined') {
-                  snaptr('track', 'CUSTOM_EVENT_1')
-                }
-              }}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '16px 40px', background: ORANGE, color: '#fff', borderRadius: 12, fontSize: 16, fontWeight: 800, textDecoration: 'none', boxShadow: '0 6px 20px rgba(234,88,12,0.3)', fontFamily: FONT }}
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '16px 40px', background: PURPLE, color: '#fff', borderRadius: 12, fontSize: 16, fontWeight: 800, border: 'none', cursor: 'pointer', fontFamily: FONT, boxShadow: `0 6px 20px rgba(124,58,237,0.3)` }}
             >
-              اطلب الآن عبر واتساب
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════ PACKAGES ═══════ */}
-      <section style={{ background: '#fff', borderTop: '1px solid #f0f0f0', padding: 'clamp(56px,8vw,80px) 24px' }}>
-        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <h2 style={{ fontSize: 'clamp(22px,4vw,32px)', fontWeight: 800, color: '#111827', marginBottom: 10 }}>اختار الباقة المناسبة</h2>
-            <p style={{ fontSize: 15, color: '#6b7280' }}>أسعار بالريال السعودي — ادفع مرة وابدأ مباشرة</p>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 14, marginBottom: 20 }}>
-            {PACKAGES.map(pkg => {
-              const isExp = expandedPkg?.id === pkg.id
-              return (
-                <div key={pkg.id} style={{
-                  position: 'relative', background: pkg.popular ? PURPLE : '#fff',
-                  borderRadius: 18, padding: '26px 16px', textAlign: 'center',
-                  border: isExp ? `2px solid ${PURPLE}` : pkg.popular ? 'none' : '1px solid #e5e7eb',
-                  boxShadow: pkg.popular ? '0 10px 32px rgba(124,58,237,0.22)' : '0 1px 4px rgba(0,0,0,0.04)',
-                  transition: 'transform 0.2s',
-                }}
-                  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-3px)'}
-                  onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
-                >
-                  {pkg.popular && (
-                    <div style={{ position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)', background: '#f59e0b', color: '#fff', padding: '3px 14px', borderRadius: 20, fontSize: 10, fontWeight: 800, whiteSpace: 'nowrap' }}>الأكثر شيوعاً</div>
-                  )}
-                  <div style={{ fontSize: pkg.free ? 14 : 36, fontWeight: 900, color: pkg.popular ? '#fff' : '#111827', marginBottom: 4 }}>
-                    {pkg.free ? pkg.label : pkg.count}
-                  </div>
-                  {!pkg.free && <div style={{ fontSize: 12, color: pkg.popular ? '#c4b5fd' : '#9ca3af', marginBottom: 10 }}>بطاقة</div>}
-                  {pkg.free && <div style={{ fontSize: 12, color: '#6b7280', margin: '4px 0 10px' }}>{pkg.desc}</div>}
-                  <div style={{ fontSize: pkg.free ? 22 : 24, fontWeight: 900, color: pkg.free ? GREEN : pkg.popular ? '#fff' : '#111827', marginBottom: 4 }}>
-                    {pkg.free ? 'مجاناً' : `${pkg.price}`}
-                  </div>
-                  {!pkg.free && <div style={{ fontSize: 11, color: pkg.popular ? '#c4b5fd' : '#9ca3af', marginBottom: 3 }}>ر.س{fmtForeign(pkg.price)}</div>}
-                  {!pkg.free && <div style={{ fontSize: 10, color: pkg.popular ? '#c4b5fd' : '#9ca3af', marginBottom: 14 }}>{pkg.perCard} ر.س / بطاقة</div>}
-                  <button
-                    onClick={() => pkg.free
-                      ? nameRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }) && nameRef.current?.focus()
-                      : setExpandedPkg(isExp ? null : pkg)
-                    }
-                    style={{
-                      width: '100%', padding: '11px', borderRadius: 10, border: 'none', fontSize: 13, fontWeight: 700,
-                      background: pkg.free ? GREEN : pkg.popular ? '#fff' : isExp ? PURPLE : '#f3f4f6',
-                      color: pkg.free ? '#fff' : pkg.popular ? PURPLE : isExp ? '#fff' : '#374151',
-                      cursor: 'pointer', fontFamily: FONT, transition: 'all 0.2s',
-                    }}
-                  >
-                    {pkg.free ? 'ابدأ مجاناً' : isExp ? 'إخفاء' : 'اشترِ'}
-                  </button>
-                </div>
-              )
-            })}
-          </div>
-
-          {/* Expanded buy panel */}
-          {expandedPkg && !expandedPkg.free && (
-            <div style={{ background: '#f9fafb', borderRadius: 14, padding: 'clamp(20px,4vw,32px)', border: '1px solid #e5e7eb', marginBottom: 20, textAlign: 'center' }}>
-              <h3 style={{ fontSize: 17, fontWeight: 800, color: '#111827', marginBottom: 8 }}>
-                باقة {expandedPkg.count} بطاقة — {expandedPkg.price} ر.س{fmtForeign(expandedPkg.price)}
-              </h3>
-              <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>تواصل معنا، ادفع، واستلم كود التفعيل — ابدأ في دقائق</p>
-              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-                <a
-                  href={`https://wa.me/${WA}?text=${encodeURIComponent(`مرحباً، أبغى باقة ${expandedPkg.count} بطاقة (${expandedPkg.price} ر.س) من سلّم`)}`}
-                  target="_blank" rel="noopener noreferrer"
-                  onClick={() => {
-                    if (typeof snaptr !== 'undefined') {
-                      snaptr('track', 'CUSTOM_EVENT_1')
-                    }
-                  }}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '13px 28px', background: ORANGE, color: '#fff', borderRadius: 10, textDecoration: 'none', fontSize: 14, fontWeight: 700 }}
-                >
-                  اطلب الآن — واتساب
-                </a>
-                <Link to="/company-activation" style={{ display: 'inline-flex', alignItems: 'center', padding: '13px 24px', background: '#fff', color: '#374151', border: '1px solid #d1d5db', borderRadius: 10, fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
-                  لدي كود تفعيل
-                </Link>
-              </div>
-            </div>
-          )}
-
-          {/* Custom slider */}
-          <div style={{ background: '#faf5ff', borderRadius: 16, padding: 'clamp(24px,4vw,36px)', border: `1px solid #e9d5ff`, textAlign: 'center' }}>
-            <h3 style={{ fontSize: 17, fontWeight: 800, color: '#111827', marginBottom: 4 }}>باقة مخصصة</h3>
-            <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 24 }}>حدد العدد وشوف السعر</p>
-            <div style={{ maxWidth: 400, margin: '0 auto 16px' }}>
-              <input type="range" min={5} max={500} step={5} value={customCount}
-                onChange={e => setCustomCount(+e.target.value)}
-                style={{ width: '100%', accentColor: PURPLE, cursor: 'pointer', height: 6 }} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#9ca3af', marginTop: 4 }}>
-                <span>5</span><span>100</span><span>200</span><span>500</span>
-              </div>
-            </div>
-            <div style={{ marginBottom: 4 }}>
-              <span style={{ fontSize: 42, fontWeight: 900, color: '#111827' }}>{customCount}</span>
-              <span style={{ fontSize: 14, color: '#6b7280', marginRight: 6 }}>بطاقة</span>
-            </div>
-            <div style={{ marginBottom: 4 }}>
-              <span style={{ fontSize: 30, fontWeight: 800, color: PURPLE }}>{customPrice}</span>
-              <span style={{ fontSize: 13, color: '#6b7280', marginRight: 4 }}>ر.س</span>
-            </div>
-            {isForeign && <div style={{ fontSize: 12, color: '#9ca3af', marginBottom: 6 }}>{flag} {convertFromSAR(customPrice)} {currency}</div>}
-            <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 22 }}>{(customPrice / customCount).toFixed(1)} ر.س / بطاقة</div>
-            <a
-              href={`https://wa.me/${WA}?text=${encodeURIComponent(`مرحباً، أبغى باقة مخصصة ${customCount} بطاقة (${customPrice} ر.س) من سلّم`)}`}
-              target="_blank" rel="noopener noreferrer"
-              onClick={() => {
-                if (typeof snaptr !== 'undefined') {
-                  snaptr('track', 'CUSTOM_EVENT_1')
-                }
-              }}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 32px', background: ORANGE, color: '#fff', borderRadius: 10, textDecoration: 'none', fontSize: 14, fontWeight: 800, fontFamily: FONT, boxShadow: '0 4px 14px rgba(234,88,12,0.25)' }}
-            >
-              اطلب هذه الباقة
-            </a>
+              🎉 ابدأ الآن مجاناً
+            </button>
           </div>
         </div>
       </section>
@@ -539,28 +292,14 @@ export default function BulkPage() {
       <section style={{ padding: 'clamp(56px,8vw,80px) 24px', background: '#111827' }}>
         <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
           <h2 style={{ fontSize: 'clamp(24px,4vw,36px)', fontWeight: 800, color: '#fff', marginBottom: 14 }}>
-            تحتاج أكثر من 50 بطاقة؟
+            هل تريد لوحة تحكم كاملة لشركتك؟
           </h2>
           <p style={{ fontSize: 15, color: '#9ca3af', lineHeight: 1.9, maxWidth: 480, margin: '0 auto 36px' }}>
-            نظام الشركات يوفر داشبورد كامل، هوية بصرية، رابط ذكي لكل موظف، وتحكم كامل في كل بطاقة
+            سجّل شركتك مجاناً واحصل على داشبورد كامل، هوية بصرية، ورابط ذكي لكل موظف
           </p>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/companies" style={{ padding: '14px 32px', background: PURPLE, color: '#fff', borderRadius: 12, textDecoration: 'none', fontSize: 15, fontWeight: 700 }}>
-              باقات الشركات
-            </Link>
-            <a
-              href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى أعرف عن باقات الشركات في سلّم')}`}
-              target="_blank" rel="noopener noreferrer"
-              onClick={() => {
-                if (typeof snaptr !== 'undefined') {
-                  snaptr('track', 'CUSTOM_EVENT_1')
-                }
-              }}
-              style={{ padding: '14px 32px', background: ORANGE, color: '#fff', borderRadius: 12, textDecoration: 'none', fontSize: 15, fontWeight: 700 }}
-            >
-              تواصل معنا
-            </a>
-          </div>
+          <Link to="/company-activation" style={{ padding: '14px 36px', background: PURPLE, color: '#fff', borderRadius: 12, textDecoration: 'none', fontSize: 15, fontWeight: 700 }}>
+            🎉 سجّل شركتك مجاناً
+          </Link>
         </div>
       </section>
 
@@ -650,7 +389,7 @@ function TemplateTile({ t, name, selected, onSelect, disabled }) {
           onClick={e => { e.stopPropagation(); !disabled && onSelect(t) }}
           style={{ width: '100%', padding: '8px', background: PURPLE, color: '#fff', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: disabled ? 'not-allowed' : 'pointer', fontFamily: FONT }}
         >
-          {disabled ? 'استخدمت التجربة' : 'فتح المحرر'}
+          فتح المحرر
         </button>
       </div>
     </div>
@@ -683,7 +422,6 @@ function InlineMiniEditor({ template, initialName, onClose }) {
       link.download = `سلّم-${cardName || 'بطاقة'}.png`
       link.href = canvas.toDataURL('image/png')
       link.click()
-      setCookie('sallim_trial_used', '1', 24)
       setDownloaded(true)
       toast.success('تم تحميل البطاقة بنجاح')
     } catch (err) {
@@ -699,7 +437,7 @@ function InlineMiniEditor({ template, initialName, onClose }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <h3 style={{ fontSize: 17, fontWeight: 800, color: '#111827', margin: 0 }}>محرر البطاقة المجانية</h3>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 12, color: '#6b7280', background: '#f9fafb', padding: '4px 12px', borderRadius: 20, border: '1px solid #e5e7eb' }}>تجربة مجانية — بطاقة واحدة</span>
+          <span style={{ fontSize: 12, color: '#059669', background: '#f0fdf4', padding: '4px 12px', borderRadius: 20, border: '1px solid #bbf7d0', fontWeight: 700 }}>🎉 مجاني بالكامل</span>
           <button onClick={onClose} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, width: 30, height: 30, cursor: 'pointer', fontSize: 16, color: '#6b7280' }}>✕</button>
         </div>
       </div>
@@ -753,18 +491,12 @@ function InlineMiniEditor({ template, initialName, onClose }) {
           ) : (
             <div>
               <div style={{ padding: '12px 16px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 12, fontSize: 14, color: '#166534', fontWeight: 700, textAlign: 'center', marginBottom: 10 }}>
-                تم التحميل بنجاح
+                ✅ تم التحميل بنجاح — يمكنك تحميل بطاقة أخرى
               </div>
-              <a href={`https://wa.me/${WA}?text=${encodeURIComponent(`مرحباً، أبغى باقة بطاقات من سلّم`)}`}
-                target="_blank" rel="noopener noreferrer"
-                onClick={() => {
-                  if (typeof snaptr !== 'undefined') {
-                    snaptr('track', 'CUSTOM_EVENT_1')
-                  }
-                }}
-                style={{ display: 'block', padding: '12px 16px', background: ORANGE, color: '#fff', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 800, textAlign: 'center', textDecoration: 'none', fontFamily: FONT }}>
-                اشترِ باقة — اطلب الآن
-              </a>
+              <button onClick={() => setDownloaded(false)}
+                style={{ display: 'block', width: '100%', padding: '12px 16px', background: PURPLE, color: '#fff', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 800, textAlign: 'center', cursor: 'pointer', fontFamily: FONT }}>
+                تحميل بطاقة جديدة
+              </button>
             </div>
           )}
         </div>
@@ -1152,15 +884,13 @@ function FullEditor({ template, initialName, onClose, onNameChange, onDownloadSu
           <p style={{ fontSize: 13, color: '#9ca3af', margin: '4px 0 0' }}>{template.name}</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          {remainingTrials > 0 && (
-            <span style={{ 
-              fontSize: 12, color: '#6b7280', background: '#f9fafb', 
-              padding: '6px 14px', borderRadius: 8, border: '1px solid #e5e7eb',
-              fontWeight: 600
-            }}>
-              {remainingTrials} محاولة متبقية
-            </span>
-          )}
+          <span style={{
+            fontSize: 12, color: '#059669', background: '#f0fdf4',
+            padding: '6px 14px', borderRadius: 8, border: '1px solid #bbf7d0',
+            fontWeight: 700
+          }}>
+            🎉 مجاني بالكامل
+          </span>
           <button 
             onClick={onClose} 
             style={{ 
@@ -1395,31 +1125,14 @@ function FullEditor({ template, initialName, onClose, onNameChange, onDownloadSu
             </button>
           ) : (
             <div>
-              <div style={{ 
-                padding: '14px 16px', background: '#f0fdf4', 
-                border: '1px solid #bbf7d0', borderRadius: 10, 
-                fontSize: 14, color: '#166534', fontWeight: 700, 
+              <div style={{
+                padding: '14px 16px', background: '#f0fdf4',
+                border: '1px solid #bbf7d0', borderRadius: 10,
+                fontSize: 14, color: '#166534', fontWeight: 700,
                 textAlign: 'center', marginBottom: 10
               }}>
-                تم التحميل بنجاح
+                ✅ تم التحميل بنجاح — يمكنك تحميل المزيد مجاناً
               </div>
-              <a 
-                href={`https://wa.me/${WA}?text=${encodeURIComponent('مرحباً، أبغى باقة بطاقات من سلّم')}`}
-                target="_blank" rel="noopener noreferrer"
-                onClick={() => {
-                  if (typeof snaptr !== 'undefined') {
-                    snaptr('track', 'CUSTOM_EVENT_1')
-                  }
-                }}
-                style={{ 
-                  display: 'block', textAlign: 'center',
-                  padding: '14px 16px', background: ORANGE, color: '#fff', 
-                  border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, 
-                  textDecoration: 'none', fontFamily: FONT
-                }}
-              >
-                اطلب باقة للمزيد
-              </a>
             </div>
           )}
         </div>

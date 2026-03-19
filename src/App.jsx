@@ -91,8 +91,8 @@ export default function App() {
   // Define isBusiness - assuming it's false for free version
   const isBusiness = false
 
-  const hideNavbar = pathname === '/editor' || pathname === '/company/dashboard' || pathname.startsWith('/greet/') || pathname.startsWith('/g/') || pathname === '/company-checkout' || pathname === '/company-access' || pathname.startsWith('/company/') || pathname.startsWith('/c/')
-  const hideFooter = pathname === '/editor' || pathname === '/company/dashboard' || pathname.startsWith('/greet/') || pathname.startsWith('/g/') || pathname === '/company-checkout' || pathname === '/company-access' || pathname.startsWith('/company/') || pathname.startsWith('/c/')
+  const hideNavbar = pathname === '/company/dashboard' || pathname.startsWith('/greet/') || pathname.startsWith('/g/') || pathname === '/company-checkout' || pathname === '/company-access' || pathname.startsWith('/company/') || pathname.startsWith('/c/')
+  const hideFooter = pathname === '/company/dashboard' || pathname.startsWith('/greet/') || pathname.startsWith('/g/') || pathname === '/company-checkout' || pathname === '/company-access' || pathname.startsWith('/company/') || pathname.startsWith('/c/')
   const noNavPadding = hideNavbar || pathname === '/'
 
   return (
@@ -132,7 +132,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/companies" element={<CompaniesPage />} />
+          <Route path="/companies" element={<Navigate to="/company-activation" replace />} />
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
           <Route path="/admin/companies" element={<AdminCompaniesPage />} />
           <Route path="/admin/invite-codes" element={<AdminInviteCodesPage />} />

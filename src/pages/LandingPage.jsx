@@ -11,12 +11,14 @@ import {
   ChevronDown,
 } from 'lucide-react'
 import OccasionSlider from '../components/OccasionSlider'
+import { templates as localTemplates, designerOnlyTemplates } from '../data/templates'
+
+const PREVIEW_TEMPLATES = [...localTemplates, ...designerOnlyTemplates].slice(0, 8)
 
 export default function LandingPage() {
   const navigate = useNavigate()
   const [openFaq, setOpenFaq] = useState(null)
   const [playingAudio, setPlayingAudio] = useState(null)
-  const [marketingIdx, setMarketingIdx] = useState(0)
 
   const audioSamples = [
     { id: 1, label: 'نموذج صوتي 1', file: '/SOUND/ssstwitter.com_1773546744734.mp3' },
@@ -56,14 +58,6 @@ export default function LandingPage() {
     { q: 'هل تعمل على الهاتف؟', a: 'نعم، متوافقة مع جميع الأجهزة.' },
   ]
 
-
-  // Rotate marketing messages every 4 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setMarketingIdx(prev => (prev + 1) % 2)
-    }, 4000)
-    return () => clearInterval(interval)
-  }, [])
 
   return (
     <div dir="rtl" style={{ fontFamily: "'Tajawal', sans-serif" }}>
@@ -327,106 +321,84 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ROTATING MARKETING SECTION */}
-      <section style={{ padding: '56px 0', background: '#f8fafc' }}>
-        <div style={{ maxWidth: '820px', margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
-          {marketingIdx === 0 ? (
-            <div style={{
-              background: '#fff',
-              border: '1px solid #e5e7eb',
-              borderRadius: 22,
-              padding: '32px 24px',
-              boxShadow: '0 10px 30px rgba(15,23,42,0.06)',
-            }}>
-              <span style={{ fontSize: '13px', color: '#7c3aed', fontWeight: 700, marginBottom: '12px', display: 'inline-block', letterSpacing: '0.04em' }}>
-                للشركات والمؤسسات
-              </span>
-              <h2 style={{ fontSize: 'clamp(24px, 4vw, 34px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.35, marginBottom: 12 }}>
-                عزّز علاقتك بموظفيك وعملائك
-              </h2>
-              <p style={{ fontSize: '15px', color: '#64748b', lineHeight: 1.9, maxWidth: 560, margin: '0 auto' }}>
-                أرسل تهنئة مخصصة باسم كل موظف وعميل دفعة واحدة، بهوية شركتك وشعارها بشكل احترافي.
-              </p>
-              <Link
-                to="/editor?mode=batch"
-                style={{
-                  marginTop: 22,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '12px 26px',
-                  background: '#7c3aed',
-                  color: '#fff',
-                  fontSize: '14px',
-                  fontWeight: 700,
-                  borderRadius: 12,
-                  textDecoration: 'none',
-                }}
-              >
-                جرّب النظام الجماعي
-              </Link>
-            </div>
-          ) : (
-            <div style={{
-              background: '#fff',
-              border: '1px solid #e5e7eb',
-              borderRadius: 22,
-              padding: '32px 24px',
-              boxShadow: '0 10px 30px rgba(15,23,42,0.06)',
-            }}>
-              <span style={{ fontSize: '13px', color: '#b8860b', fontWeight: 700, marginBottom: '12px', display: 'inline-block', letterSpacing: '0.04em' }}>
-                للأفراد والعائلات
-              </span>
-              <h2 style={{ fontSize: 'clamp(24px, 4vw, 34px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.35, marginBottom: 12 }}>
-                اصنع فرحة العيد بلمستك الخاصة
-              </h2>
-              <p style={{ fontSize: '15px', color: '#64748b', lineHeight: 1.9, maxWidth: 560, margin: '0 auto' }}>
-                صمّم بطاقة فريدة لأحبابك، اختر قالباً أنيقاً، أضف الاسم، ثم شاركها فوراً.
-              </p>
-              <Link
-                to="/editor?mode=ready"
-                style={{
-                  marginTop: 22,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '12px 26px',
-                  background: '#b8860b',
-                  color: '#fff',
-                  fontSize: '14px',
-                  fontWeight: 700,
-                  borderRadius: 12,
-                  textDecoration: 'none',
-                }}
-              >
-                ابدأ تصميم بطاقتك
-              </Link>
-            </div>
-          )}
+      {/* OCCASION CATEGORIES SLIDER */}
+      <OccasionSlider />
 
-          {/* Dots */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 14 }}>
-            {[0, 1].map(i => (
-              <button
-                key={i}
-                onClick={() => setMarketingIdx(i)}
-                style={{
-                  width: marketingIdx === i ? 24 : 8,
-                  height: 8,
-                  borderRadius: 100,
-                  border: 'none',
-                  cursor: 'pointer',
-                  background: marketingIdx === i ? '#0f172a' : '#d1d5db',
-                  transition: 'all 0.3s',
-                }}
-              />
+      {/* 8 TEMPLATES PREVIEW */}
+      <section style={{ padding: '72px 0 80px', background: '#fff' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px' }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <h2 style={{ fontSize: 'clamp(26px, 4vw, 38px)', fontWeight: 900, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.02em' }}>
+              قوالب جاهزة لعيد الفطر 🌙
+            </h2>
+            <p style={{ fontSize: 15, color: '#64748b', maxWidth: 420, margin: '0 auto' }}>
+              اختر قالبك، أضف الاسم، وشاركه فوراً — مجاناً بدون قيود
+            </p>
+          </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+            gap: 16,
+            marginBottom: 40,
+          }}>
+            {PREVIEW_TEMPLATES.map((t) => (
+              <Link
+                key={t.id}
+                to="/editor"
+                style={{ textDecoration: 'none', display: 'block' }}
+              >
+                <div
+                  style={{
+                    borderRadius: 16,
+                    overflow: 'hidden',
+                    border: '2px solid #f0f0f0',
+                    background: '#fafafa',
+                    transition: 'all 220ms ease',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = 'translateY(-6px)'
+                    e.currentTarget.style.borderColor = '#7c3aed'
+                    e.currentTarget.style.boxShadow = '0 12px 32px rgba(124,58,237,0.15)'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.borderColor = '#f0f0f0'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
+                >
+                  <div style={{ aspectRatio: '1/1', overflow: 'hidden', background: '#f5f5f5' }}>
+                    <img
+                      src={t.image}
+                      alt={t.name}
+                      loading="lazy"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </div>
+                  <div style={{ padding: '10px 14px', background: '#fff', textAlign: 'center' }}>
+                    <span style={{ fontSize: 12, color: '#6366f1', fontWeight: 700 }}>صمّم الآن ←</span>
+                  </div>
+                </div>
+              </Link>
             ))}
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <Link
+              to="/editor"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                padding: '14px 36px', background: '#0f172a', color: '#fff',
+                fontSize: 15, fontWeight: 700, borderRadius: 12, textDecoration: 'none',
+                transition: 'all 200ms ease',
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = '#1e293b'}
+              onMouseLeave={e => e.currentTarget.style.background = '#0f172a'}
+            >
+              عرض جميع القوالب →
+            </Link>
           </div>
         </div>
       </section>
-
-      {/* OCCASION CATEGORIES SLIDER */}
-      <OccasionSlider />
 
       {/* صنع تهنئة العيد */}
       <section style={{ padding: '72px 0 80px', background: '#f8fafc' }}>
