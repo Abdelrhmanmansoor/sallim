@@ -839,7 +839,7 @@ router.post('/greet-links', protectCompanyRoute, async (req, res) => {
       templateTextColor: templateTextColor || '#ffffff',
       font: font || 'amiri',
       fontSize: Number(fontSize) || 60,
-      nameY: Number(nameY) || 0.65,
+      nameY: Number(nameY) || 0.75,
       nameColor: nameColor || '',
       expiresAt: expiresAt ? new Date(expiresAt) : null,
       overlayType: overlayType || 'none',
@@ -873,8 +873,8 @@ router.get('/greet-links/:shortId', async (req, res) => {
     // Get template image - if not on Cloudinary, upload it now and save for future
     let templateImage = link.templateImage || ''
     if (templateImage && !templateImage.includes('cloudinary.com') && !templateImage.includes('res.cloudinary')) {
-      // Convert relative to absolute first
-      if (!templateImage.startsWith('http')) {
+      // Convert relative path to absolute URL (skip data URLs and already-absolute URLs)
+      if (!templateImage.startsWith('http') && !templateImage.startsWith('data:')) {
         templateImage = `https://www.sallim.co${templateImage.startsWith('/') ? '' : '/'}${templateImage}`
       }
       // Upload to Cloudinary synchronously so user gets the fast CDN URL immediately

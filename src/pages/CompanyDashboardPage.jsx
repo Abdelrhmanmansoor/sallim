@@ -325,7 +325,7 @@ function BatchCardsView({ company, token, isDepleted, remaining }) {
     const [selectedFont, setSelectedFont] = useState('amiri')
     const [fontSize, setFontSize] = useState(60)
     const [nameColor, setNameColor] = useState('')
-    const [nameY, setNameY] = useState(0.65)
+    const [nameY, setNameY] = useState(0.75)
 
     useEffect(() => {
         // Merge static templates + designer templates as fallback
@@ -703,7 +703,7 @@ function EmployeeLinkView({ company, token, isDepleted }) {
     const [selectedFont, setSelectedFont] = useState('amiri')
     const [linkFontSize, setLinkFontSize] = useState(60)
     const [linkNameColor, setLinkNameColor] = useState('')
-    const [linkNameY, setLinkNameY] = useState(0.65)
+    const [linkNameY, setLinkNameY] = useState(0.75)
     // Individual links
     const [showIndividual, setShowIndividual] = useState(false)
     const [employeeNames, setEmployeeNames] = useState('')

@@ -212,6 +212,7 @@ export default function GreetPage() {
 
     const resolveImg = (url) => {
         if (!url) return ''
+        if (url.startsWith('data:')) return url  // base64 data URL — use as-is
         if (url.startsWith('http')) return safeEncodeUrl(url)
         // Relative — use sallim.co as base (where Vercel serves /templates/)
         const base = 'https://www.sallim.co'
