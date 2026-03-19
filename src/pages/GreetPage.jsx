@@ -247,8 +247,13 @@ export default function GreetPage() {
                     opacity: d.overlayOpacity ?? 0.85,
                     size: d.overlaySize || 80,
                 })
-                const resolvedImg = resolveImg(d.templateImage || '')
-                console.log('[GreetPage] templateImage from API:', d.templateImage)
+                // Fix corrupted URLs: old server bug prepended https://www.sallim.co/ before data: URLs
+                let rawImg = d.templateImage || ''
+                if (rawImg.includes('/data:image')) {
+                    rawImg = rawImg.substring(rawImg.indexOf('data:'))
+                }
+                const resolvedImg = resolveImg(rawImg)
+                console.log('[GreetPage] templateImage from API:', rawImg)
                 console.log('[GreetPage] resolved image URL:', resolvedImg)
                 setPrimaryTemplateImage(resolvedImg)
                 setTemplateImage(resolvedImg)
