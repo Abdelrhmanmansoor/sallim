@@ -12,6 +12,17 @@ export default defineConfig({
       '@': '/src',
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          icons: ['react-icons'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
   server: {
     allowedHosts: [
       '91eabca5-9690-42c5-b018-e4a300e404e7-00-37imt1874rpo6.worf.replit.dev',

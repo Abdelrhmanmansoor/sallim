@@ -216,7 +216,13 @@ export default function SendPage() {
                           : 'border-white/10 hover:border-[#6A47ED]/30'
                         }`}
                     >
-                      <img src={t.image} alt={t.name} className="w-full h-full object-cover" />
+                      <img 
+                        src={t.image} 
+                        alt={t.name} 
+                        className="w-full h-full object-cover" 
+                        loading="lazy"
+                        decoding="async"
+                      />
                       {linkTemplate === t.id && (
                         <div className="absolute inset-0 bg-[#6A47ED]/20 flex items-center justify-center">
                           <BsCheck2 className="text-white text-2xl drop-shadow-lg" />

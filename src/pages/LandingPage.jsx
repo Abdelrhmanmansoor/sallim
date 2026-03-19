@@ -410,7 +410,7 @@ export default function LandingPage() {
             اختر من بين قوالب فاخرة، خصّصها بلمستك، وشاركها مجاناً بدون أي قيود
           </p>
           <Link
-            to="/editor"
+            to="/company-activation"
             style={{
               display: 'inline-flex',
               alignItems: 'center',

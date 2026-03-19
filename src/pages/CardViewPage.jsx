@@ -14,8 +14,20 @@ export default function CardViewPage() {
   const template = templates.find((t) => t.id === templateId) || templates[0]
 
   const [loaded, setLoaded] = useState(false)
+  const [imageError, setImageError] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
   const canvasRef = useRef(null)
+
+  // Preload image
+  useEffect(() => {
+    const img = new Image()
+    img.onload = () => setLoaded(true)
+    img.onerror = () => {
+      setImageError(true)
+      setLoaded(true)
+    }
+    img.src = template.image
+  }, [template.image])
 
   useEffect(() => {
     // Small delay for entrance animation
@@ -110,21 +122,41 @@ export default function CardViewPage() {
         <div className="relative group">
           <div className="absolute -inset-1 bg-gradient-to-b from-purple-500/20 via-transparent to-purple-500/10 rounded-3xl blur-sm"></div>
           <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-purple-500/20">
-            <img
-              src={template.image}
-              alt="بطاقة تهنئة"
-              className="w-full"
-              onLoad={() => setLoaded(true)}
-            />
-            {/* Name + Greeting overlay */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20">
-              <p className="text-white/90 text-lg md:text-xl font-bold drop-shadow-lg mb-2" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>
-                {greeting}
-              </p>
-              <h2 className="text-3xl md:text-4xl font-black text-white drop-shadow-lg" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>
-                {name}
-              </h2>
-            </div>
+            {!loaded && !imageError && (
+              <div className="w-full aspect-[3/4] flex items-center justify-center bg-gradient-to-br from-purple-900/20 to-purple-800/10">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500/30 border-t-purple-500 mx-auto mb-3"></div>
+                  <p className="text-purple-400/60 text-sm font-bold">جاري التحميل...</p>
+                </div>
+              </div>
+            )}
+            {imageError && (
+              <div className="w-full aspect-[3/4] flex items-center justify-center bg-gradient-to-br from-red-900/20 to-red-800/10">
+                <div className="text-center px-6">
+                  <p className="text-red-400 text-sm font-bold mb-2">⚠️ لم نتمكن من تحميل الصورة</p>
+                  <button onClick={() => window.location.reload()} className="text-xs text-purple-400 underline">إعادة المحاولة</button>
+                </div>
+              </div>
+            )}
+            {loaded && !imageError && (
+              <>
+                <img
+                  src={template.image}
+                  alt="بطاقة تهنئة"
+                  className="w-full"
+                  loading="eager"
+                />
+                {/* Name + Greeting overlay */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20">
+                  <p className="text-white/90 text-lg md:text-xl font-bold drop-shadow-lg mb-2" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>
+                    {greeting}
+                  </p>
+                  <h2 className="text-3xl md:text-4xl font-black text-white drop-shadow-lg" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>
+                    {name}
+                  </h2>
+                </div>
+              </>
+            )}
           </div>
         </div>
 

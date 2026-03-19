@@ -139,7 +139,7 @@ export default function Navbar() {
             {user ? (
               <>
                 <Link
-                  to="/company/dashboard"
+                  to="/company-activation"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -244,7 +244,7 @@ export default function Navbar() {
                   دخول
                 </Link>
                 <Link
-                  to="/company/dashboard"
+                  to="/company-activation"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -354,7 +354,7 @@ export default function Navbar() {
             <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #f0f0f0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <CurrencySwitcher />
               <Link
-                to="/company/dashboard"
+                to="/company-activation"
                 onClick={() => setOpen(false)}
                 style={{
                   display: 'flex',
