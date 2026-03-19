@@ -143,7 +143,7 @@ router.post('/register-free', activationLimiter, async (req, res) => {
       message: 'تم إنشاء حساب شركتك بنجاح',
       data: {
         token,
-        company: buildCompanyContext(company),
+        company: { ...buildCompanyContext(company), cardsLimit: company.cardsLimit, cardsUsed: company.cardsUsed },
       },
     })
   } catch (err) {

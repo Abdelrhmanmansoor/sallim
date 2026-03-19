@@ -239,9 +239,10 @@ function verifyPaymobHMAC(data, receivedHmac) {
       orderValue,
       data.owner,
       data.pending,
-      data.source_data_pan,
-      data.source_data_sub_type,
-      data.source_data_type,
+      // source_data is a nested object in webhook callbacks
+      data.source_data?.pan ?? data.source_data_pan,
+      data.source_data?.sub_type ?? data.source_data_sub_type,
+      data.source_data?.type ?? data.source_data_type,
       data.success,
     ].join('')
 

@@ -364,7 +364,9 @@ router.get('/payment-methods', async (_req, res) => {
  */
 router.post('/callback', async (req, res) => {
   try {
-    const { obj, type, hmac } = req.body
+    const { obj, type } = req.body
+    // Paymob sends HMAC as a query param (?hmac=...) — also fallback to body
+    const hmac = req.query.hmac || req.body.hmac
 
     // ── Full callback logging (for debugging) ──
     console.log('[Paymob Flash] ═══ CALLBACK RECEIVED ═══', {

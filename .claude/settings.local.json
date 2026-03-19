@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:developers.paymob.com)"
+      "WebFetch(domain:developers.paymob.com)",
+      "Bash(wc -l \"c:/Users/abdel/Desktop/تهنئة العيد/src/pages\"/*.jsx)",
+      "Bash(find '/c/Users/abdel/Desktop/تهنئة العيد/server' -name *.env* -o -name config.js)"
     ]
   }
 }

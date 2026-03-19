@@ -1,6 +1,16 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+let resend
+function getResend() {
+  if (!resend) {
+    if (!process.env.RESEND_API_KEY) {
+      console.warn('[Email] RESEND_API_KEY not set — emails will be skipped')
+      return null
+    }
+    resend = new Resend(process.env.RESEND_API_KEY)
+  }
+  return resend
+}
 const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@sallim.co'
 const ADMIN_EMAIL = 'admin@sallim.co'
 const WHATSAPP_NUMBER = '201007835547'
@@ -56,7 +66,7 @@ async function sendActivationEmail({ to, companyName, code, packageName, limit }
     <p style="font-size:13px;color:#64748b;text-align:center;">⚠️ الكود صالح لمرة واحدة فقط</p>
   `)
 
-  return resend.emails.send({
+  return getResend()?.emails.send({
     from: `سَلِّم <${FROM_EMAIL}>`,
     to,
     subject: 'كود تفعيل حسابك في منصة سلّم',
@@ -115,7 +125,7 @@ async function sendInvoiceEmail({ to, customerName, invoiceNumber, date, items, 
     <p style="text-align:center;color:#64748b;font-size:14px;">شكراً لثقتك في سلّم 💜</p>
   `)
 
-  return resend.emails.send({
+  return getResend()?.emails.send({
     from: `سَلِّم <${FROM_EMAIL}>`,
     to,
     subject: `فاتورتك من منصة سلّم #${invoiceNumber}`,
@@ -147,7 +157,7 @@ async function sendPackagePurchaseEmail({ to, customerName, packageName, quantit
     <p style="font-size:13px;color:#ef4444;text-align:center;">⏰ الرابط صالح لمدة 24 ساعة فقط</p>
   `)
 
-  return resend.emails.send({
+  return getResend()?.emails.send({
     from: `سَلِّم <${FROM_EMAIL}>`,
     to,
     subject: `تم الشراء بنجاح — ${packageName}`,
@@ -191,7 +201,7 @@ async function sendCompanyWelcomeEmail({ to, companyName, packageName, limit, da
     ${btn('افتح الداشبورد', dashboardUrl || `${SITE_URL}/company/dashboard`)}
   `)
 
-  return resend.emails.send({
+  return getResend()?.emails.send({
     from: `سَلِّم <${FROM_EMAIL}>`,
     to,
     subject: 'مرحباً بك في سلّم للمؤسسات',
@@ -223,7 +233,7 @@ async function sendLimitWarningEmail({ to, companyName, used, limit, remaining }
     ${btn('جدّد باقتك الآن', `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`مرحباً، أرغب بتجديد باقة شركة ${companyName} في منصة سلّم`)}`, '#25D366')}
   `)
 
-  return resend.emails.send({
+  return getResend()?.emails.send({
     from: `سَلِّم <${FROM_EMAIL}>`,
     to,
     subject: '⚠️ رصيدك على وشك النفاد',
@@ -251,7 +261,7 @@ async function sendLimitReachedEmail({ to, companyName, limit }) {
     ${btn('تواصل معنا لتجديد الباقة', `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`مرحباً، نفد رصيد شركة ${companyName} وأرغب بتجديد الباقة`)}`, '#25D366')}
   `)
 
-  return resend.emails.send({
+  return getResend()?.emails.send({
     from: `سَلِّم <${FROM_EMAIL}>`,
     to,
     subject: '🔴 انتهى رصيد بطاقاتك',
@@ -279,7 +289,7 @@ async function sendNewOrderNotification({ companyName, packageName, contactNumbe
     ${btn('افتح لوحة الأدمن', `${SITE_URL}/admin/dashboard`)}
   `)
 
-  return resend.emails.send({
+  return getResend()?.emails.send({
     from: `سَلِّم <${FROM_EMAIL}>`,
     to: ADMIN_EMAIL,
     subject: `🔔 طلب باقة جديد — ${companyName}`,
@@ -470,7 +480,7 @@ async function sendCompanyCredentialsEmail({ to, companyName, email, password, p
 </body>
 </html>`
 
-  return resend.emails.send({
+  return getResend()?.emails.send({
     from: `سَلِّم <${FROM_EMAIL}>`,
     to,
     subject: '✦ حسابكم المؤسسي جاهز — منصة سلّم',
@@ -525,7 +535,7 @@ async function sendEidWelcomeEmail({ to, companyName }) {
     </p>
   `)
 
-  return resend.emails.send({
+  return getResend()?.emails.send({
     from: `سَلِّم <${FROM_EMAIL}>`,
     to,
     subject: `🌙 عيد مبارك — أهلاً بكم في منصة سَلِّم`,
