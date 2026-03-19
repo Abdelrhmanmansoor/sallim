@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { templates as staticTemplates, designerOnlyTemplates, fonts as fontList } from '../data/templates'
 
+const DEFAULT_TEMPLATE_FALLBACK = staticTemplates[0]?.image || '/templates/جاهزة/3.png'
+const MAX_IMAGE_RETRIES = 2
+
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
 const UI_FONT = "'Tajawal', sans-serif"
 
@@ -19,6 +22,12 @@ function safeEncodeUrl(url) {
         // Relative URL — encode path segments only
         return url.split('/').map(seg => encodeURIComponent(decodeURIComponent(seg))).join('/')
     }
+}
+
+function withCacheBuster(url, token) {
+    if (!url || !token) return url
+    const separator = url.includes('?') ? '&' : '?'
+    return `${url}${separator}cb=${token}`
 }
 
 async function loadImageForCanvas(src) {
@@ -185,6 +194,7 @@ export default function GreetPage() {
     const [paramNameY, setParamNameY] = useState((parseInt(searchParams.get('y')) || 65) / 100)
     const [paramColor, setParamColor] = useState(searchParams.get('clr') ? `#${searchParams.get('clr')}` : '')
     const [templateImage, setTemplateImage] = useState('')
+    const [primaryTemplateImage, setPrimaryTemplateImage] = useState('')
     const [templateTextColor, setTemplateTextColor] = useState('#ffffff')
     const [overlay, setOverlay] = useState({ type: 'none', x: 0.5, y: 0.1, text: '', fontSize: 32, opacity: 0.85, size: 80 })
 
@@ -195,7 +205,10 @@ export default function GreetPage() {
     const [cardGenerated, setCardGenerated] = useState(false)
     const [generating, setGenerating] = useState(false)
     const [cardDataUrl, setCardDataUrl] = useState(null)
-    const [imgError, setImgError] = useState(false)
+    const [imageStatus, setImageStatus] = useState('idle') // idle | loading | success | error
+    const [autoRetryCount, setAutoRetryCount] = useState(0)
+    const [imageCacheBuster, setImageCacheBuster] = useState(0)
+    const [isFallbackTemplate, setIsFallbackTemplate] = useState(false)
 
     const resolveImg = (url) => {
         if (!url) return ''
@@ -204,6 +217,7 @@ export default function GreetPage() {
         const base = 'https://www.sallim.co'
         return safeEncodeUrl(`${base}${url.startsWith('/') ? '' : '/'}${url}`)
     }
+    const fallbackTemplateUrl = DEFAULT_TEMPLATE_FALLBACK ? resolveImg(DEFAULT_TEMPLATE_FALLBACK) : ''
 
     // ── Mode 1: /g/:shortId ──
     useEffect(() => {
@@ -235,7 +249,9 @@ export default function GreetPage() {
                 const resolvedImg = resolveImg(d.templateImage || '')
                 console.log('[GreetPage] templateImage from API:', d.templateImage)
                 console.log('[GreetPage] resolved image URL:', resolvedImg)
+                setPrimaryTemplateImage(resolvedImg)
                 setTemplateImage(resolvedImg)
+                setIsFallbackTemplate(false)
             })
             .catch(err => console.error('[GreetPage] fetch error:', err))
             .finally(() => setLoading(false))
@@ -258,10 +274,65 @@ export default function GreetPage() {
         const all = [...staticTemplates, ...designerOnlyTemplates]
         const found = all.find(t => String(t.id) === String(tmplId))
         if (found) {
-            setTemplateImage(resolveImg(found.image))
+            const resolvedImg = resolveImg(found.image)
+            setPrimaryTemplateImage(resolvedImg)
+            setTemplateImage(resolvedImg)
             setTemplateTextColor(found.textColor || '#ffffff')
+            setIsFallbackTemplate(false)
         }
     }, [tmplId, shortId])
+
+    useEffect(() => {
+        if (!templateImage) {
+            setImageStatus('idle')
+            return
+        }
+        setImageStatus('loading')
+        setAutoRetryCount(0)
+        setImageCacheBuster(0)
+    }, [templateImage])
+
+    const displayImageSrc = templateImage ? withCacheBuster(templateImage, imageCacheBuster) : ''
+
+    const handleImageLoad = () => {
+        setImageStatus('success')
+    }
+
+    const handleImageError = () => {
+        setAutoRetryCount((prev) => {
+            const next = prev + 1
+            if (next <= MAX_IMAGE_RETRIES) {
+                setTimeout(() => {
+                    setImageStatus('loading')
+                    setImageCacheBuster((cb) => cb + 1 || 1)
+                }, 200)
+            } else if (!isFallbackTemplate && fallbackTemplateUrl) {
+                setIsFallbackTemplate(true)
+                setTemplateImage(fallbackTemplateUrl)
+            } else {
+                setImageStatus('error')
+            }
+            return next
+        })
+    }
+
+    const handleRetryImage = () => {
+        if (primaryTemplateImage && isFallbackTemplate) {
+            setIsFallbackTemplate(false)
+            setTemplateImage(primaryTemplateImage)
+            return
+        }
+        if (templateImage) {
+            setImageStatus('loading')
+            setAutoRetryCount(0)
+            setImageCacheBuster((cb) => cb + 1 || 1)
+        } else if (primaryTemplateImage) {
+            setTemplateImage(primaryTemplateImage)
+        } else if (fallbackTemplateUrl) {
+            setTemplateImage(fallbackTemplateUrl)
+            setIsFallbackTemplate(true)
+        }
+    }
 
     const generateCard = useCallback(async (recipientName) => {
         if (!templateImage) return null
@@ -420,15 +491,16 @@ export default function GreetPage() {
 
                     {/* ── Template Preview ── */}
                     {templateImage && !cardGenerated && (
-                        <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 12px 48px rgba(0,0,0,0.5), 0 0 30px rgba(212,168,67,0.15)', marginBottom: 20, position: 'relative', background: '#0d3320', minHeight: imgError ? 180 : 'auto' }}>
-                            {!imgError ? (
+                        <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 12px 48px rgba(0,0,0,0.5), 0 0 30px rgba(212,168,67,0.15)', marginBottom: 20, position: 'relative', background: '#0d3320', minHeight: imageStatus === 'error' ? 200 : undefined }}>
+                            {imageStatus !== 'error' ? (
                                 <>
                                     <img
-                                        src={templateImage}
+                                        src={displayImageSrc}
                                         alt="القالب"
                                         crossOrigin="anonymous"
                                         style={{ width: '100%', display: 'block' }}
-                                        onError={() => setImgError(true)}
+                                        onLoad={handleImageLoad}
+                                        onError={handleImageError}
                                     />
                                     {name.trim() && (
                                         <div style={{
@@ -448,10 +520,55 @@ export default function GreetPage() {
                                             {name.trim()}
                                         </div>
                                     )}
+                                    {imageStatus === 'loading' && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            inset: 0,
+                                            background: 'rgba(0,0,0,0.45)',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: '#fef3c7',
+                                            fontSize: 13,
+                                            fontWeight: 700,
+                                            letterSpacing: 0.5,
+                                        }}>
+                                            جارٍ تحميل القالب...
+                                        </div>
+                                    )}
+                                    {isFallbackTemplate && imageStatus !== 'loading' && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: 12,
+                                            left: 12,
+                                            padding: '4px 12px',
+                                            borderRadius: 999,
+                                            background: 'rgba(13,51,32,0.85)',
+                                            color: '#fefce8',
+                                            fontSize: 11,
+                                            fontWeight: 700,
+                                            letterSpacing: 0.5,
+                                        }}>
+                                            قالب احتياطي
+                                        </div>
+                                    )}
                                 </>
                             ) : (
-                                <div style={{ padding: 40, textAlign: 'center', color: 'rgba(212,168,67,0.5)', fontSize: 13 }}>
-                                    جارٍ تحميل القالب...
+                                <div style={{ padding: 32, textAlign: 'center', color: 'rgba(212,168,67,0.7)', fontSize: 13 }}>
+                                    <p style={{ marginBottom: 12, fontWeight: 700 }}>لم نتمكّن من تحميل القالب.</p>
+                                    <p style={{ marginBottom: 16 }}>تحقّق من اتصالك أو أعد المحاولة.</p>
+                                    <button onClick={handleRetryImage} style={{
+                                        padding: '10px 20px',
+                                        borderRadius: 999,
+                                        border: '1px solid rgba(212,168,67,0.4)',
+                                        background: 'transparent',
+                                        color: '#fef3c7',
+                                        cursor: 'pointer',
+                                        fontWeight: 700,
+                                    }}>
+                                        إعادة المحاولة
+                                    </button>
                                 </div>
                             )}
                         </div>
@@ -605,15 +722,16 @@ export default function GreetPage() {
 
                 {/* ── Template Preview ── */}
                 {templateImage && !cardGenerated && (
-                    <div className="greet-img-wrap greet-shimmer" style={{ borderRadius: 24, overflow: 'hidden', boxShadow: '0 16px 56px rgba(0,0,0,0.18)', marginBottom: 24, position: 'relative', background: '#f1f5f9', minHeight: imgError ? 180 : 'auto' }}>
-                        {!imgError ? (
+                    <div className="greet-img-wrap greet-shimmer" style={{ borderRadius: 24, overflow: 'hidden', boxShadow: '0 16px 56px rgba(0,0,0,0.18)', marginBottom: 24, position: 'relative', background: '#f1f5f9', minHeight: imageStatus === 'error' ? 220 : undefined }}>
+                        {imageStatus !== 'error' ? (
                             <>
                                 <img
-                                    src={templateImage}
+                                    src={displayImageSrc}
                                     alt="القالب"
                                     crossOrigin="anonymous"
                                     style={{ width: '100%', display: 'block' }}
-                                    onError={() => setImgError(true)}
+                                    onLoad={handleImageLoad}
+                                    onError={handleImageError}
                                 />
                                 {name.trim() && (
                                     <div style={{
@@ -657,10 +775,52 @@ export default function GreetPage() {
                                         textShadow: '0 2px 6px rgba(0,0,0,0.5)',
                                     }}>{overlay.text}</div>
                                 )}
+                                {imageStatus === 'loading' && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        inset: 0,
+                                        background: 'rgba(241,245,249,0.85)',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: '#475569',
+                                        fontWeight: 700,
+                                    }}>
+                                        جارٍ تحميل القالب...
+                                    </div>
+                                )}
+                                {isFallbackTemplate && imageStatus !== 'loading' && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: 12,
+                                        left: 12,
+                                        padding: '4px 12px',
+                                        borderRadius: 999,
+                                        background: 'rgba(15,23,42,0.8)',
+                                        color: '#f8fafc',
+                                        fontSize: 11,
+                                        fontWeight: 700,
+                                    }}>
+                                        قالب احتياطي
+                                    </div>
+                                )}
                             </>
                         ) : (
                             <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8', fontSize: 13 }}>
-                                جارٍ تحميل القالب...
+                                <p style={{ marginBottom: 10, fontWeight: 700 }}>لم نتمكّن من تحميل القالب.</p>
+                                <p style={{ marginBottom: 16 }}>تحقّق من اتصالك ثم جرّب مجددًا.</p>
+                                <button onClick={handleRetryImage} style={{
+                                    padding: '10px 24px',
+                                    borderRadius: 999,
+                                    border: '1px solid #cbd5f5',
+                                    background: '#fff',
+                                    color: '#475569',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                }}>
+                                    إعادة المحاولة
+                                </button>
                             </div>
                         )}
                     </div>
