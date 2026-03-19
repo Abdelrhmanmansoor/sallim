@@ -224,7 +224,7 @@ export default function GreetPage() {
     useEffect(() => {
         if (!shortId) return
         setLoading(true)
-        fetch(`${API_BASE}/api/v1/company/greet-links/${shortId}`)
+        fetch(`${API_BASE}/api/v1/company/greet-links/${shortId}`, { cache: 'no-store' })
             .then(r => r.json())
             .then(res => {
                 console.log('[GreetPage] API response:', res)
