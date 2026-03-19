@@ -872,6 +872,10 @@ router.get('/greet-links/:shortId', async (req, res) => {
     
     // Get template image - if not on Cloudinary, upload it now and save for future
     let templateImage = link.templateImage || ''
+    // Fix corrupted URLs: old bug prepended https://www.sallim.co/ before data: URLs
+    if (templateImage.includes('/data:image')) {
+      templateImage = templateImage.substring(templateImage.indexOf('data:'))
+    }
     if (templateImage && !templateImage.includes('cloudinary.com') && !templateImage.includes('res.cloudinary')) {
       // Convert relative path to absolute URL (skip data URLs and already-absolute URLs)
       if (!templateImage.startsWith('http') && !templateImage.startsWith('data:')) {
