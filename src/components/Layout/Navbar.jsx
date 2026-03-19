@@ -139,7 +139,7 @@ export default function Navbar() {
             {user ? (
               <>
                 <Link
-                  to="/dashboard/diwaniya"
+                  to="/company/dashboard"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -163,8 +163,7 @@ export default function Navbar() {
                     e.currentTarget.style.boxShadow = '0 4px 12px rgba(197,167,95,0.3)'
                   }}
                 >
-                  ديوانية العيد
-                  <span style={{ fontSize: '16px' }}>✨</span>
+                  🎉 اصنع رابط تهنئتك الآن
                 </Link>
 
                 {/* User Avatar & Profile Link */}
@@ -245,7 +244,7 @@ export default function Navbar() {
                   دخول
                 </Link>
                 <Link
-                  to="/create-diwaniya"
+                  to="/company/dashboard"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -269,8 +268,7 @@ export default function Navbar() {
                     e.currentTarget.style.boxShadow = '0 4px 12px rgba(197,167,95,0.3)'
                   }}
                 >
-                  ديوانية العيد
-                  <span style={{ fontSize: '16px' }}>✨</span>
+                  🎉 اصنع رابط تهنئتك الآن
                 </Link>
               </>
             )}
@@ -356,7 +354,7 @@ export default function Navbar() {
             <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #f0f0f0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <CurrencySwitcher />
               <Link
-                to={user ? "/dashboard/diwaniya" : "/create-diwaniya"}
+                to="/company/dashboard"
                 onClick={() => setOpen(false)}
                 style={{
                   display: 'flex',
@@ -373,8 +371,7 @@ export default function Navbar() {
                   textDecoration: 'none',
                 }}
               >
-                ديوانية العيد
-                <span style={{ fontSize: '16px' }}>✨</span>
+                🎉 اصنع رابط تهنئتك الآن
               </Link>
               <Link
                 to="/editor"

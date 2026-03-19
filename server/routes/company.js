@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import { nanoid } from 'nanoid'
 import { v2 as cloudinaryV2 } from 'cloudinary'
@@ -11,6 +12,7 @@ import GreetLink from '../models/GreetLink.js'
 import Template from '../models/Template.js'
 import { upload } from '../config/upload.js'
 import { loginLimiter, activationLimiter, employeeLimiter } from '../middleware/rateLimiter.js'
+import { sendEidWelcomeEmail } from '../utils/email.js'
 
 const router = Router()
 
@@ -100,6 +102,57 @@ const generateSlug = () => nanoid(10).toLowerCase()
 const generateEmail = (slug) => `company_${slug}@sallim.co`
 
 const generateStrongPassword = () => crypto.randomBytes(12).toString('base64url')
+
+// ═══ تسجيل مجاني للشركات (بدون كود تفعيل) ═══
+router.post('/register-free', activationLimiter, async (req, res) => {
+  try {
+    const companyName = String(req.body?.companyName || '').trim()
+    const email = String(req.body?.email || '').trim().toLowerCase()
+    const password = String(req.body?.password || '').trim()
+
+    if (!companyName) return res.status(400).json({ success: false, error: 'اسم الشركة مطلوب' })
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ success: false, error: 'البريد الإلكتروني غير صالح' })
+    if (!password || password.length < 6) return res.status(400).json({ success: false, error: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' })
+
+    // Check for duplicate email
+    const existing = await Company.findOne({ email })
+    if (existing) return res.status(409).json({ success: false, error: 'البريد الإلكتروني مسجّل مسبقاً' })
+
+    const hashedPassword = await bcrypt.hash(password, 12)
+    const slug = nanoid(10).toLowerCase()
+
+    const company = new Company({
+      name: companyName,
+      email,
+      slug,
+      password: hashedPassword,
+      status: 'active',
+      isActive: true,
+      cardLimit: 500,
+      cardsUsed: 0,
+    })
+
+    await company.save()
+
+    // Send Eid welcome email (non-blocking)
+    sendEidWelcomeEmail({ to: email, companyName }).catch(err => console.error('[Email] Eid welcome failed:', err))
+
+    const token = jwt.sign({ companyId: company._id, type: 'company' }, JWT_SECRET, { expiresIn: '90d' })
+
+    return res.status(201).json({
+      success: true,
+      message: 'تم إنشاء حساب شركتك بنجاح',
+      data: {
+        token,
+        company: buildCompanyContext(company),
+      },
+    })
+  } catch (err) {
+    console.error('[register-free] Error:', err)
+    if (err.code === 11000) return res.status(409).json({ success: false, error: 'البريد الإلكتروني مسجّل مسبقاً' })
+    return res.status(500).json({ success: false, error: 'خطأ في السيرفر' })
+  }
+})
 
 // ═══ تفعيل الشركة باستخدام كود التفعيل ═══
 router.post('/activate', activationLimiter, async (req, res) => {

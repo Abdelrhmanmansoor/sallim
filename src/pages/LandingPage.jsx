@@ -1,43 +1,21 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { 
-  ArrowLeft, 
-  Palette, 
-  Download, 
-  Smartphone, 
-  Type, 
-  Layers, 
-  Shield, 
-  ChevronDown, 
-  Heart, 
-  DollarSign, 
-  X, 
-  Sparkles, 
-  Star,
-  GraduationCap,
-  Baby,
-  PartyPopper,
-  Briefcase,
-  Mail,
-  Trophy,
-  Cloud,
-  Award
+import {
+  ArrowLeft,
+  Palette,
+  Download,
+  Smartphone,
+  Type,
+  Layers,
+  Shield,
+  ChevronDown,
 } from 'lucide-react'
-import { getTemplates } from '../utils/api'
-import ProductCard from '../components/ProductCard'
 import OccasionSlider from '../components/OccasionSlider'
-import SAR from '../components/SAR'
-import { useCurrency } from '../utils/useCurrency'
 
 export default function LandingPage() {
   const navigate = useNavigate()
-  const { isForeign, convertFromSAR, currencyName } = useCurrency()
   const [openFaq, setOpenFaq] = useState(null)
-  const [previewTemplates, setPreviewTemplates] = useState([])
-  const [showPopup, setShowPopup] = useState(false)
-  const [popupCountdown, setPopupCountdown] = useState(8)
   const [playingAudio, setPlayingAudio] = useState(null)
-  const [templateTab, setTemplateTab] = useState('free') // 'free' | 'paid'
   const [marketingIdx, setMarketingIdx] = useState(0)
 
   const audioSamples = [
@@ -56,23 +34,6 @@ export default function LandingPage() {
       audio.onended = () => setPlayingAudio(null)
     }
   }
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await getTemplates()
-        if (res.success && res.data) {
-          // Get only public/premium templates for the landing page
-          const publicTemplates = res.data.filter(t => t.type === 'public' || t.type === 'premium')
-          // Take the first 6
-          setPreviewTemplates(publicTemplates.slice(0, 6))
-        }
-      } catch (e) {
-        console.error('Error fetching preview templates:', e)
-      }
-    }
-    load()
-  }, [])
 
   const features = [
     { icon: Palette, title: 'قوالب احترافية', desc: 'أكثر من ٢٠ قالب مصمم بعناية' },
@@ -95,85 +56,6 @@ export default function LandingPage() {
     { q: 'هل تعمل على الهاتف؟', a: 'نعم، متوافقة مع جميع الأجهزة.' },
   ]
 
-  const tiers = [
-    {
-      name: 'مجاني',
-      price: '0',
-      unit: '',
-      desc: 'للاستخدام الشخصي',
-      features: ['تصميم غير محدود', 'تصدير عالي الجودة', 'مشاركة فورية'],
-      cta: 'ابدأ مجاناً',
-      href: '/editor',
-      highlight: false,
-    },
-    {
-      name: 'باقة البداية',
-      price: '79',
-      unit: 'ر.س',
-      desc: 'استخدام لمرة واحدة — حتى 20 اسم',
-      features: ['حتى 20 اسم', 'قوالب جاهزة', 'تخصيص النص واللون', 'مشاركة عبر رابط أو واتساب', 'تنزيل البطاقات كصور'],
-      cta: 'اشترك الآن',
-      href: '/editor?mode=batch',
-      highlight: false,
-    },
-    {
-      name: 'باقة الأعمال',
-      price: '199',
-      unit: 'ر.س / سنة',
-      desc: 'استخدام متكرر — حتى 500 رسالة',
-      features: ['حتى 500 رسالة سنوياً', 'كل المواسم والمناسبات', 'شعار الشركة', 'قوالب حصرية', 'جدولة إرسال', 'تقارير وإحصائيات'],
-      cta: 'اشترك الآن',
-      href: '/editor?mode=batch',
-      highlight: true,
-    },
-    {
-      name: 'الباقة المؤسسية',
-      price: '1,499',
-      unit: 'ر.س / سنة',
-      desc: 'استخدام غير محدود — 10,000 رسالة + أعياد ميلاد',
-      features: ['حتى 10,000 رسالة سنوياً', 'أعياد ميلاد ومناسبات الموظفين', 'هوية الشركة كاملة', 'قوالب مخصصة حسب الطلب', 'ربط مع نظام HR', 'مدير حساب + دعم VIP'],
-      cta: 'تواصل معنا',
-      href: 'https://wa.me/966597009498?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A8%D8%A7%D9%82%D8%A9%20%D8%A7%D9%84%D9%85%D8%A4%D8%B3%D8%B3%D9%8A%D8%A9',
-      highlight: false,
-      external: true,
-    },
-    {
-      name: 'باقة خاصة',
-      price: '2,500',
-      unit: 'ر.س',
-      desc: 'تصميم وتطوير حسب الطلب بالكامل',
-      features: ['تصميم قوالب حصرية من الصفر', 'رابط خاص باسم شركتك', 'نظام إرسال مخصص بالكامل', 'دعم تقني دائم', 'بدون حد للرسائل'],
-      cta: 'تواصل معنا',
-      href: 'https://wa.me/966597009498?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A8%D8%A7%D9%82%D8%A9%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%D8%A9',
-      highlight: false,
-      external: true,
-    },
-  ]
-
-
-  useEffect(() => {
-    // Show popup after 1.5 seconds
-    const timer = setTimeout(() => {
-      setShowPopup(true)
-    }, 1500)
-
-    // Countdown timer for popup (auto-close)
-    const countdownInterval = setInterval(() => {
-      setPopupCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(countdownInterval)
-          setShowPopup(false)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => {
-      clearTimeout(timer)
-      clearInterval(countdownInterval)
-    }
-  }, [])
 
   // Rotate marketing messages every 4 seconds
   useEffect(() => {
@@ -183,229 +65,8 @@ export default function LandingPage() {
     return () => clearInterval(interval)
   }, [])
 
-  const handleClosePopup = () => {
-    setShowPopup(false)
-  }
-
-  const handleWhatsAppLink = (message) => {
-    if (typeof snaptr !== 'undefined') {
-      snaptr('track', 'CUSTOM_EVENT_1')
-    }
-    const phoneNumber = '201007835547'
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
-    window.open(whatsappUrl, '_blank')
-  }
-
   return (
     <div dir="rtl" style={{ fontFamily: "'Tajawal', sans-serif" }}>
-
-      {/* LUXURY POPUP */}
-      {showPopup && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.7)',
-            backdropFilter: 'blur(12px)',
-            zIndex: 9999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px',
-            animation: 'fadeIn 0.4s ease',
-          }}
-        >
-          <div
-            style={{
-              background: '#fff',
-              borderRadius: '28px',
-              padding: '0',
-              maxWidth: '460px',
-              width: '100%',
-              position: 'relative',
-              boxShadow: '0 25px 80px rgba(0, 0, 0, 0.35)',
-              animation: 'slideUp 0.4s ease',
-              overflow: 'hidden',
-            }}
-          >
-            {/* Top Gradient Strip */}
-            <div style={{ height: '6px', background: 'linear-gradient(90deg, #d4af37, #f5d77a, #d4af37)' }} />
-
-            <div style={{ padding: '36px 32px 32px' }}>
-              {/* Close Button */}
-              <button
-                onClick={handleClosePopup}
-                style={{
-                  position: 'absolute',
-                  top: '20px',
-                  right: '20px',
-                  background: '#f1f5f9',
-                  border: 'none',
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 200ms ease',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = '#e2e8f0' }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = '#f1f5f9' }}
-              >
-                <X size={16} color="#64748b" />
-              </button>
-
-              {/* Countdown Badge */}
-              <div style={{
-                position: 'absolute',
-                top: '20px',
-                left: '20px',
-                background: 'linear-gradient(135deg, #d4af37, #b8860b)',
-                color: '#fff',
-                padding: '5px 12px',
-                borderRadius: '100px',
-                fontSize: '12px',
-                fontWeight: 700,
-              }}>
-                ⏱ {popupCountdown}s
-              </div>
-
-              {/* Icon + Title */}
-              <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                <div style={{ width: '60px', height: '60px', margin: '0 auto 16px', borderRadius: '50%', background: 'linear-gradient(135deg, #d4af37, #f5d77a)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(212,175,55,0.3)' }}><Sparkles size={28} color="#fff" /></div>
-                <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a', marginBottom: '6px', lineHeight: 1.4 }}>
-                  🏢 باقات الشركات والمؤسسات
-                </h2>
-                <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6 }}>
-                  هنّئ موظفيك وعملاءك بهوية شركتك المميزة
-                </p>
-              </div>
-
-              {/* Companies Features */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
-                {[
-                  'لوجو وألوان شركتك على كل بطاقة',
-                  'رابط ذكي للموظفين',
-                  'لوحة تحكم ومتابعة الاستهلاك',
-                  'رفع CSV جماعي',
-                ].map((item) => (
-                  <div
-                    key={item}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 10,
-                      padding: '12px 14px',
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: 12,
-                      color: '#334155',
-                      fontSize: 13,
-                      fontWeight: 700,
-                    }}
-                  >
-                    <span style={{ color: '#16a34a', fontSize: 16 }}>✓</span>
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="btn-animated-border">
-                <button onClick={() => navigate('/company-checkout')}>
-                  اشترِ الآن
-                </button>
-              </div>
-              <button
-                onClick={() => navigate('/companies')}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  padding: '11px',
-                  background: 'transparent',
-                  color: '#6b7280',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  borderRadius: '14px',
-                  border: '1px solid #e2e8f0',
-                  cursor: 'pointer',
-                  marginTop: 8,
-                }}
-              >
-                تفاصيل الباقات
-              </button>
-              <button
-                onClick={() => handleWhatsAppLink('مرحباً، أرغب بالاستفسار عن باقات الشركات لبطاقات التهنئة')}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  padding: '14px',
-                  marginTop: 10,
-                  background: '#25D366',
-                  color: '#fff',
-                  fontSize: '14px',
-                  fontWeight: 700,
-                  borderRadius: '14px',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                تواصل معنا عبر واتساب
-              </button>
-            </div>
-          </div>
-
-          <style>{`
-            @keyframes fadeIn {
-              from { opacity: 0; }
-              to { opacity: 1; }
-            }
-            @keyframes slideUp {
-              from { opacity: 0; transform: translateY(30px); }
-              to { opacity: 1; transform: translateY(0); }
-            }
-            @keyframes borderSpin {
-              0%   { background-position: 0% 50%; }
-              50%  { background-position: 100% 50%; }
-              100% { background-position: 0% 50%; }
-            }
-            .btn-animated-border {
-              background: linear-gradient(270deg, #d4af37, #f5d77a, #c4901a, #e8c547, #d4af37);
-              background-size: 400% 400%;
-              animation: borderSpin 2.4s ease infinite;
-              border-radius: 15px;
-              padding: 2px;
-              display: block;
-              width: 100%;
-            }
-            .btn-animated-border button {
-              width: 100%;
-              padding: 13px;
-              background: #0f172a;
-              color: #fff;
-              font-size: 15px;
-              font-weight: 800;
-              border-radius: 13px;
-              border: none;
-              cursor: pointer;
-              font-family: 'Tajawal', sans-serif;
-              transition: background 200ms;
-            }
-            .btn-animated-border button:hover {
-              background: #1e293b;
-            }
-          `}</style>
-        </div>
-      )}
 
       {/* HERO */}
       <section
@@ -767,279 +428,36 @@ export default function LandingPage() {
       {/* OCCASION CATEGORIES SLIDER */}
       <OccasionSlider />
 
-      {/* PRODUCT SHOWCASE — Tabbed Free / Paid */}
-      <section style={{ padding: '72px 0 80px', background: '#f8fafc', overflow: 'hidden' }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 24px' }}>
-
-          {/* Title */}
-          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <h2 style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 900, color: '#0f172a', marginBottom: '10px', letterSpacing: '-0.02em' }}>
-              صمم تهنئتك
-            </h2>
-            <p style={{ fontSize: '15px', color: '#64748b', maxWidth: '500px', margin: '0 auto', lineHeight: 1.6 }}>
-              اختر من بين قوالب مجانية مباشرة أو قوالب مميزة باحترافية عالية
-            </p>
-          </div>
-
-          {/* Tab Switcher */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '40px' }}>
-            <div style={{ display: 'inline-flex', background: '#e2e8f0', borderRadius: '14px', padding: '4px', gap: '4px' }}>
-              <button
-                onClick={() => setTemplateTab('free')}
-                style={{
-                  padding: '10px 28px', borderRadius: '11px', border: 'none', cursor: 'pointer',
-                  fontFamily: "'Tajawal', sans-serif", fontWeight: 700, fontSize: '15px',
-                  background: templateTab === 'free' ? '#10b981' : 'transparent',
-                  color: templateTab === 'free' ? '#fff' : '#64748b',
-                  transition: 'all 0.2s', boxShadow: templateTab === 'free' ? '0 2px 12px rgba(16,185,129,0.3)' : 'none'
-                }}>
-                مجانية
-              </button>
-              <button
-                onClick={() => setTemplateTab('paid')}
-                style={{
-                  padding: '10px 28px', borderRadius: '11px', border: 'none', cursor: 'pointer',
-                  fontFamily: "'Tajawal', sans-serif", fontWeight: 700, fontSize: '15px',
-                  background: templateTab === 'paid' ? '#f59e0b' : 'transparent',
-                  color: templateTab === 'paid' ? '#fff' : '#64748b',
-                  transition: 'all 0.2s', boxShadow: templateTab === 'paid' ? '0 2px 12px rgba(245,158,11,0.3)' : 'none'
-                }}>
-                مدفوعة
-              </button>
-            </div>
-          </div>
-
-          {/* Tab Description */}
-          {templateTab === 'free' ? (
-            <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#ecfdf5', color: '#059669', padding: '6px 16px', borderRadius: '100px', fontSize: '13px', fontWeight: 700 }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                تحميل مجاني — بدون علامة مائية — بدون قيود
-              </span>
-            </div>
-          ) : (
-            <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fffbeb', color: '#d97706', padding: '6px 16px', borderRadius: '100px', fontSize: '13px', fontWeight: 700 }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                قوالب احترافية مميزة — جودة عالية — دعم مخصص
-              </span>
-            </div>
-          )}
-
-          {/* Cards Slider */}
-          <div
-            className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide"
+      {/* صنع تهنئة العيد */}
+      <section style={{ padding: '72px 0 80px', background: '#f8fafc' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: 900, color: '#0f172a', marginBottom: '16px', letterSpacing: '-0.02em' }}>
+            اصنع تهنئة العيد الآن 🎉
+          </h2>
+          <p style={{ fontSize: '16px', color: '#64748b', maxWidth: '480px', margin: '0 auto 32px', lineHeight: 1.7 }}>
+            اختر من بين قوالب فاخرة، خصّصها بلمستك، وشاركها مجاناً بدون أي قيود
+          </p>
+          <Link
+            to="/editor"
             style={{
-              paddingRight: 'min(5vw, 48px)',
-              paddingLeft: 'min(5vw, 48px)',
-              marginRight: 'calc(-1 * min(5vw, 48px))',
-              marginLeft: 'calc(-1 * min(5vw, 48px))',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '16px 40px',
+              background: 'linear-gradient(135deg, #d4af37, #b8860b)',
+              color: '#fff',
+              fontSize: '17px',
+              fontWeight: 800,
+              borderRadius: '14px',
+              textDecoration: 'none',
+              boxShadow: '0 8px 28px rgba(212,175,55,0.4)',
+              transition: 'all 200ms ease',
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)' }}
           >
-            {(templateTab === 'free' ? [
-              { id: "3",   name: "تصميم اللؤلؤة العربية",    img: "/templates/جاهزة/6.png",            badge: "مجاني" },
-              { id: "114", name: "باترن السدو الفاخر",       img: "/templates/مصمم/Artboard 12.png",   badge: "مجاني" },
-              { id: "5",   name: "بطاقة الفانوس الذهبي",     img: "/templates/جاهزة/5.png",            badge: "مجاني" },
-              { id: "7",   name: "تهنئة الهلال المضيء",      img: "/templates/جاهزة/7.png",            badge: "جديد 🎁" },
-              { id: "8",   name: "بطاقة النجمة العربية",     img: "/templates/جاهزة/8.png",            badge: "مجاني" },
-              { id: "9",   name: "تصميم المسجد الأنيق",      img: "/templates/جاهزة/9.png",            badge: "مجاني" },
-              { id: "16",  name: "بطاقة الزخرفة الملكية",    img: "/templates/جاهزة/16.png",           badge: "جديد 🎁" },
-            ] : [
-              { id: "10",  name: "تصميم الخط الديواني الملكي", img: "/templates/جاهزة/10.png",  price: 10,  badge: "الأكثر طلباً" },
-              { id: "11",  name: "بطاقة العيد العصرية",        img: "/templates/جاهزة/11.png",  price: 12,  badge: "جديد" },
-              { id: "14",  name: "نموذج التجريد الإسلامي",     img: "/templates/جاهزة/15.png",  price: 15 },
-              { id: "13",  name: "تهنئة الزخرفة الكلاسيكية",  img: "/templates/جاهزة/14.png",  price: 18 },
-              { id: "16",  name: "بطاقة الخط العربي الفاخر",  img: "/templates/جاهزة/17.png",  price: 22,  badge: "Premium" },
-              { id: "105", name: "ثيم الواحة الهادئة",         img: "/templates/مصمم/18.png",   price: 29 },
-            ]).map((p, idx) => (
-              <div key={idx} className="flex-none w-[260px] sm:w-[300px] snap-center">
-                <ProductCard
-                  id={p.id}
-                  name={p.name}
-                  image={p.img}
-                  price={p.price || 0}
-                  originalPrice={0}
-                  rating={4.9 + (idx * 0.02)}
-                  badges={p.badge ? [p.badge] : []}
-                />
-              </div>
-            ))}
-          </div>
-
-          <div className="flex justify-center gap-2 mt-4 text-gray-400 sm:hidden">
-            <span className="text-xs font-bold">اسحب لليمين لرؤية المزيد</span>
-          </div>
-        </div>
-
-        <style>{`
-          .scrollbar-hide::-webkit-scrollbar { display: none; }
-          .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-        `}</style>
-      </section>
-
-      {/* EID SONG — Premium Product Card */}
-      <section style={{ padding: '80px 0', background: '#fff' }}>
-        <div style={{ maxWidth: '480px', margin: '0 auto', padding: '0 24px' }}>
-          <div
-            style={{
-              borderRadius: '24px',
-              overflow: 'hidden',
-              background: '#fff',
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 8px 40px rgba(0,0,0,0.06)',
-              transition: 'all 300ms ease',
-            }}
-          >
-            {/* Image area */}
-            <div style={{
-              height: '220px',
-              position: 'relative',
-              overflow: 'hidden',
-            }}>
-              <img src="/eid-song-cover.png" alt="أغنية العيد" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 60%)' }} />
-            </div>
-
-            {/* Content */}
-            <div style={{ padding: '28px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                <span style={{ background: '#f0fdf4', color: '#16a34a', padding: '4px 12px', borderRadius: '100px', fontSize: '11px', fontWeight: 700 }}>جديد</span>
-                <span style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 4 }}>
-                  50 <SAR size={16} />
-                  {isForeign && convertFromSAR(50) && (
-                    <span style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', marginRight: 4 }}>≈ {convertFromSAR(50)} {currencyName}</span>
-                  )}
-                </span>
-              </div>
-
-              <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', marginBottom: '8px', lineHeight: 1.4 }}>
-                اصنع أغنية العيد لمن تحب
-              </h3>
-              <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.7, marginBottom: '16px' }}>
-                أرسل تهنئة صوتية مميزة مخصصة باسم من تحب — أغنية عيد فريدة تُحفظ في القلب وتبقى في الذاكرة. مثالية كهدية للأهل والأصدقاء في عيد الفطر وعيد الأضحى.
-              </p>
-
-              {/* Audio Samples */}
-              <div style={{ marginBottom: '20px' }}>
-                <p style={{ fontSize: '12px', fontWeight: 700, color: '#94a3b8', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>استمع لنماذج الأغاني</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {audioSamples.map(sample => (
-                    <div key={sample.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: playingAudio === sample.id ? '#f5f3ff' : '#f8fafc', borderRadius: 12, border: '1px solid ' + (playingAudio === sample.id ? '#c4b5fd' : '#e2e8f0'), transition: 'all 200ms', cursor: 'pointer' }}
-                      onClick={() => handlePlaySample(sample.id)}>
-                      <audio data-sample={sample.id} src={sample.file} preload="none" />
-                      <div style={{ width: 36, height: 36, borderRadius: '50%', background: playingAudio === sample.id ? '#7c3aed' : '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 200ms' }}>
-                        {playingAudio === sample.id ? (
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-                        ) : (
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="#64748b"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                        )}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: playingAudio === sample.id ? '#7c3aed' : '#374151' }}>{sample.label}</div>
-                        {playingAudio === sample.id && <div style={{ fontSize: 11, color: '#7c3aed' }}>جاري التشغيل...</div>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                onClick={() => navigate('/checkout?product=eid-song&price=50')}
-                style={{
-                  width: '100%',
-                  padding: '14px',
-                  background: '#0f172a',
-                  color: '#fff',
-                  fontSize: '15px',
-                  fontWeight: 800,
-                  borderRadius: '14px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  transition: 'all 200ms',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = '#1e293b' }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = '#0f172a' }}
-              >
-                اطلب الآن
-              </button>
-
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '14px' }}>
-                <span style={{ fontSize: '11px', color: '#94a3b8' }}>دفع آمن</span>
-                <span style={{ fontSize: '11px', color: '#94a3b8' }}>·</span>
-                <span style={{ fontSize: '11px', color: '#94a3b8' }}>تسليم فوري</span>
-                <span style={{ fontSize: '11px', color: '#94a3b8' }}>·</span>
-                <span style={{ fontSize: '11px', color: '#94a3b8' }}>تواصل مباشر</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CUSTOM DESIGN REQUEST — طلب تصميم خاص */}
-      <section style={{ padding: '80px 0', background: '#f8fafc' }}>
-        <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 24px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 40, alignItems: 'center' }}>
-            
-            {/* Image */}
-            <div style={{ borderRadius: 24, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.12)', maxWidth: 340, margin: '0 auto' }}>
-              <img src="/custom-design-cover.png" alt="طلب تصميم خاص" style={{ width: '100%', display: 'block', objectFit: 'cover' }} />
-            </div>
-
-            {/* Content */}
-            <div>
-              <span style={{ display: 'inline-block', background: '#fffbeb', color: '#d97706', padding: '4px 14px', borderRadius: '100px', fontSize: '12px', fontWeight: 700, marginBottom: 16 }}>خدمة حصرية</span>
-              <h2 style={{ fontSize: 'clamp(26px, 4vw, 36px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.3, marginBottom: 12 }}>
-                طلب تصميم خاص
-              </h2>
-              <p style={{ fontSize: 15, color: '#64748b', lineHeight: 1.8, marginBottom: 24 }}>
-                هل تريد تصميماً مخصصاً يعكس هويتك أو علامتك التجارية؟ نصمم لك بطاقة تهنئة عيد فريدة من نوعها — بخطوط مميزة وألوان وعناصر تختارها أنت.
-              </p>
-              
-              {/* Benefits */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
-                {['تصميم يعكس هويتك وعلامتك', 'تسليم خلال 24 ساعة', 'مراجعات غير محدودة حتى ترضى', 'صيغ متعددة: PNG, PDF, JPG'].map((b, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
-                    </div>
-                    <span style={{ fontSize: 14, color: '#374151', fontWeight: 500 }}>{b}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Price + CTA */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                    <span style={{ fontSize: 32, fontWeight: 900, color: '#0f172a' }}>35</span>
-                    <SAR size={20} style={{ verticalAlign: '-2px' }} />
-                  </div>
-                  {isForeign && convertFromSAR(35) && (
-                    <div style={{ fontSize: 12, color: '#6b7280', fontWeight: 600 }}>≈ {convertFromSAR(35)} {currencyName}</div>
-                  )}
-                </div>
-                <button
-                  onClick={() => navigate('/checkout?product=custom-design&price=35&name=' + encodeURIComponent('طلب تصميم خاص'))}
-                  style={{
-                    flex: 1, minWidth: 180, padding: '14px 28px',
-                    background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                    color: '#fff', fontSize: 16, fontWeight: 900,
-                    borderRadius: 14, border: 'none', cursor: 'pointer',
-                    fontFamily: "'Tajawal', sans-serif",
-                    boxShadow: '0 4px 20px rgba(245,158,11,0.35)',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                >
-                  اطلب تصميمك الآن
-                </button>
-              </div>
-              <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 10 }}>
-                بعد الدفع يتم التواصل معك مباشرة عبر واتساب لمناقشة التفاصيل
-              </p>
-            </div>
-          </div>
+            🎉 اصنع رابط تهنئتك الآن
+          </Link>
         </div>
       </section>
 
@@ -1180,134 +598,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* PRICING */}
-      <section style={{ padding: '100px 0', background: '#fafafa' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <span style={{ fontSize: '12px', fontWeight: 600, color: '#a3a3a3', letterSpacing: '0.1em' }}>الباقات</span>
-            <h2 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 700, color: '#171717', marginTop: '12px' }}>
-              اختر ما يناسبك
-            </h2>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
-            {tiers.map((tier, i) => {
-              const Component = tier.external ? 'a' : Link
-              const linkProps = tier.external
-                ? { href: tier.href, target: '_blank', rel: 'noopener noreferrer' }
-                : { to: tier.href }
-
-              return (
-                <div
-                  key={i}
-                  style={{
-                    padding: '32px',
-                    background: tier.highlight ? '#171717' : '#fff',
-                    borderRadius: '20px',
-                    border: tier.highlight ? 'none' : '1px solid #e5e5e5',
-                    textAlign: 'center',
-                    transition: 'all 200ms ease',
-                    transform: tier.highlight ? 'scale(1.02)' : 'scale(1)',
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!tier.highlight) {
-                      e.currentTarget.style.transform = 'translateY(-4px)'
-                      e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.08)'
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!tier.highlight) {
-                      e.currentTarget.style.transform = 'translateY(0)'
-                      e.currentTarget.style.boxShadow = 'none'
-                    }
-                  }}
-                >
-                  {tier.highlight && (
-                    <div
-                      style={{
-                        display: 'inline-block',
-                        padding: '4px 12px',
-                        background: '#404040',
-                        borderRadius: '100px',
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        color: '#fff',
-                        marginBottom: '16px',
-                      }}
-                    >
-                      مميز
-                    </div>
-                  )}
-                  <h3
-                    style={{
-                      fontSize: '20px',
-                      fontWeight: 600,
-                      color: tier.highlight ? '#fff' : '#171717',
-                      marginBottom: '8px',
-                    }}
-                  >
-                    {tier.name}
-                  </h3>
-                  <div
-                    style={{
-                      fontSize: '32px',
-                      fontWeight: 700,
-                      color: tier.highlight ? '#fff' : '#171717',
-                      marginBottom: '8px',
-                    }}
-                  >
-                    {tier.price}{tier.unit ? <span style={{ fontSize: '14px', fontWeight: 500, marginRight: '4px' }}> {tier.unit}</span> : ''}
-                  </div>
-                  <p
-                    style={{
-                      fontSize: '14px',
-                      color: tier.highlight ? 'rgba(255,255,255,0.5)' : '#737373',
-                      marginBottom: '24px',
-                    }}
-                  >
-                    {tier.desc}
-                  </p>
-                  <ul style={{ listStyle: 'none', marginBottom: '24px', textAlign: 'right' }}>
-                    {tier.features.map((f, j) => (
-                      <li
-                        key={j}
-                        style={{
-                          fontSize: '14px',
-                          color: tier.highlight ? 'rgba(255,255,255,0.7)' : '#525252',
-                          marginBottom: '12px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                        }}
-                      >
-                        <span style={{ color: tier.highlight ? '#a3a3a3' : '#171717' }}>✓</span>
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Component
-                    {...linkProps}
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      padding: '14px',
-                      background: tier.highlight ? '#fff' : '#171717',
-                      color: tier.highlight ? '#171717' : '#fff',
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      borderRadius: '12px',
-                      textDecoration: 'none',
-                      transition: 'all 200ms ease',
-                    }}
-                  >
-                    {tier.cta}
-                  </Component>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </section>
 
       {/* FAQ */}
       <section style={{ padding: '100px 0', background: '#fff' }}>
@@ -1410,10 +700,10 @@ export default function LandingPage() {
             marginBottom: '32px',
           }}>
             {[
-              { icon: '🔒', text: 'دفع آمن ومشفّر' },
               { icon: '🇸🇦', text: 'منتج سعودي' },
-              { icon: '✅', text: 'التسليم في نفس اليوم' },
+              { icon: '✅', text: 'مجاني بالكامل' },
               { icon: '🛡️', text: 'خصوصية محمية' },
+              { icon: '⚡', text: 'مشاركة فورية' },
             ].map((badge, i) => (
               <div key={i} style={{
                 display: 'flex',
@@ -1430,30 +720,6 @@ export default function LandingPage() {
                 <span style={{ fontSize: '16px' }}>{badge.icon}</span>
                 {badge.text}
               </div>
-            ))}
-          </div>
-
-          {/* Payment Methods Row */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '12px',
-            flexWrap: 'wrap',
-          }}>
-            <span style={{ fontSize: '12px', fontWeight: 600, color: '#94a3b8' }}>وسائل الدفع المعتمدة:</span>
-            {['مدى', 'Visa', 'Mastercard', 'Apple Pay'].map((method, i) => (
-              <span key={i} style={{
-                padding: '6px 16px',
-                background: '#fff',
-                borderRadius: '8px',
-                border: '1px solid #e2e8f0',
-                fontSize: '12px',
-                fontWeight: 700,
-                color: '#475569',
-              }}>
-                {method}
-              </span>
             ))}
           </div>
         </div>

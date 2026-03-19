@@ -112,6 +112,24 @@ export const CompanyProvider = ({ children }) => {
         localStorage.setItem('sallim_company_data', JSON.stringify(updated))
     }
 
+    const registerFree = async (companyName, email, password) => {
+        try {
+            const response = await fetch(`${API_BASE}/api/v1/company/register-free`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ companyName, email, password })
+            })
+            const data = await response.json()
+            if (!response.ok) {
+                throw new Error(data.error || 'فشل التسجيل')
+            }
+            login(data.data.token, data.data.company)
+            return { success: true, message: data.message }
+        } catch (error) {
+            return { success: false, error: error.message }
+        }
+    }
+
     const activate = async (email, code, password) => {
         try {
             const response = await fetch(`${API_BASE}/api/v1/company/activate`, {
@@ -214,6 +232,7 @@ export const CompanyProvider = ({ children }) => {
             isAuthenticated: !!company,
             loading,
             activate,
+            registerFree,
             login: loginCompany,
             logout,
             updateCompanyData,

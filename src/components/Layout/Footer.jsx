@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { usePaymentMethods, mapPaymentMethodsForDisplay } from '../../hooks/usePaymentMethods'
 
 const footerLinks = {
   platform: [
@@ -9,7 +8,6 @@ const footerLinks = {
   resources: [
     { to: '/', label: 'الرئيسية' },
     { to: '/about', label: 'عن المنصة' },
-    { to: '/pricing', label: 'الأسعار' },
   ],
   legal: [
     { to: '/privacy', label: 'الخصوصية' },
@@ -21,16 +19,6 @@ const footerLinks = {
 }
 
 export default function Footer() {
-  const { methods } = usePaymentMethods()
-  const fallbackMethods = [
-    { id: 'apple-pay', name: 'Apple Pay', logo: '' },
-    { id: 'visa', name: 'Visa', logo: '' },
-    { id: 'mastercard', name: 'Mastercard', logo: '' },
-    { id: 'mada', name: 'Mada', logo: '' },
-  ]
-  const displayMethods = mapPaymentMethodsForDisplay(methods)
-  const paymentMethods = displayMethods.length > 0 ? displayMethods : fallbackMethods
-
   return (
     <footer
       style={{
@@ -173,26 +161,6 @@ export default function Footer() {
 
         {/* Divider */}
         <div style={{ height: '1px', background: '#e5e5e5', marginBottom: '24px' }} />
-
-        {/* Payment Methods */}
-        {paymentMethods.length > 0 && (
-          <div style={{ marginBottom: 24 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#171717', marginBottom: 12 }}>
-              وسائل الدفع المقبولة
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-              {paymentMethods.map((m) => (
-                <div key={m.id} style={{ minHeight: 32, minWidth: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1px solid #e5e5e5', borderRadius: 8, padding: '4px 8px', gap: 6 }}>
-                  {m.logo ? (
-                    <img src={m.logo} alt={m.name} style={{ maxHeight: 28, width: 'auto', objectFit: 'contain' }} />
-                  ) : (
-                    <span style={{ fontSize: 11, fontWeight: 700, color: '#374151', whiteSpace: 'nowrap' }}>{m.name}</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* User Rights Banner */}
         <div style={{ background: 'linear-gradient(135deg, #f5f3ff, #eff6ff)', borderRadius: 14, padding: '16px 20px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, border: '1px solid #e0e7ff' }}>

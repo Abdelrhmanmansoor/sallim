@@ -292,41 +292,188 @@ async function sendNewOrderNotification({ companyName, packageName, contactNumbe
 // ══════════════════════════════════════════
 
 async function sendCompanyCredentialsEmail({ to, companyName, email, password, packageName, limit }) {
-  const html = emailLayout(`
-    <h2 style="color:#7c3aed;margin:0 0 16px;font-size:22px;">🎉 تم تفعيل حساب شركتك بنجاح!</h2>
-    <p>أهلاً <strong>${companyName}</strong>،</p>
-    <p>تم الدفع بنجاح وحسابك جاهز الآن. باقتك: <strong>${packageName}</strong> — <strong>${limit}</strong> بطاقة سنوياً.</p>
+  const html = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <title>مرحباً بك في سلّم</title>
+</head>
+<body style="margin:0;padding:0;background:#0d0d14;font-family:'Segoe UI',Tahoma,Arial,sans-serif;">
 
-    <div style="background:#f8fafc;border:2px solid #7c3aed33;border-radius:14px;padding:24px;margin:24px 0;">
-      <div style="font-size:13px;font-weight:700;color:#7c3aed;margin-bottom:14px;text-align:center;">بيانات الدخول للوحة التحكم</div>
-      <table style="width:100%;border-collapse:collapse;">
+  <!-- Outer wrapper -->
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0d0d14;min-height:100vh;">
+    <tr><td align="center" style="padding:40px 16px;">
+
+      <!-- Card -->
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;border-radius:24px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.6);">
+
+        <!-- ── Hero Header ── -->
         <tr>
-          <td style="padding:10px 0;font-size:14px;color:#64748b;width:40%;">البريد الإلكتروني:</td>
-          <td style="padding:10px 0;font-weight:800;font-size:14px;direction:ltr;text-align:right;">${email}</td>
+          <td style="background:linear-gradient(145deg,#1a0a2e 0%,#0f0f1e 40%,#1a1030 100%);padding:48px 40px 40px;text-align:center;position:relative;">
+            <!-- Decorative top line -->
+            <div style="height:3px;background:linear-gradient(90deg,transparent,#c9a227,#e8c547,#c9a227,transparent);border-radius:2px;margin-bottom:36px;"></div>
+
+            <!-- Logo -->
+            <div style="margin-bottom:20px;">
+              <img src="https://www.sallim.co/images/logo.png"
+                   alt="سلّم"
+                   width="110"
+                   style="display:block;margin:0 auto;max-height:60px;object-fit:contain;"
+                   onerror="this.style.display='none'" />
+            </div>
+
+            <!-- Brand name fallback + tagline -->
+            <div style="font-size:13px;color:#c9a227;letter-spacing:3px;font-weight:600;margin-bottom:28px;">مِنَصَّة بَطَاقَاتِ التَّهْنِئَة</div>
+
+            <!-- Celebration icon -->
+            <div style="width:72px;height:72px;background:linear-gradient(135deg,#c9a227,#e8c547);border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(201,162,39,0.35);">
+              <span style="font-size:34px;line-height:72px;display:block;text-align:center;">✦</span>
+            </div>
+
+            <h1 style="margin:0 0 10px;font-size:26px;font-weight:800;color:#f5f0e8;letter-spacing:0.5px;">
+              تم تفعيل حسابكم بنجاح
+            </h1>
+            <p style="margin:0;font-size:15px;color:#a89060;font-weight:400;">
+              أهلاً وسهلاً، <strong style="color:#e8c547;">${companyName}</strong>
+            </p>
+
+            <!-- Decorative bottom line -->
+            <div style="height:1px;background:linear-gradient(90deg,transparent,#c9a22750,transparent);margin-top:36px;"></div>
+          </td>
         </tr>
+
+        <!-- ── Package Banner ── -->
         <tr>
-          <td style="padding:10px 0;font-size:14px;color:#64748b;">كلمة المرور:</td>
-          <td style="padding:10px 0;font-weight:800;font-size:16px;font-family:monospace;letter-spacing:2px;color:#7c3aed;">${password}</td>
+          <td style="background:linear-gradient(135deg,#c9a227,#e8c547,#c9a227);padding:18px 40px;text-align:center;">
+            <span style="font-size:13px;color:#1a0a2e;font-weight:700;letter-spacing:1px;">الباقة المفعّلة</span>
+            <span style="font-size:18px;color:#0d0d14;font-weight:900;margin-right:10px;">◈ ${packageName}</span>
+            <span style="font-size:13px;color:#1a0a2e;font-weight:700;">— ${limit} بطاقة سنوياً</span>
+          </td>
         </tr>
+
+        <!-- ── Body ── -->
+        <tr>
+          <td style="background:#12111f;padding:40px 40px 36px;">
+
+            <!-- Intro -->
+            <p style="margin:0 0 28px;font-size:15px;color:#b8b0c8;line-height:1.9;text-align:center;">
+              تم إتمام الدفع وإعداد لوحة التحكم الخاصة بكم.<br>
+              فيما يلي بيانات الدخول إلى حسابكم المؤسسي.
+            </p>
+
+            <!-- Credentials Card -->
+            <div style="background:linear-gradient(145deg,#1c1a30,#1a1828);border:1px solid #c9a22730;border-radius:18px;padding:28px 32px;margin-bottom:28px;">
+              <div style="font-size:11px;font-weight:700;color:#c9a227;letter-spacing:2px;text-align:center;margin-bottom:22px;text-transform:uppercase;">بيانات الدخول للوحة التحكم</div>
+
+              <!-- Email row -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+                <tr>
+                  <td style="padding:14px 18px;background:#0d0d14;border-radius:10px;">
+                    <div style="font-size:11px;color:#6b6480;font-weight:600;margin-bottom:5px;letter-spacing:1px;">البريد الإلكتروني</div>
+                    <div style="font-size:15px;color:#e2daf0;font-weight:700;direction:ltr;text-align:right;">${email}</div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Password row -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding:14px 18px;background:#0d0d14;border-radius:10px;border:1px solid #c9a22740;">
+                    <div style="font-size:11px;color:#c9a227;font-weight:600;margin-bottom:5px;letter-spacing:1px;">كلمة المرور</div>
+                    <div style="font-size:20px;color:#e8c547;font-weight:900;font-family:monospace;letter-spacing:4px;text-align:center;padding:4px 0;">${password}</div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+            <!-- Warning notice -->
+            <div style="background:#1e0d0d;border:1px solid #7f1d1d50;border-radius:12px;padding:14px 20px;margin-bottom:32px;text-align:center;">
+              <span style="font-size:13px;color:#fca5a5;font-weight:700;">⚠ احتفظ بهذه البيانات — لن تُرسَل مرة أخرى</span>
+            </div>
+
+            <!-- CTA Button -->
+            <div style="text-align:center;margin-bottom:36px;">
+              <a href="${SITE_URL}/company-login"
+                 style="display:inline-block;padding:16px 48px;background:linear-gradient(135deg,#c9a227,#e8c547,#c9a227);color:#0d0d14;text-decoration:none;border-radius:50px;font-size:17px;font-weight:900;letter-spacing:0.5px;box-shadow:0 8px 32px rgba(201,162,39,0.4);">
+                ادخل لوحة التحكم الآن ←
+              </a>
+            </div>
+
+            <!-- Steps -->
+            <div style="border-top:1px solid #ffffff10;padding-top:28px;">
+              <div style="font-size:12px;color:#6b6480;text-align:center;letter-spacing:2px;margin-bottom:20px;font-weight:600;">ابدأ بثلاث خطوات بسيطة</div>
+
+              <!-- Step 1 -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px;">
+                <tr>
+                  <td style="width:36px;vertical-align:top;">
+                    <div style="width:32px;height:32px;background:linear-gradient(135deg,#c9a227,#e8c547);border-radius:50%;text-align:center;line-height:32px;font-size:13px;font-weight:900;color:#0d0d14;">١</div>
+                  </td>
+                  <td style="padding-right:14px;vertical-align:top;">
+                    <div style="font-size:14px;color:#e2daf0;font-weight:700;padding-top:2px;">ارفع أسماء موظفيك</div>
+                    <div style="font-size:12px;color:#6b6480;margin-top:3px;">عبر ملف CSV أو الإدخال اليدوي</div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Step 2 -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px;">
+                <tr>
+                  <td style="width:36px;vertical-align:top;">
+                    <div style="width:32px;height:32px;background:linear-gradient(135deg,#c9a227,#e8c547);border-radius:50%;text-align:center;line-height:32px;font-size:13px;font-weight:900;color:#0d0d14;">٢</div>
+                  </td>
+                  <td style="padding-right:14px;vertical-align:top;">
+                    <div style="font-size:14px;color:#e2daf0;font-weight:700;padding-top:2px;">اختر قالب البطاقة المناسب</div>
+                    <div style="font-size:12px;color:#6b6480;margin-top:3px;">عشرات القوالب الاحترافية الجاهزة</div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Step 3 -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="width:36px;vertical-align:top;">
+                    <div style="width:32px;height:32px;background:linear-gradient(135deg,#c9a227,#e8c547);border-radius:50%;text-align:center;line-height:32px;font-size:13px;font-weight:900;color:#0d0d14;">٣</div>
+                  </td>
+                  <td style="padding-right:14px;vertical-align:top;">
+                    <div style="font-size:14px;color:#e2daf0;font-weight:700;padding-top:2px;">ولّد وحمّل جميع البطاقات</div>
+                    <div style="font-size:12px;color:#6b6480;margin-top:3px;">كل البطاقات دفعة واحدة بنقرة واحدة</div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+          </td>
+        </tr>
+
+        <!-- ── Footer ── -->
+        <tr>
+          <td style="background:#0a0910;padding:28px 40px;text-align:center;border-top:1px solid #ffffff08;">
+            <div style="height:1px;background:linear-gradient(90deg,transparent,#c9a22740,transparent);margin-bottom:20px;"></div>
+            <div style="font-size:12px;color:#4a4560;margin-bottom:10px;">
+              منصة سلّم للتهنئة المؤسسية
+            </div>
+            <div style="font-size:12px;color:#4a4560;">
+              <a href="${SITE_URL}" style="color:#c9a227;text-decoration:none;">sallim.co</a>
+              &nbsp;·&nbsp;
+              <a href="mailto:support@sallim.co" style="color:#c9a227;text-decoration:none;">support@sallim.co</a>
+            </div>
+          </td>
+        </tr>
+
       </table>
-    </div>
+    </td></tr>
+  </table>
 
-    <p style="font-size:13px;color:#dc2626;font-weight:700;text-align:center;">⚠️ احتفظ بهذه البيانات — لن تُرسَل مرة أخرى</p>
-
-    ${btn('ادخل لوحة التحكم الآن', `${SITE_URL}/company-login`)}
-
-    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;margin-top:20px;">
-      <div style="font-size:13px;color:#166534;font-weight:700;margin-bottom:8px;">ابدأ بـ 3 خطوات بسيطة:</div>
-      <div style="font-size:13px;color:#166534;">١. ارفع أسماء موظفيك</div>
-      <div style="font-size:13px;color:#166534;margin-top:4px;">٢. اختر قالب البطاقة</div>
-      <div style="font-size:13px;color:#166534;margin-top:4px;">٣. ولّد وحمّل كل البطاقات دفعة واحدة</div>
-    </div>
-  `)
+</body>
+</html>`
 
   return resend.emails.send({
     from: `سَلِّم <${FROM_EMAIL}>`,
     to,
-    subject: '✅ حسابك جاهز — بيانات الدخول لمنصة سلّم',
+    subject: '✦ حسابكم المؤسسي جاهز — منصة سلّم',
     html,
   })
 }
@@ -334,6 +481,57 @@ async function sendCompanyCredentialsEmail({ to, companyName, email, password, p
 // ══════════════════════════════════════════
 // Exports
 // ══════════════════════════════════════════
+
+// ══════════════════════════════════════════
+// 9. sendEidWelcomeEmail — ترحيب مجاني + تهنئة عيد الفطر
+// ══════════════════════════════════════════
+
+async function sendEidWelcomeEmail({ to, companyName }) {
+  const html = emailLayout(`
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="font-size:48px;margin-bottom:12px;">🌙✨</div>
+      <h2 style="color:#7c3aed;margin:0 0 8px;font-size:26px;font-weight:900;">تهانينا بمناسبة عيد الفطر المبارك</h2>
+      <p style="font-size:14px;color:#94a3b8;margin:0;">تقبّل الله منا ومنكم صالح الأعمال</p>
+    </div>
+
+    <p style="font-size:16px;color:#1e293b;margin-bottom:16px;">أهلاً وسهلاً <strong>${companyName}</strong>،</p>
+
+    <p style="font-size:15px;color:#374151;line-height:1.9;margin-bottom:20px;">
+      يسعدنا انضمامكم إلى <strong>منصة سَلِّم</strong> — منصة بطاقات التهنئة الاحترافية.
+      <br />
+      حسابكم جاهز الآن ويمكنكم البدء فوراً بإنشاء تهانيكم المخصصة.
+    </p>
+
+    <div style="background:#f5f3ff;border-radius:14px;padding:20px 24px;margin:24px 0;border:1px solid #ede9fe;">
+      <p style="margin:0 0 12px;font-size:14px;font-weight:700;color:#6d28d9;">✅ ما يمكنكم فعله الآن:</p>
+      <ul style="margin:0;padding:0 16px;color:#4c1d95;font-size:14px;line-height:2;">
+        <li>إضافة شعار وألوان شركتكم</li>
+        <li>رفع قوائم الموظفين والعملاء</li>
+        <li>إنشاء بطاقات تهنئة جماعية في ثوانٍ</li>
+        <li>مشاركة روابط التهاني عبر واتساب</li>
+      </ul>
+    </div>
+
+    <div style="text-align:center;margin:32px 0;">
+      <a href="${SITE_URL}/company-login"
+         style="display:inline-block;padding:16px 48px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#ffffff;text-decoration:none;border-radius:50px;font-size:17px;font-weight:900;box-shadow:0 8px 24px rgba(124,58,237,0.35);">
+        ادخل إلى لوحة التحكم
+      </a>
+    </div>
+
+    <p style="text-align:center;font-size:15px;color:#64748b;line-height:1.8;margin-top:24px;">
+      كل عام وأنتم بخير 🌙<br/>
+      <span style="color:#7c3aed;font-weight:700;">فريق منصة سَلِّم</span>
+    </p>
+  `)
+
+  return resend.emails.send({
+    from: `سَلِّم <${FROM_EMAIL}>`,
+    to,
+    subject: `🌙 عيد مبارك — أهلاً بكم في منصة سَلِّم`,
+    html,
+  })
+}
 
 export {
   sendActivationEmail,
@@ -343,5 +541,6 @@ export {
   sendLimitWarningEmail,
   sendLimitReachedEmail,
   sendNewOrderNotification,
-  sendCompanyCredentialsEmail
+  sendCompanyCredentialsEmail,
+  sendEidWelcomeEmail
 }

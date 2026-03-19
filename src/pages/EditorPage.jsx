@@ -1258,10 +1258,6 @@ function EditorPageInner() {
   const validateBatchPayment = useCallback(() => {
     setBatchPaymentError('')
 
-    if (isCompanyUnlocked) return true
-    if (licenseActive) return true
-    if (activeBatchOrder?.status === 'paid') return true
-
     const names = normalizeBatchNames()
     if (names.length === 0) {
       setBatchPaymentError('أدخل اسماً واحداً على الأقل.')
@@ -1273,9 +1269,8 @@ function EditorPageInner() {
       return false
     }
 
-    setBatchPaymentError('ادفع عبر بايبال أو فعّل كود الشركة.')
-    return false
-  }, [activeBatchOrder?.status, batchMaxRecipients, isCompanyUnlocked, licenseActive, normalizeBatchNames])
+    return true
+  }, [batchMaxRecipients, normalizeBatchNames])
 
   const generateBatchZipBlob = useCallback(async (names) => {
     if (!stageRef.current) throw new Error('تعذر تجهيز المعاينة حالياً.')
@@ -1541,21 +1536,6 @@ function EditorPageInner() {
 
   const handleExportPNG = useCallback(async () => {
     if (!stageRef.current) return
-    // In trial mode, redirect to buy instead of downloading
-    if (isTrial) {
-      navigate('/bulk')
-      return
-    }
-    const { isCompanyUnlocked: compUnlocked, personalOrderStatus, temporarilyUnlocked: freeUnlocked } = protectionStateRef.current
-    if (!compUnlocked && !freeUnlocked) {
-      if (personalOrderStatus === 'paid') {
-        personalDownloadRef.current?.()
-      } else {
-        toast.error('التحميل متاح بعد الدفع فقط.')
-        logProtectedActionRef.current('download_before_payment', { format: 'png' })
-      }
-      return
-    }
     try {
       const uri = stageRef.current.toDataURL({ pixelRatio: 4 })
       const link = document.createElement('a')
@@ -1586,12 +1566,6 @@ function EditorPageInner() {
 
   const handleExportPDF = useCallback(async () => {
     if (!stageRef.current) return
-    const { isCompanyUnlocked: compUnlocked, temporarilyUnlocked: freeUnlocked } = protectionStateRef.current
-    if (!compUnlocked && !freeUnlocked) {
-      toast.error('تحميل PDF متاح بعد الدفع فقط.')
-      logProtectedActionRef.current('download_before_payment', { format: 'pdf' })
-      return
-    }
     try {
       const { jsPDF } = await import('jspdf')
       const uri = stageRef.current.toDataURL({ pixelRatio: 4 })
@@ -1605,12 +1579,6 @@ function EditorPageInner() {
 
   const handleShareWhatsApp = useCallback(async () => {
     if (!stageRef.current) return
-    const { isCompanyUnlocked: compUnlocked, temporarilyUnlocked: freeUnlocked } = protectionStateRef.current
-    if (!compUnlocked && !freeUnlocked) {
-      toast.error('المشاركة متاحة بعد الدفع فقط.')
-      logProtectedActionRef.current('download_before_payment', { action: 'share_whatsapp' })
-      return
-    }
     try {
       const uri = getCanvasDataURL()
       const res = await fetch(uri)
@@ -1627,12 +1595,6 @@ function EditorPageInner() {
 
   const handleCopyImage = useCallback(async () => {
     if (!stageRef.current) return
-    const { isCompanyUnlocked: compUnlocked, temporarilyUnlocked: freeUnlocked } = protectionStateRef.current
-    if (!compUnlocked && !freeUnlocked) {
-      toast.error('نسخ الصورة متاح بعد الدفع فقط.')
-      logProtectedActionRef.current('download_before_payment', { action: 'copy_image' })
-      return
-    }
     try {
       const uri = getCanvasDataURL()
       const res = await fetch(uri)
@@ -1646,12 +1608,6 @@ function EditorPageInner() {
 
   const handleShareNative = useCallback(async () => {
     if (!stageRef.current) return
-    const { isCompanyUnlocked: compUnlocked, temporarilyUnlocked: freeUnlocked } = protectionStateRef.current
-    if (!compUnlocked && !freeUnlocked) {
-      toast.error('المشاركة متاحة بعد الدفع فقط.')
-      logProtectedActionRef.current('download_before_payment', { action: 'share_native' })
-      return
-    }
     try {
       const uri = getCanvasDataURL()
       const res = await fetch(uri)
@@ -1742,340 +1698,15 @@ function EditorPageInner() {
     { id: 'text', label: 'النصوص', icon: <BsChatLeftText size={20} />, tip: 'عدّل نصوص البطاقة' },
     { id: 'style', label: 'التنسيق', icon: <HiOutlineColorSwatch size={20} />, tip: 'تحكم بالألوان والخطوط' },
   ]
-  const renderProtectionOverlay = () => {
-    if (!isPreviewProtected) return null
+  const renderProtectionOverlay = () => null
 
-    return (
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        borderRadius: 16,
-        overflow: 'hidden',
-        pointerEvents: 'none',
-        background: protectionFlash ? 'rgba(15, 23, 42, 0.86)' : 'linear-gradient(180deg, rgba(15,23,42,0.18), rgba(15,23,42,0.28))',
-        zIndex: 4,
-      }}>
-        <div style={{
-          position: 'absolute',
-          inset: '-20%',
-          display: 'grid',
-          placeItems: 'center',
-          transform: 'rotate(-24deg)',
-          opacity: 0.22,
-          fontSize: stageSize.width > 480 ? 34 : 24,
-          fontWeight: 900,
-          color: '#ffffff',
-          letterSpacing: 2,
-          lineHeight: 2.3,
-          whiteSpace: 'pre-line',
-        }}>
-          {`معاينة محمية\nالتحميل متاح بعد الدفع فقط\n\nمعاينة محمية\nالتحميل متاح بعد الدفع فقط\n\nمعاينة محمية`}
-        </div>
-        <div style={{
-          position: 'absolute',
-          left: 12,
-          right: 12,
-          bottom: 12,
-          padding: '12px 16px',
-          borderRadius: 14,
-          background: 'rgba(15, 23, 42, 0.82)',
-          color: '#fff',
-          textAlign: 'center',
-          boxShadow: '0 10px 30px rgba(15, 23, 42, 0.24)',
-        }}>
-          <div style={{ fontSize: 13, fontWeight: 900, marginBottom: 4 }}>التحميل متاح بعد الدفع فقط</div>
-          <div style={{ fontSize: 11, lineHeight: 1.6, opacity: 0.85 }}>يمكنك تعديل البطاقة الآن، لكن التصدير مقفول حتى إتمام الدفع.</div>
-        </div>
-      </div>
-    )
-  }
-
-  const renderPersonalCheckoutCard = (compact = false) => {
-    if (isCompanyUnlocked) return null
-
-    if (activePersonalOrder?.status === 'paid') {
-      return (
-        <div style={{
-          background: '#f8fafc',
-          border: '1px solid #e2e8f0',
-          borderRadius: 18,
-          padding: compact ? 16 : 20,
-          textAlign: 'center',
-        }}>
-          <p style={{ margin: '0 0 8px', fontSize: compact ? 15 : 16, fontWeight: 800, color: '#0f172a' }}>
-            تم الدفع بنجاح ✅
-          </p>
-          <p style={{ margin: '0 0 16px', fontSize: 12, color: '#64748b', lineHeight: 1.8 }}>
-            نهنئكم بحلول عيد الفطر المبارك 🌙
-            <br />
-            سيبدأ التحميل تلقائياً. إن لم يبدأ، استخدم الزر التالي مرة واحدة.
-          </p>
-          <button onClick={handlePersonalDownload} disabled={processingPersonalOrder} style={{
-            width: '100%',
-            padding: '14px 18px',
-            borderRadius: 14,
-            border: 'none',
-            background: '#0f172a',
-            color: '#fff',
-            fontSize: 15,
-            fontWeight: 800,
-            cursor: processingPersonalOrder ? 'not-allowed' : 'pointer',
-            opacity: processingPersonalOrder ? 0.7 : 1,
-            fontFamily: ds.font,
-          }}>
-            {processingPersonalOrder ? 'جارٍ التحميل...' : 'تحميل بطاقتي فورًا'}
-          </button>
-        </div>
-      )
-    }
-
-    if (activePersonalOrder?.status === 'consumed') {
-      return (
-        <div style={{
-          background: '#f0fdf4',
-          border: '1px solid #bbf7d0',
-          borderRadius: 18,
-          padding: compact ? 16 : 20,
-          textAlign: 'center',
-        }}>
-          <p style={{ margin: '0 0 8px', fontSize: compact ? 15 : 16, fontWeight: 900, color: '#166534' }}>
-            تم تحميل البطاقة بالفعل ✅
-          </p>
-          <p style={{ margin: 0, fontSize: 12, color: '#166534', lineHeight: 1.8 }}>
-            كل عملية شراء مخصصة لتحميل واحد فقط. للمساعدة: {SUPPORT_CONTACT}
-          </p>
-        </div>
-      )
-    }
-
-    return (
-      <div style={{
-        width: '100%',
-        background: '#fffaf0',
-        border: '1px solid #f4d7a4',
-        borderRadius: 18,
-        padding: compact ? 16 : 20,
-        textAlign: 'center',
-      }}>
-        <p style={{ margin: '0 0 10px', fontSize: compact ? 15 : 16, fontWeight: 900, color: '#92400e' }}>
-          شراء فردي
-        </p>
-        <p style={{ margin: '0 0 12px', fontSize: compact ? 28 : 34, fontWeight: 900, color: '#0f172a' }}>
-          {currentTemplate?.price || PERSONAL_CARD_PRICE} <span style={{ fontSize: compact ? 16 : 18 }}>ر.س</span>
-        </p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-          {['VISA', 'MADA', 'Mastercard'].map(method => (
-            <span key={method} style={{
-              padding: '6px 10px',
-              borderRadius: 999,
-              background: '#fff',
-              border: '1px solid #e5e7eb',
-              fontSize: 11,
-              fontWeight: 900,
-              color: '#0f172a',
-            }}>
-              {method}
-            </span>
-          ))}
-        </div>
-        <div style={{
-          marginBottom: 12,
-          padding: '12px 14px',
-          borderRadius: 14,
-          background: '#f8fafc',
-          border: '1px solid #e2e8f0',
-          color: '#334155',
-          fontSize: 12,
-          lineHeight: 1.9,
-          textAlign: 'right',
-        }}>
-          لن نطلب منك إدخال بيانات البطاقة هنا.
-          <br />
-          عند الضغط على الدفع سيتم تحويلك مباشرة إلى بوابة دفع آمنة لإتمام العملية.
-        </div>
-        {personalPaymentError && (
-          <div style={{
-            margin: '0 0 12px',
-            padding: '10px 12px',
-            borderRadius: 14,
-            background: '#fff1f2',
-            border: '1px solid #fecdd3',
-            color: '#9f1239',
-            fontSize: 12,
-            lineHeight: 1.8,
-            textAlign: 'right',
-          }}>
-            {personalPaymentError}
-          </div>
-        )}
-        <p style={{ margin: '0 0 16px', fontSize: 12, color: '#92400e', lineHeight: 1.9 }}>
-          اكتب الاسم أولاً، ثم ادفع عبر البوابة الآمنة، وبعد التأكيد سيظهر التحميل فوراً.
-        </p>
-        <button onClick={startPersonalCheckout} disabled={processingPersonalOrder} style={{
-          width: '100%',
-          padding: '14px 18px',
-          borderRadius: 14,
-          border: 'none',
-          background: '#0f172a',
-          color: '#fff',
-          fontSize: 15,
-          fontWeight: 800,
-          cursor: processingPersonalOrder ? 'not-allowed' : 'pointer',
-          opacity: processingPersonalOrder ? 0.7 : 1,
-          fontFamily: ds.font,
-        }}>
-          {processingPersonalOrder ? 'جارٍ التحويل...' : 'متابعة إلى الدفع الآمن'}
-        </button>
-      </div>
-    )
-  }
+  const renderPersonalCheckoutCard = () => null
   return (
     <div style={{ fontFamily: ds.font, background: '#f5f5f5', minHeight: '100vh', paddingTop: 0 }}>
       <Toaster position="top-center" toastOptions={{
         style: { background: '#1a1a1a', color: '#fff', borderRadius: 12, fontFamily: ds.font, fontSize: 14, padding: '12px 20px' }
       }} />
-      {showProtectionNotice && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(15, 23, 42, 0.72)',
-          backdropFilter: 'blur(10px)',
-          zIndex: 90,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 20,
-        }}>
-          <div style={{
-            width: '100%',
-            maxWidth: 520,
-            background: '#fff',
-            borderRadius: 28,
-            padding: '32px 28px',
-            textAlign: 'center',
-            boxShadow: '0 24px 80px rgba(15, 23, 42, 0.24)',
-          }}>
-            <div style={{ width: 64, height: 64, borderRadius: 20, background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px', color: '#0f172a' }}>
-              <BsInfoCircle size={26} />
-            </div>
-            <p style={{ margin: '0 0 22px', fontSize: 18, fontWeight: 800, color: '#111827', lineHeight: 1.9 }}>
-              يمكنك تعديل البطاقة بحرية الآن.
-              <br />
-              التحميل/التصدير متاح بعد الدفع فقط.
-              <br />
-              شكراً لتفهمك.
-            </p>
-            <button
-              onClick={() => {
-                sessionStorage.setItem(PREVIEW_NOTICE_KEY, 'true')
-                setShowProtectionNotice(false)
-              }}
-              style={{
-                border: 'none',
-                borderRadius: 16,
-                background: '#0f172a',
-                color: '#fff',
-                fontSize: 15,
-                fontWeight: 800,
-                padding: '14px 24px',
-                cursor: 'pointer',
-                fontFamily: ds.font,
-              }}
-            >
-              فهمت
-            </button>
-          </div>
-        </div>
-      )}
-      {showPaymentWarning && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(15, 23, 42, 0.72)',
-          backdropFilter: 'blur(10px)',
-          zIndex: 91,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 20,
-        }}>
-          <div style={{
-            width: '100%',
-            maxWidth: 460,
-            background: '#fff',
-            borderRadius: 28,
-            padding: '32px 28px',
-            textAlign: 'center',
-          }}>
-            <div style={{ width: 64, height: 64, borderRadius: 20, background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px', color: '#c2410c' }}>
-              <BsStars size={24} />
-            </div>
-            <p style={{ margin: '0 0 24px', fontSize: 18, fontWeight: 800, color: '#111827', lineHeight: 1.9 }}>
-              الاسم الذي أدخلته نهائي ولن يمكن تعديله بعد الدفع.
-            </p>
-            <div style={{ display: 'flex', gap: 12 }}>
-              <button
-                onClick={() => {
-                  pendingPersonalPurchaseRef.current = null
-                  setShowPaymentWarning(false)
-                }}
-                style={{
-                  flex: 1,
-                  border: '1px solid #e5e7eb',
-                  borderRadius: 16,
-                  background: '#fff',
-                  color: '#475569',
-                  fontSize: 15,
-                  fontWeight: 700,
-                  padding: '14px 16px',
-                  cursor: 'pointer',
-                  fontFamily: ds.font,
-                }}
-              >
-                رجوع
-              </button>
-              <button
-                onClick={confirmPaymentWarning}
-                style={{
-                  flex: 1,
-                  border: 'none',
-                  borderRadius: 16,
-                  background: '#0f172a',
-                  color: '#fff',
-                  fontSize: 15,
-                  fontWeight: 800,
-                  padding: '14px 16px',
-                  cursor: 'pointer',
-                  fontFamily: ds.font,
-                }}
-              >
-                متابعة الدفع
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Trial Banner */}
-      {isTrial && (
-        <div style={{
-          background: '#fef9c3', borderBottom: '1px solid #fde047',
-          padding: '10px 20px', display: 'flex', alignItems: 'center',
-          justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
-          fontFamily: ds.font, direction: 'rtl',
-        }}>
-          <span style={{ fontSize: 13, color: '#713f12', fontWeight: 600 }}>
-            وضع التجربة — لتحميل بطاقتك اشترِ باقة
-          </span>
-          <button
-            onClick={() => navigate('/bulk')}
-            style={{
-              padding: '7px 18px', background: '#7c3aed', color: '#fff', border: 'none',
-              borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: ds.font,
-            }}
-          >اشترِ الآن</button>
-        </div>
-      )}
 
       {/* ••• Header ••• */}
       <div style={{
@@ -2582,7 +2213,7 @@ function EditorPageInner() {
               </div>
 
               {/* Action Buttons */}
-              <div style={{ display: (isCompanyUnlocked || temporarilyUnlocked) ? 'flex' : 'none', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <Tooltip text="تحميل PNG">
                   <button onClick={handleExportPNG} style={{
                     display: 'flex', alignItems: 'center', gap: 10, padding: '14px 28px',
@@ -2627,7 +2258,7 @@ function EditorPageInner() {
                   </button>
                 </Tooltip>
               </div>
-              <div style={{ display: (isCompanyUnlocked || temporarilyUnlocked) ? 'flex' : 'none', gap: 10, justifyContent: 'center', marginTop: 10, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 10, flexWrap: 'wrap' }}>
                 <Tooltip text="تحميل PDF">
                   <button onClick={handleExportPDF} style={{
                     display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px',
@@ -2656,7 +2287,6 @@ function EditorPageInner() {
                   </button>
                 </Tooltip>
               </div>
-              {!isCompanyUnlocked && !temporarilyUnlocked && typeof renderPersonalCheckoutCard === 'function' && renderPersonalCheckoutCard()}
             </div>
           )}
         </div>
@@ -3316,255 +2946,50 @@ function EditorPageInner() {
             </div>
 
             {/* Generate Button */}
-            {isCompanyUnlocked ? (
-              <button
-                onClick={async () => {
-                  if (store.batchNames.length === 0) {
-                    toast.error('أدخل اسماً واحداً على الأقل')
-                    return
+            <button
+              onClick={async () => {
+                if (store.batchNames.length === 0) {
+                  toast.error('أدخل اسماً واحداً على الأقل')
+                  return
+                }
+                store.setBatchGenerating(true)
+                store.setGeneratedCards([])
+
+                for (let i = 0; i < store.batchNames.length; i++) {
+                  store.setBatchCurrentIndex(i)
+                  store.setBatchProgress(Math.round(((i + 1) / store.batchNames.length) * 100))
+                  store.setRecipientName(store.batchNames[i])
+                  await new Promise(resolve => setTimeout(resolve, 300))
+                  if (stageRef.current) {
+                    const dataUrl = stageRef.current.toDataURL({ pixelRatio: 3 })
+                    store.addGeneratedCard({ name: store.batchNames[i], dataUrl })
                   }
-                  store.setBatchGenerating(true)
-                  store.setGeneratedCards([])
+                }
 
-                  for (let i = 0; i < store.batchNames.length; i++) {
-                    store.setBatchCurrentIndex(i)
-                    store.setBatchProgress(Math.round(((i + 1) / store.batchNames.length) * 100))
-                    store.setRecipientName(store.batchNames[i])
-                    await new Promise(resolve => setTimeout(resolve, 300))
-                    if (stageRef.current) {
-                      const dataUrl = stageRef.current.toDataURL({ pixelRatio: 3 })
-                      store.addGeneratedCard({ name: store.batchNames[i], dataUrl })
-                    }
-                  }
-
-                  store.setBatchGenerating(false)
-                  toast.success(`تم إنشاء ${store.batchNames.length} بطاقة!`)
-                }}
-                disabled={store.batchGenerating || store.batchNames.length === 0}
-                style={{
-                  width: '100%', padding: '16px', borderRadius: 14, border: 'none',
-                  background: store.batchNames.length > 0 ? '#000' : '#ddd',
-                  color: '#fff', fontSize: 15, fontWeight: 700, cursor: store.batchNames.length > 0 ? 'pointer' : 'not-allowed',
-                  fontFamily: ds.font, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10
-                }}
-              >
-                {store.batchGenerating ? (
-                  <>
-                    <div style={{ width: 20, height: 20, border: '3px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                    جارٍ الإنشاء... {store.batchProgress}%
-                  </>
-                ) : (
-                  <><BsStars size={18} /> إنشاء البطاقات</>
-                )}
-              </button>
-            ) : (
-              <div style={{ borderRadius: 16, border: '1px solid #fde68a', background: '#fffbeb', padding: 16 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10, marginBottom: 10 }}>
-                  <div style={{ fontSize: 14, fontWeight: 900, color: '#92400e' }}>شراء إرسال جماعي</div>
-                  <div style={{ fontSize: 16, fontWeight: 900, color: '#0f172a' }}>
-                    {BATCH_ZIP_PRICE} <span style={{ fontSize: 12, fontWeight: 800, color: '#92400e' }}>ر.س</span> <span style={{ fontSize: 12, fontWeight: 900, color: '#0f172a' }}>≈</span> <span style={{ fontSize: 12, fontWeight: 900, color: '#0f172a' }}>${BATCH_PAYPAL_USD_PRICE}</span>
-                  </div>
-                </div>
-                <div style={{ fontSize: 12, lineHeight: 1.9, color: '#92400e', marginBottom: 12 }}>
-                  حتى {batchMaxRecipients} اسم.
-                </div>
-
-                <div style={{ display: 'grid', gap: 10, marginBottom: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                    <div style={{ fontSize: 13, fontWeight: 900, color: '#0f172a' }}>كود الشركة</div>
-                    {licenseActive && (
-                      <div style={{ fontSize: 12, fontWeight: 900, color: '#166534' }}>مفعل</div>
-                    )}
-                  </div>
-                  {!licenseActive && (
-                    <div style={{ display: 'grid', gap: 10 }}>
-                      <input
-                        type="text"
-                        value={licenseCode}
-                        onChange={(e) => setLicenseCode(e.target.value)}
-                        placeholder="اكتب كود التفعيل"
-                        disabled={processingBatchOrder || store.batchGenerating}
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-slate-900"
-                      />
-                      {licenseError && (
-                        <div style={{
-                          padding: '10px 12px',
-                          borderRadius: 14,
-                          background: '#fff1f2',
-                          border: '1px solid #fecdd3',
-                          color: '#9f1239',
-                          fontSize: 12,
-                          lineHeight: 1.8,
-                          textAlign: 'right',
-                        }}>
-                          {licenseError}
-                        </div>
-                      )}
-                      <button
-                        type="button"
-                        onClick={activateLicenseCode}
-                        disabled={processingBatchOrder || store.batchGenerating || !licenseCode.trim()}
-                        style={{
-                          width: '100%',
-                          padding: '12px 14px',
-                          borderRadius: 14,
-                          border: 'none',
-                          background: '#0f172a',
-                          color: '#fff',
-                          fontSize: 13,
-                          fontWeight: 900,
-                          cursor: (!licenseCode.trim() || processingBatchOrder || store.batchGenerating) ? 'not-allowed' : 'pointer',
-                          opacity: (!licenseCode.trim() || processingBatchOrder || store.batchGenerating) ? 0.7 : 1,
-                          fontFamily: ds.font,
-                        }}
-                      >
-                        تفعيل الكود
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {licenseActive ? (
-                  <button
-                    onClick={executeBatchPurchase}
-                    disabled={processingBatchOrder || store.batchGenerating}
-                    style={{
-                      width: '100%',
-                      padding: '14px 18px',
-                      borderRadius: 14,
-                      border: 'none',
-                      background: '#0f172a',
-                      color: '#fff',
-                      fontSize: 15,
-                      fontWeight: 800,
-                      cursor: (processingBatchOrder || store.batchGenerating) ? 'not-allowed' : 'pointer',
-                      opacity: (processingBatchOrder || store.batchGenerating) ? 0.7 : 1,
-                      fontFamily: ds.font,
-                    }}
-                  >
-                    {processingBatchOrder ? 'جارٍ التحضير...' : 'تجهيز وتحميل ZIP'}
-                  </button>
-                ) : activeBatchOrder?.status === 'consumed' ? (
-                  <div style={{ padding: '10px 12px', borderRadius: 14, background: '#ecfdf5', border: '1px solid #bbf7d0', color: '#166534', fontSize: 12, lineHeight: 1.9 }}>
-                    تم تحميل ملف ZIP بالفعل. كل عملية شراء مخصصة لتحميل واحد فقط. للمساعدة: {SUPPORT_CONTACT}
-                  </div>
-                ) : activeBatchOrder?.status === 'paid' ? (
-                  <>
-                    <div style={{ padding: '10px 12px', borderRadius: 14, background: '#ecfdf5', border: '1px solid #bbf7d0', color: '#166534', fontSize: 12, lineHeight: 1.9, marginBottom: 12 }}>
-                      تم الدفع بنجاح. حمّل ملف ZIP الآن (تحميل مرة واحدة فقط).
-                    </div>
-
-                    {batchPaymentError && (
-                      <div style={{
-                        margin: '0 0 12px',
-                        padding: '10px 12px',
-                        borderRadius: 14,
-                        background: '#fff1f2',
-                        border: '1px solid #fecdd3',
-                        color: '#9f1239',
-                        fontSize: 12,
-                        lineHeight: 1.8,
-                        textAlign: 'right',
-                      }}>
-                        {batchPaymentError}
-                      </div>
-                    )}
-
-                    <button
-                      onClick={executeBatchPurchase}
-                      disabled={processingBatchOrder || store.batchGenerating}
-                      style={{
-                        width: '100%',
-                        padding: '14px 18px',
-                        borderRadius: 14,
-                        border: 'none',
-                        background: '#0f172a',
-                        color: '#fff',
-                        fontSize: 15,
-                        fontWeight: 800,
-                        cursor: (processingBatchOrder || store.batchGenerating) ? 'not-allowed' : 'pointer',
-                        opacity: (processingBatchOrder || store.batchGenerating) ? 0.7 : 1,
-                        fontFamily: ds.font,
-                      }}
-                    >
-                      {processingBatchOrder ? 'جارٍ التحضير...' : 'حمّل ZIP الآن'}
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: 12,
-                      padding: '10px 12px',
-                      borderRadius: 14,
-                      background: '#fff',
-                      border: '1px solid #e2e8f0',
-                      marginBottom: 12,
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <img
-                          src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg"
-                          alt="PayPal"
-                          style={{ width: 37, height: 23, display: 'block' }}
-                        />
-                        <div style={{ fontSize: 13, fontWeight: 900, color: '#0f172a' }}>الدفع عبر بايبال</div>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'grid', gap: 10 }}>
-                      <div>
-                        <style>{`.pp-K7978QWGA8CHJ{text-align:center;border:none;border-radius:0.25rem;min-width:11.625rem;padding:0 2rem;height:2.625rem;font-weight:bold;background-color:#FFD140;color:#000000;font-family:"Helvetica Neue",Arial,sans-serif;font-size:1rem;line-height:1.25rem;cursor:pointer;}`}</style>
-                        <form
-                          action="https://www.paypal.com/ncp/payment/K7978QWGA8CHJ"
-                          method="post"
-                          target="_blank"
-                          style={{ display: 'inline-grid', justifyItems: 'center', alignContent: 'start', gap: '0.5rem', width: '100%' }}
-                        >
-                          <input className="pp-K7978QWGA8CHJ" type="submit" value="ادفع ببايبال ($21)" />
-                          <img src="https://www.paypalobjects.com/images/Debit_Credit.svg" alt="cards" />
-                          <section style={{ fontSize: '0.75rem' }}>
-                            مدعوم من{' '}
-                            <img
-                              src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg"
-                              alt="paypal"
-                              style={{ height: '0.875rem', verticalAlign: 'middle' }}
-                            />
-                          </section>
-                        </form>
-                      </div>
-
-                      <a
-                        href={buildWhatsAppSupportUrl('أريد كود تفعيل للجماعي')}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          display: 'block',
-                          width: '100%',
-                          padding: '14px 18px',
-                          borderRadius: 14,
-                          border: '1px solid #e2e8f0',
-                          background: '#fff',
-                          color: '#0f172a',
-                          fontSize: 15,
-                          fontWeight: 900,
-                          textDecoration: 'none',
-                          textAlign: 'center',
-                          fontFamily: ds.font,
-                        }}
-                      >
-                        الدفع بكود تفعيل
-                      </a>
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
+                store.setBatchGenerating(false)
+                toast.success(`تم إنشاء ${store.batchNames.length} بطاقة!`)
+              }}
+              disabled={store.batchGenerating || store.batchNames.length === 0}
+              style={{
+                width: '100%', padding: '16px', borderRadius: 14, border: 'none',
+                background: store.batchNames.length > 0 ? '#000' : '#ddd',
+                color: '#fff', fontSize: 15, fontWeight: 700, cursor: store.batchNames.length > 0 ? 'pointer' : 'not-allowed',
+                fontFamily: ds.font, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10
+              }}
+            >
+              {store.batchGenerating ? (
+                <>
+                  <div style={{ width: 20, height: 20, border: '3px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                  جارٍ الإنشاء... {store.batchProgress}%
+                </>
+              ) : (
+                <><BsStars size={18} /> إنشاء البطاقات</>
+              )}
+            </button>
           </div>
 
           {/* Generated Cards */}
-          {isCompanyUnlocked && store.generatedCards.length > 0 && !store.batchGenerating && (
+          {store.generatedCards.length > 0 && !store.batchGenerating && (
             <div style={{ background: '#fff', borderRadius: 20, padding: 24, boxShadow: ds.shadow.sm }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <h4 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>البطاقات المُولّدة ({store.generatedCards.length})</h4>
@@ -3727,19 +3152,24 @@ function EditorPageInner() {
           </div>
         </div>
 
-        {/* Upload Button - Paid Feature (35 SAR) */}
-        <div
-          onClick={() => navigate('/checkout?product=custom-design&price=35&name=' + encodeURIComponent('رفع تصميم خاص'))}
+        {/* Upload Custom Background */}
+        <label
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%',
             padding: '16px', background: 'linear-gradient(135deg, #f9f6ef, #fdf8ee)', border: '2px dashed #d4af37', borderRadius: 14,
-            cursor: 'pointer', marginBottom: 20, transition: 'all 200ms', fontFamily: ds.font, position: 'relative'
+            cursor: 'pointer', marginBottom: 20, transition: 'all 200ms', fontFamily: ds.font, position: 'relative', boxSizing: 'border-box'
           }}
         >
           <BsPlusLg size={16} color="#b8860b" />
           <span style={{ fontSize: 14, fontWeight: 600, color: '#b8860b' }}>رفع تصميم خاص</span>
-          <span style={{ fontSize: 12, fontWeight: 800, color: '#fff', background: '#b8860b', padding: '3px 10px', borderRadius: 6 }}>35 ر.س</span>
-        </div>
+          <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
+            const file = e.target.files?.[0]
+            if (!file) return
+            const reader = new FileReader()
+            reader.onload = (ev) => { if (ev.target?.result) store.setBackgroundImage(ev.target.result) }
+            reader.readAsDataURL(file)
+          }} />
+        </label>
 
         {/* Templates Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>

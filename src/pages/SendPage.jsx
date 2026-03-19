@@ -663,11 +663,11 @@ export default function SendPage() {
               )}
 
               <Link
-                to="/pricing"
+                to="/editor"
                 className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl border border-purple-500/30 text-purple-300 font-medium hover:bg-purple-500/10 transition-all"
               >
                 <BsSend />
-                الترقية للحصول عليها
+                اذهب إلى المحرر
               </Link>
             </div>
           </div>
