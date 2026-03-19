@@ -1975,7 +1975,7 @@ function EditorPageInner() {
                       color: '#fff', fontSize: 9, fontWeight: 800, fontFamily: ds.font,
                       backdropFilter: 'blur(4px)'
                     }}>
-                      {isFreeT ? 'مجاني' : 'مدفوع'}
+                      مجاني
                     </div>
                     {store.selectedTemplate === t.id && (
                       <div style={{ position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: '50%', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

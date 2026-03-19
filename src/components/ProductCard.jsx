@@ -21,8 +21,6 @@ const ProductCard = ({
     if (isFree) {
       navigate(`/editor?template=${id}&free=1`);
     } else {
-      const confirmed = window.confirm('هذه بطاقة مدفوعة. هل تريد المتابعة إلى تأكيد الشراء؟');
-      if (!confirmed) return;
       navigate(`/checkout?product=template&templateId=${id}&price=${price}&name=${encodeURIComponent(name)}`);
     }
   };
@@ -73,7 +71,7 @@ const ProductCard = ({
           <Star size={12} className="fill-amber-400 text-amber-400" />
           <span className="text-xs font-bold text-slate-600">{rating.toFixed(1)}</span>
           {!isFree && (
-            <span className="mr-auto text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">مدفوع</span>
+            <span className="mr-auto text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">مجاني</span>
           )}
         </div>
 

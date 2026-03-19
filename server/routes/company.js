@@ -118,17 +118,16 @@ router.post('/register-free', activationLimiter, async (req, res) => {
     const existing = await Company.findOne({ email })
     if (existing) return res.status(409).json({ success: false, error: 'البريد الإلكتروني مسجّل مسبقاً' })
 
-    const hashedPassword = await bcrypt.hash(password, 12)
     const slug = nanoid(10).toLowerCase()
 
     const company = new Company({
       name: companyName,
       email,
       slug,
-      password: hashedPassword,
+      password,
       status: 'active',
       isActive: true,
-      cardLimit: 500,
+      cardsLimit: 500,
       cardsUsed: 0,
     })
 
@@ -137,7 +136,7 @@ router.post('/register-free', activationLimiter, async (req, res) => {
     // Send Eid welcome email (non-blocking)
     sendEidWelcomeEmail({ to: email, companyName }).catch(err => console.error('[Email] Eid welcome failed:', err))
 
-    const token = jwt.sign({ companyId: company._id, type: 'company' }, JWT_SECRET, { expiresIn: '90d' })
+    const token = jwt.sign({ id: company._id, role: company.role }, JWT_SECRET, { expiresIn: '90d' })
 
     return res.status(201).json({
       success: true,

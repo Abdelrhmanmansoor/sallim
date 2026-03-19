@@ -87,16 +87,10 @@ export default function CompanyLoginPage() {
             </button>
           </form>
 
-          <div style={{ marginTop: 24, paddingTop: 24, borderTop: '1px solid #f0f4f8', display: 'grid', gap: 10 }}>
-            <p style={{ fontSize: 13, color: '#6b7280', textAlign: 'center', margin: '0 0 4px' }}>ليس لديك حساب بعد؟</p>
-            <Link to="/company-activation" style={{ display: 'block', padding: '12px', background: '#f5f3ff', color: '#7c3aed', borderRadius: 12, textAlign: 'center', textDecoration: 'none', fontSize: 14, fontWeight: 700, border: '1px solid #e9d5ff' }}>
-              تفعيل كود الاشتراك
-            </Link>
-            <Link to="/companies" style={{ display: 'block', padding: '12px', background: '#f9fafb', color: '#374151', borderRadius: 12, textAlign: 'center', textDecoration: 'none', fontSize: 13, fontWeight: 600, border: '1px solid #e5e7eb' }}>
-              اطلع على الباقات
-            </Link>
-            <Link to="/company-access" style={{ display: 'block', padding: '12px', background: '#eef2ff', color: '#3730a3', borderRadius: 12, textAlign: 'center', textDecoration: 'none', fontSize: 13, fontWeight: 700, border: '1px solid #c7d2fe' }}>
-              دخول بكود الشركة
+          <div style={{ marginTop: 24, paddingTop: 24, borderTop: '1px solid #f0f4f8' }}>
+            <p style={{ fontSize: 13, color: '#6b7280', textAlign: 'center', margin: '0 0 12px' }}>ليس لديك حساب بعد؟</p>
+            <Link to="/company-activation" style={{ display: 'block', padding: '14px', background: 'linear-gradient(135deg,#6366f1,#7c3aed)', color: '#fff', borderRadius: 12, textAlign: 'center', textDecoration: 'none', fontSize: 15, fontWeight: 800, boxShadow: '0 4px 14px rgba(124,58,237,0.3)' }}>
+              🎉 أنشئ حساباً مجاناً — 500 رسالة ببلاش
             </Link>
           </div>
         </div>
