@@ -590,8 +590,6 @@ function BatchCardsView({ company, token, isDepleted, remaining }) {
 
                                     {/* Y position */}
                                     <div>
-                                        <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 6 }}>موضع الاسم: {Math.round(nameY * 100)}%</label>
-                                        <input type="range" min={20} max={90} value={Math.round(nameY * 100)} onChange={e => setNameY(Number(e.target.value) / 100)} style={{ width: '100%' }} />
                                     </div>
                                 </div>
                             </div>
@@ -975,8 +973,6 @@ function EmployeeLinkView({ company, token, isDepleted }) {
                                             <input type="range" min={20} max={120} value={linkFontSize} onChange={e => setLinkFontSize(Number(e.target.value))} style={{ width: '100%' }} />
                                         </div>
                                         <div>
-                                            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: C.muted, marginBottom: 4 }}>موضع: {Math.round(linkNameY * 100)}%</label>
-                                            <input type="range" min={20} max={90} value={Math.round(linkNameY * 100)} onChange={e => setLinkNameY(Number(e.target.value) / 100)} style={{ width: '100%' }} />
                                         </div>
                                     </div>
                                     <div>
