@@ -305,10 +305,7 @@ export default function GreetPage() {
                 setTimeout(() => {
                     setImageStatus('loading')
                     setImageCacheBuster((cb) => cb + 1 || 1)
-                }, 200)
-            } else if (!isFallbackTemplate && fallbackTemplateUrl) {
-                setIsFallbackTemplate(true)
-                setTemplateImage(fallbackTemplateUrl)
+                }, 400)
             } else {
                 setImageStatus('error')
             }
@@ -317,20 +314,18 @@ export default function GreetPage() {
     }
 
     const handleRetryImage = () => {
-        if (primaryTemplateImage && isFallbackTemplate) {
+        if (primaryTemplateImage) {
             setIsFallbackTemplate(false)
             setTemplateImage(primaryTemplateImage)
+            setImageStatus('loading')
+            setAutoRetryCount(0)
+            setImageCacheBuster(0)
             return
         }
         if (templateImage) {
             setImageStatus('loading')
             setAutoRetryCount(0)
             setImageCacheBuster((cb) => cb + 1 || 1)
-        } else if (primaryTemplateImage) {
-            setTemplateImage(primaryTemplateImage)
-        } else if (fallbackTemplateUrl) {
-            setTemplateImage(fallbackTemplateUrl)
-            setIsFallbackTemplate(true)
         }
     }
 
@@ -535,22 +530,6 @@ export default function GreetPage() {
                                             letterSpacing: 0.5,
                                         }}>
                                             جارٍ تحميل القالب...
-                                        </div>
-                                    )}
-                                    {isFallbackTemplate && imageStatus !== 'loading' && (
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: 12,
-                                            left: 12,
-                                            padding: '4px 12px',
-                                            borderRadius: 999,
-                                            background: 'rgba(13,51,32,0.85)',
-                                            color: '#fefce8',
-                                            fontSize: 11,
-                                            fontWeight: 700,
-                                            letterSpacing: 0.5,
-                                        }}>
-                                            قالب احتياطي
                                         </div>
                                     )}
                                 </>
@@ -788,21 +767,6 @@ export default function GreetPage() {
                                         fontWeight: 700,
                                     }}>
                                         جارٍ تحميل القالب...
-                                    </div>
-                                )}
-                                {isFallbackTemplate && imageStatus !== 'loading' && (
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: 12,
-                                        left: 12,
-                                        padding: '4px 12px',
-                                        borderRadius: 999,
-                                        background: 'rgba(15,23,42,0.8)',
-                                        color: '#f8fafc',
-                                        fontSize: 11,
-                                        fontWeight: 700,
-                                    }}>
-                                        قالب احتياطي
                                     </div>
                                 )}
                             </>

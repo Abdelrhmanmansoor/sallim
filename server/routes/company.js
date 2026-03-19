@@ -870,20 +870,19 @@ router.get('/greet-links/:shortId', async (req, res) => {
     // Fetch company branding
     const company = await Company.findById(link.companyId).select('name logoUrl slug').lean()
     
-    // Get template image - if not on Cloudinary, upload it now (lazy migration)
+    // Get template image - if not on Cloudinary, upload it now and save for future
     let templateImage = link.templateImage || ''
     if (templateImage && !templateImage.includes('cloudinary.com') && !templateImage.includes('res.cloudinary')) {
       // Convert relative to absolute first
       if (!templateImage.startsWith('http')) {
         templateImage = `https://www.sallim.co${templateImage.startsWith('/') ? '' : '/'}${templateImage}`
       }
-      // Upload to Cloudinary in background (lazy migration)
-      uploadToCloudinary(templateImage).then(cloudinaryUrl => {
-        if (cloudinaryUrl !== templateImage) {
-          // Update the record with Cloudinary URL for future requests
-          GreetLink.findByIdAndUpdate(link._id, { templateImage: cloudinaryUrl }).catch(() => {})
-        }
-      }).catch(() => {})
+      // Upload to Cloudinary synchronously so user gets the fast CDN URL immediately
+      const cloudinaryUrl = await uploadToCloudinary(templateImage)
+      if (cloudinaryUrl !== templateImage) {
+        templateImage = cloudinaryUrl
+        GreetLink.findByIdAndUpdate(link._id, { templateImage: cloudinaryUrl }).catch(() => {})
+      }
     }
     console.log('[greet-links GET] returning templateImage:', templateImage)
     
