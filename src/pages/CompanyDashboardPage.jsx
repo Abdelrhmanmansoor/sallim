@@ -758,8 +758,6 @@ function EmployeeLinkView({ company, token, isDepleted }) {
         const templateImgRaw = selectedTemplate.image || selectedTemplate.imageUrl || selectedTemplate.template || ''
         if (!templateImgRaw) { toast.error('القالب المختار لا يحتوي على صورة'); return }
         const templateImgAbs = templateImgRaw.startsWith('http') ? templateImgRaw : `${window.location.origin}${templateImgRaw}`
-        // Convert to data URL so Cloudinary upload works even for Arabic-path static templates
-        const templateImg = await fetchImageAsDataUrl(templateImgAbs)
 
         try {
             const res = await fetch(`${API_BASE}/api/v1/company/greet-links`, {
@@ -770,7 +768,7 @@ function EmployeeLinkView({ company, token, isDepleted }) {
                     greetingText: greetingText.trim(),
                     customCompanyName: customCompanyName.trim() || company?.name || '',
                     templateId: String(selectedTemplate.id || selectedTemplate._id || ''),
-                    templateImage: templateImg,
+                    templateImage: templateImgAbs,
                     templateTextColor: selectedTemplate.textColor || '#ffffff',
                     font: selectedFont,
                     fontSize: linkFontSize,
@@ -799,7 +797,6 @@ function EmployeeLinkView({ company, token, isDepleted }) {
         const templateImgRaw = selectedTemplate.image || selectedTemplate.imageUrl || selectedTemplate.template || ''
         if (!templateImgRaw) { toast.error('القالب المختار لا يحتوي على صورة'); return }
         const templateImgAbs = templateImgRaw.startsWith('http') ? templateImgRaw : `${window.location.origin}${templateImgRaw}`
-        const templateImg = await fetchImageAsDataUrl(templateImgAbs)
 
         try {
             const res = await fetch(`${API_BASE}/api/v1/company/greet-links`, {
@@ -810,7 +807,7 @@ function EmployeeLinkView({ company, token, isDepleted }) {
                     greetingText: greetingText.trim(),
                     customCompanyName: customCompanyName.trim() || company?.name || '',
                     templateId: String(selectedTemplate.id || selectedTemplate._id || ''),
-                    templateImage: templateImg,
+                    templateImage: templateImgAbs,
                     templateTextColor: selectedTemplate.textColor || '#ffffff',
                     font: selectedFont,
                     fontSize: linkFontSize,
